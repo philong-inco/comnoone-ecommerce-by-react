@@ -21,6 +21,7 @@ const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const ComNo1PageDemo = Loadable(lazy(() => import('views/utilities/ComNo1PageDemo.jsx')));
+const DanhSachPhieuGiamGia = Loadable(lazy(() => import('views/pages/phieugiamgia/DanhSach.jsx')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -171,19 +172,19 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: <ErrorBoundary><DanhSachPhieuGiamGia/></ErrorBoundary>
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: <ErrorBoundary><DanhSachPhieuGiamGia/></ErrorBoundary>
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: <ErrorBoundary><DanhSachPhieuGiamGia/></ErrorBoundary>
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: <ErrorBoundary><DanhSachPhieuGiamGia/></ErrorBoundary>
         }
       ]
     },

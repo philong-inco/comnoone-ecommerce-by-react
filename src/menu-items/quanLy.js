@@ -1,6 +1,6 @@
-import { IconReceipt2 } from '@tabler/icons-react';
+import { IconReceipt2, IconBox, IconUserCircle, IconDiscount } from '@tabler/icons-react';
 
-const icons = { IconReceipt2};
+const icons = { IconReceipt2, IconBox, IconUserCircle, IconDiscount};
 
 const quanLy = {
     id: 'quanly',
@@ -33,7 +33,7 @@ const quanLy = {
             id: 'sanpham',
             title: 'Quản lý sản phẩm',
             type: 'collapse',
-            icon: icons.IconReceipt2,
+            icon: icons.IconBox,
             children: [
                 {
                     id: 'sanpham',
@@ -101,7 +101,7 @@ const quanLy = {
             id: 'khuyenmai',
             title: 'Giảm giá',
             type: 'collapse',
-            icon: icons.IconReceipt2,
+            icon: icons.IconDiscount,
             children: [
                 {
                     id: 'dotgiamgia',
@@ -121,7 +121,7 @@ const quanLy = {
             id: 'taikhoan',
             title: 'Tài khoản',
             type: 'collapse',
-            icon: icons.IconReceipt2,
+            icon: icons.IconUserCircle,
             children: [
                 {
                     id: 'nhanvien',

@@ -1,6 +1,6 @@
-import { IconCoin } from '@tabler/icons-react';
+import { IconInfoSquare } from '@tabler/icons-react';
 
-const icons = { IconCoin };
+const icons = { IconInfoSquare };
 
 const chinhSach = {
     id: 'rule',
@@ -12,7 +12,7 @@ const chinhSach = {
             title: 'Chính sách bán hàng',
             type: 'item',
             url: '/chinhsach',
-            icon: icons.IconCoin,
+            icon: icons.IconInfoSquare,
             target: true
         }
     ]
