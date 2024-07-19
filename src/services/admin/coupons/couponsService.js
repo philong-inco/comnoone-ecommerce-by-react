@@ -12,7 +12,6 @@ import { get, post, patch, put, del } from 'utils/request';
 export const getPGGPage = async (page, size) => {
   try {
     const result = await get(`v1/coupons?page=${page - 1}&size=${size}`);
-    // console.log('GET response:', result)
     return result;
   } catch (error) {
     console.log('Error get :');

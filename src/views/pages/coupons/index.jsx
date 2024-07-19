@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -40,7 +40,6 @@ function PGGTable() {
     const response = await getPGGPage(page, size);
 
     if (response.status_code === 200) {
-      <Notification />;
       setListPhieuGiamGia(response.data.result);
       setCurrentPage(response.data.meta.page + 1);
       setSize(response.data.meta.pageSize);
@@ -93,6 +92,11 @@ function PGGTable() {
 
   return (
     <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
+      <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
+        <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
+          Add
+        </Button>
+      </Link>
       <TableContainer component={Paper}>
         <Table size="small" className="table">
           <TableHead>
@@ -120,7 +124,7 @@ function PGGTable() {
                 </TableCell>
                 <TableCell className="table-cell-small">
                   {record.loaiGiamGia === 1
-                    ? `${record.giaTriGiamGia}%`
+                    ? `${record.giaTriGiamGia} %`
                     : record.giaTriGiamGia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                 </TableCell>
                 <TableCell className="table-cell-small">
