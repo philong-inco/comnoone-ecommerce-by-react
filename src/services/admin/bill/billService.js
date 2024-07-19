@@ -3,7 +3,6 @@ import { get, post, del, patch, put } from '../utils/request';
 export const getBillFilter = async (page, size, path) => {
   try {
     const result = await get(`v1/bills/all?page=${page}&size=${size}&sort=id,DESC&filter=${path}`);
-
     return result;
   } catch (error) {
     console.error('Error fetching bill filter:', error);

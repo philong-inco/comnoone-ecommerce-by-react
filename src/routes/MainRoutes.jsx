@@ -5,7 +5,7 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ErrorBoundary from '../error/ErrorBoundary.jsx';
 import { element } from 'prop-types';
-
+import PGGTable from 'views/pages/coupons/index.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -33,16 +33,28 @@ const MainRoutes = {
       children: [
         {
           path: 'banhangtaiquay',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'choxacnhan',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-        },
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
+        }
 
         // Thêm các route add update detail ở đây
       ]
@@ -50,94 +62,134 @@ const MainRoutes = {
 
     // Sản phẩm
     {
-        path: 'sanpham',
-        children: [
-          {
-            path: 'danhsach',
-            element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-          },
-          {
-            path: 'ram',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'vga',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'cpu',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'manhinh',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'banphim',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'ocung',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'hedieuhanh',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'webcam',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'mausac',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          }
-        ]
+      path: 'sanpham',
+      children: [
+        {
+          path: 'danhsach',
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
+        },
+        {
+          path: 'ram',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'vga',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'cpu',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'manhinh',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'banphim',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'ocung',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'hedieuhanh',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'webcam',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'mausac',
+          children: [
+            {
+              path: 'danhsach',
+              element: (
+                <ErrorBoundary>
+                  <ComNo1PageDemo />
+                </ErrorBoundary>
+              )
+            } // Thêm các route add update detail ở đây
+          ]
+        }
+      ]
     },
 
     // Đợt giảm giá
@@ -146,24 +198,38 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
-
-   
 
     //Phiếu giảm giá
     {
@@ -171,23 +237,38 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <PGGTable />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
-
 
     // Nhân viên
     {
@@ -195,19 +276,35 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
@@ -218,19 +315,35 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
@@ -241,19 +354,35 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
@@ -264,34 +393,52 @@ const MainRoutes = {
       children: [
         {
           path: 'sanpham',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         },
         {
           path: 'doanhthu',
-          element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <ComNo1PageDemo />
+            </ErrorBoundary>
+          )
         }
       ]
     },
 
-
-
     // Default của giao diện cứ để lại đây sau làm thống kê
     {
       path: '/',
-      element: <ErrorBoundary><DashboardDefault /></ErrorBoundary>
+      element: (
+        <ErrorBoundary>
+          <DashboardDefault />
+        </ErrorBoundary>
+      )
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: <ErrorBoundary><DashboardDefault /></ErrorBoundary>
+          element: (
+            <ErrorBoundary>
+              <DashboardDefault />
+            </ErrorBoundary>
+          )
         }
       ]
     },
     {
       path: 'chinhsach',
-      element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
+      element: (
+        <ErrorBoundary>
+          <ComNo1PageDemo />
+        </ErrorBoundary>
+      )
     }
   ]
 };
