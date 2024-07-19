@@ -195,7 +195,7 @@ const MainRoutes = {
       path: 'nhanvien',
       children: [
         {
-          path: 'danhsach',
+          path: 'danhsachnhanvien',
           element: <ErrorBoundary><ComNo1PageDemo/></ErrorBoundary>
         },
         {
