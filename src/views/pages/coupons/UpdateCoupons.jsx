@@ -1,35 +1,36 @@
+import React, { useState, useEffect } from 'react';
 import {
-  Grid,
-  TextField,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  Button,
-  Snackbar,
   Checkbox,
+  CircularProgress,
+  Paper,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  CircularProgress,
-  Typography,
-  TableContainer
+  TextField,
+  Button,
+  Snackbar,
+  Grid,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Typography
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment from 'moment';
-import { createPGG } from 'services/admin/coupons/couponsService';
+import { createPGG, getPGGById, updatedPGG } from 'services/admin/coupons/couponsService';
 import { getPageKH } from 'services/admin/customer/customerService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-function CreateCoupons() {
+function UpdateCoupons() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [selectAll, setSelectAll] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [customers, setCustomers] = useState([]);
@@ -42,33 +43,44 @@ function CreateCoupons() {
     type: ''
   });
 
-  const columns = [
-    {
-      title: (
-        <Checkbox
-          checked={selectAll}
-          onChange={() => {
-            const newSelectAll = !selectAll;
-            setSelectAll(newSelectAll);
-            if (newSelectAll) {
-              setCustomerCoupons(customers.map((customer) => customer.id));
-            } else {
-              setCustomerCoupons([]);
-            }
-          }}
-        />
-      ),
-      key: 'checkbox',
-      render: (record) => <Checkbox checked={customerCoupons.includes(record.id)} onChange={() => onSelectChange(record.id)} />
-    },
-    {
-      title: 'Họ và tên',
-      key: 'ten',
-      render: (record) => `${record.ho ? record.ho : ''} ${record.ten ? record.ten : ''}`.trim() || 'N/A'
-    },
-    { title: 'SDT', key: 'sdt' },
-    { title: 'Email', key: 'email', render: (text) => (text ? text : 'N/A') }
-  ];
+  //   const columns = [
+  //     {
+  //       title: (
+  //         <Checkbox
+  //           checked={selectAll}
+  //           onChange={() => {
+  //             const newSelectAll = !selectAll;
+  //             setSelectAll(newSelectAll);
+  //             if (newSelectAll) {
+  //               setCustomerCoupons(customers.map((customer) => customer.id));
+  //             } else {
+  //               setCustomerCoupons([]);
+  //             }
+  //           }}
+  //         />
+  //       ),
+  //       key: 'checkbox',
+  //       render: (record) => <Checkbox checked={customerCoupons.includes(record.id)} onChange={() => onSelectChange(record.id)} />
+  //     },
+  //     {
+  //       title: 'Họ và tên',
+  //       key: 'ten',
+  //       render: (record) => {
+  //         const hoVaTen = `${record.ho ? record.ho : ''} ${record.ten ? record.ten : ''}`.trim();
+  //         return hoVaTen || 'N/A';
+  //       }
+  //     },
+  //     {
+  //       title: 'SDT',
+  //       key: 'sdt',
+  //       render: (record) => (record.sdt ? record.sdt : 'N/A')
+  //     },
+  //     {
+  //       title: 'Email',
+  //       key: 'email',
+  //       render: (record) => (record.email ? record.email : 'N/A')
+  //     }
+  //   ];
 
   const onSelectChange = (customerId) => {
     setCustomerCoupons((prev) => (prev.includes(customerId) ? prev.filter((id) => id !== customerId) : [...prev, customerId]));
@@ -94,7 +106,7 @@ function CreateCoupons() {
     };
     console.log(data);
     try {
-      const response = await createPGG(data);
+      const response = await updatedPGG(id, data);
       if (response.status_code === 200 || response.status_code === 201) {
         setFormValues({});
         setCustomerCoupons([]);
@@ -126,7 +138,8 @@ function CreateCoupons() {
     setLoading(true);
     try {
       const response = await getPageKH();
-      if (response) {
+      console.log('res', response);
+      if (response && response.content) {
         setCustomers(response.content);
       } else {
         setNotification({
@@ -146,9 +159,43 @@ function CreateCoupons() {
     }
   };
 
+  const fetchCouponById = async (couponId) => {
+    try {
+      const response = await getPGGById(couponId);
+      if (response.status_code === 200) {
+        const { data } = response;
+        setFormValues({
+          ma: data.ma,
+          ten: data.ten,
+          loaiGiamGia: data.loaiGiamGia.toString(),
+          phamViApDung: data.phamViApDung.toString(),
+          soLuong: data.soLuong,
+          giaTriGiamGia: data.giaTriGiamGia,
+          giaTriDonToiThieu: data.giaTriDonToiThieu,
+          giamToiGia: data.giamToiGia,
+          moTa: data.moTa,
+          ngayBatDau: moment(data.ngayBatDau),
+          ngayKetThuc: moment(data.ngayHetHan)
+        });
+        setCustomerCoupons(data.khachHangPhieuGiamGias.map((kh) => kh.id));
+        setShowCustomerTable(data.phamViApDung.toString() === '2');
+      }
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: 'Có lỗi xảy ra khi tải dữ liệu phiếu giảm giá!',
+        type: 'error'
+      });
+    }
+  };
+
   useEffect(() => {
     fetchApiAllCustomer();
-  }, []);
+    if (id) {
+      fetchCouponById(id);
+    }
+  }, [id]);
+  console.log(customers);
 
   return (
     <>
@@ -163,7 +210,16 @@ function CreateCoupons() {
         </Grid>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={11} md={6} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px' }}>
+            <Grid
+              item
+              xs={11}
+              md={6}
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                padding: '15px'
+              }}
+            >
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField label="Mã" name="ma" value={formValues.ma || ''} onChange={handleChange} fullWidth />
@@ -191,49 +247,45 @@ function CreateCoupons() {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Số lượng phiếu"
+                    label="Số lượng"
                     name="soLuong"
-                    type="number"
                     value={formValues.soLuong || ''}
                     onChange={handleChange}
+                    type="number"
                     fullWidth
-                    inputProps={{ min: 0 }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Giá trị giảm"
                     name="giaTriGiamGia"
-                    type="number"
                     value={formValues.giaTriGiamGia || ''}
                     onChange={handleChange}
+                    type="number"
                     fullWidth
-                    inputProps={{ min: 0 }}
-                    required
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Đơn tối thiểu"
+                    label="Giá trị đơn tối thiểu"
                     name="giaTriDonToiThieu"
-                    type="number"
                     value={formValues.giaTriDonToiThieu || ''}
                     onChange={handleChange}
+                    type="number"
                     fullWidth
-                    inputProps={{ min: 0 }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Giá trị giảm tối đa"
+                    label="Giảm tối đa"
                     name="giamToiGia"
-                    type="number"
                     value={formValues.giamToiGia || ''}
                     onChange={handleChange}
+                    type="number"
                     fullWidth
-                    inputProps={{ min: 0 }}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <DatePicker
                     label="Ngày bắt đầu"
@@ -251,54 +303,67 @@ function CreateCoupons() {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Mô tả" name="moTa" value={formValues.moTa || ''} onChange={handleChange} fullWidth multiline rows={4} />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button type="submit" variant="contained" color="primary" disabled={loading}>
-                    {loading ? <CircularProgress size={24} /> : 'Tạo mới'}
-                  </Button>
+                  <TextField label="Mô tả" name="moTa" value={formValues.moTa || ''} onChange={handleChange} multiline rows={4} fullWidth />
                 </Grid>
               </Grid>
             </Grid>
-            {showCustomerTable && (
-              <Grid item xs={11} md={6} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px', marginLeft: '0px' }}>
-                <TableContainer component={Paper} style={{ maxHeight: '500px' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        {columns.map((column) => (
-                          <TableCell key={column.key}>{column.title}</TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                      {customers.map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell>
-                            <Checkbox checked={customerCoupons.includes(customer.id)} onChange={() => onSelectChange(customer.id)} />
-                          </TableCell>
-                          <TableCell>{`${customer.ho ? customer.ho : ''} ${customer.ten ? customer.ten : ''}`.trim() || 'N/A'}</TableCell>
-                          <TableCell>{customer.sdt}</TableCell>
-                          <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
+            <Grid item xs={11} md={6}>
+              {/* <Paper style={{ height: '70vh', overflow: 'auto' }}>
+                {loading ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100%'
+                    }}
+                  >
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          {columns.map((column) => (
+                            <TableCell key={column.key}>{column.title}</TableCell>
+                          ))}
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  {loading && <CircularProgress />}
-                </TableContainer>
-              </Grid>
-            )}
+                      </TableHead>
+                      <TableBody>
+                        {customers.map((record) => (
+                          <TableRow key={record.id}>
+                            {columns.map((column) => (
+                              <TableCell key={column.key}>
+                                {column.render ? column.render(record[column.key], record) : record[column.key]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </Paper> */}
+            </Grid>
+          </Grid>
+          <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
+            <Button type="submit" variant="contained" color="primary" size="large">
+              Lưu
+            </Button>
           </Grid>
         </form>
-        <Snackbar
-          open={notification.open}
-          onClose={() => setNotification({ ...notification, open: false })}
-          message={notification.message}
-          autoHideDuration={6000}
-        />
       </LocalizationProvider>
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        message={notification.message}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        ContentProps={{ style: { backgroundColor: notification.type === 'success' ? 'green' : 'red' } }}
+      />
     </>
   );
 }
 
-export default CreateCoupons;
+export default UpdateCoupons;

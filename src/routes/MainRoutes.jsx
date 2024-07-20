@@ -7,6 +7,7 @@ import ErrorBoundary from '../error/ErrorBoundary.jsx';
 import { element } from 'prop-types';
 import PGGTable from 'views/pages/coupons/index.jsx';
 import CreateCoupons from 'views/pages/coupons/CreateCoupons.jsx';
+import UpdateCoupons from 'views/pages/coupons/UpdateCoupons.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -249,12 +250,8 @@ const MainRoutes = {
           element: <CreateCoupons />
         },
         {
-          path: 'sua',
-          element: (
-            <ErrorBoundary>
-              <ComNo1PageDemo />
-            </ErrorBoundary>
-          )
+          path: 'sua/:id',
+          element: <UpdateCoupons />
         },
         {
           path: 'xoa',

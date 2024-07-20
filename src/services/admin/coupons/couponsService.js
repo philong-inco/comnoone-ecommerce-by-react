@@ -1,4 +1,4 @@
-import { get, post, patch, put, del } from 'utils/request';
+import { get, post, patch, put, del, del2 } from 'utils/request';
 
 // export const getPGG = async () => {
 //   try {
@@ -77,7 +77,7 @@ export const getKHPGGById = async (id, page, size) => {
 
 export const deleteKhPGG = async (id, status) => {
   try {
-    const result = await del(`v1/coupons/customer-coupons/del/${id}?status=${status}`);
+    const result = await del2(`v1/coupons/customer-coupons/del/${id}?status=${status}`);
     console.log('GET response:', result);
     return result;
   } catch (error) {

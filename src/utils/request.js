@@ -50,6 +50,16 @@ export const del = async (path) => {
   }
 };
 
+export const del2 = async (path) => {
+  try {
+    const response = await axiosInstance.delete(path);
+    return response;
+  } catch (error) {
+    console.error('DELETE request error:', error);
+    throw error;
+  }
+};
+
 export const patch = async (path, data) => {
   try {
     const response = await axiosInstance.patch(path, data);

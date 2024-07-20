@@ -26,10 +26,13 @@ import { Delete as DeleteIcon, Edit as EditIcon, MoreHoriz as MoreHorizIcon, Syn
 import { deletedCoupons, getPGGPage } from 'services/admin/coupons/couponsService';
 import './index.css';
 import Notification from 'views/Notification';
+import CouponsCustomer from './CouponsCustomer';
+
 function PGGTable() {
   const navigate = useNavigate();
   let sttCounter = 0;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [listPhieuGiamGia, setListPhieuGiamGia] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [size, setSize] = useState(5);
@@ -73,7 +76,17 @@ function PGGTable() {
   };
 
   const handleNavigate = (path, id) => {
-    navigate(`/coupons/${path}/${id}`);
+    navigate(`/phieugiamgia/${path}/${id}`);
+  };
+
+  const handleOpenModal = (coupon) => {
+    setSelectedCoupon(coupon);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCoupon(null);
   };
 
   const columns = [
@@ -82,6 +95,7 @@ function PGGTable() {
     { title: 'Tên phiếu', key: 'ten' },
     { title: 'Loại giảm giá', key: 'loaiGiamGia' },
     { title: 'Phạm vi', key: 'phamViApDung' },
+    { title: 'Số lượng', key: 'soLuong' },
     { title: 'Giá trị giảm', key: 'giaTriGiamGia' },
     { title: 'Giá trị đơn tối thiểu', key: 'giaTriDonToiThieu' },
     { title: 'Giá trị giảm tối đa', key: 'giamToiGia' },
@@ -122,6 +136,7 @@ function PGGTable() {
                     <Typography color="cyan">Công khai</Typography>
                   )}
                 </TableCell>
+                <TableCell className="table-cell-small">{record.soLuong ? record.soLuong : 'Không giới hạn'}</TableCell>
                 <TableCell className="table-cell-small">
                   {record.loaiGiamGia === 1
                     ? `${record.giaTriGiamGia} %`
@@ -174,12 +189,12 @@ function PGGTable() {
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Chỉnh sửa">
-                    <IconButton color="primary" onClick={() => handleNavigate('update', record.id)} sx={{ marginLeft: 1 }}>
+                    <IconButton color="primary" onClick={() => handleNavigate('sua', record.id)} sx={{ marginLeft: 1 }}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Chi tiết phiếu giảm giá">
-                    <IconButton color="default" onClick={() => handleNavigate('customer-coupons', record.id)} sx={{ marginLeft: 1 }}>
+                    <IconButton color="default" onClick={() => handleOpenModal(record)}>
                       <MoreHorizIcon />
                     </IconButton>
                   </Tooltip>
@@ -206,6 +221,16 @@ function PGGTable() {
           <MenuItem value={20}>20</MenuItem>
         </Select>
       </div>
+
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Đóng
+          </Button>
+        </DialogActions>
+        <DialogTitle>Chi tiết phiếu giảm giá</DialogTitle>
+        <DialogContent>{selectedCoupon && <CouponsCustomer id={selectedCoupon.id} />}</DialogContent>
+      </Dialog>
     </Box>
   );
 }
