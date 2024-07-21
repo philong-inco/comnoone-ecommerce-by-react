@@ -15,7 +15,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Tooltip,
   Paper,
   Chip,
@@ -23,10 +22,12 @@ import {
   MenuItem
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, MoreHoriz as MoreHorizIcon, Sync as SyncIcon } from '@mui/icons-material';
-import { deletedCoupons, getPGGPage } from 'services/admin/coupons/couponsService';
+import { deletedCoupons, filterCoupons, getPGGPage } from 'services/admin/coupons/couponsService';
 import './index.css';
 import Notification from 'views/Notification';
 import CouponsCustomer from './CouponsCustomer';
+import FilterCoupons from './FilterCoupons';
+import { toDate } from 'date-fns';
 
 function PGGTable() {
   const navigate = useNavigate();
@@ -38,23 +39,50 @@ function PGGTable() {
   const [size, setSize] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [ma, setMa] = useState('');
+  const [phamViApDung, setPhamViApDung] = useState('');
+  const [trangThai, setTrangThai] = useState('');
+  const [loaiPhieu, setLoaiPhieu] = useState('');
 
-  const fetchApi = async (page = currentPage, size = size) => {
-    const response = await getPGGPage(page, size);
+  const fetchApi = async (currentPage, size) => {
+    setLoading(true);
+    try {
+      let filterString = `(ma ~~ '${ma}')`;
+      if (phamViApDung) {
+        filterString += ` and phamViApDung = ${phamViApDung}`;
+      }
+      if (trangThai) {
+        filterString += ` and trangThai = ${trangThai}`;
+      }
+      if (loaiPhieu) {
+        filterString += ` and loaiGiamGia = ${loaiPhieu}`;
+      }
 
-    if (response.status_code === 200) {
-      setListPhieuGiamGia(response.data.result);
-      setCurrentPage(response.data.meta.page + 1);
-      setSize(response.data.meta.pageSize);
-      setTotalItems(response.data.meta.total);
-    } else {
-      alert('Failed to fetch data from API');
+      const response = await filterCoupons(currentPage, size, filterString);
+      // const response = await getPGGPage(page, size, filterString);
+
+      if (response.status_code === 200) {
+        setListPhieuGiamGia(response.data.result);
+        setCurrentPage(response.data.meta.page + 1);
+        setSize(response.data.meta.pageSize);
+        setTotalItems(response.data.meta.total);
+      } else {
+        alert('Failed to fetch data from API');
+      }
+    } catch (error) {
+      alert('An error occurred while fetching data');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchApi(currentPage, size);
-  }, [currentPage, size, loading]);
+    const timeoutId = setTimeout(() => {
+      fetchApi(currentPage, size);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [currentPage, size, ma, phamViApDung, trangThai, loaiPhieu]);
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
@@ -89,6 +117,26 @@ function PGGTable() {
     setSelectedCoupon(null);
   };
 
+  const handleSearch = (value) => {
+    setMa(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (e) => {
+    setTrangThai(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePhamViChange = (e) => {
+    setPhamViApDung(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleLoaiPhieuChange = (e) => {
+    setLoaiPhieu(e.target.value);
+    setCurrentPage(1);
+  };
+
   const columns = [
     { title: 'STT', key: 'STT' },
     { title: 'Mã phiếu', key: 'ma' },
@@ -105,133 +153,135 @@ function PGGTable() {
   ];
 
   return (
-    <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
-      <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
-        <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
-          Add
-        </Button>
-      </Link>
-      <TableContainer component={Paper}>
-        <Table size="small" className="table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.key}>{column.title}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {listPhieuGiamGia.map((record, index) => (
-              <TableRow key={record.id}>
-                <TableCell className="table-cell-small">{sttCounter + index + 1}</TableCell>
-                <TableCell className="table-cell-small">{record.ma}</TableCell>
-                <TableCell className="table-cell-small">{record.ten}</TableCell>
-                <TableCell className="table-cell-small">
-                  {record.loaiGiamGia === 1 ? <Typography color="magenta"> %</Typography> : <Typography>VND</Typography>}
-                </TableCell>
-                <TableCell className="table-cell-small">
-                  {record.phamViApDung === 2 ? (
-                    <Typography color="gold">Riêng tư</Typography>
-                  ) : (
-                    <Typography color="cyan">Công khai</Typography>
-                  )}
-                </TableCell>
-                <TableCell className="table-cell-small">{record.soLuong ? record.soLuong : 'Không giới hạn'}</TableCell>
-                <TableCell className="table-cell-small">
-                  {record.loaiGiamGia === 1
-                    ? `${record.giaTriGiamGia} %`
-                    : record.giaTriGiamGia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                </TableCell>
-                <TableCell className="table-cell-small">
-                  {record.giaTriDonToiThieu !== null
-                    ? record.giaTriDonToiThieu.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-                    : '0 ₫'}
-                </TableCell>
-                <TableCell className="table-cell-small">
-                  {record.giamToiGia !== null
-                    ? record.giamToiGia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-                    : 'Không giới hạn'}
-                </TableCell>
-                <TableCell className="table-cell-small">
-                  {new Date(record.ngayBatDau).toLocaleDateString('vi-VN')} | {new Date(record.ngayHetHan).toLocaleDateString('vi-VN')}
-                </TableCell>
+    <>
+      <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
+        <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
+          <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
+            Add
+          </Button>
+        </Link>
+      </Box>
 
-                <TableCell className="table-cell-small">
-                  {(() => {
-                    let color = '';
-                    let text = '';
+      <FilterCoupons
+        handleSearch={handleSearch}
+        handleStatusChange={handleStatusChange}
+        handlePhamViChange={handlePhamViChange}
+        handleLoaiPhieuChange={handleLoaiPhieuChange}
+      />
 
-                    switch (record.trangThai) {
-                      case 1:
-                        color = 'success';
-                        text = 'Đang áp dụng';
-                        break;
-                      case 2:
-                        color = 'warning';
-                        text = 'Hết hạn';
-                        break;
-                      case 3:
-                        color = 'error';
-                        text = 'Hủy';
-                        break;
-                      default:
-                        color = 'default';
-                        text = 'Chưa đến';
-                    }
-
-                    return <Chip size="small" label={text} color={color} variant="outlined" />;
-                  })()}
-                </TableCell>
-                <TableCell className="table-cell">
-                  <Tooltip title="Hủy">
-                    <IconButton color="error" onClick={() => handleDelete(record.id)} disabled={record.trangThai === 3}>
-                      <SyncIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Chỉnh sửa">
-                    <IconButton color="primary" onClick={() => handleNavigate('sua', record.id)} sx={{ marginLeft: 1 }}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Chi tiết phiếu giảm giá">
-                    <IconButton color="default" onClick={() => handleOpenModal(record)}>
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+      <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
+        <TableContainer component={Paper}>
+          <Table size="small" className="table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell key={column.key}>{column.title}</TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
-        <Pagination
-          sx={{ marginTop: 2 }}
-          count={Math.ceil(totalItems / size)}
-          page={currentPage}
-          onChange={handlePageChange}
-          showFirstButton
-          showLastButton
-          size="small"
-        />
-        <Select size="small" value={size} onChange={handleSizeChange}>
-          <MenuItem value={5}>5</MenuItem>
-          <MenuItem value={10}>10</MenuItem>
-          <MenuItem value={15}>15</MenuItem>
-          <MenuItem value={20}>20</MenuItem>
-        </Select>
-      </div>
+            </TableHead>
+            <TableBody>
+              {listPhieuGiamGia.map((record, index) => (
+                <TableRow key={record.id}>
+                  <TableCell className="table-cell-small">{sttCounter + index + 1}</TableCell>
+                  <TableCell className="table-cell-small">{record.ma}</TableCell>
+                  <TableCell className="table-cell-small">{record.ten}</TableCell>
+                  <TableCell className="table-cell-small">
+                    {record.loaiGiamGia === 1 ? <Typography color="magenta"> %</Typography> : <Typography>VND</Typography>}
+                  </TableCell>
+                  <TableCell className="table-cell-small">
+                    {record.phamViApDung === 2 ? (
+                      <Typography color="gold">Riêng tư</Typography>
+                    ) : (
+                      <Typography color="cyan">Công khai</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell className="table-cell-small">{record.soLuong ? record.soLuong : 'Không giới hạn'}</TableCell>
+                  <TableCell className="table-cell-small">
+                    {record.loaiGiamGia === 1
+                      ? `${record.giaTriGiamGia} %`
+                      : record.giaTriGiamGia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  </TableCell>
+                  <TableCell className="table-cell-small">
+                    {record.giaTriDonToiThieu !== null
+                      ? record.giaTriDonToiThieu.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+                      : '0 ₫'}
+                  </TableCell>
+                  <TableCell className="table-cell-small">
+                    {record.giamToiGia !== null
+                      ? record.giamToiGia.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+                      : 'Không giới hạn'}
+                  </TableCell>
+                  <TableCell className="table-cell-small">
+                    {new Date(record.ngayBatDau).toLocaleDateString()} - {new Date(record.ngayKetThuc).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="table-cell-small">
+                    {(() => {
+                      let color = '';
+                      let text = '';
 
-      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+                      switch (record.trangThai) {
+                        case 1:
+                          color = 'success';
+                          text = 'Đang áp dụng';
+                          break;
+                        case 2:
+                          color = 'warning';
+                          text = 'Hết hạn';
+                          break;
+                        case 3:
+                          color = 'error';
+                          text = 'Hủy';
+                          break;
+                        default:
+                          color = 'default';
+                          text = 'Chưa đến';
+                      }
+
+                      return <Chip size="small" label={text} color={color} variant="outlined" />;
+                    })()}
+                  </TableCell>
+                  <TableCell className="table-cell">
+                    <Tooltip title="Hủy">
+                      <IconButton color="error" onClick={() => handleDelete(record.id)} disabled={record.trangThai === 3}>
+                        <SyncIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                      <IconButton color="primary" onClick={() => handleNavigate('sua', record.id)} sx={{ marginLeft: 1 }}>
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Chi tiết phiếu giảm giá">
+                      <IconButton color="default" onClick={() => handleOpenModal(record)}>
+                        <MoreHorizIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Box display="flex" justifyContent="space-between" alignItems="center" m={2}>
+            <Pagination count={Math.ceil(totalItems / size)} page={currentPage} onChange={handlePageChange} />
+            <Select value={size} onChange={handleSizeChange} displayEmpty>
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+            </Select>
+          </Box>
+        </TableContainer>
+      </Box>
+      <Dialog open={isModalOpen} onClose={handleCloseModal} fullWidth maxWidth="sm">
+        <DialogContent>
+          <CouponsCustomer record={selectedCoupon} />
+        </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal} color="primary">
-            Đóng
+            Close
           </Button>
         </DialogActions>
-        <DialogTitle>Chi tiết phiếu giảm giá</DialogTitle>
-        <DialogContent>{selectedCoupon && <CouponsCustomer id={selectedCoupon.id} />}</DialogContent>
       </Dialog>
-    </Box>
+    </>
   );
 }
 
