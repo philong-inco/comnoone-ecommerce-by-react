@@ -23,7 +23,6 @@ const FilterCoupons = ({ handleSearch, handleStatusChange, handlePhamViChange, h
   const handleTrangThaiChange = (e) => {
     setTrangThai(e.target.value);
     handleStatusChange(e);
-    handlePhamViChange(e);
   };
 
   const handlePhamViFChange = (e) => {
