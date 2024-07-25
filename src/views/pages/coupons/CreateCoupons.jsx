@@ -27,20 +27,67 @@ import moment from 'moment';
 import { createPGG } from 'services/admin/coupons/couponsService';
 import { getPageKH } from 'services/admin/customer/customerService';
 import { useNavigate } from 'react-router-dom';
+import * as z from 'zod';
+import { style } from '@mui/system';
+const couponSchema = z
+  .object({
+    ten: z.string().nonempty('Tên phiếu không được để trống'),
+    loaiGiamGia: z.enum(['1', '2'], 'Loại giảm giá không hợp lệ'),
+    phamViApDung: z.enum(['1', '2'], 'Phạm vi áp dụng không hợp lệ'),
+    soLuong: z
+      .number()
+      .nullable()
+      .refine((value) => value === null || value > 0, 'Số lượng phải lớn hơn 0'),
+    giaTriGiamGia: z.number().refine((value) => value !== null && value > 0, 'Giá trị giảm không được để trống và phải lớn hơn 0'),
+    giaTriDonToiThieu: z
+      .number()
+      .nullable()
+      .refine((value) => value === null || value >= 0, 'Giá trị đơn tối thiểu không được âm'),
+    giamToiGia: z
+      .number()
+      .nullable()
+      .refine((value) => value === null || value >= 0, 'Giảm tối đa không được âm'),
+    ngayBatDau: z.string().nonempty('Ngày bắt đầu không được để trống'),
+    ngayHetHan: z.string().nonempty('Ngày kết thúc không được để trống'),
+    moTa: z.string().optional()
+  })
+  .refine(
+    (data) => {
+      const ngayBatDau = moment(data.ngayBatDau, 'YYYY-MM-DD');
+      const ngayHetHan = moment(data.ngayHetHan, 'YYYY-MM-DD');
+      return ngayBatDau.isBefore(ngayHetHan, 'day');
+    },
+    {
+      message: 'Ngày bắt đầu phải trước ngày kết thúc',
+      path: ['ngayBatDau']
+    }
+  );
 
 function CreateCoupons() {
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState({
+    ma: '',
+    ten: '',
+    loaiGiamGia: 1,
+    phamViApDung: 1,
+    giaTriDonToiThieu: null,
+    giamToiGia: null,
+    ngayBatDau: null,
+    ngayHetHan: null,
+    soLuong: null,
+    giaTriGiamGia: null
+  });
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customerCoupons, setCustomerCoupons] = useState([]);
-  const [showCustomerTable, setShowCustomerTable] = useState(false);
+  // const [showCustomerTable, setShowCustomerTable] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
     message: '',
     type: ''
   });
+  const [errors, setErrors] = useState({});
 
   const columns = [
     {
@@ -86,16 +133,57 @@ function CreateCoupons() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // const data = {
+    //   ...formValues,
+    //   listKhachHang: customerCoupons,
+    //   ngayBatDau: formValues.ngayBatDau ? moment(formValues.ngayBatDau).format('YYYY-MM-DD') : undefined,
+    //   ngayHetHan: formValues.ngayKetThuc ? moment(formValues.ngayKetThuc).format('YYYY-MM-DD') : undefined
+    // };
+    // Hàm chuyển đổi an toàn từ chuỗi sang số
+    const safeParseFloat = (value) => {
+      const number = parseFloat(value);
+      return isNaN(number) ? null : number;
+    };
+
+    // Chuyển đổi dữ liệu từ biểu mẫu thành kiểu số và chuỗi thích hợp
     const data = {
       ...formValues,
       listKhachHang: customerCoupons,
       ngayBatDau: formValues.ngayBatDau ? moment(formValues.ngayBatDau).format('YYYY-MM-DD') : undefined,
-      ngayHetHan: formValues.ngayKetThuc ? moment(formValues.ngayKetThuc).format('YYYY-MM-DD') : undefined
+      ngayHetHan: formValues.ngayHetHan ? moment(formValues.ngayHetHan).format('YYYY-MM-DD') : undefined,
+      giaTriGiamGia: formValues.giaTriGiamGia ? safeParseFloat(formValues.giaTriGiamGia) : null,
+      giaTriDonToiThieu: formValues.giaTriDonToiThieu ? safeParseFloat(formValues.giaTriDonToiThieu) : null,
+      giamToiGia: formValues.giamToiGia ? safeParseFloat(formValues.giamToiGia) : null,
+      soLuong: formValues.soLuong ? safeParseFloat(formValues.soLuong) : null,
+      loaiGiamGia: String(formValues.loaiGiamGia), // Đảm bảo là chuỗi
+      phamViApDung: String(formValues.phamViApDung) // Đảm bảo là chuỗi
     };
     console.log(data);
+    const validationResult = couponSchema.safeParse(data);
+    if (!validationResult.success) {
+      // debugger;
+      const errors = {};
+      validationResult.error.errors.forEach((error) => {
+        if (error.path.length > 0) {
+          // debugger;
+          console.log('Lỗi : ', error.message);
+          errors[error.path[0]] = error.message;
+        }
+      });
+      setErrors(errors);
+      setNotification({
+        open: true,
+        message: 'Dữ liệu nhập không hợp lệ!',
+        type: 'error'
+      });
+      return;
+    }
+
+    setErrors({});
     try {
       const response = await createPGG(data);
-      if (response.status_code === 200 || response.status_code === 201) {
+
+      if (response.status_code === 201) {
         setFormValues({});
         setCustomerCoupons([]);
         setSelectAll(false);
@@ -112,18 +200,15 @@ function CreateCoupons() {
         message: 'Có lỗi xảy ra khi tạo phiếu giảm giá!',
         type: 'error'
       });
-    } finally {
     }
   };
 
   const handlePhamViApDungChange = (event) => {
     const value = event.target.value;
     setFormValues({ ...formValues, phamViApDung: value });
-    setShowCustomerTable(value === '2');
   };
 
   const fetchApiAllCustomer = async () => {
-    setLoading(true);
     try {
       const response = await getPageKH();
       if (response) {
@@ -141,35 +226,34 @@ function CreateCoupons() {
         message: 'Có lỗi xảy ra khi tải dữ liệu khách hàng!',
         type: 'error'
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchApiAllCustomer();
   }, []);
-
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterMoment}>
-        <Grid container>
-          <Grid item xs={11} md={6}>
-            <h4>Thông tin phiếu giảm giá</h4>
-          </Grid>
-          <Grid item xs={11} md={6}>
-            <h4> Danh sách khác hàng</h4>
-          </Grid>
-        </Grid>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
-            <Grid item xs={11} md={6} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px' }}>
+            <Grid item xs={11} md={5} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px', marginLeft: '130px' }}>
+              {' '}
+              <h4>Thông tin phiếu giảm giá</h4>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField label="Mã" name="ma" value={formValues.ma || ''} onChange={handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Tên phiếu" name="ten" value={formValues.ten || ''} onChange={handleChange} fullWidth />
+                  <TextField
+                    label="Tên phiếu"
+                    name="ten"
+                    value={formValues.ten || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ten}
+                    helperText={errors.ten ? errors.ten : ''}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl component="fieldset" fullWidth>
@@ -194,10 +278,12 @@ function CreateCoupons() {
                     label="Số lượng phiếu"
                     name="soLuong"
                     type="number"
-                    value={formValues.soLuong || ''}
+                    value={formValues.soLuong || null}
                     onChange={handleChange}
                     fullWidth
-                    inputProps={{ min: 0 }}
+                    // inputProps={{ min: 0 }}
+                    error={!!errors.soLuong}
+                    helperText={errors.soLuong ? errors.soLuong : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -208,8 +294,10 @@ function CreateCoupons() {
                     value={formValues.giaTriGiamGia || ''}
                     onChange={handleChange}
                     fullWidth
-                    inputProps={{ min: 0 }}
-                    required
+                    // inputProps={{ min: 0 }}
+                    // required
+                    error={!!errors.giaTriGiamGia}
+                    helperText={errors.giaTriGiamGia ? errors.giaTriGiamGia : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -220,7 +308,9 @@ function CreateCoupons() {
                     value={formValues.giaTriDonToiThieu || ''}
                     onChange={handleChange}
                     fullWidth
-                    inputProps={{ min: 0 }}
+                    // inputProps={{ min: 0 }}
+                    error={!!errors.giaTriDonToiThieu}
+                    helperText={errors.giaTriDonToiThieu ? errors.giaTriDonToiThieu : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -231,7 +321,9 @@ function CreateCoupons() {
                     value={formValues.giamToiGia || ''}
                     onChange={handleChange}
                     fullWidth
-                    inputProps={{ min: 0 }}
+                    // inputProps={{ min: 0 }}
+                    error={!!errors.giamToiGia}
+                    helperText={errors.giamToiGia ? errors.giamToiGia : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -239,55 +331,69 @@ function CreateCoupons() {
                     label="Ngày bắt đầu"
                     value={formValues.ngayBatDau || null}
                     onChange={(date) => handleDateChange('ngayBatDau', date)}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.ngayBatDau}
+                        helperText={errors.ngayBatDau ? errors.ngayBatDau : ''}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <DatePicker
+                    ngayHetHan
                     label="Ngày kết thúc"
-                    value={formValues.ngayKetThuc || null}
-                    onChange={(date) => handleDateChange('ngayKetThuc', date)}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    value={formValues.ngayHetHan || null}
+                    onChange={(date) => handleDateChange('ngayHetHan', date)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        error={!!errors.ngayHetHan}
+                        helperText={errors.ngayHetHan ? errors.ngayHetHan : ''}
+                        fullWidth={true}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField label="Mô tả" name="moTa" value={formValues.moTa || ''} onChange={handleChange} fullWidth multiline rows={4} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Button type="submit" variant="contained" color="primary" disabled={loading}>
-                    {loading ? <CircularProgress size={24} /> : 'Tạo mới'}
+                  <Button type="submit" variant="contained" color="primary">
+                    Tạo mới
                   </Button>
                 </Grid>
               </Grid>
             </Grid>
-            {showCustomerTable && (
-              <Grid item xs={11} md={6} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px', marginLeft: '0px' }}>
-                <TableContainer component={Paper} style={{ maxHeight: '500px' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        {columns.map((column) => (
-                          <TableCell key={column.key}>{column.title}</TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                      {customers.map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell>
-                            <Checkbox checked={customerCoupons.includes(customer.id)} onChange={() => onSelectChange(customer.id)} />
-                          </TableCell>
-                          <TableCell>{`${customer.ho ? customer.ho : ''} ${customer.ten ? customer.ten : ''}`.trim() || 'N/A'}</TableCell>
-                          <TableCell>{customer.sdt}</TableCell>
-                          <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
-                        </TableRow>
+
+            <Grid item xs={11} md={5} style={{ backgroundColor: 'white', borderRadius: '10px', padding: '15px', marginLeft: '80px' }}>
+              <h4> Danh sách khác hàng</h4>
+              <TableContainer component={Paper} style={{ maxHeight: '500px' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => (
+                        <TableCell key={column.key}>{column.title}</TableCell>
                       ))}
-                    </TableBody>
-                  </Table>
-                  {loading && <CircularProgress />}
-                </TableContainer>
-              </Grid>
-            )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {customers.map((customer) => (
+                      <TableRow key={customer.id}>
+                        <TableCell>
+                          <Checkbox checked={customerCoupons.includes(customer.id)} onChange={() => onSelectChange(customer.id)} />
+                        </TableCell>
+                        <TableCell>{`${customer.ho ? customer.ho : ''} ${customer.ten ? customer.ten : ''}`.trim() || 'N/A'}</TableCell>
+                        <TableCell>{customer.sdt}</TableCell>
+                        <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
           </Grid>
         </form>
         <Snackbar

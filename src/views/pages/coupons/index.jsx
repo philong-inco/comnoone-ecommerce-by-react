@@ -45,7 +45,6 @@ function PGGTable() {
   const [loaiPhieu, setLoaiPhieu] = useState('');
 
   const fetchApi = async (currentPage, size) => {
-    setLoading(true);
     try {
       let filterString = `(ma ~~ '${ma}')`;
       if (phamViApDung) {
@@ -59,8 +58,6 @@ function PGGTable() {
       }
 
       const response = await filterCoupons(currentPage, size, filterString);
-      // const response = await getPGGPage(page, size, filterString);
-
       if (response.status_code === 200) {
         setListPhieuGiamGia(response.data.result);
         setCurrentPage(response.data.meta.page + 1);
@@ -82,7 +79,7 @@ function PGGTable() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, size, ma, phamViApDung, trangThai, loaiPhieu]);
+  }, [currentPage, size, ma, phamViApDung, trangThai, loaiPhieu, loading]);
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
@@ -109,7 +106,9 @@ function PGGTable() {
 
   const handleOpenModal = (coupon) => {
     setSelectedCoupon(coupon);
-    setIsModalOpen(true);
+    setTimeout(() => {
+      setIsModalOpen(true);
+    }, 500);
   };
 
   const handleCloseModal = () => {
@@ -151,16 +150,16 @@ function PGGTable() {
     { title: 'Trạng thái', key: 'trangThai' },
     { title: 'Action', key: 'action' }
   ];
-
+  console.log(selectedCoupon);
   return (
     <>
-      <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
-        <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
-            Add
-          </Button>
-        </Link>
-      </Box>
+      {/* <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}> */}
+      <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
+        <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
+          Thêm mới
+        </Button>
+      </Link>
+      {/* </Box> */}
 
       <FilterCoupons
         handleSearch={handleSearch}
@@ -212,7 +211,7 @@ function PGGTable() {
                       : 'Không giới hạn'}
                   </TableCell>
                   <TableCell className="table-cell-small">
-                    {new Date(record.ngayBatDau).toLocaleDateString()} - {new Date(record.ngayKetThuc).toLocaleDateString()}
+                    {new Date(record.ngayBatDau).toLocaleDateString()} - {new Date(record.ngayHetHan).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="table-cell-small">
                     {(() => {
@@ -271,15 +270,13 @@ function PGGTable() {
           </Box>
         </TableContainer>
       </Box>
-      <Dialog open={isModalOpen} onClose={handleCloseModal} fullWidth maxWidth="sm">
-        <DialogContent>
-          <CouponsCustomer record={selectedCoupon} />
-        </DialogContent>
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth={800}>
         <DialogActions>
           <Button onClick={handleCloseModal} color="primary">
-            Close
+            Đóng
           </Button>
         </DialogActions>
+        <DialogContent>{selectedCoupon && <CouponsCustomer id={selectedCoupon.id} />}</DialogContent>
       </Dialog>
     </>
   );

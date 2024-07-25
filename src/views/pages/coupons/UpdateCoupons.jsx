@@ -43,44 +43,33 @@ function UpdateCoupons() {
     type: ''
   });
 
-  //   const columns = [
-  //     {
-  //       title: (
-  //         <Checkbox
-  //           checked={selectAll}
-  //           onChange={() => {
-  //             const newSelectAll = !selectAll;
-  //             setSelectAll(newSelectAll);
-  //             if (newSelectAll) {
-  //               setCustomerCoupons(customers.map((customer) => customer.id));
-  //             } else {
-  //               setCustomerCoupons([]);
-  //             }
-  //           }}
-  //         />
-  //       ),
-  //       key: 'checkbox',
-  //       render: (record) => <Checkbox checked={customerCoupons.includes(record.id)} onChange={() => onSelectChange(record.id)} />
-  //     },
-  //     {
-  //       title: 'Họ và tên',
-  //       key: 'ten',
-  //       render: (record) => {
-  //         const hoVaTen = `${record.ho ? record.ho : ''} ${record.ten ? record.ten : ''}`.trim();
-  //         return hoVaTen || 'N/A';
-  //       }
-  //     },
-  //     {
-  //       title: 'SDT',
-  //       key: 'sdt',
-  //       render: (record) => (record.sdt ? record.sdt : 'N/A')
-  //     },
-  //     {
-  //       title: 'Email',
-  //       key: 'email',
-  //       render: (record) => (record.email ? record.email : 'N/A')
-  //     }
-  //   ];
+  const columns = [
+    {
+      title: (
+        <Checkbox
+          checked={selectAll}
+          onChange={() => {
+            const newSelectAll = !selectAll;
+            setSelectAll(newSelectAll);
+            if (newSelectAll) {
+              setCustomerCoupons(customers.map((customer) => customer.id));
+            } else {
+              setCustomerCoupons([]);
+            }
+          }}
+        />
+      ),
+      key: 'checkbox',
+      render: (record) => <Checkbox checked={customerCoupons.includes(record.id)} onChange={() => onSelectChange(record.id)} />
+    },
+    {
+      title: 'Họ và tên',
+      key: 'ten',
+      render: (record) => `${record.ho ? record.ho : ''} ${record.ten ? record.ten : ''}`.trim() || 'N/A'
+    },
+    { title: 'SDT', key: 'sdt' },
+    { title: 'Email', key: 'email', render: (text) => (text ? text : 'N/A') }
+  ];
 
   const onSelectChange = (customerId) => {
     setCustomerCoupons((prev) => (prev.includes(customerId) ? prev.filter((id) => id !== customerId) : [...prev, customerId]));
@@ -177,10 +166,11 @@ function UpdateCoupons() {
           ngayBatDau: moment(data.ngayBatDau),
           ngayKetThuc: moment(data.ngayHetHan)
         });
-        setCustomerCoupons(data.khachHangPhieuGiamGias.map((kh) => kh.id));
+        setCustomerCoupons(data.khachHangPhieuGiamGias);
         setShowCustomerTable(data.phamViApDung.toString() === '2');
       }
     } catch (error) {
+      console.log('Error : ', error);
       setNotification({
         open: true,
         message: 'Có lỗi xảy ra khi tải dữ liệu phiếu giảm giá!',
@@ -196,6 +186,7 @@ function UpdateCoupons() {
     }
   }, [id]);
   console.log(customers);
+  console.log(customerCoupons);
 
   return (
     <>
@@ -305,10 +296,15 @@ function UpdateCoupons() {
                 <Grid item xs={12}>
                   <TextField label="Mô tả" name="moTa" value={formValues.moTa || ''} onChange={handleChange} multiline rows={4} fullWidth />
                 </Grid>
+                <Grid style={{ marginTop: '20px', marginLeft: '20px' }}>
+                  <Button type="submit" variant="contained" color="primary" size="large">
+                    Lưu
+                  </Button>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item xs={11} md={6}>
-              {/* <Paper style={{ height: '70vh', overflow: 'auto' }}>
+              <Paper style={{ height: '70vh', overflow: 'auto' }}>
                 {loading ? (
                   <div
                     style={{
@@ -330,27 +326,23 @@ function UpdateCoupons() {
                           ))}
                         </TableRow>
                       </TableHead>
-                      <TableBody>
-                        {customers.map((record) => (
-                          <TableRow key={record.id}>
-                            {columns.map((column) => (
-                              <TableCell key={column.key}>
-                                {column.render ? column.render(record[column.key], record) : record[column.key]}
-                              </TableCell>
-                            ))}
+                      <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        {customers.map((customer) => (
+                          <TableRow key={customer.id}>
+                            <TableCell>
+                              <Checkbox checked={customerCoupons.includes(customer.id)} onChange={() => onSelectChange(customer.id)} />
+                            </TableCell>
+                            <TableCell>{`${customer.ho ? customer.ho : ''} ${customer.ten ? customer.ten : ''}`.trim() || 'N/A'}</TableCell>
+                            <TableCell>{customer.sdt}</TableCell>
+                            <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
                   </TableContainer>
                 )}
-              </Paper> */}
+              </Paper>
             </Grid>
-          </Grid>
-          <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
-            <Button type="submit" variant="contained" color="primary" size="large">
-              Lưu
-            </Button>
           </Grid>
         </form>
       </LocalizationProvider>
