@@ -7,6 +7,7 @@ import ErrorBoundary from '../error/ErrorBoundary.jsx';
 import { element } from 'prop-types';
 
 
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
 
@@ -25,6 +26,10 @@ const DanhSachPhieuGiamGia = Loadable(lazy(() => import('views/pages/phieugiamgi
 // ==============================||  NHÂN VIÊN ||============================== //
 const DanhSachNhanVien = Loadable(lazy(() => import('views/pages/nhanvien/NhanVien.jsx')));
 const NhanVienConfiguration = Loadable(lazy(() => import('views/pages/nhanvien/NhanVienConfiguration.jsx')));
+// ==============================||  KHÁCH HÀNG ||============================== //
+const KhachHang = Loadable(lazy(() => import('views/pages/khachhang/KhachHang.jsx')));
+const KhachHangConfiguration = Loadable(lazy(() => import('views/pages/khachhang/KhachHangConfiguration.jsx')));
+const KhachHangAddress = Loadable(lazy(() => import('views/pages/khachhang/KhachHangAddress.jsx')))
 
 const MainRoutes = {
   path: '/',
@@ -198,13 +203,17 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachnhanvien',
-          element: <DanhSachNhanVien/>
+          element: <DanhSachNhanVien />
         },
         {
           path: 'configuration',
-          element: <NhanVienConfiguration/>
+          element: <NhanVienConfiguration />
         },
-       
+        {
+          path: 'configuration/:id',
+          element: <NhanVienConfiguration />
+        },
+
       ]
     },
 
@@ -213,21 +222,17 @@ const MainRoutes = {
       path: 'khachhang',
       children: [
         {
-          path: 'danhsach',
-          element: <ErrorBoundary></ErrorBoundary>
+          path: 'danhsachkhachhang',
+          element: <KhachHang/>
         },
         {
-          path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
+          path: 'khachhangconfiguration',
+          element: <KhachHangConfiguration/>
         },
         {
-          path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
+          path: 'khachhangaddress',
+          element: <KhachHangAddress/>
         },
-        {
-          path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        }
       ]
     },
 

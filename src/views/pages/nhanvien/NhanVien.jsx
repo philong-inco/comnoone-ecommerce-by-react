@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Switch } from '@mui/material'; // Add Switch import
+import { Switch } from '@mui/material';
 import {
     Box,
     Button,
@@ -22,11 +22,16 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Pagination
+    Pagination,
+    InputLabel,
+    Select,
+    MenuItem,
+    Avatar,
+    Chip
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus } from 'services/admin/employee/employeeService';
-import { textAlign } from '@mui/system';
+import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, searchYearOfEmplpyee } from 'services/admin/employee/employeeService';
+import { IconEdit } from '@tabler/icons-react';
 
 const DanhSachNhanVien = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -35,13 +40,16 @@ const DanhSachNhanVien = () => {
     const [searchRadio, setSearchRadio] = useState('');
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-    const [deleteIdStatus, setDeleteIdStatus] = useState(null); // For holding the status change
+    const [deleteIdStatus, setDeleteIdStatus] = useState(null);
     const [nhanVien, setNhanVien] = useState([]);
-    const [statuses] = useState([
+    const [selectGioiTinh, setSelectGioiTinh] = useState('');
+    const [searchYear, setSearchYear] = useState('');
+
+    const statuses = [
         { id: '', name: 'Tất Cả' },
         { id: '0', name: 'Đã Nghỉ Việc' },
         { id: '1', name: 'Đang Làm Việc' }
-    ]);
+    ];
 
     const navigate = useNavigate();
 
@@ -52,10 +60,12 @@ const DanhSachNhanVien = () => {
                 result = await searchNhanVienKeyWord(currentPage, searchKeyWord);
             } else if (searchRadio) {
                 result = await searchTrangThai(currentPage, searchRadio);
+            } else if (searchYear !== '') {
+                result = await searchYearOfEmplpyee(currentPage, searchYear);
+            } else if (selectGioiTinh !== '') {
+                result = await searchGioiTinh(currentPage, selectGioiTinh);
             } else {
                 result = await getAll(currentPage);
-
-                setTotalPages(result.totalPages);
             }
             setNhanVien(result.content);
             setTotalPages(result.totalPages);
@@ -66,16 +76,34 @@ const DanhSachNhanVien = () => {
 
     useEffect(() => {
         fetchNhanVien();
-    }, [currentPage, searchKeyWord, searchRadio]);
+    }, [currentPage, searchKeyWord, searchRadio, selectGioiTinh, searchYear]);
 
     const getStatusNhanVien = (status) => {
         switch (status) {
             case 0:
-                return 'Đã Nghỉ Việc';
+                return (
+                    <Chip
+                        label="Đã Nghỉ Việc"
+                        color="default"
+                        style={{ backgroundColor: '#f44336', color: '#fff' }}
+                    />
+                )
             case 1:
-                return 'Đang Làm Việc';
+                return (
+                    <Chip
+                        label="Đang Làm Việc"
+                        color="success"
+                        style={{ backgroundColor: '#4caf50', color: '#fff' }}
+                    />
+                )
             default:
-                return 'Chưa Xác Định';
+                return (
+                <Chip
+                    label="Không xác định"
+                    color="warning"
+                    style={{ backgroundColor: '#ff9800', color: '#fff' }}
+                />
+            )
         }
     };
 
@@ -86,15 +114,22 @@ const DanhSachNhanVien = () => {
     };
 
     const handleRadioChange = (event) => {
-        const value = event.target.value;
-        setSearchRadio(value);
+        setSearchRadio(event.target.value);
         setCurrentPage(0);
         setSearchKeyWord('');
     };
 
-    const handleDelete = (id) => {
-        setDeleteId(id);
-        setConfirmOpen(true);
+    const handleSelectChange = (event) => {
+        const value = event.target.value;
+        setSelectGioiTinh(value);
+        setCurrentPage(0);
+
+    };
+
+    const handleYearChange = (event) => {
+        setSearchYear(event.target.value);
+        setCurrentPage(0);
+        debugger;
     };
 
     const handleConfirmDelete = async () => {
@@ -122,7 +157,7 @@ const DanhSachNhanVien = () => {
         return new Date(dateString).toLocaleDateString('vi-VN', options);
     };
 
-    const handlePageChange = (event, value) => {
+    const handlePageChange = (value) => {
         setCurrentPage(value - 1);
     };
 
@@ -136,12 +171,17 @@ const DanhSachNhanVien = () => {
         navigate('/nhanvien/configuration');
     };
 
+    const handleEdit = (id) => {
+        navigate(`/nhanvien/configuration/${id}`);
+    };
+
+    // Tạo danh sách năm từ năm hiện tại - 100 đến năm hiện tại
+    const currentYear = new Date().getFullYear();
+    const years = Array.from(new Array(101), (_, index) => currentYear - index);
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
-            <Button variant="contained" style={{ marginLeft:"80%" , marginBottom: "10px"}} color="secondary" onClick={handleNavigate}>
-                + Thêm Nhân Viên
-            </Button>
-            <Box display="flex"
+            <Box
+                display="flex"
                 flexDirection="row"
                 alignItems="center"
                 justifyContent="space-between"
@@ -149,45 +189,95 @@ const DanhSachNhanVien = () => {
                 p={2}
                 sx={{
                     backgroundColor: 'white',
-                    boxShadow: '0 4px 8px rgba(0.2, 0.1, 0.2, 0.3)',
+                    boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.2, 0.3)',
                     borderRadius: '8px',
-                }}>
+                }}
+            >
+                <Box flex={1} mr={2}>
+                    <form onSubmit={handleSearch}>
+                        <FormLabel component="legend">Tìm Kiếm</FormLabel>
+                        <TextField
+                            label="Tìm kiếm"
+                            value={searchKeyWord}
+                            onChange={(e) => setSearchKeyWord(e.target.value)}
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
+                        />
+                    </form>
+                </Box>
+                <Box flex={1} mx={2}>
+                    <FormLabel component="legend">Giới Tính</FormLabel>
 
-                <form onSubmit={handleSearch}>
-                    <TextField
-                        label="Tìm kiếm"
-                        value={searchKeyWord}
-                        onChange={(e) => setSearchKeyWord(e.target.value)}
-                        variant="outlined"
-                        margin="normal"
-                    />
-                </form>
-                <FormControl component="fieldset" margin="normal">
-                    <FormLabel component="legend">Trạng thái</FormLabel>
-                    <RadioGroup
-                        row
-                        value={searchRadio}
-                        onChange={handleRadioChange}
-                    >
-                        {statuses.map((status) => (
-                            <FormControlLabel
-                                key={status.id}
-                                value={status.id}
-                                control={<Radio />}
-                                label={status.name}
-                            />
-                        ))}
-                    </RadioGroup>
-                </FormControl>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
+                        <Select
+                            labelId="gender-select-label"
+                            id="gender-select"
+                            value={selectGioiTinh}
+                            label="Giới tính"
+                            onChange={handleSelectChange}
+                        >
+                            <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
+                            <MenuItem value={1}>Nam</MenuItem>
+                            <MenuItem value={0}>Nữ</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+
+                <Box flex={1} mx={2}>
+                    <FormLabel component="legend">Năm Sinh</FormLabel>
+                    <FormControl fullWidth margin="dense">
+                        <InputLabel id="year-select-label">-- Chọn năm sinh --</InputLabel>
+                        <Select
+                            labelId="year-select-label"
+                            id="year-select"
+                            value={searchYear}
+                            label="Năm Sinh"
+                            onChange={handleYearChange}
+                        >
+                            <MenuItem value=""><em>-- Chọn năm sinh --</em></MenuItem>
+                            {years.map((year) => (
+                                <MenuItem key={year} value={year}>
+                                    {year}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+
+                <Box flex={1} ml={2}>
+                    <FormControl component="fieldset" fullWidth margin="normal">
+                        <FormLabel component="legend">Trạng thái</FormLabel>
+                        <RadioGroup
+                            row
+                            value={searchRadio}
+                            onChange={handleRadioChange}
+                        >
+                            {statuses.map((status) => (
+                                <FormControlLabel
+                                    key={status.id}
+                                    value={status.id}
+                                    control={<Radio />}
+                                    label={status.name}
+                                />
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                </Box>
             </Box>
+
+            <Button variant="contained" style={{ marginLeft: "85%", marginBottom: "10px" }} color="secondary" onClick={handleNavigate}>
+                + Thêm Nhân Viên
+            </Button>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell style={{ width: '1%' }}>STT</TableCell>
+                            <TableCell>STT</TableCell>
+                            <TableCell>Hình Ảnh</TableCell>
                             <TableCell>Mã</TableCell>
                             <TableCell>Tên</TableCell>
-                            <TableCell>Vai Trò</TableCell>
                             <TableCell>Ngày Sinh</TableCell>
                             <TableCell>Số Điện Thoại</TableCell>
                             <TableCell>Email</TableCell>
@@ -202,15 +292,25 @@ const DanhSachNhanVien = () => {
                             return (
                                 <TableRow key={nv.id}>
                                     <TableCell>{index + 1 + currentPage * 10}</TableCell>
+                                    <TableCell>
+                                        <Avatar
+                                            alt={nv.ten}
+                                            src={nv.hinhAnh}
+                                            sx={{ width: 100, height: 100 }}
+                                        />
+                                    </TableCell>
                                     <TableCell>{nv.ma}</TableCell>
                                     <TableCell>{nv.ten}</TableCell>
-                                    <TableCell>{nv.vaiTro}</TableCell>
                                     <TableCell>{ngaySinh}</TableCell>
                                     <TableCell>{nv.sdt}</TableCell>
                                     <TableCell>{nv.email}</TableCell>
                                     <TableCell>{nv.diaChi}</TableCell>
+
                                     <TableCell>{getStatusNhanVien(nv.trangThai)}</TableCell>
                                     <TableCell>
+                                        <Button className="btn btn-link">
+                                            <IconEdit stroke={2} onClick={() => handleEdit(nv.id)} />
+                                        </Button>
                                         <Switch
                                             checked={nv.trangThai === 1}
                                             onChange={() => handleSwitchChange(nv.id, nv.trangThai)}

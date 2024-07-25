@@ -1,72 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import axios from 'axios';
-import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useNavigate } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import {
-    Select,
-    MenuItem,
+    Box,
+    Button,
     FormControl,
     InputLabel,
+    Select,
+    MenuItem,
     TextField,
-    Button,
     Typography,
-    Box,
     Grid,
-    CircularProgress,
-    Checkbox,
-    ListItemText,
-    Chip,
     FormHelperText,
-    Snackbar,
     FormLabel,
-    RadioGroup,
+    Snackbar,
     Alert,
+    RadioGroup,
     Radio,
+    CircularProgress
 } from '@mui/material';
-const schema = Yup.object().shape({
-    ten: Yup.string().required('Họ và tên không được để trống').max(255, 'Tên không được vượt quá 255 ký tự').typeError("Tên xảy ra lỗi !"),
-    sdt: Yup.string().required('Số điện thoại không được để trống').matches(/^0\d{9}$/, 'Số điện thoại không hợp lệ'),
-    email: Yup.string().required('Email không được để trống').email('Email không đúng định dạng').max(255, 'Email không được vượt quá 255 ký tự'),
-    tai_khoan_ngan_hang: Yup.string().required('Tài khoản ngân hàng không được để trống').max(50, 'Tài khoản ngân hàng không được vượt quá 50 ký tự'),
-    ngay_sinh: Yup.date().required('Ngày sinh không được để trống').typeError('Ngày sinh không hợp lệ'),
-    gioi_tinh: Yup.number().required('Giới tính không được để trống').oneOf([0, 1], 'Giới tính phải là 0 hoặc 1'),
-    hinh_anh: Yup.string().nullable(),
-    dia_chi: Yup.string().required('Địa chỉ không được để trống'),
-    list_vai_tro: Yup.array().of(Yup.string()).required('Vui lòng chọn vai trò cho nhân viên.')
+import { yupResolver } from '@hookform/resolvers/yup';
+import axios from 'axios';
+
+const validationSchema = Yup.object().shape({
+    ten: Yup.string()
+        .max(50, 'Tên không được vượt quá 50 ký tự')
+        .required('Tên không được để trống'),
+    email: Yup.string()
+        .email('Email không hợp lệ')
+        .required('Email không được để trống'),
+    sdt: Yup.string()
+        .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
+        .required('Số điện thoại không được để trống'),
+    ngay_sinh: Yup.date()
+        .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
+        .required('Ngày sinh không được để trống'),
+    gioi_tinh: Yup.number().required('Giới tính không được để trống'),
+    hinhAnh: Yup.string(),
 });
 
-function NhanVienConfiguration() {
-    const { id } = useParams();
-    const { register, handleSubmit, formState: { errors }, setValue, control } = useForm({
-        resolver: yupResolver(schema)
+function KhachHangConfiguration() {
+    const navigate = useNavigate();
+    const { register, handleSubmit, control, formState: { errors } } = useForm({
+        resolver: yupResolver(validationSchema)
     });
     const [imageUrl, setImageUrl] = useState('');
-    const [roles, setRoles] = useState([]);
-    const [selectedRoles, setSelectedRoles] = useState([]);
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [selectedWard, setSelectedWard] = useState('');
-    const [isProvincesLoaded, setIsProvincesLoaded] = useState(false);
+    const [loading, setLoading] = useState('');
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const navigate = useNavigate();
+    const [isProvincesLoaded, setIsProvincesLoaded] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await fetchRoles();
                 await fetchProvinces();
             } catch (error) {
                 setError('Failed to fetch initial data');
@@ -76,12 +75,6 @@ function NhanVienConfiguration() {
         };
         fetchData();
     }, []);
-
-    useEffect(() => {
-        if (isProvincesLoaded && id) {
-            fetchNhanVien(id);
-        }
-    }, [isProvincesLoaded, id]);
 
     useEffect(() => {
         if (selectedProvince) {
@@ -95,15 +88,6 @@ function NhanVienConfiguration() {
         }
     }, [selectedDistrict]);
 
-    const fetchRoles = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/api/vaitro');
-            setRoles(response.data);
-        } catch (error) {
-            setError('Failed to fetch roles');
-        }
-    };
-
     useEffect(() => {
         const errorKeys = Object.keys(errors);
         if (errorKeys.length > 0) {
@@ -116,6 +100,7 @@ function NhanVienConfiguration() {
     }, [errors]);
 
     const fetchProvinces = async () => {
+        debugger;
         try {
             const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
             if (response.data.data && Array.isArray(response.data.data)) {
@@ -155,159 +140,51 @@ function NhanVienConfiguration() {
         }
     };
 
-    function toNonAccentVietnamese(str) {
-        str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");
-        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
-        str = str.replace(/E|É|È|Ẽ|Ẹ|Ê|Ế|Ề|Ễ|Ệ/, "E");
-        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
-        str = str.replace(/I|Í|Ì|Ĩ|Ị/g, "I");
-        str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
-        str = str.replace(/O|Ó|Ò|Õ|Ọ|Ô|Ố|Ồ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ỡ|Ợ/g, "O");
-        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
-        str = str.replace(/U|Ú|Ù|Ũ|Ụ|Ư|Ứ|Ừ|Ữ|Ự/g, "U");
-        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
-        str = str.replace(/Y|Ý|Ỳ|Ỹ|Ỵ/g, "Y");
-        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
-        str = str.replace(/Đ/g, "D");
-        str = str.replace(/đ/g, "d");
-        // Some system encode vietnamese combining accent as individual utf-8 characters
-        str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền sắc hỏi ngã nặng 
-        str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
-        return str;
-    }
-
-    const fetchNhanVien = async (id) => {
-        try {
-            debugger;
-            const response = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
-            const nhanVienData = response.data;
-            const responseVaiTro = await axios.get(`http://localhost:8080/api/vaitro/findbynhanvien/${response.data.id}`)
-            setValue('ten', nhanVienData.ten);
-            setValue('sdt', nhanVienData.sdt);
-            setValue('email', nhanVienData.email);
-            setValue('tai_khoan_ngan_hang', nhanVienData.taiKhoanNganHang);
-            setValue('hinh_anh', nhanVienData.hinhAnh);
-            setValue('gioi_tinh', nhanVienData.gioiTinh.toString());
-            setImageUrl(nhanVienData.hinhAnh);
-            const selectedRoles = responseVaiTro.data.map(role => role.ten);
-            setSelectedRoles(selectedRoles);
-            setValue('ngay_sinh', nhanVienData.ngaySinh.split('T')[0]);
-
-            if (nhanVienData.diaChi) {
-                const addressParts = nhanVienData.diaChi.split(',').map(part => part.trim());
-                if (addressParts.length >= 4) {
-                    const dia_chi_chi_tiet = addressParts[0];
-                    setValue('dia_chi', dia_chi_chi_tiet);
-
-                    const selectedProvinceName = addressParts[3].trim().toLowerCase();
-                    const selectedDistrictName = addressParts[2].trim().toLowerCase();
-                    const selectedWardName = addressParts[1].trim().toLowerCase();
-
-                    let selectedProvince = provinces.find(province => province.name_en.trim().toLowerCase() == toNonAccentVietnamese(selectedProvinceName));
-                    if (!selectedProvince) {
-                        setError(`Province not found: ${selectedProvinceName}`);
-                        return;
-                    }
-                    if (selectedProvince) {
-                        setSelectedProvince(selectedProvince.id);
-                        await fetchDistricts(selectedProvince.id);
-                    }
-                    let districtData = [];
-
-                    try {
-                        const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince.id}.htm`);
-                        const formattedData = response.data.data.map(district => ({
-                            id: district.id,
-                            ten: district.name
-                        }));
-                        districtData = formattedData;
-                    } catch (error) {
-                        setError('Failed to fetch districts');
-                    }
-
-                    const selectedDistrict = districtData.find(district =>
-                        district.ten.trim().toLowerCase() === selectedDistrictName);
-
-                    if (selectedDistrict) {
-                        setSelectedDistrict(selectedDistrict.id);
-                    }
-                    let wardData = [];
-                    try {
-                        const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict.id}.htm`);
-                        const formattedData = response.data.data.map(ward => ({
-                            id: ward.id,
-                            ten: ward.name
-                        }));
-                        wardData = formattedData;
-                    } catch (error) {
-                        setError('Failed to fetch wards');
-                    }
-
-                    const selectedWard = wardData.find(ward => ward.ten.trim().toLowerCase() === selectedWardName);
-                    if (selectedWard) {
-                        setSelectedWard(selectedWard.id);
-                    }
-                }
-            }
-        } catch (error) {
-            console.log(error);
-            setError('Failed to fetch employee details');
-        }
-
-    };
-
     const openCloudinaryWidget = () => {
-        window.cloudinary.openUploadWidget(
-            {
-                cloudName: 'daljc2ktr',
-                uploadPreset: 'ovuxjxsx',
-                sources: ['local', 'url', 'camera', 'google_photos', 'facebook', 'dropbox', 'instagram'],
-                multiple: false,
-                cropping: true,
-                folder: 'employee_images',
-            },
+        window.cloudinary.openUploadWidget({
+            cloudName: 'daljc2ktr',
+            uploadPreset: 'ovuxjxsx',
+            sources: ['local', 'url', 'camera', 'google_photos', 'facebook', 'dropbox', 'instagram'],
+            multiple: false,
+            cropping: true,
+            folder: 'customers_images',
+        },
             (error, result) => {
-                if (!error && result && result.event === "success") {
+                if (!error && result.event === "success") {
                     setImageUrl(result.info.secure_url);
-                    setValue('hinh_anh', result.info.secure_url);
                 }
             }
         );
     };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    }
+
+    const handleNavigate = () => {
+        navigate('/khachhang/danhsachkhachhang');
+    }
+
     const onSubmit = async (data) => {
         setLoading(true);
         try {
-            let formData = {};
+            debugger;
+            let formData = {}
             formData.ten = data.ten;
-            formData.sdt = data.sdt;
             formData.email = data.email;
-            formData.tai_khoan_ngan_hang = data.tai_khoan_ngan_hang;
-            // Tính tuổi từ ngày sinh
-            const today = new Date();
-            const birthDate = new Date(data.ngay_sinh);
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDifference = today.getMonth() - birthDate.getMonth();
-
-            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-            if (age < 18) {
-                setSnackbarMessage('Tuổi phải lớn hơn hoặc bằng 18!');
-                setSnackbarSeverity('error');
-                setSnackbarOpen(true);
-                return;
-            }
+            formData.sdt = data.sdt;
             formData.ngay_sinh = new Date(data.ngay_sinh).toISOString();
             formData.gioi_tinh = data.gioi_tinh;
-            formData.hinh_anh = data.hinh_anh;
-            const diaChi = `${data.dia_chi}, ${selectedWard ? wards.find(ward => ward.id === selectedWard).ten : ''}, ${selectedDistrict ? districts.find(district => district.id === selectedDistrict).ten : ''}, ${selectedProvince ? provinces.find(province => province.id === selectedProvince).name : ''}`;
-            formData.dia_chi = diaChi;
-            formData.list_vai_tro = selectedRoles;
+            formData.hinhAnh = imageUrl;
+            formData.idPhuongXa = selectedWard;
+            formData.idQuanHuyen = selectedDistrict;
+            formData.idTinhThanhPho = selectedProvince;
+            formData.diaChiNhanHang = data.dia_chi;
 
-            await schema.validate(formData);
+            await validationSchema.validate(formData);
 
-            const url = id ? `http://localhost:8080/api/nhan_vien/update/${id}` : 'http://localhost:8080/api/nhan_vien/create';
-            const method = id ? 'put' : 'post';
+            const url = `http://localhost:8080/api/khachhang/create`
+            const method = 'post'
 
             const response = await axios({
                 method: method,
@@ -316,27 +193,18 @@ function NhanVienConfiguration() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
+            })
 
-            if (id) {
-                setSnackbarMessage('Cập nhật nhân viên thành công!');
+            if (response.status === 200) {
+                setSnackbarMessage('Dữ liệu đã được gửi thành công!');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
-
                 setTimeout(() => {
                     handleNavigate();
                 }, 1000);
             } else {
-
-                setSnackbarMessage('Thêm nhân viên thành công!');
-                setSnackbarSeverity('success');
-                setSnackbarOpen(true);
-
-                setTimeout(() => {
-                    handleNavigate();
-                }, 1000);
+                throw new Error('Unexpected response status');
             }
-            console.log(response);
         } catch (error) {
             setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
             setSnackbarSeverity('error');
@@ -344,28 +212,12 @@ function NhanVienConfiguration() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleCloseSnackbar = () => {
-        setSnackbarOpen(false);
-    };
-
-    const handleNavigate = () => {
-        navigate('/nhanvien/danhsachnhanvien');
-    };
-
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <CircularProgress />
-            </Box>
-        );
     }
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
-                {id ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên mới'}
+                Thêm Khách Hàng
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)} >
                 <Grid container spacing={3}>
@@ -429,24 +281,7 @@ function NhanVienConfiguration() {
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Controller
-                                    name="tai_khoan_ngan_hang"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            fullWidth
-                                            label="Tài khoản ngân hàng"
-                                            variant="outlined"
-                                            {...register('tai_khoan_ngan_hang')}
-                                            InputLabelProps={{ shrink: true }}
-                                            error={!!errors.tai_khoan_ngan_hang}
-                                            helperText={errors.tai_khoan_ngan_hang?.message}
-                                            sx={{ mb: 2 }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
+                            {/* Thiếu 1 */}
                         </Grid>
 
                         <Grid container spacing={3}>
@@ -502,46 +337,11 @@ function NhanVienConfiguration() {
                         </Grid>
 
                         <Grid container spacing={3}>
-                            <Grid item xs={12} md={12}>
-                                <FormControl fullWidth sx={{ mb: 2 }}>
-                                    <InputLabel>Vai trò</InputLabel>
-                                    <Controller
-                                        name="list_vai_tro"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                {...register('vai_tro')}
-                                                multiple
-                                                value={selectedRoles}
-                                                onChange={(e) => setSelectedRoles(e.target.value)}
-                                                renderValue={(selected) => (
-                                                    <div>
-                                                        {selected.map((value) => (
-                                                            <Chip key={value} label={roles.find((role) => role.ten === value)?.ten} />
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            >
-                                                {roles.map((role) => (
-                                                    <MenuItem key={role.ten} value={role.ten}>
-                                                        <Checkbox checked={selectedRoles.indexOf(role.ten) > -1} />
-                                                        <ListItemText primary={role.ten} />
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        )}
-                                    />
-                                    <FormHelperText>{errors.list_vai_tro?.message}</FormHelperText>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-
-                        <Grid container spacing={3}>
                             <Grid item xs={12} md={4}>
                                 <FormControl fullWidth sx={{ mb: 2 }}>
                                     <InputLabel>Tỉnh/Thành Phố *</InputLabel>
                                     <Controller
-                                        name="province"
+                                        name="idTinhThanhPho"
                                         control={control}
                                         render={({ field }) => (
                                             <Select
@@ -607,7 +407,7 @@ function NhanVienConfiguration() {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    label="Địa chỉ"
+                                    label="Địa chỉ Nhận Hàng"
                                     multiline
                                     rows={4}
                                     style={{ marginBottom: '30px' }}
@@ -626,7 +426,7 @@ function NhanVienConfiguration() {
 
                     {/* Image Preview */}
                     <Grid item xs={12} md={4}>
-                        <Typography variant="h6" style={{textAlign: 'center'}}>Ảnh đại diện</Typography>
+                        <Typography variant="h3" style={{ textAlign: 'center' }}>Ảnh đại diện</Typography>
                         <Box display="flex" flexDirection="column" alignItems="center" height="100%">
                             {imageUrl ? (
                                 <img
@@ -670,4 +470,4 @@ function NhanVienConfiguration() {
     );
 }
 
-export default NhanVienConfiguration;
+export default KhachHangConfiguration;

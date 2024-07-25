@@ -23,11 +23,31 @@ export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
 
 export const searchTrangThai = async (page, searchRadio) => {
     try {
-        const result = await get(`/nhan_vien/searchtrangthai?page=${page}&trangThai=${searchRadio}`
-        );
+        const result = await get(`/nhan_vien/searchtrangthai?page=${page}&trangThai=${searchRadio}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees by status:', error);
+        throw error;
+    }
+};
+
+export const searchGioiTinh = async (page, selectGioiTinh) => {
+    try {
+        const result = await get(`/nhan_vien/searchgioitinh?page=${page}&gioiTinh=${selectGioiTinh}`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching Employees by sex:', error);
+        throw error;
+    }
+};
+
+export const searchYearOfEmplpyee = async (page, searchYear) => {
+    try {
+        debugger;
+        const result = await get(`/nhan_vien/searchyear?page=${page}&year=${searchYear}`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching Employees by Year:', error);
         throw error;
     }
 };

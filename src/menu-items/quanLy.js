@@ -133,7 +133,7 @@ const quanLy = {
                     id: 'khachhang',
                     title: 'Khách hàng',
                     type: 'item',
-                    url: '/khachhang/danhsach'
+                    url: '/khachhang/danhsachkhachhang'
                   },
                   {
                     id: 'vaitro',
