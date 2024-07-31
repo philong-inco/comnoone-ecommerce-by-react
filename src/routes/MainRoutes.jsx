@@ -230,7 +230,7 @@ const MainRoutes = {
           element: <KhachHangConfiguration/>
         },
         {
-          path: 'khachhangaddress',
+          path: 'khachhangaddress/:id',
           element: <KhachHangAddress/>
         },
       ]

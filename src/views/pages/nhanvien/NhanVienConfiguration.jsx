@@ -38,7 +38,6 @@ const schema = Yup.object().shape({
     gioi_tinh: Yup.number().required('Giới tính không được để trống').oneOf([0, 1], 'Giới tính phải là 0 hoặc 1'),
     hinh_anh: Yup.string().nullable(),
     dia_chi: Yup.string().required('Địa chỉ không được để trống'),
-    list_vai_tro: Yup.array().of(Yup.string()).required('Vui lòng chọn vai trò cho nhân viên.')
 });
 
 function NhanVienConfiguration() {

@@ -92,7 +92,7 @@ const KhachHang = () => {
     };
 
     const handleEdit = (id) => {
-        navigate(`/khachhang/khachhangconfiguration/${id}`);
+        navigate(`/khachhang/khachhangaddress/${id}`);
     };
 
     const handlePageChange = (value) => {
@@ -151,7 +151,7 @@ const KhachHang = () => {
                                         {/* <TableCell align="center">{getStatusChip(kh.trangThai)}</TableCell> */}
                                         <TableCell align="center">
                                             <Button className="btn btn-link">
-                                                <IconEdit stroke={2} onClick={() => handleEdit(nv.id)} />
+                                                <IconEdit stroke={2} onClick={() => handleEdit(kh.id)} />
                                             </Button>
                                         </TableCell>
                                     </TableRow>

@@ -102,7 +102,7 @@ function KhachHangConfiguration() {
     const fetchProvinces = async () => {
         debugger;
         try {
-            const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
+            const response = await axios.get(`https://esgoo.net/api-tinhthanh/1/0.htm`);
             if (response.data.data && Array.isArray(response.data.data)) {
                 setProvinces(response.data.data);
                 setIsProvincesLoaded(true);

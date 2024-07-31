@@ -158,7 +158,7 @@ const DanhSachNhanVien = () => {
     };
 
     const handlePageChange = (value) => {
-        setCurrentPage(value - 1);
+        setCurrentPage(value + 1);
     };
 
     const handleSwitchChange = (id, currentStatus) => {

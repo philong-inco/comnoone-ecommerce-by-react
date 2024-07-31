@@ -29,29 +29,4 @@ export const getsearchGioiTinh = async (page, gioiTinh) => {
     }
 }
 
-export const createNhanVien = async () => {
-    try {
-        const result = await post('/khachhang/create', data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return result;
-    } catch (error) {
-        console.log('Error create customer', error);
-    }
-}
-
-export const updateNhanVien = async () => {
-    try {
-        const result = await put('/khachhang/update/{id}', data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return result;
-    } catch (error) {
-        console.log('Error create customer', error);
-    }
-}
 
