@@ -23,11 +23,12 @@ import {
   IconButton,
   FormLabel,
   RadioGroup,
-  Radio
+  Radio,
+  FormHelperText
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { IconPencil } from '@tabler/icons-react';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
@@ -48,11 +49,7 @@ const validationSchema = Yup.object().shape({
 const addressValidationSchema = Yup.object().shape({
   ten_nguoi_nhan: Yup.string().required('Tên người nhận không được để trống'),
   sdt_nguoi_nhan: Yup.string().required('Số điện thoại người nhận không được để trống'),
-  email: Yup.string().email('Email không hợp lệ').required('Email không được để trống'),
-  dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống'),
-  province: Yup.string().required('Tỉnh thành không được để trống'),
-  district: Yup.string().required('Quận huyện không được để trống'),
-  ward: Yup.string().required('Phường xã không được để trống'),
+  dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống')
 });
 
 function KhachHangAddress() {
@@ -94,8 +91,8 @@ function KhachHangAddress() {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [addresses, setAddresses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchProvinces, setSearchProvinces] = useState('');
-  const [searchWards, setSearchWards] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     if (isProvincesLoaded && id) {
       fetchKhachHangInfo(id);
@@ -104,6 +101,7 @@ function KhachHangAddress() {
 
   useEffect(() => {
     if (selectedProvince) {
+      console.log('1231231', districts);
       fetchDistricts(selectedProvince);
     } else {
       setDistricts([]);
@@ -112,6 +110,7 @@ function KhachHangAddress() {
 
   useEffect(() => {
     if (selectedDistrict) {
+
       fetchWards(selectedDistrict);
     } else {
       setWards([]);
@@ -162,7 +161,7 @@ function KhachHangAddress() {
       const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${provinceId}.htm`);
       const formattedData = response.data.data.map(district => ({
         id: district.id,
-        ten: district.name
+        name: district.name
       }));
       setDistricts(formattedData);
     } catch (error) {
@@ -175,7 +174,7 @@ function KhachHangAddress() {
       const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
       const formattedData = response.data.data.map(ward => ({
         id: ward.id,
-        ten: ward.name
+        name: ward.name
       }));
       setWards(formattedData);
     } catch (error) {
@@ -185,7 +184,6 @@ function KhachHangAddress() {
 
   const fetchKhachHangInfo = async (id) => {
     try {
-      debugger;
       const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
       const khachHangData = response.data;
       setValue('ten', khachHangData.ten);
@@ -198,35 +196,47 @@ function KhachHangAddress() {
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;
       setAddresses(diaChiList);
-     
-      for (const [index, diaChi] of diaChiList.entries()) {
+      const provinces = new Set();
+      const districts = new Set();
 
-        const formattedTinhThanhPhoId = diaChi.idTinhThanhPho.toString().padStart(2, '0');
-        const formattedQuanHuyenId = diaChi.idQuanHuyen.toString().padStart(3, '0');
-        let districtData = [];
-        try {
-          const responseDistrict = await axios.get(`https://esgoo.net/api-tinhthanh/2/${formattedTinhThanhPhoId}.htm`);
-          districtData = responseDistrict.data.data.map(district => ({
-            id: district.id,
-            ten: district.name
-          }));
-          setDistricts(districtData);
-        } catch (error) {
-          setError('Failed to fetch districts');
-        }
-        let wardData = [];
-        try {
-          const responseWard = await axios.get(`https://esgoo.net/api-tinhthanh/3/${formattedQuanHuyenId}.htm`);
-          wardData = responseWard.data.data.map(ward => ({
-            id: ward.id,
-            ten: ward.name
-          }));
-          setWards(wardData);
-        } catch (error) {
-          setError('Failed to fetch wards');
-        }
+      for (const diaChi of diaChiList) {
+        provinces.add(diaChi.idTinhThanhPho);
+        districts.add(diaChi.idQuanHuyen);
       }
 
+      const fetchDistrictsAndWards = async () => {
+        const districtPromises = Array.from(provinces).map(async (districtId) => {
+          const formattedTinhThanhPhoId = districtId.toString().padStart(2, '0');
+          try {
+            const responseDistrict = await axios.get(`https://esgoo.net/api-tinhthanh/2/${formattedTinhThanhPhoId}.htm`);
+            return responseDistrict.data.data.map(district => ({
+              id: district.id,
+              name: district.name
+            }));
+          } catch (error) {
+            setError('Failed to fetch districts');
+            return [];
+          }
+        });
+        const allDistricts = (await Promise.all(districtPromises)).flat();
+        setDistricts(allDistricts);
+        const wardPromises = Array.from(districts).map(async (districtId) => {
+          const formattedQuanHuyenId = districtId.toString().padStart(3, '0');
+          try {
+            const responseWard = await axios.get(`https://esgoo.net/api-tinhthanh/3/${formattedQuanHuyenId}.htm`);
+            return responseWard.data.data.map(ward => ({
+              id: ward.id,
+              name: ward.name
+            }));
+          } catch (error) {
+            setError('Failed to fetch wards');
+            return [];
+          }
+        });
+        const allWards = (await Promise.all(wardPromises)).flat();
+        setWards(allWards);
+      };
+      await fetchDistrictsAndWards();
     } catch (error) {
       setError('Failed to fetch KhachHang Info');
     }
@@ -234,9 +244,14 @@ function KhachHangAddress() {
 
 
   const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
+    setIsModalOpen(false);
+    resetAddress();
+    setIsEditing(false);
   }
 
+  const handleNavigate = () => {
+    navigate('/khachhang/danhsachkhachhang');
+  }
   const onSubmit = async (data) => {
     try {
       let formData = {
@@ -245,7 +260,7 @@ function KhachHangAddress() {
         email: data.email,
         ngay_sinh: new Date(data.ngay_sinh).toISOString(),
         gioi_tinh: data.gioi_tinh,
-        hinhAnh: data.hinhAnh
+        hinhAnh: imageUrl
       };
 
       // Tính tuổi từ ngày sinh
@@ -266,19 +281,30 @@ function KhachHangAddress() {
 
       await validationSchema.validate(formData);
       const url = `http://localhost:8080/api/khachhang/update/${id}`;
-      await axios.put(url, formData);
-      setSnackbarMessage('Cập nhật thành công!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
+      const method = 'put'
+      const response = await axios({
+        method: method,
+        url: url,
+        data: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.status === 200) {
+        setSnackbarMessage('Cập nhật thành công!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          handleNavigate();
+        }, 1000);
+      }
+
     } catch (error) {
       setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
-  };
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -287,18 +313,54 @@ function KhachHangAddress() {
   };
 
   const onAddressSubmit = async (data) => {
+    debugger
     try {
-      const newAddress = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...data,
-      };
+      let formDataAddress = {};
+      formDataAddress.tenNguoiNhan = data.ten_nguoi_nhan;
+      formDataAddress.sdtNguoiNhan = data.sdt_nguoi_nhan;
+      formDataAddress.diaChiNhanHang = data.dia_chi_nhan_hang;
+      formDataAddress.emailNguoiNhan = data.email;
+      formDataAddress.khach_hang_id = id;
+      formDataAddress.idTinhThanhPho = data.provinces  || selectedProvince;
+      formDataAddress.idQuanHuyen = data.districts || selectedDistrict;
+      formDataAddress.idPhuongXa = data.wards || selectedWard;
 
-      setAddresses((prevAddresses) => [...prevAddresses, newAddress]);
-      handleCloseModal();
+      await addressValidationSchema.validate(formDataAddress);
+      try {
+        const url = data.id_dia_chi ? `http://localhost:8080/api/diachi/updatelocation/${data.id_dia_chi}` : 'http://localhost:8080/api/diachi/create';
+        const method = data.id_dia_chi ? 'PUT' : 'POST';
+        const responseAddress = await axios({
+          method: method,
+          url: url,
+          data: formDataAddress,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log(responseAddress);
+      } catch (error){
+        console.log(error);
+      }
+      
+
+      if (data.id_dia_chi) {
+        setSnackbarMessage('Cập nhật thành công địa chỉ!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+
+        setTimeout(() => {
+          handleCloseModal();
+        }, 1000);
+      } else {
+        setSnackbarMessage('Thêm thành công địa chỉ !');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          handleCloseModal();
+        }, 1000);
+      }
     } catch (error) {
-      setSnackbarMessage('Có lỗi xảy ra khi thêm địa chỉ!');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      console.log(error);
     }
   };
 
@@ -319,7 +381,28 @@ function KhachHangAddress() {
     );
   };
 
+  const handleOpenModal = async (address) => {
+    setSelectedAddress(address);
+    setIsEditing(true);
+    setIsModalOpen(true);
+    setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
+    setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
+    setValueAddress('email', address.emailNguoiNhan);
+    setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
+    setValueAddress('id_dia_chi', address.id);
 
+    try {
+
+      const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
+      const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
+      setValueAddress('provinces', formattedTinhThanhPhoId);
+      setValueAddress('districts', formattedQuanHuyenId);
+      const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
+      setValueAddress('wards', formaterPhuongXaId);
+    } catch (error) {
+      console.error('Failed to fetch address data', error);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
@@ -442,8 +525,7 @@ function KhachHangAddress() {
           </Button>
         </form>
       </Box>
-
-      <Box sx={{ width: '67%', p: 2 }}>
+      <Box sx={{ width: '55%', p: 2 }}>
 
         <Grid item xs={8}>
           <Paper elevation={3}>
@@ -457,25 +539,83 @@ function KhachHangAddress() {
               <Grid container spacing={2}>
                 {addresses.map((address, index) => (
                   <Grid item xs={6} key={index}>
-                    <Paper elevation={2} sx={{ p: 2 }}>
-                      <Typography variant="body1">
-                        Tên người nhận: {address.tenNguoiNhan}
-                      </Typography>
-                      <Typography variant="body1">
-                        Số điện thoại: {address.sdtNguoiNhan}
-                      </Typography>
-                      {/* <Typography variant="body1">Email: {address.email}</Typography> */}
-                      <Typography variant="body1">
-                        Tỉnh/Thành phố: {provinces.find(p => p.id == address.idTinhThanhPho)?.name}
-                      </Typography>
-                      <Typography variant="body1">
-                        Quận/Huyện: {districts.find(d => d.id == address.idQuanHuyen)?.ten}
-                      </Typography>
-                      <Typography variant="body1">
-                        Phường/Xã: {wards.find(w => w.id == address.idPhuongXa)?.ten}
-                      </Typography>
-                      <Typography variant="body1">Địa chỉ: {address.diaChiNhanHang}</Typography>
+                    <Paper elevation={2} sx={{ p: 2, position: 'relative' }}>
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          display: 'flex',
+                          alignItems: 'center',
+                          zIndex: 1
+                        }}
+                      >
+                        {address.loaiDiaChi === 1 && (
+                          <StarIcon color="warning" sx={{ mr: 1 }} />
+                        )}
+                        <IconPencil stroke={1} onClick={() => handleOpenModal(address)} />
+                      </Box>
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', display: 'none' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          ID:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {address.id}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Tên người nhận:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {address.tenNguoiNhan}
+                        </Typography>
+                      </Box>
 
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Số điện thoại:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {address.sdtNguoiNhan}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Tỉnh/Thành phố:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {provinces.find(p => p.id == address.idTinhThanhPho)?.name}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Quận/Huyện:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {districts.find(d => d.id == address.idQuanHuyen)?.name}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Phường/Xã:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {wards.find(w => w.id == address.idPhuongXa)?.name}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'inline' }}>
+                          Địa chỉ:
+                        </Typography>
+                        <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
+                          {address.diaChiNhanHang}
+                        </Typography>
+                      </Box>
                     </Paper>
                   </Grid>
                 ))}
@@ -485,132 +625,149 @@ function KhachHangAddress() {
         </Grid>
       </Box>
 
-      <Modal open={isModalOpen} onClose={handleCloseModal}>
-        <Paper sx={{ p: 3, position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '50%' }}>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseModal}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" gutterBottom>
-            Thêm địa chỉ mới
-          </Typography>
+      <Modal open={isModalOpen} onClose={handleCloseModal} aria-labelledby="modal-title"
+        aria-describedby="modal-description">
+        <Box sx={{ width: '400px', bgcolor: 'background.paper', p: 4, mx: 'auto', mt: 4 }}>
+          <Typography variant="h6">{isEditing ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ'}</Typography>
           <form onSubmit={handleSubmitAddress(onAddressSubmit)}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Tên người nhận"
-                  fullWidth
-                  {...registerAddress('ten_nguoi_nhan')}
-                  error={!!addressErrors.ten_nguoi_nhan}
-                  helperText={addressErrors.ten_nguoi_nhan?.message}
+
+            <TextField
+              label="ID"
+              fullWidth
+              margin="normal"
+              style={{ display: 'none' }}
+              {...registerAddress('id_dia_chi')}
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <TextField
+              label="Tên người nhận"
+              fullWidth
+              margin="normal"
+              {...registerAddress('ten_nguoi_nhan')}
+              InputLabelProps={{ shrink: true }}
+              error={Boolean(addressErrors.ten_nguoi_nhan)}
+              helperText={addressErrors.ten_nguoi_nhan?.message}
+            />
+            <TextField
+              label="Số điện thoại người nhận"
+              fullWidth
+              margin="normal"
+              {...registerAddress('sdt_nguoi_nhan')}
+              InputLabelProps={{ shrink: true }}
+              error={Boolean(addressErrors.sdt_nguoi_nhan)}
+              helperText={addressErrors.sdt_nguoi_nhan?.message}
+            />
+            <TextField
+              label="Email người nhận"
+              fullWidth
+              margin="normal"
+              {...registerAddress('email')}
+              InputLabelProps={{ shrink: true }}
+              error={Boolean(addressErrors.email)}
+              helperText={addressErrors.email?.message}
+            />
+
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, mb: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel>Tỉnh thành</InputLabel>
+                <Controller
+                  name="provinces"
+                  control={controlAddress}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setValueAddress('province', value);
+                        setSelectedProvince(value);
+                      }}
+                      error={Boolean(addressErrors.province)}
+                    >
+                      {provinces.map((province) => (
+                        <MenuItem key={province.id} value={province.id}>
+                          {province.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Số điện thoại người nhận"
-                  fullWidth
-                  {...registerAddress('sdt_nguoi_nhan')}
-                  error={!!addressErrors.sdt_nguoi_nhan}
-                  helperText={addressErrors.sdt_nguoi_nhan?.message}
+                {addressErrors.province && <FormHelperText error>{addressErrors.province.message}</FormHelperText>}
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Quận huyện</InputLabel>
+                <Controller
+                  name="districts"
+                  control={controlAddress}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setValueAddress('district', value);
+                        setSelectedDistrict(value);
+                      }}
+                      error={Boolean(addressErrors.district)}
+                    >
+                      {districts.map((district) => (
+                        <MenuItem key={district.id} value={district.id}>
+                          {district.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Địa chỉ nhận hàng"
-                  fullWidth
-                  {...registerAddress('dia_chi_nhan_hang')}
-                  error={!!addressErrors.dia_chi_nhan_hang}
-                  helperText={addressErrors.dia_chi_nhan_hang?.message}
+                {addressErrors.district && <FormHelperText error>{addressErrors.district.message}</FormHelperText>}
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Phường xã</InputLabel>
+                <Controller
+                  name="wards"
+                  control={controlAddress}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setValueAddress('ward', value);
+                        setSelectedWard(value);
+                      }}
+                      error={Boolean(addressErrors.ward)}
+                    >
+                      {wards.map((ward) => (
+                        <MenuItem key={ward.id} value={ward.id}>
+                          {ward.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Tỉnh thành</InputLabel>
-                      <Select
-                        {...registerAddress('province')}
-                        error={!!addressErrors.province}
-                        onChange={(e) => {
-                          setSelectedProvince(e.target.value);
-                          setValueAddress('district', '');
-                          setValueAddress('ward', '');
-                        }}
-                      >
-                        {provinces.map((province) => (
-                          <MenuItem key={province.id} value={province.id}>
-                            {province.ten}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {addressErrors.province && (
-                        <Typography variant="body2" color="error">
-                          {addressErrors.province.message}
-                        </Typography>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Quận huyện</InputLabel>
-                      <Select
-                        {...registerAddress('district')}
-                        error={!!addressErrors.district}
-                        onChange={(e) => {
-                          setSelectedDistrict(e.target.value);
-                          setValueAddress('ward', '');
-                        }}
-                      >
-                        {districts.map((district) => (
-                          <MenuItem key={district.id} value={district.id}>
-                            {district.ten}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {addressErrors.district && (
-                        <Typography variant="body2" color="error">
-                          {addressErrors.district.message}
-                        </Typography>
-                      )}
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Phường xã</InputLabel>
-                      <Select
-                        {...registerAddress('ward')}
-                        error={!!addressErrors.ward}
-                      >
-                        {wards.map((ward) => (
-                          <MenuItem key={ward.id} value={ward.id}>
-                            {ward.ten}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {addressErrors.ward && (
-                        <Typography variant="body2" color="error">
-                          {addressErrors.ward.message}
-                        </Typography>
-                      )}
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Box sx={{ mt: 2, textAlign: 'right' }}>
-              <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
-                Hủy
-              </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Thêm
-              </Button>
+                {addressErrors.ward && <FormHelperText error>{addressErrors.ward.message}</FormHelperText>}
+              </FormControl>
             </Box>
+            <TextField
+              label="Địa chỉ nhận hàng"
+              fullWidth
+              margin="normal"
+              {...registerAddress('dia_chi_nhan_hang')}
+              InputLabelProps={{ shrink: true }}
+
+              error={Boolean(addressErrors.dia_chi_nhan_hang)}
+              helperText={addressErrors.dia_chi_nhan_hang?.message}
+              sx={{ fontFamily: 'Arial' }}
+            />
+            <Button type="submit" variant="contained" color="primary">
+              {isEditing ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ'}
+            </Button>
+            <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 10, right: 10 }}>
+              <CloseIcon />
+            </IconButton>
           </form>
-        </Paper>
+        </Box>
       </Modal>
+
 
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>

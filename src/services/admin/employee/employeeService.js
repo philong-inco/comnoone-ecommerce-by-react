@@ -1,8 +1,8 @@
 import { get, post, del, patch, put } from '../../../utils/request.js';
 
-export const getAll = async (page) => {
+export const getAll = async (pageNo) => {
     try {
-        const result = await get(`/nhan_vien/all?page=${page}`);
+        const result = await get(`/nhan_vien/all?pageNo=${pageNo}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees:', error);
@@ -12,7 +12,7 @@ export const getAll = async (page) => {
 
 export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
     try {
-        const result = await get(`/nhan_vien/search?page=${page}&search=${searchKeyWord}`
+        const result = await get(`/nhan_vien/search?pageNo=${page}&search=${searchKeyWord}`
         );
         return result;
     } catch (error) {
@@ -23,7 +23,7 @@ export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
 
 export const searchTrangThai = async (page, searchRadio) => {
     try {
-        const result = await get(`/nhan_vien/searchtrangthai?page=${page}&trangThai=${searchRadio}`);
+        const result = await get(`/nhan_vien/searchtrangthai?pageNo=${page}&trangThai=${searchRadio}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees by status:', error);
@@ -33,7 +33,7 @@ export const searchTrangThai = async (page, searchRadio) => {
 
 export const searchGioiTinh = async (page, selectGioiTinh) => {
     try {
-        const result = await get(`/nhan_vien/searchgioitinh?page=${page}&gioiTinh=${selectGioiTinh}`);
+        const result = await get(`/nhan_vien/searchgioitinh?pageNo=${page}&gioiTinh=${selectGioiTinh}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees by sex:', error);
@@ -44,7 +44,7 @@ export const searchGioiTinh = async (page, selectGioiTinh) => {
 export const searchYearOfEmplpyee = async (page, searchYear) => {
     try {
         debugger;
-        const result = await get(`/nhan_vien/searchyear?page=${page}&year=${searchYear}`);
+        const result = await get(`/nhan_vien/searchyear?pageNo=${page}&year=${searchYear}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees by Year:', error);

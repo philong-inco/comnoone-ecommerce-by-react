@@ -34,7 +34,7 @@ import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBac
 import { IconEdit } from '@tabler/icons-react';
 
 const DanhSachNhanVien = () => {
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [searchKeyWord, setSearchKeyWord] = useState('');
     const [searchRadio, setSearchRadio] = useState('');
@@ -57,15 +57,15 @@ const DanhSachNhanVien = () => {
         try {
             let result;
             if (searchKeyWord) {
-                result = await searchNhanVienKeyWord(currentPage, searchKeyWord);
+                result = await searchNhanVienKeyWord(currentPage - 1, searchKeyWord);
             } else if (searchRadio) {
-                result = await searchTrangThai(currentPage, searchRadio);
+                result = await searchTrangThai(currentPage - 1, searchRadio);
             } else if (searchYear !== '') {
-                result = await searchYearOfEmplpyee(currentPage, searchYear);
+                result = await searchYearOfEmplpyee(currentPage - 1, searchYear);
             } else if (selectGioiTinh !== '') {
-                result = await searchGioiTinh(currentPage, selectGioiTinh);
+                result = await searchGioiTinh(currentPage - 1, selectGioiTinh);
             } else {
-                result = await getAll(currentPage);
+                result = await getAll(currentPage - 1);
             }
             setNhanVien(result.content);
             setTotalPages(result.totalPages);
@@ -98,38 +98,38 @@ const DanhSachNhanVien = () => {
                 )
             default:
                 return (
-                <Chip
-                    label="Không xác định"
-                    color="warning"
-                    style={{ backgroundColor: '#ff9800', color: '#fff' }}
-                />
-            )
+                    <Chip
+                        label="Không xác định"
+                        color="warning"
+                        style={{ backgroundColor: '#ff9800', color: '#fff' }}
+                    />
+                )
         }
     };
 
     const handleSearch = (event) => {
         event.preventDefault();
-        setCurrentPage(0);
+        setCurrentPage(1);
         setSearchRadio('');
     };
 
     const handleRadioChange = (event) => {
         setSearchRadio(event.target.value);
-        setCurrentPage(0);
+        setCurrentPage(1);
         setSearchKeyWord('');
     };
 
     const handleSelectChange = (event) => {
+        debugger;
         const value = event.target.value;
         setSelectGioiTinh(value);
-        setCurrentPage(0);
+        setCurrentPage(1);
 
     };
 
     const handleYearChange = (event) => {
         setSearchYear(event.target.value);
-        setCurrentPage(0);
-        debugger;
+        setCurrentPage(1);
     };
 
     const handleConfirmDelete = async () => {
@@ -157,8 +157,8 @@ const DanhSachNhanVien = () => {
         return new Date(dateString).toLocaleDateString('vi-VN', options);
     };
 
-    const handlePageChange = (value) => {
-        setCurrentPage(value + 1);
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
     };
 
     const handleSwitchChange = (id, currentStatus) => {
@@ -178,6 +178,7 @@ const DanhSachNhanVien = () => {
     // Tạo danh sách năm từ năm hiện tại - 100 đến năm hiện tại
     const currentYear = new Date().getFullYear();
     const years = Array.from(new Array(101), (_, index) => currentYear - index);
+
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
             <Box
@@ -291,7 +292,7 @@ const DanhSachNhanVien = () => {
                             const ngaySinh = formatDate(nv.ngaySinh);
                             return (
                                 <TableRow key={nv.id}>
-                                    <TableCell>{index + 1 + currentPage * 10}</TableCell>
+                                    <TableCell>{index + 1 + (currentPage - 1) * 10}</TableCell>
                                     <TableCell>
                                         <Avatar
                                             alt={nv.ten}
@@ -326,7 +327,7 @@ const DanhSachNhanVien = () => {
             <Box display="flex" justifyContent="center" mt={2}>
                 <Pagination
                     count={totalPages}
-                    page={currentPage + 1}
+                    page={currentPage}
                     onChange={handlePageChange}
                     color="primary"
                 />

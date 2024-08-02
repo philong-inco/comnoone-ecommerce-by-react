@@ -61,6 +61,7 @@ function NhanVienConfiguration() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
