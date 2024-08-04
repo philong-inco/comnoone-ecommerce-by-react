@@ -15,8 +15,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
-  Typography,
   TableContainer
 } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -27,52 +25,18 @@ import moment from 'moment';
 import { createPGG } from 'services/admin/coupons/couponsService';
 import { getPageKH } from 'services/admin/customer/customerService';
 import { useNavigate } from 'react-router-dom';
-import * as z from 'zod';
-import { style } from '@mui/system';
-const couponSchema = z
-  .object({
-    ten: z.string().nonempty('Tên phiếu không được để trống'),
-    loaiGiamGia: z.enum(['1', '2'], 'Loại giảm giá không hợp lệ'),
-    phamViApDung: z.enum(['1', '2'], 'Phạm vi áp dụng không hợp lệ'),
-    soLuong: z
-      .number()
-      .nullable()
-      .refine((value) => value === null || value > 0, 'Số lượng phải lớn hơn 0'),
-    giaTriGiamGia: z.number().refine((value) => value !== null && value > 0, 'Giá trị giảm không được để trống và phải lớn hơn 0'),
-    giaTriDonToiThieu: z
-      .number()
-      .nullable()
-      .refine((value) => value === null || value >= 0, 'Giá trị đơn tối thiểu không được âm'),
-    giamToiGia: z
-      .number()
-      .nullable()
-      .refine((value) => value === null || value >= 0, 'Giảm tối đa không được âm'),
-    ngayBatDau: z.string().nonempty('Ngày bắt đầu không được để trống'),
-    ngayHetHan: z.string().nonempty('Ngày kết thúc không được để trống'),
-    moTa: z.string().optional()
-  })
-  .refine(
-    (data) => {
-      const ngayBatDau = moment(data.ngayBatDau, 'YYYY-MM-DD');
-      const ngayHetHan = moment(data.ngayHetHan, 'YYYY-MM-DD');
-      return ngayBatDau.isBefore(ngayHetHan, 'day');
-    },
-    {
-      message: 'Ngày bắt đầu phải trước ngày kết thúc',
-      path: ['ngayBatDau']
-    }
-  );
+import { handleCouponErrors } from 'utils/handleError/couponsError';
 
 function CreateCoupons() {
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
   const [formValues, setFormValues] = useState({
-    ma: '',
+    ma: null,
     ten: '',
     loaiGiamGia: 1,
     phamViApDung: 1,
     giaTriDonToiThieu: null,
-    giamToiGia: null,
+    giamToiDa: null,
     ngayBatDau: null,
     ngayHetHan: null,
     soLuong: null,
@@ -81,7 +45,6 @@ function CreateCoupons() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customerCoupons, setCustomerCoupons] = useState([]);
-  // const [showCustomerTable, setShowCustomerTable] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
     message: '',
@@ -132,59 +95,31 @@ function CreateCoupons() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // const data = {
-    //   ...formValues,
-    //   listKhachHang: customerCoupons,
-    //   ngayBatDau: formValues.ngayBatDau ? moment(formValues.ngayBatDau).format('YYYY-MM-DD') : undefined,
-    //   ngayHetHan: formValues.ngayKetThuc ? moment(formValues.ngayKetThuc).format('YYYY-MM-DD') : undefined
-    // };
-    // Hàm chuyển đổi an toàn từ chuỗi sang số
-    const safeParseFloat = (value) => {
-      const number = parseFloat(value);
-      return isNaN(number) ? null : number;
-    };
-
-    // Chuyển đổi dữ liệu từ biểu mẫu thành kiểu số và chuỗi thích hợp
+    event.preventDefault();
     const data = {
       ...formValues,
       listKhachHang: customerCoupons,
       ngayBatDau: formValues.ngayBatDau ? moment(formValues.ngayBatDau).format('YYYY-MM-DD') : undefined,
-      ngayHetHan: formValues.ngayHetHan ? moment(formValues.ngayHetHan).format('YYYY-MM-DD') : undefined,
-      giaTriGiamGia: formValues.giaTriGiamGia ? safeParseFloat(formValues.giaTriGiamGia) : null,
-      giaTriDonToiThieu: formValues.giaTriDonToiThieu ? safeParseFloat(formValues.giaTriDonToiThieu) : null,
-      giamToiGia: formValues.giamToiGia ? safeParseFloat(formValues.giamToiGia) : null,
-      soLuong: formValues.soLuong ? safeParseFloat(formValues.soLuong) : null,
-      loaiGiamGia: String(formValues.loaiGiamGia), // Đảm bảo là chuỗi
-      phamViApDung: String(formValues.phamViApDung) // Đảm bảo là chuỗi
+      ngayHetHan: formValues.ngayHetHan ? moment(formValues.ngayHetHan).format('YYYY-MM-DD') : undefined
     };
-    console.log(data);
-    const validationResult = couponSchema.safeParse(data);
-    if (!validationResult.success) {
-      // debugger;
-      const errors = {};
-      validationResult.error.errors.forEach((error) => {
-        if (error.path.length > 0) {
-          // debugger;
-          console.log('Lỗi : ', error.message);
-          errors[error.path[0]] = error.message;
-        }
-      });
-      setErrors(errors);
-      setNotification({
-        open: true,
-        message: 'Dữ liệu nhập không hợp lệ!',
-        type: 'error'
-      });
-      return;
-    }
-
-    setErrors({});
+    console.log('DATA : ', data);
     try {
       const response = await createPGG(data);
+      console.log('Response : ', response);
 
       if (response.status_code === 201) {
-        setFormValues({});
+        setFormValues({
+          ma: null,
+          ten: '',
+          loaiGiamGia: '1',
+          phamViApDung: '1',
+          giaTriDonToiThieu: '',
+          giamToiGia: '',
+          ngayBatDau: null,
+          ngayHetHan: null,
+          soLuong: '',
+          giaTriGiamGia: ''
+        });
         setCustomerCoupons([]);
         setSelectAll(false);
         setNotification({
@@ -195,6 +130,7 @@ function CreateCoupons() {
         navigate('/phieugiamgia/danhsach');
       }
     } catch (error) {
+      handleCouponErrors(error.response?.data, setErrors);
       setNotification({
         open: true,
         message: 'Có lỗi xảy ra khi tạo phiếu giảm giá!',
@@ -242,7 +178,15 @@ function CreateCoupons() {
               <h4>Thông tin phiếu giảm giá</h4>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Mã" name="ma" value={formValues.ma || ''} onChange={handleChange} fullWidth />
+                  <TextField
+                    label="Mã"
+                    name="ma"
+                    value={formValues.ma || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ma}
+                    helperText={errors.ma ? errors.ma : ''}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -316,45 +260,43 @@ function CreateCoupons() {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Giá trị giảm tối đa"
-                    name="giamToiGia"
+                    name="giamToiDa"
                     type="number"
-                    value={formValues.giamToiGia || ''}
+                    value={formValues.giamToiDa || ''}
                     onChange={handleChange}
                     fullWidth
-                    // inputProps={{ min: 0 }}
                     error={!!errors.giamToiGia}
                     helperText={errors.giamToiGia ? errors.giamToiGia : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <DatePicker
+                  <TextField
                     label="Ngày bắt đầu"
-                    value={formValues.ngayBatDau || null}
-                    onChange={(date) => handleDateChange('ngayBatDau', date)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!!errors.ngayBatDau}
-                        helperText={errors.ngayBatDau ? errors.ngayBatDau : ''}
-                      />
-                    )}
+                    name="ngayBatDau"
+                    type="date"
+                    value={formValues.ngayBatDau || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ngayBatDau}
+                    helperText={errors.ngayBatDau || ''}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    ngayHetHan
+                  <TextField
                     label="Ngày kết thúc"
-                    value={formValues.ngayHetHan || null}
-                    onChange={(date) => handleDateChange('ngayHetHan', date)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        error={!!errors.ngayHetHan}
-                        helperText={errors.ngayHetHan ? errors.ngayHetHan : ''}
-                        fullWidth={true}
-                      />
-                    )}
+                    name="ngayHetHan"
+                    type="date"
+                    value={formValues.ngayHetHan || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ngayHetHan}
+                    helperText={errors.ngayHetHan || ''}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
