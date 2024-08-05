@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Grid, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import { Box, Grid, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Input } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
-const FilterCoupons = ({ handleSearch, handleStatusChange, handlePhamViChange, handleLoaiPhieuChange }) => {
+const FilterCoupons = ({ handleSearch, handlePhamViChange, handleLoaiPhieuChange, ngayBatDau, ngayHetHan, onDateChange }) => {
   const [searchValue, setSearchValue] = useState('');
   const [loaiGiamGia, setLoaiGiamGia] = useState('');
   const [trangThai, setTrangThai] = useState('');
@@ -20,16 +20,16 @@ const FilterCoupons = ({ handleSearch, handleStatusChange, handlePhamViChange, h
     handleLoaiPhieuChange(e);
   };
 
-  const handleTrangThaiChange = (e) => {
-    setTrangThai(e.target.value);
-    handleStatusChange(e);
-  };
-
   const handlePhamViFChange = (e) => {
     setPhamViApDung(e.target.value);
     handlePhamViChange(e);
   };
+  const handleChange = (e) => {
+    console.log('CHạy ');
 
+    const { name, value } = e.target;
+    onDateChange(name, value);
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 2, marginBottom: 2 }}>
@@ -45,15 +45,34 @@ const FilterCoupons = ({ handleSearch, handleStatusChange, handlePhamViChange, h
                 onChange={handleSearchChange}
               />
             </Grid>
-            {/* Vẫn đang lỗi nên chưa làm */}
             {/* Ngày bắt đầu */}
             <Grid item xs={12} sm={3}>
-              <DatePicker label="Ngày bắt đầu" renderInput={(params) => <TextField {...params} fullWidth />} />
+              <TextField
+                label="Ngày bắt đầu"
+                name="ngayBatDau"
+                type="date"
+                value={ngayBatDau}
+                onChange={handleChange}
+                fullWidth
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
             </Grid>
 
             {/* Ngày kết thúc */}
             <Grid item xs={12} sm={3}>
-              <DatePicker label="Ngày kết thúc" renderInput={(params) => <TextField {...params} fullWidth />} />
+              <TextField
+                label="Ngày kết thúc"
+                name="ngayHetHan"
+                type="date"
+                value={ngayHetHan}
+                onChange={handleChange}
+                fullWidth
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
             </Grid>
 
             {/* Phạm vi áp dụng*/}
@@ -64,20 +83,6 @@ const FilterCoupons = ({ handleSearch, handleStatusChange, handlePhamViChange, h
                   <FormControlLabel value="" control={<Radio />} label="Tất cả" />
                   <FormControlLabel value="1" control={<Radio />} label="Công khai" />
                   <FormControlLabel value="2" control={<Radio />} label="Riêng tư" />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-
-            {/* Trạng thái */}
-            <Grid item xs={12} sm={6}>
-              <FormControl component="fieldset" fullWidth>
-                <FormLabel component="legend">Trạng thái</FormLabel>
-                <RadioGroup row name="trangThai" value={trangThai} onChange={handleTrangThaiChange}>
-                  <FormControlLabel value="" control={<Radio />} label="Tất cả" />
-                  <FormControlLabel value="0" control={<Radio />} label="Chưa đến" />
-                  <FormControlLabel value="1" control={<Radio />} label="Đang áp dụng" />
-                  <FormControlLabel value="2" control={<Radio />} label="Hết hạn" />
-                  <FormControlLabel value="3" control={<Radio />} label="Hủy" />
                 </RadioGroup>
               </FormControl>
             </Grid>

@@ -49,7 +49,7 @@ export const createPGG = async (options) => {
     const result = await post('v1/coupons/add', options);
     return result;
   } catch (error) {
-    console.error('Error creating book room:', error);
+    console.error('Error creating coupons:', error);
     throw error;
   }
 };
@@ -59,7 +59,7 @@ export const deletedCoupons = async (id) => {
     const result = await del(`v1/coupons/delete/${id}`);
     return result;
   } catch (error) {
-    console.error('Error :');
+    console.error('Error :', error);
     throw error;
   }
 };
@@ -69,7 +69,7 @@ export const updatedPGG = async (id, pgg) => {
     const result = await put(`v1/coupons/update/${id}`, pgg);
     return result;
   } catch (error) {
-    console.error('Error :');
+    console.error('Error :', error);
     throw error;
   }
 };
@@ -82,7 +82,7 @@ export const getKHPGGById = async (id, page, size) => {
     console.log('GET response:', result);
     return result;
   } catch (error) {
-    console.log('Error get :');
+    console.log('Error get :', error);
     throw error;
   }
 };
@@ -95,7 +95,7 @@ export const deleteKhPGG = async (id, status) => {
     console.log('GET response:', result);
     return result;
   } catch (error) {
-    console.log('Error get :');
+    console.log('Error get :', error);
     throw error;
   }
 };

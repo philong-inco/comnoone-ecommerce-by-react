@@ -35,7 +35,6 @@ function CouponsCustomer(props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCouponId, setSelectedCouponId] = useState(null);
   const [refreshData, setRefreshData] = useState(false);
-  console.log('ID : ', props.id);
   const fetchApi = async (page = currentPage, size = size) => {
     setLoading(true);
     const response = await getKHPGGById(id, page, size);
@@ -134,8 +133,11 @@ function CouponsCustomer(props) {
   ];
 
   return (
-    <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
-      <Typography variant="h4">Tất cả khách hàng có phiếu giảm giá</Typography>
+    <>
+      {/* <Box sx={{ backgroundColor: '#f0f0f0', p: 5, borderRadius: 5 }}> */}
+      <Typography variant="h4" style={{ marginBottom: '15px', marginTop: '-20px' }}>
+        Tất cả khách hàng có phiếu giảm giá
+      </Typography>
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
@@ -177,7 +179,8 @@ function CouponsCustomer(props) {
         </DialogActions>
       </Dialog>
       {loading && <CircularProgress />}
-    </Box>
+      {/* </Box> */}
+    </>
   );
 }
 

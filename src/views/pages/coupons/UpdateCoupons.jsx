@@ -17,16 +17,15 @@ import {
   FormLabel,
   RadioGroup,
   FormControlLabel,
-  Radio,
-  Typography
+  Radio
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import moment from 'moment';
-import { createPGG, getPGGById, updatedPGG } from 'services/admin/coupons/couponsService';
+import { getPGGById, updatedPGG } from 'services/admin/coupons/couponsService';
 import { getPageKH } from 'services/admin/customer/customerService';
 import { useNavigate, useParams } from 'react-router-dom';
+import { handleCouponErrors } from 'utils/handleError/couponsError';
 
 function UpdateCoupons() {
   const navigate = useNavigate();
@@ -36,12 +35,12 @@ function UpdateCoupons() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customerCoupons, setCustomerCoupons] = useState([]);
-  const [showCustomerTable, setShowCustomerTable] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
     message: '',
     type: ''
   });
+  const [errors, setErrors] = useState({});
 
   const columns = [
     {
@@ -91,9 +90,9 @@ function UpdateCoupons() {
       ...formValues,
       listKhachHang: customerCoupons,
       ngayBatDau: formValues.ngayBatDau ? moment(formValues.ngayBatDau).format('YYYY-MM-DD') : undefined,
-      ngayHetHan: formValues.ngayKetThuc ? moment(formValues.ngayKetThuc).format('YYYY-MM-DD') : undefined
+      ngayHetHan: formValues.ngayHetHan ? moment(formValues.ngayHetHan).format('YYYY-MM-DD') : undefined
     };
-    console.log(data);
+    console.log('DATA : ', data);
     try {
       const response = await updatedPGG(id, data);
       if (response.status_code === 200 || response.status_code === 201) {
@@ -102,15 +101,19 @@ function UpdateCoupons() {
         setSelectAll(false);
         setNotification({
           open: true,
-          message: 'Tạo phiếu giảm giá thành công!',
+          message: 'Cập nhập phiếu giảm giá thành công !!!',
           type: 'success'
         });
-        navigate('/phieugiamgia/danhsach');
+        setErrors({});
+        setTimeout(() => {
+          navigate('/phieugiamgia/danhsach');
+        }, 2000);
       }
     } catch (error) {
+      handleCouponErrors(error.response?.data, setErrors);
       setNotification({
         open: true,
-        message: 'Có lỗi xảy ra khi tạo phiếu giảm giá!',
+        message: 'Có lỗi xảy ra khi tạo phiếu giảm giá !!!',
         type: 'error'
       });
     } finally {
@@ -120,14 +123,12 @@ function UpdateCoupons() {
   const handlePhamViApDungChange = (event) => {
     const value = event.target.value;
     setFormValues({ ...formValues, phamViApDung: value });
-    setShowCustomerTable(value === '2');
   };
 
   const fetchApiAllCustomer = async () => {
     setLoading(true);
     try {
       const response = await getPageKH();
-      console.log('res', response);
       if (response && response.content) {
         setCustomers(response.content);
       } else {
@@ -151,6 +152,8 @@ function UpdateCoupons() {
   const fetchCouponById = async (couponId) => {
     try {
       const response = await getPGGById(couponId);
+      console.log(response);
+
       if (response.status_code === 200) {
         const { data } = response;
         setFormValues({
@@ -161,13 +164,12 @@ function UpdateCoupons() {
           soLuong: data.soLuong,
           giaTriGiamGia: data.giaTriGiamGia,
           giaTriDonToiThieu: data.giaTriDonToiThieu,
-          giamToiGia: data.giamToiGia,
+          giamToiDa: data.giamToiDa,
           moTa: data.moTa,
-          ngayBatDau: moment(data.ngayBatDau),
-          ngayKetThuc: moment(data.ngayHetHan)
+          ngayBatDau: moment(data.ngayBatDau).format('YYYY-MM-DD'),
+          ngayHetHan: moment(data.ngayHetHan).format('YYYY-MM-DD')
         });
         setCustomerCoupons(data.khachHangPhieuGiamGias);
-        setShowCustomerTable(data.phamViApDung.toString() === '2');
       }
     } catch (error) {
       console.log('Error : ', error);
@@ -185,8 +187,8 @@ function UpdateCoupons() {
       fetchCouponById(id);
     }
   }, [id]);
-  console.log(customers);
-  console.log(customerCoupons);
+  console.log('Danh sách khách hàng : ', customers);
+  console.log('Danh sách khách hàng vs PGG : ', customerCoupons);
 
   return (
     <>
@@ -213,10 +215,18 @@ function UpdateCoupons() {
             >
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Mã" name="ma" value={formValues.ma || ''} onChange={handleChange} fullWidth />
+                  <TextField label="Mã" name="ma" value={formValues.ma || ''} disabled={true} onChange={handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField label="Tên phiếu" name="ten" value={formValues.ten || ''} onChange={handleChange} fullWidth />
+                  <TextField
+                    label="Tên phiếu"
+                    name="ten"
+                    value={formValues.ten || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ten}
+                    helperText={errors.ten ? errors.ten : ''}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl component="fieldset" fullWidth>
@@ -244,6 +254,8 @@ function UpdateCoupons() {
                     onChange={handleChange}
                     type="number"
                     fullWidth
+                    error={!!errors.soLuong}
+                    helperText={errors.soLuong ? errors.soLuong : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -254,6 +266,8 @@ function UpdateCoupons() {
                     onChange={handleChange}
                     type="number"
                     fullWidth
+                    error={!!errors.giaTriGiamGia}
+                    helperText={errors.giaTriGiamGia ? errors.giaTriGiamGia : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -264,33 +278,51 @@ function UpdateCoupons() {
                     onChange={handleChange}
                     type="number"
                     fullWidth
+                    error={!!errors.giaTriDonToiThieu}
+                    helperText={errors.giaTriDonToiThieu ? errors.giaTriDonToiThieu : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Giảm tối đa"
-                    name="giamToiGia"
-                    value={formValues.giamToiGia || ''}
+                    label="Giá trị giảm tối đa"
+                    name="giamToiDa"
+                    value={formValues.giamToiDa || ''}
                     onChange={handleChange}
                     type="number"
                     fullWidth
+                    error={!!errors.giamToiDa}
+                    helperText={errors.giamToiDa ? errors.giamToiDa : ''}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  <DatePicker
+                  <TextField
                     label="Ngày bắt đầu"
-                    value={formValues.ngayBatDau || null}
-                    onChange={(date) => handleDateChange('ngayBatDau', date)}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    name="ngayBatDau"
+                    type="date"
+                    value={formValues.ngayBatDau || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ngayBatDau}
+                    helperText={errors.ngayBatDau || ''}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <DatePicker
+                  <TextField
                     label="Ngày kết thúc"
-                    value={formValues.ngayKetThuc || null}
-                    onChange={(date) => handleDateChange('ngayKetThuc', date)}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    name="ngayHetHan"
+                    type="date"
+                    value={formValues.ngayHetHan || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    error={!!errors.ngayHetHan}
+                    helperText={errors.ngayHetHan || ''}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>

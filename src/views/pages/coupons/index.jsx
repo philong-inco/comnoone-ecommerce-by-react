@@ -19,7 +19,10 @@ import {
   Paper,
   Chip,
   Select,
-  MenuItem
+  MenuItem,
+  Tabs,
+  Tab,
+  Badge
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, MoreHoriz as MoreHorizIcon, Sync as SyncIcon } from '@mui/icons-material';
 import { deletedCoupons, filterCoupons, getPGGPage } from 'services/admin/coupons/couponsService';
@@ -43,6 +46,8 @@ function PGGTable() {
   const [phamViApDung, setPhamViApDung] = useState('');
   const [trangThai, setTrangThai] = useState('');
   const [loaiPhieu, setLoaiPhieu] = useState('');
+  const [ngayBatDau, setNgayBatDau] = useState(null);
+  const [ngayHetHan, setNgayHetHan] = useState(null);
 
   const fetchApi = async (currentPage, size) => {
     try {
@@ -56,7 +61,9 @@ function PGGTable() {
       if (loaiPhieu) {
         filterString += ` and loaiGiamGia = ${loaiPhieu}`;
       }
-
+      if (ngayBatDau && ngayHetHan) {
+        filterString += ` and ngayBatDau>: '${ngayBatDau}' and ngayHetHan<: '${ngayHetHan}' `;
+      }
       const response = await filterCoupons(currentPage, size, filterString);
       if (response.status_code === 200) {
         setListPhieuGiamGia(response.data.result);
@@ -67,6 +74,8 @@ function PGGTable() {
         alert('Failed to fetch data from API');
       }
     } catch (error) {
+      console.log(error);
+
       alert('An error occurred while fetching data');
     } finally {
       setLoading(false);
@@ -79,7 +88,7 @@ function PGGTable() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, size, ma, phamViApDung, trangThai, loaiPhieu, loading]);
+  }, [currentPage, size, ma, phamViApDung, trangThai, loaiPhieu, loading, ngayBatDau, ngayHetHan]);
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
@@ -136,6 +145,11 @@ function PGGTable() {
     setCurrentPage(1);
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTrangThai(newValue);
+    setCurrentPage(1);
+  };
+
   const columns = [
     { title: 'STT', key: 'STT' },
     { title: 'Mã phiếu', key: 'ma' },
@@ -150,25 +164,74 @@ function PGGTable() {
     { title: 'Trạng thái', key: 'trangThai' },
     { title: 'Action', key: 'action' }
   ];
-  console.log(selectedCoupon);
+
+  const tabList = [
+    { key: '', label: 'Tất cả' },
+    { key: '0', label: 'Chưa đến' },
+    { key: '1', label: 'Đang áp dung' },
+    { key: '2', label: 'Hết hạn' },
+    { key: '3', label: 'Hủy' }
+  ];
+
+  const handleDateChange = (name, value) => {
+    if (name === 'ngayBatDau') {
+      setNgayBatDau(value);
+    } else if (name === 'ngayHetHan') {
+      setNgayHetHan(value);
+    }
+  };
+
   return (
     <>
-      {/* <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}> */}
       <Link to="/phieugiamgia/them" style={{ textDecoration: 'none' }}>
         <Button variant="contained" color="primary" style={{ marginBottom: '10px' }}>
           Thêm mới
         </Button>
       </Link>
-      {/* </Box> */}
 
       <FilterCoupons
+        ngayBatDau={ngayBatDau}
+        ngayHetHan={ngayHetHan}
+        onDateChange={handleDateChange}
         handleSearch={handleSearch}
-        handleStatusChange={handleStatusChange}
         handlePhamViChange={handlePhamViChange}
         handleLoaiPhieuChange={handleLoaiPhieuChange}
       />
 
       <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 5 }}>
+        <Tabs
+          value={trangThai}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ backgroundColor: 'white', borderRadius: '10px 10px 0 0', padding: '10px' }}
+        >
+          {tabList.map((tab) => (
+            <Tab
+              key={tab.key}
+              value={tab.key}
+              label={
+                <Badge
+                  badgeContent={5}
+                  color="primary"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      right: -6,
+                      top: -5,
+                      fontSize: '0.75rem',
+                      height: '16px',
+                      minWidth: '16px'
+                    }
+                  }}
+                >
+                  {tab.label}
+                </Badge>
+              }
+            />
+          ))}
+        </Tabs>
         <TableContainer component={Paper}>
           <Table size="small" className="table">
             <TableHead>
@@ -194,7 +257,7 @@ function PGGTable() {
                       <Typography color="cyan">Công khai</Typography>
                     )}
                   </TableCell>
-                  <TableCell className="table-cell-small">{record.soLuong ? record.soLuong : 'Không giới hạn'}</TableCell>
+                  <TableCell className="table-cell-small">{record.soLuong != null ? record.soLuong : `Không giới hạn `}</TableCell>
                   <TableCell className="table-cell-small">
                     {record.loaiGiamGia === 1
                       ? `${record.giaTriGiamGia} %`
@@ -211,7 +274,7 @@ function PGGTable() {
                       : 'Không giới hạn'}
                   </TableCell>
                   <TableCell className="table-cell-small">
-                    {new Date(record.ngayBatDau).toLocaleDateString()} - {new Date(record.ngayHetHan).toLocaleDateString()}
+                    {new Date(record.ngayBatDau).toLocaleDateString()} | {new Date(record.ngayHetHan).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="table-cell-small">
                     {(() => {

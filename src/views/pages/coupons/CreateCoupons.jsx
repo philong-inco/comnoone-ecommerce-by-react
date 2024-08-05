@@ -89,12 +89,7 @@ function CreateCoupons() {
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleDateChange = (name, date) => {
-    setFormValues({ ...formValues, [name]: date });
-  };
-
   const handleSubmit = async (event) => {
-    event.preventDefault();
     event.preventDefault();
     const data = {
       ...formValues,
@@ -127,7 +122,10 @@ function CreateCoupons() {
           message: 'Tạo phiếu giảm giá thành công!',
           type: 'success'
         });
-        navigate('/phieugiamgia/danhsach');
+
+        setTimeout(() => {
+          navigate('/phieugiamgia/danhsach');
+        }, 2000);
       }
     } catch (error) {
       handleCouponErrors(error.response?.data, setErrors);
@@ -225,7 +223,6 @@ function CreateCoupons() {
                     value={formValues.soLuong || null}
                     onChange={handleChange}
                     fullWidth
-                    // inputProps={{ min: 0 }}
                     error={!!errors.soLuong}
                     helperText={errors.soLuong ? errors.soLuong : ''}
                   />
@@ -238,8 +235,6 @@ function CreateCoupons() {
                     value={formValues.giaTriGiamGia || ''}
                     onChange={handleChange}
                     fullWidth
-                    // inputProps={{ min: 0 }}
-                    // required
                     error={!!errors.giaTriGiamGia}
                     helperText={errors.giaTriGiamGia ? errors.giaTriGiamGia : ''}
                   />
@@ -252,7 +247,6 @@ function CreateCoupons() {
                     value={formValues.giaTriDonToiThieu || ''}
                     onChange={handleChange}
                     fullWidth
-                    // inputProps={{ min: 0 }}
                     error={!!errors.giaTriDonToiThieu}
                     helperText={errors.giaTriDonToiThieu ? errors.giaTriDonToiThieu : ''}
                   />
@@ -265,8 +259,8 @@ function CreateCoupons() {
                     value={formValues.giamToiDa || ''}
                     onChange={handleChange}
                     fullWidth
-                    error={!!errors.giamToiGia}
-                    helperText={errors.giamToiGia ? errors.giamToiGia : ''}
+                    error={!!errors.giamToiDa}
+                    helperText={errors.giamToiDa ? errors.giamToiDa : ''}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
