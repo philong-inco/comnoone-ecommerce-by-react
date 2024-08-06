@@ -120,7 +120,6 @@ const DanhSachNhanVien = () => {
     };
 
     const handleSelectChange = (event) => {
-        debugger;
         const value = event.target.value;
         setSelectGioiTinh(value);
         setCurrentPage(1);
@@ -207,7 +206,7 @@ const DanhSachNhanVien = () => {
                         />
                     </form>
                 </Box>
-                <Box flex={1} mx={2}>
+                <Box flex={0.5} mx={2}>
                     <FormLabel component="legend">Giới Tính</FormLabel>
 
                     <FormControl fullWidth margin="dense">
@@ -226,7 +225,7 @@ const DanhSachNhanVien = () => {
                     </FormControl>
                 </Box>
 
-                <Box flex={1} mx={2}>
+                <Box flex={0.5} mx={2}>
                     <FormLabel component="legend">Năm Sinh</FormLabel>
                     <FormControl fullWidth margin="dense">
                         <InputLabel id="year-select-label">-- Chọn năm sinh --</InputLabel>

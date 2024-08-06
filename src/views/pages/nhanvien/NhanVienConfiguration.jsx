@@ -61,7 +61,7 @@ function NhanVienConfiguration() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -188,7 +188,11 @@ function NhanVienConfiguration() {
             setValue('tai_khoan_ngan_hang', nhanVienData.taiKhoanNganHang);
             setValue('hinh_anh', nhanVienData.hinhAnh);
             setValue('gioi_tinh', nhanVienData.gioiTinh.toString());
-            setImageUrl(nhanVienData.hinhAnh);
+            if (nhanVienData.hinhAnh) {
+                setImageUrl(nhanVienData.hinhAnh);
+            } else {
+                setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
+            }
             const selectedRoles = responseVaiTro.data.map(role => role.ten);
             setSelectedRoles(selectedRoles);
             setValue('ngay_sinh', nhanVienData.ngaySinh.split('T')[0]);
@@ -626,7 +630,7 @@ function NhanVienConfiguration() {
 
                     {/* Image Preview */}
                     <Grid item xs={12} md={4}>
-                        <Typography variant="h6" style={{textAlign: 'center'}}>Ảnh đại diện</Typography>
+                        <Typography variant="h6" style={{ textAlign: 'center' }}>Ảnh đại diện</Typography>
                         <Box display="flex" flexDirection="column" alignItems="center" height="100%">
                             {imageUrl ? (
                                 <img
