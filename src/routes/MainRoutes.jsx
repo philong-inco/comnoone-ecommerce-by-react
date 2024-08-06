@@ -8,6 +8,7 @@ import { element } from 'prop-types';
 import PGGTable from 'views/pages/coupons/index.jsx';
 import CreateCoupons from 'views/pages/coupons/CreateCoupons.jsx';
 import UpdateCoupons from 'views/pages/coupons/UpdateCoupons.jsx';
+import Bill from 'views/pages/bill/index.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -31,8 +32,12 @@ const MainRoutes = {
   children: [
     // Hóa đơn
     {
-      path: 'hoadon',
+      path: 'hoa-don',
       children: [
+        {
+          path: 'danh-sach',
+          element: <Bill />
+        },
         {
           path: 'banhangtaiquay',
           element: (

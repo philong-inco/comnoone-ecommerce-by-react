@@ -1,6 +1,8 @@
-import { get, post, del, patch, put } from '../utils/request';
+import { get, post, patch, put, del, del2 } from 'utils/request';
 
 export const getBillFilter = async (page, size, path) => {
+  console.log('Path : ', path);
+
   try {
     const result = await get(`v1/bills/all?page=${page}&size=${size}&sort=id,DESC&filter=${path}`);
     return result;
