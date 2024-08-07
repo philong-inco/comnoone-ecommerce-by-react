@@ -52,7 +52,7 @@ const KhachHang = () => {
             } else if (selectHangKhachHang !== '') {
                 result = await getSelectHangKhachHang(currentPage - 1, selectHangKhachHang);
             } else {
-                result = await getAll(currentPage-1);
+                result = await getAll(currentPage - 1);
             }
             setKhachHang(result.content);
             setTotalPages(result.totalPages);
@@ -346,7 +346,7 @@ const KhachHang = () => {
             <Box display="flex" justifyContent="center" mt={2}>
                 <Pagination
                     count={totalPages}
-                    page={currentPage + 1}
+                    page={currentPage}
                     onChange={handlePageChange}
                     color="primary"
                 />

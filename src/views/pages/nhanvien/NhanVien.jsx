@@ -111,24 +111,34 @@ const DanhSachNhanVien = () => {
         event.preventDefault();
         setCurrentPage(1);
         setSearchRadio('');
+        setSelectGioiTinh('');
+        setSearchYear('');
     };
 
     const handleRadioChange = (event) => {
         setSearchRadio(event.target.value);
         setCurrentPage(1);
         setSearchKeyWord('');
+        setSelectGioiTinh('');
+        setSearchYear('');
     };
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
         setSelectGioiTinh(value);
         setCurrentPage(1);
-
+        setSearchKeyWord('');
+        setSearchYear('');
+        setSearchRadio('');
     };
 
     const handleYearChange = (event) => {
         setSearchYear(event.target.value);
         setCurrentPage(1);
+        setSearchRadio('');
+        setSelectGioiTinh('');
+        setSearchKeyWord('');
+
     };
 
     const handleConfirmDelete = async () => {
