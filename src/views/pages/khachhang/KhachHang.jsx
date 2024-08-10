@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAll, getSearchKeyWord, getSearchGioiTinh, getSelectHangKhachHang } from 'services/admin/customer/customerService.js';
 import { IconEdit } from '@tabler/icons-react';
-
+import AddIcon from '@mui/icons-material/Add';
+import { styled } from '@mui/system';
 import {
     Box,
     Button,
@@ -24,9 +25,12 @@ import {
     Chip,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    Grid,
+    Typography
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
+import { center } from '@cloudinary/url-gen/qualifiers/textAlignment';
 
 const KhachHang = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -52,7 +56,7 @@ const KhachHang = () => {
             } else if (selectHangKhachHang !== '') {
                 result = await getSelectHangKhachHang(currentPage - 1, selectHangKhachHang);
             } else {
-                result = await getAll(currentPage-1);
+                result = await getAll(currentPage - 1);
             }
             setKhachHang(result.content);
             setTotalPages(result.totalPages);
@@ -168,17 +172,11 @@ const KhachHang = () => {
     };
 
     const handlePageChange = (event, value) => {
-        setCurrentPage(value - 1);
+        setCurrentPage(value);
     }
 
     const handleNavigate = () => {
         navigate('/khachhang/khachhangconfiguration');
-    }
-
-    const handleSearchText = (event) => {
-        event.preventDefault();
-        setCurrentPage(1);
-        setSearchRadio('');
     }
 
     const handleRadioChange = (event) => {
@@ -195,7 +193,22 @@ const KhachHang = () => {
         setCurrentPage(1);
         setSearchKeyWord('');
         setSearchRadio('');
+    };
 
+    const handleExportExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(khachhang.map((kh, index) => ({
+            STT: index + 1 + currentPage * 10,
+            'Mã Khách Hàng': kh.ma,
+            'Tên Khách Hàng': kh.ten,
+            'Hạng Khách Hàng': getHangKhachHang(kh.hangKhachHang).props.label,
+            'Ngày Sinh': formatDate(kh.ngaySinh),
+            Email: kh.email,
+            'Số Điện Thoại': kh.sdt,
+            'Giới Tính': getGioiTinhKhachHang(kh.gioiTinh)
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Danh Sách Khách Hàng');
+        XLSX.writeFile(wb, 'DanhSachKhachHang.xlsx');
     };
 
     return (
@@ -211,88 +224,112 @@ const KhachHang = () => {
                     backgroundColor: 'white',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                     borderRadius: '8px',
+                    width: '100%'
                 }}
             >
-                <Box
-                    flex={1}
-                    mr={2}
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                >
-                    <form onSubmit={handleSearchText}>
-                        <FormLabel component="legend" sx={{ mb: 1 }}>
-                            Tìm kiếm
-                        </FormLabel>
-                        <TextField
-                            label="Tìm kiếm"
-                            value={searchKeyWord}
-                            onChange={(e) => setSearchKeyWord(e.target.value)}
-                            variant="outlined"
-                            margin="normal"
-                            fullWidth
-                            sx={{ mb: 1 }}
-                        />
-                    </form>
-                </Box>
-                <Box
-                    flex={1}
-                    ml={2}
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                >
-                    <FormControl component="fieldset" fullWidth margin="normal">
-                        <FormLabel component="legend" sx={{ mb: 1 }}>
-                            Giới Tính
-                        </FormLabel>
-                        <RadioGroup
-                            row
-                            value={searchRadio}
-                            onChange={handleRadioChange}
-                            sx={{ alignItems: 'center', mb: 1 }}
-                        >
-                            {statuses.map((status) => (
-                                <FormControlLabel
-                                    key={status.id}
-                                    value={status.id}
-                                    control={<Radio />}
-                                    label={status.name}
-                                    sx={{ margin: '0 8px' }}
+                <Grid container spacing={2} flex={4} alignItems="center">
+                    <Grid item xs={3}>
+                        <FormControl fullWidth margin="normal">
+                            <Box display="flex" alignItems="center">
+                                <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                    Tìm kiếm
+                                </FormLabel>
+                                <TextField
+                                    value={searchKeyWord}
+                                    onChange={(e) => setSearchKeyWord(e.target.value)}
+                                    variant="outlined"
+                                    placeholder="Nhập tên khách hàng"
                                 />
-                            ))}
-                        </RadioGroup>
+                            </Box>
+                        </FormControl>
+                    </Grid>
 
+                    <Box
+                        sx={{
+                            borderLeft: '1px solid black',
+                            height: '40px',
+                            mx: 3,
+                            mt: 3,
+                            alignSelf: 'center'
+                        }}
+                    />
 
-                    </FormControl>
-                </Box>
+                    <Grid item xs={3.5}>
+                        <FormControl fullWidth margin="normal">
+                            <Box display="flex" alignItems="center">
+                                <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                    Giới Tính
+                                </FormLabel>
+                                <RadioGroup
+                                    row
+                                    value={searchRadio}
+                                    onChange={handleRadioChange}
+                                >
+                                    {statuses.map((status) => (
+                                        <FormControlLabel
+                                            key={status.id}
+                                            value={status.id}
+                                            control={<Radio />}
+                                            label={status.name}
+                                            sx={{ margin: '7 8px' }}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            </Box>
+                        </FormControl>
+                    </Grid>
 
-                <Box flex={1} mx={2}>
-                    <FormLabel component="legend">Hạng Khách Hàng</FormLabel>
+                    <Box
+                        sx={{
+                            borderLeft: '1px solid black',
+                            height: '40px',
+                            mx: 3,
+                            mt: 3,
+                            alignSelf: 'center'
+                        }}
+                    />
 
-                    <FormControl fullWidth margin="dense">
-                        <InputLabel id="gender-select-label">-- Chọn hạng khách hàng --</InputLabel>
-                        <Select
-                            labelId="gender-select-label"
-                            id="gender-select"
-                            value={selectHangKhachHang}
-                            label="Giới tính"
-                            onChange={handleSelectChange}
-                        >
-                            <MenuItem value=''><em>-- Chọn hạng khách hàng --</em></MenuItem>
-                            <MenuItem value={0}>Đồng</MenuItem>
-                            <MenuItem value={1}>Bạc</MenuItem>
-                            <MenuItem value={2}>Vàng</MenuItem>
-                            <MenuItem value={3}>Bạch Kim</MenuItem>
-                            <MenuItem value={4}>Kim Cương</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <Grid item xs={3.5}>
+                        <FormControl fullWidth margin="normal">
+                            <Box display="flex" alignItems="center">
+                                <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                    Hạng Khách Hàng
+                                </FormLabel>
+                                <Select
+                                    labelId="hang-khach-hang-label"
+                                    id="hang-khach-hang-select"
+                                    value={selectHangKhachHang}
+                                    onChange={handleSelectChange}
+                                    displayEmpty
+                                    fullWidth
+                                >
+                                    <MenuItem value=''><em>-- Chọn hạng khách hàng --</em></MenuItem>
+                                    <MenuItem value={0}>Đồng</MenuItem>
+                                    <MenuItem value={1}>Bạc</MenuItem>
+                                    <MenuItem value={2}>Vàng</MenuItem>
+                                    <MenuItem value={3}>Bạch Kim</MenuItem>
+                                    <MenuItem value={4}>Kim Cương</MenuItem>
+                                </Select>
+                            </Box>
+                        </FormControl>
+                    </Grid>
+                </Grid>
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    ml={2}
+                >
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleNavigate}
+                    >
+                        + Thêm Khách Hàng
+                    </Button>
                 </Box>
             </Box>
-
-            <Button variant="contained" style={{ marginLeft: "85%", marginBottom: "10px" }} color="secondary" onClick={handleNavigate}>
-                + Thêm Khách Hàng
-            </Button>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -346,7 +383,7 @@ const KhachHang = () => {
             <Box display="flex" justifyContent="center" mt={2}>
                 <Pagination
                     count={totalPages}
-                    page={currentPage + 1}
+                    page={currentPage}
                     onChange={handlePageChange}
                     color="primary"
                 />

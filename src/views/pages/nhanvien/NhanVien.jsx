@@ -32,6 +32,7 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, searchYearOfEmplpyee } from 'services/admin/employee/employeeService';
 import { IconEdit } from '@tabler/icons-react';
+import AddIcon from '@mui/icons-material/Add';
 
 const DanhSachNhanVien = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,7 +44,6 @@ const DanhSachNhanVien = () => {
     const [deleteIdStatus, setDeleteIdStatus] = useState(null);
     const [nhanVien, setNhanVien] = useState([]);
     const [selectGioiTinh, setSelectGioiTinh] = useState('');
-    const [searchYear, setSearchYear] = useState('');
 
     const statuses = [
         { id: '', name: 'Tất Cả' },
@@ -60,8 +60,6 @@ const DanhSachNhanVien = () => {
                 result = await searchNhanVienKeyWord(currentPage - 1, searchKeyWord);
             } else if (searchRadio) {
                 result = await searchTrangThai(currentPage - 1, searchRadio);
-            } else if (searchYear !== '') {
-                result = await searchYearOfEmplpyee(currentPage - 1, searchYear);
             } else if (selectGioiTinh !== '') {
                 result = await searchGioiTinh(currentPage - 1, selectGioiTinh);
             } else {
@@ -76,7 +74,7 @@ const DanhSachNhanVien = () => {
 
     useEffect(() => {
         fetchNhanVien();
-    }, [currentPage, searchKeyWord, searchRadio, selectGioiTinh, searchYear]);
+    }, [currentPage, searchKeyWord, searchRadio, selectGioiTinh]);
 
     const getStatusNhanVien = (status) => {
         switch (status) {
@@ -111,25 +109,33 @@ const DanhSachNhanVien = () => {
         event.preventDefault();
         setCurrentPage(1);
         setSearchRadio('');
+        setSelectGioiTinh("");
     };
+
+    const handleSearchKeyWord = (event) => {
+        setSearchKeyWord(event.target.value);
+        setCurrentPage(1);
+
+        setSearchRadio('');
+        setSelectGioiTinh("");
+    }
 
     const handleRadioChange = (event) => {
         setSearchRadio(event.target.value);
         setCurrentPage(1);
         setSearchKeyWord('');
+        setSelectGioiTinh('');
+
     };
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
         setSelectGioiTinh(value);
         setCurrentPage(1);
-
+        setSearchKeyWord('');
+        setSearchRadio('');
     };
 
-    const handleYearChange = (event) => {
-        setSearchYear(event.target.value);
-        setCurrentPage(1);
-    };
 
     const handleConfirmDelete = async () => {
         setConfirmOpen(false);
@@ -174,7 +180,6 @@ const DanhSachNhanVien = () => {
         navigate(`/nhanvien/configuration/${id}`);
     };
 
-    // Tạo danh sách năm từ năm hiện tại - 100 đến năm hiện tại
     const currentYear = new Date().getFullYear();
     const years = Array.from(new Array(101), (_, index) => currentYear - index);
 
@@ -182,9 +187,9 @@ const DanhSachNhanVien = () => {
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
             <Box
                 display="flex"
-                flexDirection="row"
-                alignItems="center"
                 justifyContent="space-between"
+                alignItems="center"
+                width="100%"
                 mb={2}
                 p={2}
                 sx={{
@@ -193,83 +198,112 @@ const DanhSachNhanVien = () => {
                     borderRadius: '8px',
                 }}
             >
-                <Box flex={1} mr={2}>
-                    <form onSubmit={handleSearch}>
-                        <FormLabel component="legend">Tìm Kiếm</FormLabel>
+                {/* Box chứa các trường tìm kiếm, chiếm 80% chiều rộng */}
+                <Box display="flex" width="80%">
+                    <Box flex={1} display="flex" alignItems="center" mr={2}>
+                        <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap' }}>Tìm Kiếm</FormLabel>
                         <TextField
                             label="Tìm kiếm"
                             value={searchKeyWord}
-                            onChange={(e) => setSearchKeyWord(e.target.value)}
+                            onChange={handleSearchKeyWord}
                             variant="outlined"
                             margin="normal"
                             fullWidth
                         />
-                    </form>
-                </Box>
-                <Box flex={0.5} mx={2}>
-                    <FormLabel component="legend">Giới Tính</FormLabel>
+                    </Box>
 
-                    <FormControl fullWidth margin="dense">
-                        <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
-                        <Select
-                            labelId="gender-select-label"
-                            id="gender-select"
-                            value={selectGioiTinh}
-                            label="Giới tính"
-                            onChange={handleSelectChange}
-                        >
-                            <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
-                            <MenuItem value={1}>Nam</MenuItem>
-                            <MenuItem value={0}>Nữ</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <Box flex={1} display="flex" alignItems="center" mx={2}>
+                        <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap' }}>Giới Tính</FormLabel>
+                        <FormControl fullWidth margin="dense">
+                            <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
+                            <Select
+                                labelId="gender-select-label"
+                                id="gender-select"
+                                value={selectGioiTinh}
+                                label="Giới tính"
+                                onChange={handleSelectChange}
+                            >
+                                <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
+                                <MenuItem value={1}>Nam</MenuItem>
+                                <MenuItem value={0}>Nữ</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                    <Box flex={1} display="flex" alignItems="center" ml={2}>
+                        <FormLabel component="legend" sx={{ width: '100%', mr: 2, whiteSpace: 'nowrap' }}>Trạng thái</FormLabel>
+                        <FormControl component="fieldset" fullWidth>
+                            <RadioGroup
+                                row
+                                value={searchRadio}
+                                onChange={handleRadioChange}
+                            >
+                                {statuses.map((status) => (
+                                    <FormControlLabel
+                                        key={status.id}
+                                        value={status.id}
+                                        control={<Radio />}
+                                        label={status.name}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                </Box>
+                <Box width="20%" display="flex" justifyContent="flex-end">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNavigate}
+                        sx={{
+                            height: '45px',
+                            minWidth: '160px',
+                            padding: '8px 10px',
+                            borderRadius: '20px',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            fontSize: '13px',
+                            boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
+                            transition: 'all 0.3s ease',
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '&:hover': {
+                                backgroundColor: '#0056b3',
+                                boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
+                                transform: 'translateY(-3px)',
+                            },
+                            '&:active': {
+                                backgroundColor: '#004080',
+                                boxShadow: '0px 5px 10px rgba(0, 64, 128, 0.2)',
+                                transform: 'translateY(1px)',
+                            },
+                        }}
+                    >
+                        <AddIcon
+                            sx={{
+                                position: 'absolute',
+                                left: '16px',
+                                backgroundColor: '#9c27b0',
+                                color: '#fff',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '5px',
+                            }}
+                        />
+                        <span style={{ marginLeft: '25px' }}>Thêm Nhân Viên</span>
+                    </Button>
                 </Box>
 
-                <Box flex={0.5} mx={2}>
-                    <FormLabel component="legend">Năm Sinh</FormLabel>
-                    <FormControl fullWidth margin="dense">
-                        <InputLabel id="year-select-label">-- Chọn năm sinh --</InputLabel>
-                        <Select
-                            labelId="year-select-label"
-                            id="year-select"
-                            value={searchYear}
-                            label="Năm Sinh"
-                            onChange={handleYearChange}
-                        >
-                            <MenuItem value=""><em>-- Chọn năm sinh --</em></MenuItem>
-                            {years.map((year) => (
-                                <MenuItem key={year} value={year}>
-                                    {year}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-
-                <Box flex={1} ml={2}>
-                    <FormControl component="fieldset" fullWidth margin="normal">
-                        <FormLabel component="legend">Trạng thái</FormLabel>
-                        <RadioGroup
-                            row
-                            value={searchRadio}
-                            onChange={handleRadioChange}
-                        >
-                            {statuses.map((status) => (
-                                <FormControlLabel
-                                    key={status.id}
-                                    value={status.id}
-                                    control={<Radio />}
-                                    label={status.name}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
-                </Box>
             </Box>
 
-            <Button variant="contained" style={{ marginLeft: "85%", marginBottom: "10px" }} color="secondary" onClick={handleNavigate}>
-                + Thêm Nhân Viên
-            </Button>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>

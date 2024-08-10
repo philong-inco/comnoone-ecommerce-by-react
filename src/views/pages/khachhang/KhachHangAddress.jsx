@@ -34,29 +34,48 @@ import {
   DialogActions
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import { IconPencil } from '@tabler/icons-react';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
-    .required('Tên không được để trống'),
+    .required('Tên không được để trống')
+    .matches(/^[a-zA-ZÀ-ỹ\s]*$/, 'Tên chỉ được chứa các ký tự chữ cái và khoảng trắng'),
+
   email: Yup.string()
     .email('Email không hợp lệ')
     .required('Email không được để trống'),
+
   sdt: Yup.string()
     .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
     .required('Số điện thoại không được để trống'),
+
   ngay_sinh: Yup.date()
     .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
     .required('Ngày sinh không được để trống'),
-  gioi_tinh: Yup.number().required('Giới tính không được để trống'),
-  hinhAnh: Yup.string(),
+
+  gioi_tinh: Yup.number()
+    .oneOf([0, 1], 'Giới tính không hợp lệ')
+    .required('Giới tính không được để trống'),
+
+  hinhAnh: Yup.string()
+    .url('Hình ảnh phải là một URL hợp lệ')
+    .nullable(),
 });
 
 const addressValidationSchema = Yup.object().shape({
-  ten_nguoi_nhan: Yup.string().required('Tên người nhận không được để trống'),
-  sdt_nguoi_nhan: Yup.string().required('Số điện thoại người nhận không được để trống'),
-  dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống'),
+  ten_nguoi_nhan: Yup.string()
+    .required('Tên người nhận không được để trống')
+    .min(3, 'Tên người nhận phải có ít nhất 3 ký tự')
+    .max(50, 'Tên người nhận không được vượt quá 50 ký tự')
+    .matches(/^[a-zA-ZÀ-ỹ\s]*$/, 'Tên người nhận chỉ được chứa các ký tự chữ cái và khoảng trắng'),
+
+  sdt_nguoi_nhan: Yup.string()
+    .required('Số điện thoại người nhận không được để trống')
+    .matches(/^\d{10}$/, 'Số điện thoại người nhận phải bao gồm đúng 10 chữ số'),
+
+  dia_chi_nhan_hang: Yup.string()
+    .required('Địa chỉ nhận hàng không được để trống')
+
 });
 
 function KhachHangAddress() {
@@ -100,19 +119,16 @@ function KhachHangAddress() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDefault, setIsDefault] = useState(selectedAddress?.isDefault === 1 || false);
+  const [isDefault, setIsDefault] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [pendingChangeValue, setPendingChangeValue] = useState(false);
-  const [addressToDelete, setAddressToDelete] = useState(null);
   const [addressId, setAddressId] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
+  const [defaultAddressId, setDefaultAddressId] = useState(selectedAddress?.isDefault ? selectedAddress.id : null);
+  const [openSetDefaultDialog, setOpenSetDefaultDialog] = useState(false);
+  const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
 
-  useEffect(() => {
-    if (selectedAddress) {
-      setIsDefault(selectedAddress.isDefault === 1);
-    }
-  }, [selectedAddress]);
   useEffect(() => {
     if (isProvincesLoaded && id) {
       fetchKhachHangInfo(id);
@@ -189,28 +205,45 @@ function KhachHangAddress() {
   };
 
   const handleDefaultChange = (event) => {
-    const newValue = event.target.checked;
-    setPendingChangeValue(newValue);
-    setOpenConfirmDialog(true);
+    const isChecked = event.target.checked;
+
+    if (isChecked) {
+      setOpenSetDefaultDialog(true);
+    } else {
+      setOpenUnsetDefaultDialog(true);
+    }
   };
 
-  const handleConfirmChange = async () => {
-    setOpenConfirmDialog(false);
-    setIsDefault(pendingChangeValue);
+
+  const handleConfirmSetDefault = async () => {
+    setOpenSetDefaultDialog(false);
     if (selectedAddress) {
       try {
         await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setDefaultAddressId(selectedAddress.id); // Set this address as default
         handleCloseModal();
       } catch (error) {
-        console.error('Failed to update default address', error);
-        setIsDefault(!pendingChangeValue); // Revert the switch if update fails
+        console.error('Failed to set default address', error);
+      }
+    }
+  };
+
+  const handleConfirmUnsetDefault = async () => {
+    setOpenUnsetDefaultDialog(false);
+    if (selectedAddress) {
+      try {
+        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setDefaultAddressId(null); // Unset the default address
+        handleCloseModal();
+      } catch (error) {
+        console.error('Failed to unset default address', error);
       }
     }
   };
 
   const handleCancelChange = () => {
     setOpenConfirmDialog(false);
-    setPendingChangeValue(isDefault); // Revert the switch to its previous state
+    setPendingChangeValue(isDefault);
   };
 
   const handleDeleteAddress = async () => {
@@ -226,7 +259,6 @@ function KhachHangAddress() {
   };
 
   const handleDeleteClick = () => {
-    debugger;
     setIdToDelete(addressId);
     setOpenDialog(true);
   };
@@ -395,7 +427,7 @@ function KhachHangAddress() {
   };
 
   const onAddressSubmit = async (data) => {
-    debugger
+
     try {
       let formDataAddress = {};
       formDataAddress.tenNguoiNhan = data.ten_nguoi_nhan;
@@ -470,25 +502,33 @@ function KhachHangAddress() {
   };
 
   const handleOpenModal = async (address) => {
-    setSelectedAddress(address);
-    setIsEditing(true);
-    setIsModalOpen(true);
-    setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
-    setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
-    setValueAddress('email', address.emailNguoiNhan);
-    setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
-    setValueAddress('id_dia_chi', address.id);
-    setAddressId(address.id)
-    try {
+    if (address.id) {
+      setSelectedAddress(address);
+      setIsEditing(true);
+      setIsModalOpen(true);
+      setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
+      setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
+      setValueAddress('email', address.emailNguoiNhan);
+      setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
+      setValueAddress('id_dia_chi', address.id);
+      setAddressId(address.id);
+      if (address.loaiDiaChi === 1) {
+        setIsDefault(true)
+      }
+      try {
 
-      const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
-      const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
-      const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
-      setSelectedProvince(formattedTinhThanhPhoId);
-      setSelectedDistrict(formattedQuanHuyenId);
-      setSelectedWard(formaterPhuongXaId);
-    } catch (error) {
-      console.error('Failed to fetch address data', error);
+        const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
+        const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
+        const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
+        setSelectedProvince(formattedTinhThanhPhoId);
+        setSelectedDistrict(formattedQuanHuyenId);
+        setSelectedWard(formaterPhuongXaId);
+      } catch (error) {
+        console.error('Failed to fetch address data', error);
+      }
+    } else {
+      setIsEditing(false);
+      setIsModalOpen(true);
     }
   };
 
@@ -841,11 +881,21 @@ function KhachHangAddress() {
               helperText={addressErrors.dia_chi_nhan_hang?.message}
               sx={{ fontFamily: 'Arial' }}
             />
-            <FormControlLabel
-              control={<Switch checked={isDefault} onChange={handleDefaultChange} />}
-              label="Địa chỉ mặc định"
-              sx={{ mt: 2 }}
-            />
+            {isEditing && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={selectedAddress?.id === defaultAddressId}
+                    onChange={handleDefaultChange}
+                  />
+                }
+                label="Địa chỉ mặc định"
+                sx={{ mt: 2 }}
+              />
+            )}
+
+
+
 
             <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
               <Button
@@ -875,7 +925,6 @@ function KhachHangAddress() {
         </Box>
       </Modal>
 
-      {/* Thông báo xóa địa chỉ */}
 
       <Dialog
         open={openDialog}
@@ -895,24 +944,43 @@ function KhachHangAddress() {
         </DialogActions>
       </Dialog>
 
-      {/* Thông báo đặt làm giá trị mặc định */}
       <Dialog
-        open={openConfirmDialog}
-        onClose={handleCancelChange}
+        open={openSetDefaultDialog}
+        onClose={() => setOpenSetDefaultDialog(false)}
       >
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn thay đổi địa chỉ mặc định không?</Typography>
+          <Typography>Bạn có chắc chắn muốn đặt địa chỉ này làm mặc định không?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelChange} color="primary">
+          <Button onClick={() => setOpenSetDefaultDialog(false)} color="primary">
             Hủy
           </Button>
-          <Button onClick={handleConfirmChange} color="primary">
+          <Button onClick={handleConfirmSetDefault} color="primary">
             Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Thông báo bỏ làm giá trị mặc định */}
+      <Dialog
+        open={openUnsetDefaultDialog}
+        onClose={() => setOpenUnsetDefaultDialog(false)}
+      >
+        <DialogTitle>Xác nhận thay đổi</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn bỏ địa chỉ này làm mặc định không?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenUnsetDefaultDialog(false)} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmUnsetDefault} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
 
       <Snackbar
         open={snackbarOpen}

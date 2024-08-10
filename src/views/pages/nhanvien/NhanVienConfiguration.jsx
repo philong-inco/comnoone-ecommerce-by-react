@@ -433,24 +433,7 @@ function NhanVienConfiguration() {
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Controller
-                                    name="tai_khoan_ngan_hang"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <TextField
-                                            fullWidth
-                                            label="Tài khoản ngân hàng"
-                                            variant="outlined"
-                                            {...register('tai_khoan_ngan_hang')}
-                                            InputLabelProps={{ shrink: true }}
-                                            error={!!errors.tai_khoan_ngan_hang}
-                                            helperText={errors.tai_khoan_ngan_hang?.message}
-                                            sx={{ mb: 2 }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
+                           
                         </Grid>
 
                         <Grid container spacing={3}>
