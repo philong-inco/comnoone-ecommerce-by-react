@@ -33,7 +33,6 @@ const schema = Yup.object().shape({
     ten: Yup.string().required('Họ và tên không được để trống').max(255, 'Tên không được vượt quá 255 ký tự').typeError("Tên xảy ra lỗi !"),
     sdt: Yup.string().required('Số điện thoại không được để trống').matches(/^0\d{9}$/, 'Số điện thoại không hợp lệ'),
     email: Yup.string().required('Email không được để trống').email('Email không đúng định dạng').max(255, 'Email không được vượt quá 255 ký tự'),
-    tai_khoan_ngan_hang: Yup.string().required('Tài khoản ngân hàng không được để trống').max(50, 'Tài khoản ngân hàng không được vượt quá 50 ký tự'),
     ngay_sinh: Yup.date().required('Ngày sinh không được để trống').typeError('Ngày sinh không hợp lệ'),
     gioi_tinh: Yup.number().required('Giới tính không được để trống').oneOf([0, 1], 'Giới tính phải là 0 hoặc 1'),
     hinh_anh: Yup.string().nullable(),
@@ -433,7 +432,7 @@ function NhanVienConfiguration() {
                                     )}
                                 />
                             </Grid>
-                           
+
                         </Grid>
 
                         <Grid container spacing={3}>
@@ -611,38 +610,46 @@ function NhanVienConfiguration() {
                         {error && <FormHelperText error>{error}</FormHelperText>}
                     </Grid>
 
-                    {/* Image Preview */}
                     <Grid item xs={12} md={4}>
-                        <Typography variant="h6" style={{ textAlign: 'center' }}>Ảnh đại diện</Typography>
                         <Box display="flex" flexDirection="column" alignItems="center" height="100%">
                             {imageUrl ? (
                                 <img
                                     src={imageUrl}
                                     alt="Ảnh đại diện"
-                                    style={{ width: '250px', height: '250px', objectFit: 'cover' }}
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
                                 />
                             ) : (
                                 <img
                                     src='../src/assets/images/images.jpg'
                                     alt="Ảnh đại diện"
-                                    style={{ width: '250px', height: '250px', objectFit: 'cover' }}
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%', // Make the image circular
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', // Add shadow for pop-up effect
+                                        transition: 'all 0.3s ease', // Smooth transition for hover effect
+                                    }}
+                                    onClick={openCloudinaryWidget} // Trigger the image upload widget on click
                                 />
                             )}
-                            <Button
-                                onClick={openCloudinaryWidget}
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                sx={{ mt: 2 }}
-                            >
-                                Chọn ảnh
-                            </Button>
                         </Box>
                     </Grid>
+
+
                 </Grid>
             </form>
 
-            {/* Snackbar for Success and Error Messages */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={6000}

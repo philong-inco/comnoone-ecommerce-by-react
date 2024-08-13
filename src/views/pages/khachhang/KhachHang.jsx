@@ -231,7 +231,7 @@ const KhachHang = () => {
                     <Grid item xs={3}>
                         <FormControl fullWidth margin="normal">
                             <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                <FormLabel component="legend" sx={{ mr: 5, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
                                     Tìm kiếm
                                 </FormLabel>
                                 <TextField
@@ -239,6 +239,7 @@ const KhachHang = () => {
                                     onChange={(e) => setSearchKeyWord(e.target.value)}
                                     variant="outlined"
                                     placeholder="Nhập tên khách hàng"
+                                    maxWidth
                                 />
                             </Box>
                         </FormControl>
@@ -257,7 +258,7 @@ const KhachHang = () => {
                     <Grid item xs={3.5}>
                         <FormControl fullWidth margin="normal">
                             <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                <FormLabel component="legend" sx={{ mr: 7, whiteSpace: 'nowrap', fontWeight: 'bold', display:' flex',justifyContent: 'space-evenly', alignItems: 'center' }}>
                                     Giới Tính
                                 </FormLabel>
                                 <RadioGroup
@@ -292,7 +293,7 @@ const KhachHang = () => {
                     <Grid item xs={3.5}>
                         <FormControl fullWidth margin="normal">
                             <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                                <FormLabel component="legend" sx={{ mr: 4, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
                                     Hạng Khách Hàng
                                 </FormLabel>
                                 <Select
@@ -353,7 +354,7 @@ const KhachHang = () => {
                                 const { text: hangText, color: hangColor } = getHangKhachHang(kh.hangKhachHang);
                                 return (
                                     <TableRow key={kh.id}>
-                                        <TableCell align="center">{index + 1 + currentPage * 10}</TableCell>
+                                        <TableCell align="center">{index + 1 + (currentPage -1) * 5}</TableCell>
                                         <TableCell align="center">
                                             <Avatar
                                                 alt={kh.ten}

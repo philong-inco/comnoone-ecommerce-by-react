@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@mui/material';
+import { CSVLink } from 'react-csv';
+import * as XLSX from 'xlsx';
 import {
     Box,
     Button,
@@ -30,9 +32,10 @@ import {
     Chip
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, searchYearOfEmplpyee } from 'services/admin/employee/employeeService';
+import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, searchYearOfEmplpyee, getDanhSachNhanVien } from 'services/admin/employee/employeeService';
 import { IconEdit } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 
 const DanhSachNhanVien = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +46,7 @@ const DanhSachNhanVien = () => {
     const [deleteId, setDeleteId] = useState(null);
     const [deleteIdStatus, setDeleteIdStatus] = useState(null);
     const [nhanVien, setNhanVien] = useState([]);
+    const [allNhanVien, setAllNhanVien] = useState([]);
     const [selectGioiTinh, setSelectGioiTinh] = useState('');
 
     const statuses = [
@@ -72,9 +76,23 @@ const DanhSachNhanVien = () => {
         }
     };
 
+    const getAllNhanVien = async () => {
+        let result;
+        try {
+            result = await getDanhSachNhanVien();
+            setAllNhanVien(result);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
         fetchNhanVien();
     }, [currentPage, searchKeyWord, searchRadio, selectGioiTinh]);
+
+    useEffect(() => {
+        getAllNhanVien();
+    }, []);
 
     const getStatusNhanVien = (status) => {
         switch (status) {
@@ -183,6 +201,23 @@ const DanhSachNhanVien = () => {
     const currentYear = new Date().getFullYear();
     const years = Array.from(new Array(101), (_, index) => currentYear - index);
 
+    const handleExportExcel = () => {
+        debugger;
+        const ws = XLSX.utils.json_to_sheet(allNhanVien.map((nv, index) => ({
+            STT: index + 1 + (currentPage - 1) * 10,
+            'Hình Ảnh': nv.hinhAnh,
+            Mã: nv.ma,
+            Tên: nv.ten,
+            'Ngày Sinh': formatDate(nv.ngaySinh),
+            'Số Điện Thoại': nv.sdt,
+            Email: nv.email,
+            'Địa Chỉ': nv.diaChi,
+            'Trạng Thái': nv.trangThai === 1 ? 'Đang Làm Việc' : 'Đã Nghỉ Việc'
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Nhân Viên");
+        XLSX.writeFile(wb, "danh_sach_nhan_vien.xlsx");
+    };
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
             <Box
@@ -198,10 +233,9 @@ const DanhSachNhanVien = () => {
                     borderRadius: '8px',
                 }}
             >
-                {/* Box chứa các trường tìm kiếm, chiếm 80% chiều rộng */}
-                <Box display="flex" width="80%">
-                    <Box flex={1} display="flex" alignItems="center" mr={2}>
-                        <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap' }}>Tìm Kiếm</FormLabel>
+                <Box display="flex" width="80%" alignItems={'center'}>
+                    <Box flex={0.6} display="flex" alignItems="center" mr={2}>
+                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>Tìm Kiếm</FormLabel>
                         <TextField
                             label="Tìm kiếm"
                             value={searchKeyWord}
@@ -211,9 +245,18 @@ const DanhSachNhanVien = () => {
                             fullWidth
                         />
                     </Box>
+                    <Box
+                        sx={{
+                            borderLeft: '1px solid black',
+                            height: '50px',
+                            mx: 3,
+                            mt: 3,
+                            alignSelf: 'center'
+                        }}
+                    />
 
-                    <Box flex={1} display="flex" alignItems="center" mx={2}>
-                        <FormLabel component="legend" sx={{ mr: 2, whiteSpace: 'nowrap' }}>Giới Tính</FormLabel>
+                    <Box flex={0.5} display="flex" alignItems="center" mx={2}>
+                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>Giới Tính</FormLabel>
                         <FormControl fullWidth margin="dense">
                             <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
                             <Select
@@ -229,9 +272,18 @@ const DanhSachNhanVien = () => {
                             </Select>
                         </FormControl>
                     </Box>
+                    <Box
+                        sx={{
+                            borderLeft: '1px solid black',
+                            height: '50px',
+                            mx: 3,
+                            mt: 3,
+                            alignSelf: 'center'
+                        }}
+                    />
 
                     <Box flex={1} display="flex" alignItems="center" ml={2}>
-                        <FormLabel component="legend" sx={{ width: '100%', mr: 2, whiteSpace: 'nowrap' }}>Trạng thái</FormLabel>
+                        <FormLabel component="legend" sx={{ mr: 3, whiteSpace: 'nowrap', fontWeight: 'bold', display: 'flex', direction: 'column-reverse' }}>Trạng thái</FormLabel>
                         <FormControl component="fieldset" fullWidth>
                             <RadioGroup
                                 row
@@ -250,7 +302,7 @@ const DanhSachNhanVien = () => {
                         </FormControl>
                     </Box>
                 </Box>
-                <Box width="20%" display="flex" justifyContent="flex-end">
+                <Box width="20%" display="flex" flexDirection="column" alignItems="flex-end">
                     <Button
                         variant="contained"
                         color="primary"
@@ -299,10 +351,60 @@ const DanhSachNhanVien = () => {
                         />
                         <span style={{ marginLeft: '25px' }}>Thêm Nhân Viên</span>
                     </Button>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleExportExcel}
+                        sx={{
+                            marginTop: '10px',
+                            height: '45px',
+                            minWidth: '160px',
+                            padding: '8px 10px',
+                            borderRadius: '20px',
+                            backgroundColor: '#28a745',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            fontSize: '13px',
+                            boxShadow: '0px 8px 15px rgba(40, 167, 69, 0.3)',
+                            transition: 'all 0.3s ease',
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '&:hover': {
+                                backgroundColor: '#218838',
+                                boxShadow: '0px 15px 20px rgba(33, 136, 56, 0.4)',
+                                transform: 'translateY(-3px)',
+                            },
+                            '&:active': {
+                                backgroundColor: '#1e7e34',
+                                boxShadow: '0px 5px 10px rgba(30, 126, 52, 0.2)',
+                                transform: 'translateY(1px)',
+                            },
+                        }}
+                    >
+                        <InsertDriveFileIcon
+                            sx={{
+                                position: 'absolute',
+                                left: '16px',
+                                backgroundColor: '#ffffff',
+                                color: '#28a745',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '5px',
+                            }}
+                        />
+                        <span style={{ marginLeft: '25px' }}>Xuất Excel</span>
+                    </Button>
                 </Box>
 
-            </Box>
 
+            </Box>
 
             <TableContainer component={Paper}>
                 <Table>
@@ -325,7 +427,7 @@ const DanhSachNhanVien = () => {
                             const ngaySinh = formatDate(nv.ngaySinh);
                             return (
                                 <TableRow key={nv.id}>
-                                    <TableCell>{index + 1 + (currentPage - 1) * 10}</TableCell>
+                                    <TableCell>{index + 1 + (currentPage - 1) * 5}</TableCell>
                                     <TableCell>
                                         <Avatar
                                             alt={nv.ten}
