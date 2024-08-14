@@ -97,11 +97,13 @@ function NhanVienConfiguration() {
     const fetchRoles = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/vaitro');
-            setRoles(response.data);
+            const filteredRoles = response.data.filter(role => role.ten !== 'Admin');
+            setRoles(filteredRoles);
         } catch (error) {
             setError('Failed to fetch roles');
         }
     };
+
 
     useEffect(() => {
         const errorKeys = Object.keys(errors);
@@ -285,7 +287,6 @@ function NhanVienConfiguration() {
             formData.sdt = data.sdt;
             formData.email = data.email;
             formData.tai_khoan_ngan_hang = data.tai_khoan_ngan_hang;
-            // Tính tuổi từ ngày sinh
             const today = new Date();
             const birthDate = new Date(data.ngay_sinh);
             let age = today.getFullYear() - birthDate.getFullYear();
@@ -636,11 +637,11 @@ function NhanVienConfiguration() {
                                         height: '250px',
                                         objectFit: 'cover',
                                         cursor: 'pointer',
-                                        borderRadius: '50%', 
-                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', 
-                                        transition: 'all 0.3s ease', 
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
                                     }}
-                                    onClick={openCloudinaryWidget} 
+                                    onClick={openCloudinaryWidget}
                                 />
                             )}
                         </Box>
