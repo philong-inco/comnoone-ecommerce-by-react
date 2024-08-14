@@ -35,6 +35,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
+import { textAlign } from '@mui/system';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
@@ -220,7 +221,7 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
-        setDefaultAddressId(selectedAddress.id); // Set this address as default
+        setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
         console.error('Failed to set default address', error);
@@ -512,9 +513,12 @@ function KhachHangAddress() {
       setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
       setValueAddress('id_dia_chi', address.id);
       setAddressId(address.id);
-      if (address.loaiDiaChi === 1) {
-        setIsDefault(true)
+      if (address.loaiDiaChi == 1) {
+        setDefaultAddressId(address.id);
+      } else {
+        setDefaultAddressId(null);
       }
+
       try {
 
         const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
@@ -558,7 +562,7 @@ function KhachHangAddress() {
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
       {/* Thông tin khách hàng */}
       <Box sx={{ width: '33%', p: 2, borderRight: '1px solid #ddd' }}>
-        <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%' }}>
+        <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center'}}>
           Thông tin khách hàng
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -570,7 +574,16 @@ function KhachHangAddress() {
                   <img
                     src={imageUrl}
                     alt="Ảnh đại diện"
-                    style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%' }}
+                    style={{
+                      width: '250px',
+                      height: '250px',
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      borderRadius: '50%',
+                      boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onClick={openCloudinaryWidget}
                   />
                 ) : (
                   <img
@@ -579,19 +592,6 @@ function KhachHangAddress() {
                     style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%' }}
                   />
                 )}
-                <Button
-                  onClick={openCloudinaryWidget}
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<IconPhoto stroke={2} />}
-                  sx={{
-                    mt: 2,
-                    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-                    color: 'white',
-                  }}
-                >
-                  Chọn ảnh
-                </Button>
               </Box>
             </Grid>
 
@@ -686,7 +686,7 @@ function KhachHangAddress() {
           <Paper elevation={3}>
             <Box p={2}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">Danh sách địa chỉ</Typography>
+                <Typography variant="h4">Danh sách địa chỉ</Typography>
                 <IconButton color="primary" onClick={handleOpenModal}>
                   <AddIcon />
                 </IconButton>
@@ -700,10 +700,10 @@ function KhachHangAddress() {
                         p: 2,
                         position: 'relative',
                         '&:hover': {
-                          backgroundColor: '#f0f0f0', // Màu nền khi hover
-                          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Hiệu ứng shadow khi hover
-                          transform: 'scale(1.02)', // Phóng to nhẹ khi hover
-                          transition: 'all 0.3s ease-in-out', // Hiệu ứng chuyển đổi
+                          backgroundColor: '#f0f0f0',
+                          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                          transform: 'scale(1.02)',
+                          transition: 'all 0.3s ease-in-out',
                         },
                       }}
                     >

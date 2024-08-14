@@ -426,30 +426,38 @@ function KhachHangConfiguration() {
 
                     {/* Image Preview */}
                     <Grid item xs={12} md={4}>
-                        <Typography variant="h3" style={{ textAlign: 'center' }}>Ảnh đại diện</Typography>
                         <Box display="flex" flexDirection="column" alignItems="center" height="100%">
                             {imageUrl ? (
                                 <img
                                     src={imageUrl}
                                     alt="Ảnh đại diện"
-                                    style={{ width: '250px', height: '250px', objectFit: 'cover' }}
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
                                 />
                             ) : (
                                 <img
                                     src='../src/assets/images/images.jpg'
                                     alt="Ảnh đại diện"
-                                    style={{ width: '250px', height: '250px', objectFit: 'cover' }}
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%', // Make the image circular
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', // Add shadow for pop-up effect
+                                        transition: 'all 0.3s ease', // Smooth transition for hover effect
+                                    }}
+                                    onClick={openCloudinaryWidget} // Trigger the image upload widget on click
                                 />
                             )}
-                            <Button
-                                onClick={openCloudinaryWidget}
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                sx={{ mt: 2 }}
-                            >
-                                Chọn ảnh
-                            </Button>
                         </Box>
                     </Grid>
                 </Grid>

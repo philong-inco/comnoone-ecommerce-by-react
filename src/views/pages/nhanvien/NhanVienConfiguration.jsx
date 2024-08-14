@@ -636,11 +636,11 @@ function NhanVienConfiguration() {
                                         height: '250px',
                                         objectFit: 'cover',
                                         cursor: 'pointer',
-                                        borderRadius: '50%', // Make the image circular
-                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', // Add shadow for pop-up effect
-                                        transition: 'all 0.3s ease', // Smooth transition for hover effect
+                                        borderRadius: '50%', 
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', 
+                                        transition: 'all 0.3s ease', 
                                     }}
-                                    onClick={openCloudinaryWidget} // Trigger the image upload widget on click
+                                    onClick={openCloudinaryWidget} 
                                 />
                             )}
                         </Box>

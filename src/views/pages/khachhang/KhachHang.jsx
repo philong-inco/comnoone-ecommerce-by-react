@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAll, getSearchKeyWord, getSearchGioiTinh, getSelectHangKhachHang } from 'services/admin/customer/customerService.js';
+import { getAll, getSearchKeyWord, getSearchGioiTinh, getSelectHangKhachHang, getDanhSachKhachHang } from 'services/admin/customer/customerService.js';
 import { IconEdit } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
-import { styled } from '@mui/system';
+import * as XLSX from 'xlsx';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import Divider from '@mui/material/Divider';
+
 import {
     Box,
     Button,
@@ -30,8 +33,6 @@ import {
     Typography
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import { center } from '@cloudinary/url-gen/qualifiers/textAlignment';
-
 const KhachHang = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -39,6 +40,8 @@ const KhachHang = () => {
     const [searchKeyWord, setSearchKeyWord] = useState('');
     const [searchRadio, setSearchRadio] = useState('');
     const [selectHangKhachHang, setSelectHangKhachHang] = useState('');
+    const [getAllDanhSach, setAllDanhSach] = useState('');
+
     const statuses = [
         { id: '1', name: 'Nam' },
         { id: '0', name: 'Nữ' },
@@ -69,6 +72,20 @@ const KhachHang = () => {
         fetchKhachHang();
     }, [currentPage, searchKeyWord, searchRadio, selectHangKhachHang]);
 
+    useEffect(() => {
+        getAllDanhSachKhachHang();
+    }, [])
+
+    const getAllDanhSachKhachHang = async () => {
+        try {
+            const result = await getDanhSachKhachHang();
+            setAllDanhSach(result);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    
     const getGioiTinhKhachHang = (sex) => {
         switch (sex) {
             case 0:
@@ -196,141 +213,218 @@ const KhachHang = () => {
     };
 
     const handleExportExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(khachhang.map((kh, index) => ({
-            STT: index + 1 + currentPage * 10,
-            'Mã Khách Hàng': kh.ma,
-            'Tên Khách Hàng': kh.ten,
-            'Hạng Khách Hàng': getHangKhachHang(kh.hangKhachHang).props.label,
+        debugger;
+        const ws = XLSX.utils.json_to_sheet(getAllDanhSach.map((kh, index) => ({
+            STT: index + 1 + (currentPage - 1) * 10,
+            'Hình Ảnh': kh.hinhAnh,
+            'Mã': kh.ma,
+            'Tên': kh.ten,
             'Ngày Sinh': formatDate(kh.ngaySinh),
-            Email: kh.email,
             'Số Điện Thoại': kh.sdt,
-            'Giới Tính': getGioiTinhKhachHang(kh.gioiTinh)
+            'Giới Tính' : kh.gioiTinh == 1 ? 'Nam' : 'Nữ',
+            'Email': kh.email,
+            'Địa Chỉ': kh.diaChi,
         })));
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Danh Sách Khách Hàng');
-        XLSX.writeFile(wb, 'DanhSachKhachHang.xlsx');
+        XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Khách Hàng");
+        XLSX.writeFile(wb, "danh_sach_khach_hang.xlsx");
     };
 
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Khách Hàng">
             <Box
-                display="flex"
-                flexDirection="row"
-                alignItems="center"
-                justifyContent="space-between"
-                mb={2}
-                p={2}
-                sx={{
-                    backgroundColor: 'white',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                    borderRadius: '8px',
-                    width: '100%'
-                }}
-            >
-                <Grid container spacing={2} flex={4} alignItems="center">
-                    <Grid item xs={3}>
-                        <FormControl fullWidth margin="normal">
-                            <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 5, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                                    Tìm kiếm
-                                </FormLabel>
-                                <TextField
-                                    value={searchKeyWord}
-                                    onChange={(e) => setSearchKeyWord(e.target.value)}
-                                    variant="outlined"
-                                    placeholder="Nhập tên khách hàng"
-                                    maxWidth
-                                />
-                            </Box>
-                        </FormControl>
-                    </Grid>
-
-                    <Box
-                        sx={{
-                            borderLeft: '1px solid black',
-                            height: '40px',
-                            mx: 3,
-                            mt: 3,
-                            alignSelf: 'center'
-                        }}
+    display="flex"
+    flexDirection="row"
+    alignItems="center"
+    justifyContent="space-between"
+    mb={2}
+    p={2}
+    sx={{
+        backgroundColor: 'white',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+        borderRadius: '8px',
+        width: '100%'
+    }}
+>
+    <Grid container spacing={2} flex={4} alignItems="center">
+        <Grid item xs={3}>
+            <FormControl fullWidth margin="normal">
+                <Box display="flex" alignItems="center">
+                    <FormLabel component="legend" sx={{ mr: 5, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                        Tìm kiếm
+                    </FormLabel>
+                    <TextField
+                        value={searchKeyWord}
+                        onChange={(e) => setSearchKeyWord(e.target.value)}
+                        variant="outlined"
+                        placeholder="Nhập tên khách hàng"
+                        maxWidth
                     />
-
-                    <Grid item xs={3.5}>
-                        <FormControl fullWidth margin="normal">
-                            <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 7, whiteSpace: 'nowrap', fontWeight: 'bold', display:' flex',justifyContent: 'space-evenly', alignItems: 'center' }}>
-                                    Giới Tính
-                                </FormLabel>
-                                <RadioGroup
-                                    row
-                                    value={searchRadio}
-                                    onChange={handleRadioChange}
-                                >
-                                    {statuses.map((status) => (
-                                        <FormControlLabel
-                                            key={status.id}
-                                            value={status.id}
-                                            control={<Radio />}
-                                            label={status.name}
-                                            sx={{ margin: '7 8px' }}
-                                        />
-                                    ))}
-                                </RadioGroup>
-                            </Box>
-                        </FormControl>
-                    </Grid>
-
-                    <Box
-                        sx={{
-                            borderLeft: '1px solid black',
-                            height: '40px',
-                            mx: 3,
-                            mt: 3,
-                            alignSelf: 'center'
-                        }}
-                    />
-
-                    <Grid item xs={3.5}>
-                        <FormControl fullWidth margin="normal">
-                            <Box display="flex" alignItems="center">
-                                <FormLabel component="legend" sx={{ mr: 4, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                                    Hạng Khách Hàng
-                                </FormLabel>
-                                <Select
-                                    labelId="hang-khach-hang-label"
-                                    id="hang-khach-hang-select"
-                                    value={selectHangKhachHang}
-                                    onChange={handleSelectChange}
-                                    displayEmpty
-                                    fullWidth
-                                >
-                                    <MenuItem value=''><em>-- Chọn hạng khách hàng --</em></MenuItem>
-                                    <MenuItem value={0}>Đồng</MenuItem>
-                                    <MenuItem value={1}>Bạc</MenuItem>
-                                    <MenuItem value={2}>Vàng</MenuItem>
-                                    <MenuItem value={3}>Bạch Kim</MenuItem>
-                                    <MenuItem value={4}>Kim Cương</MenuItem>
-                                </Select>
-                            </Box>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-                <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    ml={2}
-                >
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleNavigate}
-                    >
-                        + Thêm Khách Hàng
-                    </Button>
                 </Box>
-            </Box>
+            </FormControl>
+        </Grid>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 3 }} />
+
+        <Grid item xs={3.5}>
+            <FormControl fullWidth margin="normal">
+                <Box display="flex" alignItems="center">
+                    <FormLabel component="legend" sx={{ mr: 7, whiteSpace: 'nowrap', fontWeight: 'bold', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                        Giới Tính
+                    </FormLabel>
+                    <RadioGroup
+                        row
+                        value={searchRadio}
+                        onChange={handleRadioChange}
+                    >
+                        {statuses.map((status) => (
+                            <FormControlLabel
+                                key={status.id}
+                                value={status.id}
+                                control={<Radio />}
+                                label={status.name}
+                                sx={{ margin: '7 8px' }}
+                            />
+                        ))}
+                    </RadioGroup>
+                </Box>
+            </FormControl>
+        </Grid>
+
+        <Divider orientation="vertical" flexItem sx={{ mx: 3 }} />
+
+        <Grid item xs={3.5}>
+            <FormControl fullWidth margin="normal">
+                <Box display="flex" alignItems="center">
+                    <FormLabel component="legend" sx={{ mr: 4, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                        Hạng Khách Hàng
+                    </FormLabel>
+                    <Select
+                        labelId="hang-khach-hang-label"
+                        id="hang-khach-hang-select"
+                        value={selectHangKhachHang}
+                        onChange={handleSelectChange}
+                        displayEmpty
+                        fullWidth
+                    >
+                        <MenuItem value=''><em>-- Chọn hạng khách hàng --</em></MenuItem>
+                        <MenuItem value={0}>Đồng</MenuItem>
+                        <MenuItem value={1}>Bạc</MenuItem>
+                        <MenuItem value={2}>Vàng</MenuItem>
+                        <MenuItem value={3}>Bạch Kim</MenuItem>
+                        <MenuItem value={4}>Kim Cương</MenuItem>
+                    </Select>
+                </Box>
+            </FormControl>
+        </Grid>
+    </Grid>
+    <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        ml={2}
+    >
+        <Button
+            variant="contained"
+            color="primary"
+            onClick={handleNavigate}
+            sx={{
+                height: '45px',
+                minWidth: '200px',
+                padding: '8px 10px',
+                borderRadius: '20px',
+                backgroundColor: '#007bff',
+                color: '#fff',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                    backgroundColor: '#0056b3',
+                    boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
+                    transform: 'translateY(-3px)',
+                },
+                '&:active': {
+                    backgroundColor: '#004080',
+                    boxShadow: '0px 5px 10px rgba(0, 64, 128, 0.2)',
+                    transform: 'translateY(1px)',
+                },
+            }}
+        >
+            <AddIcon
+                sx={{
+                    position: 'absolute',
+                    left: '16px',
+                    backgroundColor: '#9c27b0',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '5px',
+                }}
+            />
+            <span style={{ marginLeft: '25px' }}>Thêm Khác Hàng</span>
+        </Button>
+
+        <Button
+            variant="contained"
+            color="primary"
+            onClick={handleExportExcel}
+            sx={{
+                marginTop: '10px',
+                height: '45px',
+                minWidth: '200px',
+                padding: '8px 10px',
+                borderRadius: '20px',
+                backgroundColor: '#28a745',
+                color: '#fff',
+                fontWeight: 'bold',
+                fontSize: '13px',
+                boxShadow: '0px 8px 15px rgba(40, 167, 69, 0.3)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                    backgroundColor: '#218838',
+                    boxShadow: '0px 15px 20px rgba(33, 136, 56, 0.4)',
+                    transform: 'translateY(-3px)',
+                },
+                '&:active': {
+                    backgroundColor: '#1e7e34',
+                    boxShadow: '0px 5px 10px rgba(30, 126, 52, 0.2)',
+                    transform: 'translateY(1px)',
+                },
+            }}
+        >
+            <InsertDriveFileIcon
+                sx={{
+                    position: 'absolute',
+                    left: '16px',
+                    backgroundColor: '#ffffff',
+                    color: '#28a745',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '5px',
+                }}
+            />
+            <span style={{ marginLeft: '25px' }}>Danh Sách Khách Hàng</span>
+        </Button>
+    </Box>
+</Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -354,7 +448,7 @@ const KhachHang = () => {
                                 const { text: hangText, color: hangColor } = getHangKhachHang(kh.hangKhachHang);
                                 return (
                                     <TableRow key={kh.id}>
-                                        <TableCell align="center">{index + 1 + (currentPage -1) * 5}</TableCell>
+                                        <TableCell align="center">{index + 1 + (currentPage - 1) * 5}</TableCell>
                                         <TableCell align="center">
                                             <Avatar
                                                 alt={kh.ten}
