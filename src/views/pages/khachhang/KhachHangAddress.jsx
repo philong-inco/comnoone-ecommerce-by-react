@@ -35,31 +35,32 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
+import { textAlign } from '@mui/system';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
-    .required('Tên không được để trống'),
+    .required('Tên không được để trống')
+    .matches(/^[a-zA-ZÀ-ỹ\s]*$/, 'Tên chỉ được chứa các ký tự chữ cái và khoảng trắng'),
+
   email: Yup.string()
     .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email không hợp lệ')
     .required('Email không được để trống'),
+
   sdt: Yup.string()
     .matches(/^[0-9]{10}$/, 'Số điện thoại phải có 10 chữ số')
     .required('Số điện thoại không được để trống'),
+
   ngay_sinh: Yup.date()
     .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
     .required('Ngày sinh không được để trống'),
-  gioi_tinh: Yup.number()
-    .oneOf([0, 1], 'Giới tính không hợp lệ')
-    .required('Giới tính không được để trống'),
-  hinhAnh: Yup.string()
-    .url('Hình ảnh phải là URL hợp lệ')
+  gioi_tinh: Yup.number().required('Giới tính không được để trống'),
+  hinhAnh: Yup.string(),
 });
 
 
 const addressValidationSchema = Yup.object().shape({
   ten_nguoi_nhan: Yup.string().required('Tên người nhận không được để trống'),
-  sdt_nguoi_nhan: Yup.string()
-    .matches(/^[0-9]{10}$/, 'Số điện thoại phải có 10 chữ số'),
+  sdt_nguoi_nhan: Yup.string().required('Số điện thoại người nhận không được để trống'),
   dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống'),
 });
 
@@ -104,14 +105,13 @@ function KhachHangAddress() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDefault, setIsDefault] = useState(selectedAddress?.isDefault === 1 || false);
+  const [isDefault, setIsDefault] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [pendingChangeValue, setPendingChangeValue] = useState(false);
-  const [addressToDelete, setAddressToDelete] = useState(null);
   const [addressId, setAddressId] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
-  const [openedByIconButton, setOpenedByIconButton] = useState(false);
+
   useEffect(() => {
     if (selectedAddress) {
       setIsDefault(selectedAddress.isDefault === 1);
@@ -193,28 +193,45 @@ function KhachHangAddress() {
   };
 
   const handleDefaultChange = (event) => {
-    const newValue = event.target.checked;
-    setPendingChangeValue(newValue);
-    setOpenConfirmDialog(true);
+    const isChecked = event.target.checked;
+
+    if (isChecked) {
+      setOpenSetDefaultDialog(true);
+    } else {
+      setOpenUnsetDefaultDialog(true);
+    }
   };
 
-  const handleConfirmChange = async () => {
-    setOpenConfirmDialog(false);
-    setIsDefault(pendingChangeValue);
+
+  const handleConfirmSetDefault = async () => {
+    setOpenSetDefaultDialog(false);
     if (selectedAddress) {
       try {
         await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
-        console.error('Failed to update default address', error);
-        setIsDefault(!pendingChangeValue); // Revert the switch if update fails
+        console.error('Failed to set default address', error);
+      }
+    }
+  };
+
+  const handleConfirmUnsetDefault = async () => {
+    setOpenUnsetDefaultDialog(false);
+    if (selectedAddress) {
+      try {
+        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setDefaultAddressId(null); // Unset the default address
+        handleCloseModal();
+      } catch (error) {
+        console.error('Failed to unset default address', error);
       }
     }
   };
 
   const handleCancelChange = () => {
     setOpenConfirmDialog(false);
-    setPendingChangeValue(isDefault); // Revert the switch to its previous state
+    setPendingChangeValue(isDefault);
   };
 
   const handleDeleteAddress = async () => {
@@ -230,7 +247,6 @@ function KhachHangAddress() {
   };
 
   const handleDeleteClick = () => {
-    debugger;
     setIdToDelete(addressId);
     setOpenDialog(true);
   };
@@ -399,6 +415,7 @@ function KhachHangAddress() {
   };
 
   const onAddressSubmit = async (data) => {
+    debugger
     try {
       let formDataAddress = {};
       formDataAddress.tenNguoiNhan = data.ten_nguoi_nhan;
@@ -472,51 +489,27 @@ function KhachHangAddress() {
     );
   };
   const handleOpenModal = async (address) => {
-    if (address.id != null) {
-      setOpenedByIconButton(true);
-      setSelectedAddress(address);
-      setIsEditing(true);
-      setIsModalOpen(true);
-      setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
-      setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
-      setValueAddress('email', address.emailNguoiNhan);
-      setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
-      setValueAddress('id_dia_chi', address.id);
-      setAddressId(address.id);
-      try {
-        const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
-        const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
-        const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');
-        setSelectedProvince(formattedTinhThanhPhoId);
-        setSelectedDistrict(formattedQuanHuyenId);
-        setSelectedWard(formaterPhuongXaId);
-      } catch (error) {
-        console.error('Failed to fetch address data', error);
-      }
+    setSelectedAddress(address);
+    setIsEditing(true);
+    setIsModalOpen(true);
+    setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
+    setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
+    setValueAddress('email', address.emailNguoiNhan);
+    setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
+    setValueAddress('id_dia_chi', address.id);
+    setAddressId(address.id)
+    try {
 
-      if (address.loaiDiaChi == 1) {
-        setIsEditing(false);
-      }
-    } else {
-      setSelectedAddress(null);
-      setIsEditing(false);
-      setIsModalOpen(true);
-      resetAddressForm();
+      const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
+      const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
+      const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
+      setSelectedProvince(formattedTinhThanhPhoId);
+      setSelectedDistrict(formattedQuanHuyenId);
+      setSelectedWard(formaterPhuongXaId);
+    } catch (error) {
+      console.error('Failed to fetch address data', error);
     }
   };
-
-
-  const resetAddressForm = () => {
-    setValueAddress('ten_nguoi_nhan', '');
-    setValueAddress('sdt_nguoi_nhan', '');
-    setValueAddress('email', '');
-    setValueAddress('dia_chi_nhan_hang', '');
-    setValueAddress('id_dia_chi', '');
-    setSelectedProvince('');
-    setSelectedDistrict('');
-    setSelectedWard('');
-  };
-
 
   const handleProvinceChange = async (event) => {
     const selectedProvinceId = event.target.value;
@@ -544,7 +537,7 @@ function KhachHangAddress() {
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
       {/* Thông tin khách hàng */}
       <Box sx={{ width: '33%', p: 2, borderRight: '1px solid #ddd' }}>
-        <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%' }}>
+        <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center'}}>
           Thông tin khách hàng
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -556,7 +549,16 @@ function KhachHangAddress() {
                   <img
                     src={imageUrl}
                     alt="Ảnh đại diện"
-                    style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%' }}
+                    style={{
+                      width: '250px',
+                      height: '250px',
+                      objectFit: 'cover',
+                      cursor: 'pointer',
+                      borderRadius: '50%',
+                      boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onClick={openCloudinaryWidget}
                   />
                 ) : (
                   <img
@@ -565,19 +567,6 @@ function KhachHangAddress() {
                     style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%' }}
                   />
                 )}
-                <Button
-                  onClick={openCloudinaryWidget}
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<IconPhoto stroke={2} />}
-                  sx={{
-                    mt: 2,
-                    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-                    color: 'white',
-                  }}
-                >
-                  Chọn ảnh
-                </Button>
               </Box>
             </Grid>
 
@@ -672,7 +661,7 @@ function KhachHangAddress() {
           <Paper elevation={3}>
             <Box p={2}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">Danh sách địa chỉ</Typography>
+                <Typography variant="h4">Danh sách địa chỉ</Typography>
                 <IconButton color="primary" onClick={handleOpenModal}>
                   <AddIcon />
                 </IconButton>
@@ -686,10 +675,10 @@ function KhachHangAddress() {
                         p: 2,
                         position: 'relative',
                         '&:hover': {
-                          backgroundColor: '#f0f0f0', // Màu nền khi hover
-                          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Hiệu ứng shadow khi hover
-                          transform: 'scale(1.02)', // Phóng to nhẹ khi hover
-                          transition: 'all 0.3s ease-in-out', // Hiệu ứng chuyển đổi
+                          backgroundColor: '#f0f0f0',
+                          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                          transform: 'scale(1.02)',
+                          transition: 'all 0.3s ease-in-out',
                         },
                       }}
                     >
@@ -867,20 +856,11 @@ function KhachHangAddress() {
               helperText={addressErrors.dia_chi_nhan_hang?.message}
               sx={{ fontFamily: 'Arial' }}
             />
-            {isEditing && ( // Hiển thị Switch chỉ khi đang chỉnh sửa
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isDefault}
-                      onChange={handleDefaultChange}
-                      color="primary"
-                    />
-                  }
-                  label="Đặt làm địa chỉ mặc định"
-                />
-              </Grid>
-            )}
+            <FormControlLabel
+              control={<Switch checked={isDefault} onChange={handleDefaultChange} />}
+              label="Địa chỉ mặc định"
+              sx={{ mt: 2 }}
+            />
 
             <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
               <Button
@@ -910,7 +890,6 @@ function KhachHangAddress() {
         </Box>
       </Modal>
 
-      {/* Thông báo xóa địa chỉ */}
 
       <Dialog
         open={openDialog}
@@ -930,24 +909,43 @@ function KhachHangAddress() {
         </DialogActions>
       </Dialog>
 
-      {/* Thông báo đặt làm giá trị mặc định */}
       <Dialog
-        open={openConfirmDialog}
-        onClose={handleCancelChange}
+        open={openSetDefaultDialog}
+        onClose={() => setOpenSetDefaultDialog(false)}
       >
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
         <DialogContent>
-          <Typography>Bạn có chắc chắn muốn thay đổi địa chỉ mặc định không?</Typography>
+          <Typography>Bạn có chắc chắn muốn đặt địa chỉ này làm mặc định không?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelChange} color="primary">
+          <Button onClick={() => setOpenSetDefaultDialog(false)} color="primary">
             Hủy
           </Button>
-          <Button onClick={handleConfirmChange} color="primary">
+          <Button onClick={handleConfirmSetDefault} color="primary">
             Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Thông báo bỏ làm giá trị mặc định */}
+      <Dialog
+        open={openUnsetDefaultDialog}
+        onClose={() => setOpenUnsetDefaultDialog(false)}
+      >
+        <DialogTitle>Xác nhận thay đổi</DialogTitle>
+        <DialogContent>
+          <Typography>Bạn có chắc chắn muốn bỏ địa chỉ này làm mặc định không?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenUnsetDefaultDialog(false)} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmUnsetDefault} color="primary">
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
 
       <Snackbar
         open={snackbarOpen}

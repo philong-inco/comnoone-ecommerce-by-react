@@ -125,7 +125,7 @@ const quanLy = {
             children: [
                 {
                     id: 'nhanvien',
-                    title: 'Quản Lý Nhân viên',
+                    title: 'Nhân viên',
                     type: 'item',
                     url: '/nhanvien/danhsachnhanvien'
                   },

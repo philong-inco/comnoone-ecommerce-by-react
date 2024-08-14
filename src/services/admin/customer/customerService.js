@@ -10,6 +10,15 @@ export const getAll = async (page) => {
     }
 }
 
+export const getDanhSachKhachHang = async () => {
+    try {
+        const result = await get('/khachhang/danhsachkhachhang');
+        return result;
+    } catch (error) {
+        console.log('Error fetching DanhSachKhachHang', error);
+    }
+}
+
 export const getSearchKeyWord = async (page, keyWord) => {
     try {
         const result = await get(`/khachhang/search?pageNo=${page}&search=${keyWord}`);
@@ -28,11 +37,13 @@ export const getSearchGioiTinh = async (page, gioiTinh) => {
     }
 }
 
-export const getSelectHangKhachHang = async (page, hangKhachHang) => {    try {
+export const getSelectHangKhachHang = async (page, hangKhachHang) => {
+    try {
         const result = await get(`/khachhang/searchhangkhachhang?pageNo=${page}&hangKhachHang=${hangKhachHang}`);
         return result;
     } catch (error) {
         console.log('Error  fetching Custommer by keyword', error);
     }
 }
+
 

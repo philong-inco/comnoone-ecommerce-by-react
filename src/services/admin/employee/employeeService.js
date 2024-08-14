@@ -10,6 +10,16 @@ export const getAll = async (pageNo) => {
     }
 };
 
+export const getDanhSachNhanVien = async () => {
+    try {
+        const result = await get(`/nhan_vien/danhsachnhanvien`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching Employees:', error);
+        throw error;
+    }
+};
+
 export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
     try {
         const result = await get(`/nhan_vien/search?pageNo=${page}&search=${searchKeyWord}`
