@@ -34,19 +34,19 @@ import { IconBell } from '@tabler/icons-react';
 const status = [
   {
     value: 'all',
-    label: 'All Notification'
+    label: 'Tất cả thông báo'
   },
   {
     value: 'new',
-    label: 'New'
+    label: 'Mới nhất'
   },
   {
     value: 'unread',
-    label: 'Unread'
+    label: 'Chưa đọc '
   },
   {
     value: 'other',
-    label: 'Other'
+    label: 'Khác'
   }
 ];
 
@@ -149,10 +149,10 @@ const NotificationSection = () => {
                       <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 2 }}>
                         <Grid item>
                           <Stack direction="row" spacing={2}>
-                            <Typography variant="subtitle1">All Notification</Typography>
+                            <Typography variant="subtitle1">Thông báo</Typography>
                             <Chip
                               size="small"
-                              label="01"
+                              label="02"
                               sx={{
                                 color: theme.palette.background.default,
                                 bgcolor: theme.palette.warning.dark
@@ -162,7 +162,7 @@ const NotificationSection = () => {
                         </Grid>
                         <Grid item>
                           <Typography component={Link} to="#" variant="subtitle2" color="primary">
-                            Mark as all read
+                            Đánh đấu đã đọc
                           </Typography>
                         </Grid>
                       </Grid>
@@ -201,7 +201,7 @@ const NotificationSection = () => {
                   <Divider />
                   <CardActions sx={{ p: 1.25, justifyContent: 'center' }}>
                     <Button size="small" disableElevation>
-                      View All
+                      Xem tất cả
                     </Button>
                   </CardActions>
                 </MainCard>

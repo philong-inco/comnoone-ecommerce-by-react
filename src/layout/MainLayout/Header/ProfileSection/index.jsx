@@ -155,19 +155,19 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
+                        <Typography variant="h4">Chào bạn,</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Johne Doe
+                          Mạnh Mới Mẻ
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
+                      <Typography variant="subtitle2">Mỗi tội chưa có người yêu</Typography>
                     </Stack>
                     <OutlinedInput
                       sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
                       id="input-search-profile"
                       value={value}
                       onChange={(e) => setValue(e.target.value)}
-                      placeholder="Search profile options"
+                      placeholder="Tìm gì thì viết vào đây"
                       startAdornment={
                         <InputAdornment position="start">
                           <IconSearch stroke={1.5} size="1rem" color={theme.palette.grey[500]} />
@@ -195,7 +195,7 @@ const ProfileSection = () => {
                             <Grid item>
                               <Grid item container alignItems="center" justifyContent="space-between">
                                 <Grid item>
-                                  <Typography variant="subtitle1">Start DND Mode</Typography>
+                                  <Typography variant="subtitle1">Tú Mộng Mơ</Typography>
                                 </Grid>
                                 <Grid item>
                                   <Switch
@@ -211,7 +211,7 @@ const ProfileSection = () => {
                             <Grid item>
                               <Grid item container alignItems="center" justifyContent="space-between">
                                 <Grid item>
-                                  <Typography variant="subtitle1">Allow Notifications</Typography>
+                                  <Typography variant="subtitle1">Huy Sad boi</Typography>
                                 </Grid>
                                 <Grid item>
                                   <Switch
@@ -251,7 +251,7 @@ const ProfileSection = () => {
                           <ListItemIcon>
                             <IconSettings stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
+                          <ListItemText primary={<Typography variant="body2">Cài đặt tài khoản</Typography>} />
                         </ListItemButton>
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
@@ -265,11 +265,11 @@ const ProfileSection = () => {
                             primary={
                               <Grid container spacing={1} justifyContent="space-between">
                                 <Grid item>
-                                  <Typography variant="body2">Social Profile</Typography>
+                                  <Typography variant="body2">Cập nhật thông tin</Typography>
                                 </Grid>
                                 <Grid item>
                                   <Chip
-                                    label="02"
+                                    label="đã có ghệ"
                                     size="small"
                                     sx={{
                                       bgcolor: theme.palette.warning.dark,
@@ -289,7 +289,7 @@ const ProfileSection = () => {
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                          <ListItemText primary={<Typography variant="body2">Đăng xuất</Typography>} />
                         </ListItemButton>
                       </List>
                     </Box>

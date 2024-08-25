@@ -101,12 +101,12 @@ const NotificationList = () => {
           <ListItemAvatar>
             <Avatar alt="John Doe" src={User1} />
           </ListItemAvatar>
-          <ListItemText primary="John Doe" />
+          <ListItemText primary="Thảo Crush" />
           <ListItemSecondaryAction>
             <Grid container justifyContent="flex-end">
               <Grid item xs={12}>
                 <Typography variant="caption" display="block" gutterBottom>
-                  2 min ago
+                  vừa xong
                 </Typography>
               </Grid>
             </Grid>
@@ -114,15 +114,15 @@ const NotificationList = () => {
         </ListItem>
         <Grid container direction="column" className="list-container">
           <Grid item xs={12} sx={{ pb: 2 }}>
-            <Typography variant="subtitle2">It is a long established fact that a reader will be distracted</Typography>
+            <Typography variant="subtitle2">Chào anh, em đứng đây từ chiều</Typography>
           </Grid>
           <Grid item xs={12}>
             <Grid container>
               <Grid item>
-                <Chip label="Unread" sx={chipErrorSX} />
+                <Chip label="Xóa" sx={chipErrorSX} />
               </Grid>
               <Grid item>
-                <Chip label="New" sx={chipWarningSX} />
+                <Chip label="Phản hồi" sx={chipWarningSX} />
               </Grid>
             </Grid>
           </Grid>
@@ -143,12 +143,12 @@ const NotificationList = () => {
               <IconBuildingStore stroke={1.5} size="1.3rem" />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary={<Typography variant="subtitle1">Store Verification Done</Typography>} />
+          <ListItemText primary={<Typography variant="subtitle1">Thông báo đuổi việc</Typography>} />
           <ListItemSecondaryAction>
             <Grid container justifyContent="flex-end">
               <Grid item xs={12}>
                 <Typography variant="caption" display="block" gutterBottom>
-                  2 min ago
+                  2 phút trước
                 </Typography>
               </Grid>
             </Grid>
@@ -156,12 +156,12 @@ const NotificationList = () => {
         </ListItem>
         <Grid container direction="column" className="list-container">
           <Grid item xs={12} sx={{ pb: 2 }}>
-            <Typography variant="subtitle2">We have successfully received your request.</Typography>
+            <Typography variant="subtitle2">Vào 15:00 chiều nay, sếp Tú đã cho bạn thôi việc, lý do ế.</Typography>
           </Grid>
           <Grid item xs={12}>
             <Grid container>
               <Grid item>
-                <Chip label="Unread" sx={chipErrorSX} />
+                <Chip label="Hẹn đi uống bia" sx={chipErrorSX} />
               </Grid>
             </Grid>
           </Grid>
