@@ -9,6 +9,7 @@ import PGGTable from 'views/pages/coupons/index.jsx';
 import CreateCoupons from 'views/pages/coupons/CreateCoupons.jsx';
 import UpdateCoupons from 'views/pages/coupons/UpdateCoupons.jsx';
 import Bill from 'views/pages/bill/index.jsx';
+import BillDetail from 'views/pages/bill-detail/BillDetail.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -37,6 +38,10 @@ const MainRoutes = {
         {
           path: 'danh-sach',
           element: <Bill />
+        },
+        {
+          path: 'chi-tiet/:id',
+          element: <BillDetail />
         },
         {
           path: 'banhangtaiquay',

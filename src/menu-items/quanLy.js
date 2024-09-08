@@ -18,9 +18,13 @@ const quanLy = {
           title: 'Danh sách',
           type: 'item',
           url: '/hoa-don/danh-sach'
-          // nếu muốn ẩn điều hướng thì đặt thêm thuộc tính breadcrumbs: false
-          // nếu muốn bấm vào mở ra tab mới thì thêm target: true
         },
+        // {
+        //   id: 'chi-tiet',
+        //   title: 'Danh sách',
+        //   type: 'item',
+        //   url: '/hoa-don:id'
+        // },
         {
           id: 'hoadoncho',
           title: 'Chờ xác nhận',

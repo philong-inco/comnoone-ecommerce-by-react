@@ -1,8 +1,26 @@
 import React from 'react';
-import { Tabs, Tab, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination } from '@mui/material';
+import {
+  Tabs,
+  Tab,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Pagination,
+  Chip,
+  IconButton
+} from '@mui/material';
+import { getStatusColor, getStatusDisplayName } from 'utils/billUtil/billStatus';
+import { Edit } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 function BillTable(props) {
-  const { activeKey, handleTabChange, columns, bills, page, pageSize, total, onPageChange } = props;
+  const { activeKey, handleTabChange, bills, page, pageSize, total, onPageChange } = props;
+  const navigate = useNavigate();
 
   const tabList = [
     { key: '', label: 'TẤT CẢ' },
@@ -15,7 +33,52 @@ function BillTable(props) {
     { key: 'HOAN_THANH', label: 'Hoàn thành' },
     { key: 'HUY', label: 'Hủy' }
   ];
+  const handleNavigate = (ma) => {
+    console.log('Code', ma);
 
+    navigate(`/hoa-don/chi-tiet/${ma}`);
+  };
+
+  const columns = [
+    { title: '#', dataIndex: 'key', key: 'key' },
+    { title: 'Mã', dataIndex: 'ma', key: 'ma' },
+    { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
+    { title: 'Tổng số tiền', dataIndex: 'tongTien', key: 'tongTien' },
+    {
+      title: 'Tên khách hàng',
+      dataIndex: 'tenKhachHang',
+      key: 'tenKhachHang',
+      render: (tenKhachHang) => (tenKhachHang == null ? 'Khách lẻ' : tenKhachHang)
+    },
+    { title: 'SDT', dataIndex: 'sdt', key: 'sdt' },
+    { title: 'Email', dataIndex: 'email', key: 'email' },
+    { title: 'Ngày tạo', dataIndex: 'ngayTao', key: 'ngayTao' },
+    {
+      title: 'Loại hóa đơn',
+      dataIndex: 'loaiHoaDon',
+      key: 'loaiHoaDon',
+      render: (loaiHoaDon) => (
+        <Chip label={loaiHoaDon == 0 ? 'Tại quầy' : 'Online'} color={loaiHoaDon == 0 ? 'primary' : 'success'} size="small" />
+      )
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'trangThai',
+      key: 'trangThai',
+      render: (trangThai) => (
+        <Chip label={getStatusDisplayName(trangThai)} style={{ backgroundColor: getStatusColor(trangThai), color: '#fff' }} size="small" />
+      )
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (text, record) => (
+        <IconButton onClick={() => handleNavigate(record.ma)}>
+          <Edit />
+        </IconButton>
+      )
+    }
+  ];
   return (
     <Box
       sx={{

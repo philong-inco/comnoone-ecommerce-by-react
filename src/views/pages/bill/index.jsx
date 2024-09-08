@@ -1,11 +1,8 @@
-import { Search } from '@mui/icons-material';
-import { Chip, IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createBill, getBillFilter } from 'services/admin/bill/billService';
 import ComponentFilter from './ComponentFilter';
 import BillTable from './BillTable';
-import { getStatusColor, getStatusDisplayName } from 'utils/billUtil/billStatus';
 
 function Bill() {
   const navigate = useNavigate();
@@ -23,14 +20,25 @@ function Bill() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const getCurrentTimeInSeconds = (date) => {
-    return date instanceof Date ? Math.floor(date.valueOf() / 1000) : null;
+  const getCurrentTimeInMilliseconds = (dateString, isStartOfDay = true) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error('Lỗi : ', dateString);
+      return null;
+    }
+    if (isStartOfDay) {
+      date.setHours(0, 0, 0, 0);
+    } else {
+      date.setHours(23, 59, 59, 999);
+    }
+    return date.getTime();
   };
 
   const fetchBills = async () => {
     if (loading) return;
     setLoading(true);
-    let filter = ` ( ma ~~ '${searchTerm}' or sdt ~~ '${searchTerm}' or email ~~ '${searchTerm}') `;
+    let filter = ` ( ma ~~ '${searchTerm.trim()}' or sdt ~~ '${searchTerm.trim()}' or email ~~ '${searchTerm.trim()}') `;
     if (billType) {
       filter += ` and loaiHoaDon:${billType}`;
     }
@@ -38,7 +46,7 @@ function Bill() {
       filter += ` and trangThai:'${status}'`;
     }
     if (fromDate && toDate) {
-      filter += ` and ngayTao >: '${getCurrentTimeInSeconds(fromDate)}' and ngayTao <:'${getCurrentTimeInSeconds(toDate)}'`;
+      filter += ` and ngayTao >: '${getCurrentTimeInMilliseconds(fromDate, true)}' and ngayTao <:'${getCurrentTimeInMilliseconds(toDate, false)}'   `;
     }
 
     try {
@@ -74,10 +82,11 @@ function Bill() {
     const date = new Date(value);
 
     if (name === 'tuNgay' && value !== null) {
-      setFromDate(new Date(date.setHours(0, 0, 0, 0)));
+      setFromDate(value);
     } else if (name === 'denNgay' && value !== null) {
-      setToDate(new Date(date.setHours(23, 59, 59, 999)));
+      setToDate(value);
     }
+    console.table(fromDate, toDate);
   };
   const handleCreateBill = async () => {
     try {
@@ -112,52 +121,11 @@ function Bill() {
     setActiveKey(key);
   };
 
-  const handleNavigate = (id) => {
-    // navigate(`/bills/detail/${id}`);
+  const handleNavigate = (ma) => {
+    console.log('Code', ma);
+
+    navigate(`/hoa-don/chi-tiet/${ma}`);
   };
-
-  const columns = [
-    { title: '#', dataIndex: 'key', key: 'key' },
-    { title: 'Mã', dataIndex: 'ma', key: 'ma' },
-    { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
-    { title: 'Tổng số tiền', dataIndex: 'tongTien', key: 'tongTien' },
-    {
-      title: 'Tên khách hàng',
-      dataIndex: 'tenKhachHang',
-      key: 'tenKhachHang',
-      render: (tenKhachHang) => (tenKhachHang == null ? 'Khách lẻ' : tenKhachHang)
-    },
-    { title: 'SDT', dataIndex: 'sdt', key: 'sdt' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'Ngày tạo', dataIndex: 'ngayTao', key: 'ngayTao' },
-    {
-      title: 'Loại hóa đơn',
-      dataIndex: 'loaiHoaDon',
-      key: 'loaiHoaDon',
-      render: (loaiHoaDon) => (
-        <Chip label={loaiHoaDon == 0 ? 'Tại quầy' : 'Online'} color={loaiHoaDon == 0 ? 'primary' : 'success'} size="small" />
-      )
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'trangThai',
-      key: 'trangThai',
-      render: (trangThai) => (
-        <Chip label={getStatusDisplayName(trangThai)} style={{ backgroundColor: getStatusColor(trangThai), color: '#fff' }} size="small" />
-      )
-    },
-    {
-      title: 'Hành động',
-      key: 'action',
-      render: (recorder) => (
-        <IconButton onClick={() => handleNavigate(recorder.id)}>
-          <Search />
-        </IconButton>
-      )
-    }
-  ];
-
-  console.table(fromDate, toDate);
 
   return (
     <>
@@ -172,7 +140,6 @@ function Bill() {
       <BillTable
         activeKey={activeKey}
         handleTabChange={handleTabChange}
-        columns={columns}
         bills={bills}
         page={page}
         pageSize={pageSize}

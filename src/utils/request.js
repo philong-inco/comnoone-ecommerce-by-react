@@ -23,6 +23,8 @@ const axiosInstance = axios.create({
 export const get = async (path) => {
   try {
     const response = await axiosInstance.get(path);
+    console.log('URL :', path);
+
     return response.data;
   } catch (error) {
     console.error('GET request error:', error);

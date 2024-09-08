@@ -25,8 +25,6 @@ const FilterCoupons = ({ handleSearch, handlePhamViChange, handleLoaiPhieuChange
     handlePhamViChange(e);
   };
   const handleChange = (e) => {
-    console.log('CHạy ');
-
     const { name, value } = e.target;
     onDateChange(name, value);
   };

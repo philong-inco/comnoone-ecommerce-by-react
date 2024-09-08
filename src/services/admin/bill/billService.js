@@ -17,7 +17,18 @@ export const getBillById = async (id) => {
 
     return result;
   } catch (error) {
-    console.error('Error fetching bill history:', error);
+    console.error('Error fetching bill :', error);
+    throw error;
+  }
+};
+
+export const getBillByCode = async (code) => {
+  try {
+    const result = await get(`v1/bills/code/${code}`);
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching bill by code :', error);
     throw error;
   }
 };
@@ -27,7 +38,17 @@ export const createBill = async () => {
     const result = await post('v1/bills/create');
     return result;
   } catch (error) {
-    console.error('Error creating :');
+    console.error('Error creating :', error);
+    throw error;
+  }
+};
+
+export const updateStatusByCode = async (code, status) => {
+  try {
+    const result = await post(`v1/bills/update-status/${code}?status=${status}`);
+    return result;
+  } catch (error) {
+    console.error('Error update bill by code :', error);
     throw error;
   }
 };
@@ -44,12 +65,12 @@ export const getBillHistoryByBillId = async (id) => {
 };
 
 // quay lại trạng thái
-export const revertBillStatus = async (id) => {
+export const revertBillStatus = async (code) => {
   try {
-    const result = await post(`v1/bills/bill-history/${id}/revert-status`);
+    const result = await post(`v1/bills/bill-history/${code}/revert-status`);
     return result;
   } catch (error) {
-    console.error('Error creating room:');
+    console.error('Error revert Bill Status : ');
     throw error;
   }
 };

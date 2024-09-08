@@ -14,7 +14,7 @@ function ComponentFilter(props) {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            placeholder="Tìm kiếm mã hóa đơn, sdt, email"
+            placeholder="Tìm kiếm mã hóa đơn , sdt , email"
             InputProps={{
               startAdornment: <Search style={{ marginRight: '8px' }} />
             }}
@@ -24,11 +24,11 @@ function ComponentFilter(props) {
           />
         </Grid>
         <Grid item xs={12} sm={6} container justifyContent="flex-end">
-          <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreateBill}>
-            Tạo hóa đơn
+          <Button variant="outlined" color="primary" startIcon={<FileDownload />}>
+            Quét mã
           </Button>
-          <Button variant="outlined" color="primary" startIcon={<FileDownload />} style={{ marginLeft: '10px' }}>
-            Export Excel
+          <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreateBill} style={{ marginLeft: '10px' }}>
+            Tạo hóa đơn
           </Button>
         </Grid>
       </Grid>
@@ -61,21 +61,6 @@ function ComponentFilter(props) {
             }}
           />
         </Grid>
-
-        {/* <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DateRangePicker
-              startText="Từ ngày"
-              endText="Đến ngày"
-              value={[fromDate ? moment(fromDate) : null, toDate ? moment(toDate) : null]}
-              onChange={(newValue) => handleDateChange(newValue)}
-              renderInput={(startProps, endProps) => (
-                <>
-                  <TextField {...startProps} fullWidth size="small" variant="outlined" />
-                  <TextField {...endProps} fullWidth size="small" variant="outlined" style={{ marginLeft: 10 }} />
-                </>
-              )}
-            />
-          </LocalizationProvider> */}
         <Grid item xs={12} sm={6} container alignItems="center">
           <FormControl component="fieldset">
             <FormLabel component="legend" style={{ marginRight: '10px' }}>
@@ -88,7 +73,7 @@ function ComponentFilter(props) {
             </RadioGroup>
           </FormControl>
           <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }}>
-            Export
+            Export Excel
           </Button>
         </Grid>
       </Grid>

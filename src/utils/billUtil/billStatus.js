@@ -54,6 +54,33 @@ export const getStatusColor = (status) => {
   }
 };
 
+export const getStatusBillHistoryColor = (status) => {
+  switch (status) {
+    case 0:
+      return blue[500];
+    case 1:
+      return orange[500];
+    case 2:
+      return orange[300];
+    case 3:
+      return purple[500];
+    case 4:
+      return cyan[500];
+    case 5:
+      return purple[200];
+    case 6:
+      return green[500];
+    case 7:
+      return red[500];
+    case 8:
+      return grey[500];
+    case 9:
+      return grey[500];
+    default:
+      return grey[400];
+  }
+};
+
 export const getStatusBillHistory = (status) => {
   switch (status) {
     case 0:
