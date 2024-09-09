@@ -1,3 +1,4 @@
+
 import { get, post, del, patch, put } from '../../../utils/request.js';
 
 export const getAll = async (page) => {
@@ -45,5 +46,3 @@ export const getSelectHangKhachHang = async (page, hangKhachHang) => {
         console.log('Error  fetching Custommer by keyword', error);
     }
 }
-
-

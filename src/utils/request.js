@@ -23,6 +23,8 @@ const axiosInstance = axios.create({
 export const get = async (path) => {
   try {
     const response = await axiosInstance.get(path);
+    console.log('URL :', path);
+
     return response.data;
   } catch (error) {
     console.error('GET request error:', error);
@@ -44,6 +46,16 @@ export const del = async (path) => {
   try {
     const response = await axiosInstance.delete(path);
     return response.data;
+  } catch (error) {
+    console.error('DELETE request error:', error);
+    throw error;
+  }
+};
+
+export const del2 = async (path) => {
+  try {
+    const response = await axiosInstance.delete(path);
+    return response;
   } catch (error) {
     console.error('DELETE request error:', error);
     throw error;
