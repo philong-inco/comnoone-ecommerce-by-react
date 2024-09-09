@@ -136,10 +136,10 @@ const quanLy = {
                     url: '/khachhang/danhsachkhachhang'
                   },
                   {
-                    id: 'vaitro',
-                    title: 'Vai trò',
+                    id: 'lichlamviec',
+                    title: 'Lịch làm việc',
                     type: 'item',
-                    url: '/vaitro'
+                    url: 'lichlamviec/hienthilich'
                   }
             ]
         }

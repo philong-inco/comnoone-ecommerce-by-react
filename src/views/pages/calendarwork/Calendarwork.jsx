@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Views  } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Modal, Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Modal, Box, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
@@ -10,23 +10,22 @@ const localizer = momentLocalizer(moment);
 function Calendarwork() {
   const [events, setEvents] = useState([]);
   const [open, setOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);  
   const [chuThich, setChuThich] = useState('');
   const [idNhanVien, setIdNhanVien] = useState('');
   const [idCaLamViec, setIdCaLamViec] = useState('');
   const [danhSachNhanVien, setDanhSachNhanVien] = useState([]);
   const [danhSachCaLamViec, setDanhSachCaLamViec] = useState([]);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         await fetchAllNhanVien();
         await fetchAllCaLamViec();
         await fetchAllLichLamViec();
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -39,6 +38,20 @@ function Calendarwork() {
     setOpen(true);
   };
 
+  function CustomToolbar({ label, onNavigate, onView }) {
+    return (
+      <div className="rbc-toolbar">
+        <span className="rbc-btn-group">
+          <button type="button" onClick={() => onNavigate('PREV')}>Trước</button>
+          <button type="button" onClick={() => onNavigate('TODAY')}>Hôm nay</button>
+          <button type="button" onClick={() => onNavigate('NEXT')}>Tiếp</button>
+        </span>
+        <span className="rbc-toolbar-label">{label}</span>
+        
+      </div>
+    );
+  }
+
   const handleClose = () => {
     setOpen(false);
     setChuThich('');
@@ -47,12 +60,20 @@ function Calendarwork() {
     setSelectedDate(null);
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
+  const findNhanVien = async (id) => {
+    const result = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
+    return result.data.ten;
+  }
+
+  const findCaLamViec = async (id) => {
+    const result = await axios.get(`http://localhost:8080/api/ca_lam_viec/searchcalamviec/${id}`);
+    return result.data.moTa;
+  }
 
   const fetchAllLichLamViec = async () => {
     try {
+
+      debugger;
       const response = await axios.get('http://localhost:8080/api/lichlamviec/danhsachlich');
       if (Array.isArray(response.data)) {
         const lichLamViecEvents = await Promise.all(response.data.map(async (item) => {
@@ -93,7 +114,7 @@ function Calendarwork() {
         setDanhSachCaLamViec(results.data);
       } else {
         console.error('Expected an array for danhSachCaLamViec, but got:', results.data);
-        setDanhSachCaLamViec([]);
+        setDanhSachCaLamViec([]); 
       }
     } catch (error) {
       console.log(error);
@@ -124,38 +145,25 @@ function Calendarwork() {
           ngayLamViec: moment(selectedDate).format('YYYY-MM-DD')
         });
 
-
-        setEvents([...events, newEvent]);
-
-        setSnackbarMessage('Lịch làm việc đã được thêm thành công!');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
         await fetchAllLichLamViec();
+        setEvents([...events, newEvent]);
         handleClose();
       } catch (error) {
         console.error('Error saving event:', error);
-        setSnackbarMessage('Đã xảy ra lỗi khi thêm lịch làm việc!');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
       }
     }
   };
 
-  const handleConfirmSave = () => {
-    setConfirmOpen(false);
-    handleSaveEvent();
-  };
-
   const customStyles = {
     event: {
-      backgroundColor: '#4CAF50',
+      backgroundColor: '#4CAF50', // Màu nền khi có ca làm việc
       color: 'white',
       borderRadius: '5px',
       padding: '5px',
       fontSize: '14px',
     },
     dayCell: {
-      height: '150px',
+      height: '150px', // Tăng chiều cao của các ô trong chế độ xem tháng
       fontSize: '16px',
       padding: '10px',
     },
@@ -163,7 +171,7 @@ function Calendarwork() {
 
   return (
     <div style={{ height: '80vh' }}>
-      <Calendar
+     <Calendar
         localizer={localizer}
         events={events}
         startAccessor="start"
@@ -192,7 +200,7 @@ function Calendarwork() {
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
           <h2>Thêm Lịch Làm Việc</h2>
-
+          
           <FormControl fullWidth margin="normal">
             <InputLabel>ID Nhân Viên</InputLabel>
             <Select
@@ -201,7 +209,7 @@ function Calendarwork() {
             >
               {danhSachNhanVien.map((nhanVien) => (
                 <MenuItem key={nhanVien.id} value={nhanVien.id}>
-                  {nhanVien.ten}
+                  {nhanVien.ten} 
                 </MenuItem>
               ))}
             </Select>
@@ -214,7 +222,7 @@ function Calendarwork() {
             >
               {danhSachCaLamViec.map((caLamViec) => (
                 <MenuItem key={caLamViec.id} value={caLamViec.id}>
-                  {caLamViec.moTa}
+                  {caLamViec.moTa} 
                 </MenuItem>
               ))}
             </Select>
@@ -236,43 +244,25 @@ function Calendarwork() {
             inputProps={{ maxLength: 255 }}
             margin="normal"
           />
-          <Button variant="contained" color="primary" onClick={() => setConfirmOpen(true)}>
+          <Button variant="contained" color="primary" onClick={handleSaveEvent}>
             Lưu
           </Button>
         </Box>
       </Modal>
-
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-      >
-        <DialogTitle>Xác nhận</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Bạn có chắc chắn muốn thêm lịch làm việc cho ngày {moment(selectedDate).format('DD/MM/YYYY')} không?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="primary">
-            Hủy bỏ
-          </Button>
-          <Button onClick={handleConfirmSave} color="primary" autoFocus>
-            Xác nhận
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 export default Calendarwork;

@@ -49,6 +49,7 @@ function NhanVienConfiguration() {
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
+    
     const [wards, setWards] = useState([]);
     const [selectedProvince, setSelectedProvince] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
