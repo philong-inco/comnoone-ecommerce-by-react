@@ -23,8 +23,8 @@ const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const ComNo1PageDemo = Loadable(lazy(() => import('views/utilities/ComNo1PageDemo.jsx')));
 // Phiếu giảm giá
-const DanhSachPhieuGiamGia = Loadable(lazy(() => import('views/pages/phieugiamgia/DanhSach.jsx')));
-
+const DanhSachPhieuGiamGia = Loadable(lazy(() => import('views/pages/phieugiamgia/PhieuGiamGia.jsx')));
+const  PhieuGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/phieugiamgia/PhieuGiamGiaConfiguration.jsx')));
 
 // Sản phẩm
 const DanhSachSanPham = Loadable(lazy(() => import('views/pages/sanpham/DanhSachSanPham.jsx')));
@@ -53,6 +53,8 @@ const KhachHangAddress = Loadable(lazy(() => import('views/pages/khachhang/Khach
 // ==============================|| CALENDA WORK ||============================== //
 const CalendarWork = Loadable(lazy(() => import('views/pages/calendarwork/Calendarwork.jsx')));
 
+
+
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -80,103 +82,103 @@ const MainRoutes = {
 
     // Sản phẩm
     {
-<<<<<<< HEAD
-        path: 'sanpham',
-        children: [
-          {
-            path: 'danhsach',
-            element: <ErrorBoundary><DanhSachSanPham/></ErrorBoundary>
-          },
-          {
-            path: 'them',
-            element: <ThemSanPham/>
-          },
-          {
-            path: 'sua',
-            element: <ErrorBoundary><SuaSanPham/></ErrorBoundary>
-          },
-          {
-            path: 'ram',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachRam/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'vga',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachVga/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'cpu',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachCpu/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'manhinh',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachManHinh/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'banphim',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachBanPhim/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'ocung',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachOCung/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'hedieuhanh',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachHeDieuHanh/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'webcam',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachWebcam/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          },
-          {
-            path: 'mausac',
-            children: [
-              {
-                path: 'danhsach',
-                element: <ErrorBoundary><DanhSachMauSac/></ErrorBoundary>
-              }// Thêm các route add update detail ở đây
-            ]
-          }
-        ]
+
+      path: 'sanpham',
+      children: [
+        {
+          path: 'danhsach',
+          element: <ErrorBoundary><DanhSachSanPham /></ErrorBoundary>
+        },
+        {
+          path: 'them',
+          element: <ThemSanPham />
+        },
+        {
+          path: 'sua',
+          element: <ErrorBoundary><SuaSanPham /></ErrorBoundary>
+        },
+        {
+          path: 'ram',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachRam /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'vga',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachVga /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'cpu',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachCpu /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'manhinh',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachManHinh /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'banphim',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachBanPhim /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'ocung',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachOCung /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'hedieuhanh',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachHeDieuHanh /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'webcam',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachWebcam /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        },
+        {
+          path: 'mausac',
+          children: [
+            {
+              path: 'danhsach',
+              element: <ErrorBoundary><DanhSachMauSac /></ErrorBoundary>
+            }// Thêm các route add update detail ở đây
+          ]
+        }
+      ]
     },
 
     // Đợt giảm giá
@@ -202,31 +204,20 @@ const MainRoutes = {
       ]
     },
 
-
-
     //Phiếu giảm giá
     {
       path: 'phieugiamgia',
       children: [
         {
-          path: 'danhsach',
-          element: <ErrorBoundary><DanhSachPhieuGiamGia /></ErrorBoundary>
-        },
+          path: 'danhsachphieugiamgia',
+          element: <DanhSachPhieuGiamGia />
+        }, 
         {
-          path: 'them',
-          element: <ErrorBoundary><DanhSachPhieuGiamGia /></ErrorBoundary>
-        },
-        {
-          path: 'sua',
-          element: <ErrorBoundary><DanhSachPhieuGiamGia /></ErrorBoundary>
-        },
-        {
-          path: 'xoa',
-          element: <ErrorBoundary><DanhSachPhieuGiamGia /></ErrorBoundary>
+          path: 'cauhinhphieugiamgia',
+          element: <PhieuGiamGiaConfiguration />
         }
       ]
     },
-
 
     // Nhân viên
     {
@@ -254,15 +245,15 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachkhachhang',
-          element: <KhachHang/>
+          element: <KhachHang />
         },
         {
           path: 'khachhangconfiguration',
-          element: <KhachHangConfiguration/>
+          element: <KhachHangConfiguration />
         },
         {
           path: 'khachhangaddress/:id',
-          element: <KhachHangAddress/>
+          element: <KhachHangAddress />
         },
       ]
     },
@@ -273,19 +264,7 @@ const MainRoutes = {
       children: [
         {
           path: 'hienthilich',
-          element: <CalendarWork/>
-        },
-        {
-          path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        },
-        {
-          path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        },
-        {
-          path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
+          element: <CalendarWork />
         }
       ]
     },

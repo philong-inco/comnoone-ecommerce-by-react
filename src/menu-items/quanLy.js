@@ -113,7 +113,13 @@ const quanLy = {
                     id: 'phieugiamgia',
                     title: 'Phiếu giảm giá',
                     type: 'item',
-                    url: '/phieugiamgia/danhsach'
+                    url: '/phieugiamgia/danhsachphieugiamgia'
+                  },
+                  {
+                    id: 'themphieugiamgia',
+                    title: 'Thêm phiếu giảm giá',
+                    type: 'item',
+                    url: '/phieugiamgia/cauhinhphieugiamgia'
                   }
             ]
         },

@@ -156,14 +156,14 @@ function Calendarwork() {
 
   const customStyles = {
     event: {
-      backgroundColor: '#4CAF50', // Màu nền khi có ca làm việc
+      backgroundColor: '#4CAF50', 
       color: 'white',
       borderRadius: '5px',
       padding: '5px',
       fontSize: '14px',
     },
     dayCell: {
-      height: '150px', // Tăng chiều cao của các ô trong chế độ xem tháng
+      height: '150px',
       fontSize: '16px',
       padding: '10px',
     },
