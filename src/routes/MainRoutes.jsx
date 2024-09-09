@@ -30,6 +30,8 @@ const NhanVienConfiguration = Loadable(lazy(() => import('views/pages/nhanvien/N
 const KhachHang = Loadable(lazy(() => import('views/pages/khachhang/KhachHang.jsx')));
 const KhachHangConfiguration = Loadable(lazy(() => import('views/pages/khachhang/KhachHangConfiguration.jsx')));
 const KhachHangAddress = Loadable(lazy(() => import('views/pages/khachhang/KhachHangAddress.jsx')))
+// ==============================|| CALENDA WORK ||============================== //
+const CalendarWork = Loadable(lazy(() => import('views/pages/calendarwork/Calendarwork.jsx')));
 
 const MainRoutes = {
   path: '/',
@@ -236,13 +238,13 @@ const MainRoutes = {
       ]
     },
 
-    // Vai trò
+    // Lịch Làm Việc
     {
-      path: 'vaitro',
+      path: 'lichlamviec',
       children: [
         {
-          path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
+          path: 'hienthilich',
+          element: <CalendarWork/>
         },
         {
           path: 'them',

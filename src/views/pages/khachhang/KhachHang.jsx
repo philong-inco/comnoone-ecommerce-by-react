@@ -371,7 +371,7 @@ const KhachHang = () => {
                     padding: '5px',
                 }}
             />
-            <span style={{ marginLeft: '25px' }}>Thêm Khác Hàng</span>
+            <span style={{ marginLeft: '25px' }}>Thêm Khách Hàng</span>
         </Button>
 
         <Button
