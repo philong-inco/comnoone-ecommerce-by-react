@@ -21,7 +21,6 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     listKeySort.forEach((key, index) => {
       const attributeValue = combinedKey(index, variant);
       const countKey = `${attributeValue}`;
-        console.log(countKey)
       if (counts[countKey] === undefined) {
         counts[countKey] = 0;
       }
@@ -48,8 +47,8 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
   
 
   const handleGiaBan = (index) => (e) => {
-    const value = e.target.value;
-    console.log(value);
+    const value = e.target.value.replace(/\D/g, '');
+    
     const updateVariant = variantList.map((item, idx) => {
       if (idx === index) {
         return {
@@ -89,15 +88,15 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
   }, [serialsTemp]);
 
   const handleUploadSerial = (index) => {
-    console.log('index: ', index);
-    console.log('variantList[index]: ', variantList[index]);
-    console.log('variantList[index].serialNumberList: ', variantList[index].serialNumberList);
-    console.log('SR:', variantList[index].serialNumberList.join(','));
+    // console.log('index: ', index);
+    // console.log('variantList[index]: ', variantList[index]);
+    // console.log('variantList[index].serialNumberList: ', variantList[index].serialNumberList);
+    // console.log('SR:', variantList[index].serialNumberList.join(','));
     setSerialsTemp((prev) => ({
       index: index,
       value: variantList[index].serialNumberList.join(',')
     }));
-    console.log(serialsTemp);
+    // console.log(serialsTemp);
     setOpenFormSerial(true);
   };
 
@@ -126,7 +125,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
       return true;
     }
 
-    console.log('Cha nhận: ', obj);
+    // console.log('Cha nhận: ', obj);
     let newSerial = obj.value.split(',').map((serial) => serial.trim());
     if (newSerial.length === 1 && newSerial[0] === '') {
       newSerial = [];
@@ -175,6 +174,13 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     });
     return check;
   };
+
+  function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
+    return new Intl.NumberFormat(locale, {
+      style: 'decimal',
+      currency: currency,
+    }).format(amount);
+  }
 
   //   listKeySort.forEach((key) => {
   //     firstOccurrences[key] = {};
@@ -252,7 +258,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
                   })}
                   <TableCell>{variant.serialNumberList.length}</TableCell>
                   <TableCell>
-                    <TextField onChange={handleGiaBan(rowIndex)} label="Giá bán" variant="standard" fullWidth color="secondary" />
+                    <TextField value={formatCurrency(variant.giaBan)} onChange={handleGiaBan(rowIndex)} label="Giá bán" variant="standard" fullWidth color="secondary" />
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { MenuItem, FormControl, Select, Box, OutlinedInput, InputLabel, Chip } from '@mui/material';
+import { MenuItem, FormControl, Select, Box, OutlinedInput, InputLabel, Chip, InputAdornment, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown }) => {
     // SELECT DROPDOWN
@@ -70,6 +71,13 @@ const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown }) => {
                             ))}
                         </Box>
                     )}
+                    endAdornment={
+                        <InputAdornment style={{marginRight: "10px"}} position="end">
+                          <IconButton>
+                            <AddIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      }
                     MenuProps={MenuProps}
                 >
                     {list.map((element) => (

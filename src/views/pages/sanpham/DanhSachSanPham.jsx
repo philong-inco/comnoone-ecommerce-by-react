@@ -6,27 +6,32 @@ import axios from 'axios';
 import MainCard from 'ui-component/cards/MainCard';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
-import { 
-    TextField,FormLabel, RadioGroup, 
-    FormControl,FormControlLabel , Radio,Paper,
-    Table,TableBody,TableCell,
-    TableContainer,TableHead,TablePagination,
-    TableRow,Chip,Switch
+import {
+    TextField, FormLabel, RadioGroup,
+    FormControl, FormControlLabel, Radio, Paper,
+    Table, TableBody, TableCell,
+    TableContainer, TableHead, TablePagination,
+    TableRow, Chip, Switch,
+    Fab,
+    IconButton
 } from '@mui/material';
 // My component
 import SelectDropDown from '../sanpham/ui-component/SelectDropDown.jsx';
 import ButtonAdd from './ui-component/ButtonAdd.jsx';
 
 import Loader from 'ui-component/Loader';
-import { maxHeight } from '@mui/system';
+import { Box, maxHeight } from '@mui/system';
+import { Download, Upload } from '@mui/icons-material';
+import { MenuButton } from '@mui/base';
+import MenuDownload from "./ui-component/Menu.jsx"
+import ImportProduct from './ui-component/ImportProduct.jsx';
 
 const DanhSachSanPham = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleUpdate = (id) => {
-        navigate(`/sanpham/update/${id}`);
+        navigate(`/sanpham/sua/${id}`);
     };
     const handleAdd = () => {
-      console.log("add nè")
         navigate(`/sanpham/add`);
     };
 
@@ -80,7 +85,7 @@ const DanhSachSanPham = () => {
     const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
     const [sanPham, setsanPham] = useState([]);
     const [filter, setFilter] = useState({
-        page: '0',
+        page: 0,
         size: '5',
         tenSanPham: '',
         ma: '',
@@ -147,7 +152,6 @@ const DanhSachSanPham = () => {
             ...prev,
             trangThai: trangThaiInt
         }));
-        console.log('Trạng thái checked: ', trangThaiChecked);
     }, [trangThaiChecked]);
 
     useEffect(() => {
@@ -156,7 +160,6 @@ const DanhSachSanPham = () => {
             ...prev,
             idNhuCau: idString
         }));
-        console.log('NhuCauChecked: ', nhuCauChecked);
     }, [nhuCauChecked]);
 
     useEffect(() => {
@@ -260,8 +263,6 @@ const DanhSachSanPham = () => {
         }
     }
 
-
-
     const [totalElement, setTotalElement] = useState(0);
 
     useEffect(() => {
@@ -275,7 +276,6 @@ const DanhSachSanPham = () => {
             .join('&');
         const urlQuery = urlFindFilter + queryString;
         const result = await axios.get(urlQuery);
-        console.log(urlQuery);
         setsanPham(result.data.data);
         setTotalElement(parseInt(result.data.totalElement));
     };
@@ -331,9 +331,9 @@ const DanhSachSanPham = () => {
             label: 'Trạng thái',
             minWidth: 30,
             align: 'center',
-            format: (value) => value === 1 ? <Chip label="Hoạt động" size='small' color="secondary" /> 
-            : 
-            <Chip label="Đã tắt" size='small' sx={{backgroundColor: '#EDE7F6'}} />
+            format: (value) => value === 1 ? <Chip label="Hoạt động" size='small' color="secondary" />
+                :
+                <Chip label="Đã tắt" size='small' sx={{ backgroundColor: '#EDE7F6' }} />
         },
         {
             id: 'hanhDong',
@@ -346,13 +346,10 @@ const DanhSachSanPham = () => {
 
 
     const handleSwitchChange = (id) => (e) => {
-        console.log('ID:', id);
-        console.log('Checked:', e.target.checked);
         e.target.checked ? suaTrangThai(id, 1) : suaTrangThai(id, 0);
     };
 
     const suaTrangThai = (id, status) => {
-        console.log(id, status);
         axios.get(`http://localhost:8080/api/san-pham/change-status?id=${id}&status=${status}`)
             .then(response => {
                 loadProducts();
@@ -364,7 +361,6 @@ const DanhSachSanPham = () => {
 
 
     const handleChangePage = (event, newPage) => {
-        console.log(newPage)
         setFilter(prev => ({
             ...prev,
             page: newPage
@@ -372,7 +368,6 @@ const DanhSachSanPham = () => {
     };
 
     const handleChangeRowsPerPage = (event) => {
-        console.log(event.target.value);
         setFilter(prev => ({
             ...prev,
             size: event.target.value
@@ -391,184 +386,195 @@ const DanhSachSanPham = () => {
     // SELECT DROPDOWN
 
     return (
-      <>
-        <MainCard label="Danh sách sản phẩm">
-            <div key={resetFilter} style={{ marginBottom: 30 }}>
-                <Paper>
-                    <div style={{ display: 'flex', padding: 10, paddingTop: 20 }}>
-                        <TextField sx={{maxHeight: '10px'}} color='secondary' onChange={handleTextFieldSearch} id="outlined-basic" label="Nhập từ khóa" variant="outlined" />
-                      
-                        <div style={{ marginLeft: 10,display: 'flex', alignItems: 'center' }}>
-                        
-                            <FormControl>
-                                {/* <FormLabel id="demo-controlled-radio-buttons-group">Tìm theo:</FormLabel> */}
-                                <RadioGroup
-                                    aria-labelledby="demo-controlled-radio-buttons-group"
-                                    name="controlled-radio-buttons-group"
-                                    value={typeOfFilter}
-                                    row
-                                    onChange={changeTypeOfFilter}
-                                >
-                                    <FormControlLabel  value="0" control={<Radio color='secondary' size="small" />} label="Tên" />
-                                    <FormControlLabel  value="1" control={<Radio color='secondary' size="small" />} label="Mã" />
-                                </RadioGroup>
-                            </FormControl>
+        <>
+            <MainCard label="Danh sách sản phẩm">
+                <div key={resetFilter} style={{ marginBottom: 30 }}>
+                    <Paper>
+                        <div style={{ display: 'flex', padding: 10, paddingTop: 20 }}>
+                            <TextField sx={{ maxHeight: '10px' }} color='secondary' onChange={handleTextFieldSearch} id="outlined-basic" label="Nhập từ khóa" variant="outlined" />
+
+                            <div style={{ marginLeft: 10, display: 'flex', alignItems: 'center' }}>
+
+                                <FormControl>
+                                    {/* <FormLabel id="demo-controlled-radio-buttons-group">Tìm theo:</FormLabel> */}
+                                    <RadioGroup
+                                        aria-labelledby="demo-controlled-radio-buttons-group"
+                                        name="controlled-radio-buttons-group"
+                                        value={typeOfFilter}
+                                        row
+                                        onChange={changeTypeOfFilter}
+                                    >
+                                        <FormControlLabel value="0" control={<Radio color='secondary' size="small" />} label="Tên" />
+                                        <FormControlLabel value="1" control={<Radio color='secondary' size="small" />} label="Mã" />
+                                    </RadioGroup>
+                                </FormControl>
+                            </div>
+
+                            <div onClick={cleanFilter} style={{ marginLeft: 20, marginTop: 10, marginRight: 20 }}>
+                                <FilterAltOffOutlinedIcon
+                                    color='secondary'
+                                    fontSize='large'
+                                />
+                            </div>
+                            <div style={{ flexGrow: '1', display: 'flex', justifyContent: 'end' }}>
+
+                                <Box style={{ marginRight: "10px" }} onClick={() => navigate('/sanpham/themnhieusanpham')}>
+                                    <Fab size="medium" color="secondary">
+                                        <Upload />
+                                    </Fab>
+                                </Box>
+                                <Box style={{ marginRight: "10px" }}>
+                                    <MenuDownload data={sanPham} />
+                                </Box>
+
+                                <ButtonAdd
+                                    size={"medium"}
+                                    color={"secondary"}
+                                    title={"Thêm sản phẩm"}
+                                    targetUrl={"them"}
+                                />
+
+                            </div>
                         </div>
-                        
-                        <div onClick={cleanFilter} style={{marginLeft: 20, marginTop: 10,marginRight: 20}}>
-                            <FilterAltOffOutlinedIcon
-                                color='secondary'
-                                fontSize='large'
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+
+                            <SelectDropDown
+                                list={nhuCau}
+                                setListChecked={setNhuCauChecked}
+                                nameDropDown={"Nhu cầu"}
+                            />
+                            <SelectDropDown
+                                list={thuongHieu}
+                                setListChecked={setThuongHieuChecked}
+                                nameDropDown={"Thương hiệu"}
+                            />
+                            <SelectDropDown
+                                list={trangThai}
+                                setListChecked={setTrangThaiChecked}
+                                nameDropDown={"Trạng thái"}
+                            />
+                            <SelectDropDown
+                                list={ram}
+                                setListChecked={setRamChecked}
+                                nameDropDown={"RAM"}
+                            />
+                            <SelectDropDown
+                                list={CPU}
+                                setListChecked={setCPUChecked}
+                                nameDropDown={"CPU"}
+                            />
+                            <SelectDropDown
+                                list={VGA}
+                                setListChecked={setVGAChecked}
+                                nameDropDown={"VGA"}
+                            />
+                            <SelectDropDown
+                                list={manHinh}
+                                setListChecked={setManHinhChecked}
+                                nameDropDown={"Màn hình"}
+                            />
+                            <SelectDropDown
+                                list={banPhim}
+                                setListChecked={setBanPhimChecked}
+                                nameDropDown={"Bàn phím"}
+                            />
+                            <SelectDropDown
+                                list={oCung}
+                                setListChecked={setOCungChecked}
+                                nameDropDown={"Ổ cứng"}
+                            />
+                            <SelectDropDown
+                                list={mauSac}
+                                setListChecked={setmauSacChecked}
+                                nameDropDown={"Màu sắc"}
+                            />
+                            <SelectDropDown
+                                list={heDieuHanh}
+                                setListChecked={setHeDieuHanhChecked}
+                                nameDropDown={"Hệ điều hành"}
+                            />
+                            <SelectDropDown
+                                list={webcam}
+                                setListChecked={setWebcamChecked}
+                                nameDropDown={"Webcam"}
                             />
                         </div>
-                        <div style={{flexGrow:'1', display: 'flex', justifyContent: 'end'}}>
-                        
-                          <ButtonAdd
-                          size={"medium"}
-                          color={"secondary"}
-                          title={"Thêm sản phẩm"}
-                          targetUrl={"them"}
-                          />
-                        
-                        </div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    </Paper>
+                </div>
 
-                        <SelectDropDown
-                            list={nhuCau}
-                            setListChecked={setNhuCauChecked}
-                            nameDropDown={"Nhu cầu"}
-                        />
-                        <SelectDropDown
-                            list={thuongHieu}
-                            setListChecked={setThuongHieuChecked}
-                            nameDropDown={"Thương hiệu"}
-                        />
-                        <SelectDropDown
-                            list={trangThai}
-                            setListChecked={setTrangThaiChecked}
-                            nameDropDown={"Trạng thái"}
-                        />
-                        <SelectDropDown
-                            list={ram}
-                            setListChecked={setRamChecked}
-                            nameDropDown={"RAM"}
-                        />
-                        <SelectDropDown
-                            list={CPU}
-                            setListChecked={setCPUChecked}
-                            nameDropDown={"CPU"}
-                        />
-                        <SelectDropDown
-                            list={VGA}
-                            setListChecked={setVGAChecked}
-                            nameDropDown={"VGA"}
-                        />
-                        <SelectDropDown
-                            list={manHinh}
-                            setListChecked={setManHinhChecked}
-                            nameDropDown={"Màn hình"}
-                        />
-                        <SelectDropDown
-                            list={banPhim}
-                            setListChecked={setBanPhimChecked}
-                            nameDropDown={"Bàn phím"}
-                        />
-                        <SelectDropDown
-                            list={oCung}
-                            setListChecked={setOCungChecked}
-                            nameDropDown={"Ổ cứng"}
-                        />
-                        <SelectDropDown
-                            list={mauSac}
-                            setListChecked={setmauSacChecked}
-                            nameDropDown={"Màu sắc"}
-                        />
-                        <SelectDropDown
-                            list={heDieuHanh}
-                            setListChecked={setHeDieuHanhChecked}
-                            nameDropDown={"Hệ điều hành"}
-                        />
-                        <SelectDropDown
-                            list={webcam}
-                            setListChecked={setWebcamChecked}
-                            nameDropDown={"Webcam"}
-                        />
-                    </div>
+                <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+                    <TableContainer sx={{ maxHeight: 440 }}>
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell style={{ fontWeight: 700 }}>STT</TableCell>
+                                    {columns.map((column) => (
+                                        <TableCell
+                                            key={column.id}
+                                            align={column.align}
+                                            style={{ minWidth: column.minWidth, fontWeight: 700 }}
+                                        >
+                                            {column.label}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {sanPham
+                                    // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row, index) => {
+                                        const rowIndex = filter.page * filter.size + index + 1;
+                                        return (
+                                            // lặp từng row
+                                            <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+
+                                                <TableCell align='center'>{rowIndex}</TableCell>
+                                                {/* lặp từng cell dựa vào tên cot */}
+                                                {columns.map((column) => {
+                                                    const value = row[column.id];
+                                                    if (column.id === 'hanhDong') {
+                                                        const valueTrangThai = row['trangThai'];
+                                                        return <TableCell key={column.id} align={column.align}>
+                                                            <IconButton onClick={() => handleUpdate(row.id)} >
+                                                                <EditOutlinedIcon />
+                                                            </IconButton>
+                                                            {valueTrangThai === 1 ?
+                                                                <Switch defaultChecked color="secondary"
+                                                                    onChange={handleSwitchChange(row.id)}
+                                                                />
+                                                                :
+                                                                <Switch onChange={handleSwitchChange(row.id)} />}
+                                                        </TableCell>
+                                                    }
+                                                    return (
+                                                        <TableCell key={column.id} align={column.align}>
+                                                            {column.format && typeof value === 'number'
+                                                                ? column.format(value)
+                                                                : value}
+                                                        </TableCell>
+                                                    );
+                                                })}
+                                            </TableRow>
+                                        );
+                                    })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                        component="div"
+                        count={totalElement}
+                        rowsPerPage={parseInt(filter.size)}
+                        page={filter.page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
                 </Paper>
-            </div>
 
-            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell style={{ fontWeight: 700 }}>STT</TableCell>
-                                {columns.map((column) => (
-                                    <TableCell
-                                        key={column.id}
-                                        align={column.align}
-                                        style={{ minWidth: column.minWidth, fontWeight: 700 }}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {sanPham
-                                // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    const rowIndex = filter.page * filter.size + index + 1;
-                                    return (
-                                        // lặp từng row
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
 
-                                            <TableCell align='center'>{rowIndex}</TableCell>
-                                            {/* lặp từng cell dựa vào tên cot */}
-                                            {columns.map((column) => {
-                                                const value = row[column.id];
-                                                if (column.id === 'hanhDong') {
-                                                    const valueTrangThai = row['trangThai'];
-                                                    return <TableCell key={column.id} align={column.align}>
-                                                        <EditOutlinedIcon onClick={() => handleUpdate(row.id)} />
-                                                        {valueTrangThai === 1 ?
-                                                            <Switch defaultChecked color="secondary"
-                                                                onChange={handleSwitchChange(row.id)}
-                                                            />
-                                                            :
-                                                            <Switch onChange={handleSwitchChange(row.id)} />}
-                                                    </TableCell>
-                                                }
-                                                return (
-                                                    <TableCell key={column.id} align={column.align}>
-                                                        {column.format && typeof value === 'number'
-                                                            ? column.format(value)
-                                                            : value}
-                                                    </TableCell>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    );
-                                })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    component="div"
-                    count={totalElement}
-                    rowsPerPage={parseInt(filter.size)}
-                    page={filter.page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
+            </MainCard>
 
-            
-        </MainCard>
-        
         </>
     );
 }
