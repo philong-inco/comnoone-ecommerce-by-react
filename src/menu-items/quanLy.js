@@ -19,11 +19,19 @@ const quanLy = {
           type: 'item',
           url: '/hoa-don/danh-sach'
         },
+        // {
+        //   id: 'chi-tiet',
+        //   title: 'Danh sách',
+        //   type: 'item',
+        //   url: '/hoa-don:id'
+        // },
         {
           id: 'hoadoncho',
           title: 'Chờ xác nhận',
           type: 'item',
           url: '/hoadon/choxacnhan'
+          // nếu muốn ẩn điều hướng thì đặt thêm thuộc tính breadcrumbs: false
+          // nếu muốn bấm vào mở ra tab mới thì thêm target: true
         },
         {
           id: 'danhsachhoadon',
@@ -108,17 +116,17 @@ const quanLy = {
       icon: icons.IconReceipt2,
       children: [
         {
+          id: 'dotgiamgia',
+          title: 'Đợt giảm giá',
+          type: 'item',
+          url: '/dotgiamgia/danhsach'
+        },
+        {
           id: 'phieugiamgia',
           title: 'Phiếu giảm giá',
           type: 'item',
-          url: '/phieugiamgia/danhsachphieugiamgia'
-        },
-        {
-          id: 'cauhinhphieugiamgia',
-          title: 'Cấu hình phiếu giảm giá',
-          type: 'item',
-          url: '/phieugiamgia/cauhinhphieugiamgia'
-        },
+          url: '/phieugiamgia/danhsach'
+        }
       ]
     },
     {
@@ -131,27 +139,19 @@ const quanLy = {
           id: 'nhanvien',
           title: 'Nhân viên',
           type: 'item',
-          url: '/nhanvien/danhsachnhanvien'
+          url: '/nhanvien/danhsach'
         },
         {
           id: 'khachhang',
           title: 'Khách hàng',
           type: 'item',
-          url: '/khachhang/danhsachkhachhang'
-        }
-      ]
-    },
-    {
-      id: 'lichlamviec',
-      title: 'Lịch Làm Việc',
-      type: 'collapse',
-      icon: icons.IconReceipt2,
-      children: [
+          url: '/khachhang/danhsach'
+        },
         {
-          id: 'hienthilich',
-          title: 'Thông tin lịch làm việc ',
+          id: 'vaitro',
+          title: 'Vai trò',
           type: 'item',
-          url: '/lichlamviec/hienthilich'
+          url: '/vaitro'
         }
       ]
     }
