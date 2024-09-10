@@ -116,16 +116,16 @@ const quanLy = {
       icon: icons.IconReceipt2,
       children: [
         {
-          id: 'dotgiamgia',
-          title: 'Đợt giảm giá',
-          type: 'item',
-          url: '/dotgiamgia/danhsach'
-        },
-        {
           id: 'phieugiamgia',
           title: 'Phiếu giảm giá',
           type: 'item',
-          url: '/phieugiamgia/danhsach'
+          url: '/phieugiamgia/danhsachphieugiamgia'
+        },
+        {
+          id: 'cauhinhphieu',
+          title: 'Cấu hình phiếu giảm giá',
+          type: 'item',
+          url: '/phieugiamgia/cauhinhphieugiamgia'
         }
       ]
     },
@@ -139,19 +139,27 @@ const quanLy = {
           id: 'nhanvien',
           title: 'Nhân viên',
           type: 'item',
-          url: '/nhanvien/danhsach'
+          url: '/nhanvien/danhsachnhanvien'
         },
         {
           id: 'khachhang',
           title: 'Khách hàng',
           type: 'item',
-          url: '/khachhang/danhsach'
-        },
+          url: '/khachhang/danhsachkhachhang'
+        }
+      ]
+    },
+    {
+      id: 'lichlamviec',
+      title: 'Lịch làm việc',
+      type: 'collapse',
+      icon: icons.IconReceipt2,
+      children: [
         {
-          id: 'vaitro',
-          title: 'Vai trò',
+          id: 'lichlamviec',
+          title:'Lịch làm việc',
           type: 'item',
-          url: '/vaitro'
+          url: '/lichlamviec/hienthilich'
         }
       ]
     }
