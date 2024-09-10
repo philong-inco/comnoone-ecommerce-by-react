@@ -265,7 +265,6 @@ const MainRoutes = {
       ]
     },
 
-    // Khách hàng
     {
       path: 'khachhang',
       children: [
@@ -284,7 +283,6 @@ const MainRoutes = {
       ]
     },
 
-    // Lịch Làm Việc
     {
       path: 'lichlamviec',
       children: [
@@ -295,7 +293,6 @@ const MainRoutes = {
       ]
     },
 
-    // Thống kê
     {
       path: 'thongke',
       children: [
