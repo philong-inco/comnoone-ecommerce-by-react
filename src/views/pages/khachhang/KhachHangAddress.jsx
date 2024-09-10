@@ -33,8 +33,10 @@ import {
   DialogContent,
   DialogActions
 } from '@mui/material';
+import { textAlign } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
+import CloseIcon from '@mui/icons-material/Close';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
@@ -52,15 +54,29 @@ const validationSchema = Yup.object().shape({
   ngay_sinh: Yup.date()
     .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
     .required('Ngày sinh không được để trống'),
-  gioi_tinh: Yup.number().required('Giới tính không được để trống'),
-  hinhAnh: Yup.string(),
+  gioi_tinh: Yup.number()
+    .oneOf([0, 1], 'Giới tính không hợp lệ')
+    .required('Giới tính không được để trống'),
+
+  hinhAnh: Yup.string()
+    .url('Hình ảnh phải là một URL hợp lệ')
+    .nullable(),
 });
 
 
 const addressValidationSchema = Yup.object().shape({
-  ten_nguoi_nhan: Yup.string().required('Tên người nhận không được để trống'),
-  sdt_nguoi_nhan: Yup.string().required('Số điện thoại người nhận không được để trống'),
-  dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống'),
+  ten_nguoi_nhan: Yup.string()
+    .required('Tên người nhận không được để trống')
+    .min(3, 'Tên người nhận phải có ít nhất 3 ký tự')
+    .max(50, 'Tên người nhận không được vượt quá 50 ký tự')
+    .matches(/^[a-zA-ZÀ-ỹ\s]*$/, 'Tên người nhận chỉ được chứa các ký tự chữ cái và khoảng trắng'),
+
+  sdt_nguoi_nhan: Yup.string()
+    .required('Số điện thoại người nhận không được để trống')
+    .matches(/^\d{10}$/, 'Số điện thoại người nhận phải bao gồm đúng 10 chữ số'),
+
+  dia_chi_nhan_hang: Yup.string()
+    .required('Địa chỉ nhận hàng không được để trống')
 });
 
 function KhachHangAddress() {
@@ -111,14 +127,9 @@ function KhachHangAddress() {
   const [openDialog, setOpenDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
   const [openSetDefaultDialog, setOpenSetDefaultDialog] = useState(false);
-const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
+  const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
+  const [defaultAddressId, setDefaultAddressId] = useState(selectedAddress?.isDefault ? selectedAddress.id : null);
 
-
-  useEffect(() => {
-    if (selectedAddress) {
-      setIsDefault(selectedAddress.isDefault === 1);
-    }
-  }, [selectedAddress]);
   useEffect(() => {
     if (isProvincesLoaded && id) {
       fetchKhachHangInfo(id);
@@ -197,7 +208,6 @@ const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
 
   const handleDefaultChange = (event) => {
     const isChecked = event.target.checked;
-
     if (isChecked) {
       setOpenSetDefaultDialog(true);
     } else {
@@ -485,25 +495,32 @@ const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
     );
   };
   const handleOpenModal = async (address) => {
-    setSelectedAddress(address);
-    setIsEditing(true);
-    setIsModalOpen(true);
-    setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
-    setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
-    setValueAddress('email', address.emailNguoiNhan);
-    setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
-    setValueAddress('id_dia_chi', address.id);
-    setAddressId(address.id)
-    try {
-
-      const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
-      const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
-      const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
-      setSelectedProvince(formattedTinhThanhPhoId);
-      setSelectedDistrict(formattedQuanHuyenId);
-      setSelectedWard(formaterPhuongXaId);
-    } catch (error) {
-      console.error('Failed to fetch address data', error);
+    if (address.id) {
+      setSelectedAddress(address);
+      setIsEditing(true);
+      setIsModalOpen(true);
+      setValueAddress('ten_nguoi_nhan', address.tenNguoiNhan);
+      setValueAddress('sdt_nguoi_nhan', address.sdtNguoiNhan);
+      setValueAddress('email', address.emailNguoiNhan);
+      setValueAddress('dia_chi_nhan_hang', address.diaChiNhanHang);
+      setValueAddress('id_dia_chi', address.id);
+      setAddressId(address.id);
+      if (address.loaiDiaChi === 1) {
+        setIsDefault(true)
+      }
+      try {
+        const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
+        const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
+        const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
+        setSelectedProvince(formattedTinhThanhPhoId);
+        setSelectedDistrict(formattedQuanHuyenId);
+        setSelectedWard(formaterPhuongXaId);
+      } catch (error) {
+        console.error('Failed to fetch address data', error);
+      }
+    } else {
+      setIsEditing(false);
+      setIsModalOpen(true);
     }
   };
 
@@ -850,11 +867,18 @@ const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
               helperText={addressErrors.dia_chi_nhan_hang?.message}
               sx={{ fontFamily: 'Arial' }}
             />
-            <FormControlLabel
-              control={<Switch checked={isDefault} onChange={handleDefaultChange} />}
-              label="Địa chỉ mặc định"
-              sx={{ mt: 2 }}
-            />
+            {isEditing && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={selectedAddress?.id === defaultAddressId}
+                    onChange={handleDefaultChange}
+                  />
+                }
+                label="Địa chỉ mặc định"
+                sx={{ mt: 2 }}
+              />
+            )}
 
             <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
               <Button
@@ -904,7 +928,7 @@ const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
       </Dialog>
 
       <Dialog
-        open={openSetDefaultDialog}
+         open={openSetDefaultDialog}
         onClose={() => setOpenSetDefaultDialog(false)}
       >
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
@@ -915,10 +939,12 @@ const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
           <Button onClick={() => setOpenSetDefaultDialog(false)} color="primary">
             Hủy
           </Button>
-          <Button onClick={handleConfirmSetDefault} color="primary"> Xác nhận
+          <Button onClick={handleConfirmSetDefault} color="primary">
+            Xác nhận
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Thông báo bỏ làm giá trị mặc định */}
       <Dialog
         open={openUnsetDefaultDialog}
