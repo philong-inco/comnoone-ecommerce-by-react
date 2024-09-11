@@ -56,13 +56,20 @@ function BillHistory(props) {
       <Grid container spacing={2}>
         <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Button variant="contained" color="error" onClick={handleCancelled} disabled={bill.trangThai === 'HUY'} sx={{ marginRight: 2 }}>
-            Hủy
+            HỦY
           </Button>
-          <Button variant="contained">In hóa đơn</Button>
+          <Button variant="contained">XÁC NHẬN</Button>
         </Grid>
         <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-            Chi tiết
+          <Button variant="contained" sx={{ marginRight: 2 }}>
+            IN HÓA ĐƠN
+          </Button>
+          <Button variant="contained" sx={{ marginRight: 2 }}>
+            IN PHIẾU GIAO HÀNG
+          </Button>
+
+          <Button variant="contained" color="warning" onClick={handleOpenDialog}>
+            CHI TIẾT{' '}
           </Button>
         </Grid>
       </Grid>

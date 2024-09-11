@@ -4,7 +4,7 @@ export const getBillFilter = async (page, size, path) => {
   console.log('Path : ', path);
 
   try {
-    const result = await get(`v1/bills/all?page=${page}&size=${size}&sort=id,DESC&filter=${path}`);
+    const result = await get(`bills/all?page=${page}&size=${size}&sort=id,DESC&filter=${path}`);
     return result;
   } catch (error) {
     console.error('Error fetching bill filter:', error);
@@ -13,7 +13,7 @@ export const getBillFilter = async (page, size, path) => {
 };
 export const getBillById = async (id) => {
   try {
-    const result = await get(`v1/bills/${id}`);
+    const result = await get(`bills/${id}`);
 
     return result;
   } catch (error) {
@@ -24,8 +24,7 @@ export const getBillById = async (id) => {
 
 export const getBillByCode = async (code) => {
   try {
-    const result = await get(`v1/bills/code/${code}`);
-
+    const result = await get(`bills/code/${code}`);
     return result;
   } catch (error) {
     console.error('Error fetching bill by code :', error);
@@ -35,7 +34,7 @@ export const getBillByCode = async (code) => {
 
 export const createBill = async () => {
   try {
-    const result = await post('v1/bills/create');
+    const result = await post('bills/create');
     return result;
   } catch (error) {
     console.error('Error creating :', error);
@@ -45,7 +44,7 @@ export const createBill = async () => {
 
 export const updateStatusByCode = async (code, status) => {
   try {
-    const result = await post(`v1/bills/update-status/${code}?status=${status}`);
+    const result = await post(`bills/update-status/${code}?status=${status}`);
     return result;
   } catch (error) {
     console.error('Error update bill by code :', error);
@@ -55,7 +54,7 @@ export const updateStatusByCode = async (code, status) => {
 // lịch sử hóa đơn
 export const getBillHistoryByBillId = async (id) => {
   try {
-    const result = await get(`v1/bills/bill-history/${id}`);
+    const result = await get(`bills/bill-history/${id}`);
 
     return result;
   } catch (error) {
@@ -67,7 +66,7 @@ export const getBillHistoryByBillId = async (id) => {
 // quay lại trạng thái
 export const revertBillStatus = async (code) => {
   try {
-    const result = await post(`v1/bills/bill-history/${code}/revert-status`);
+    const result = await post(`bills/bill-history/${code}/revert-status`);
     return result;
   } catch (error) {
     console.error('Error revert Bill Status : ');

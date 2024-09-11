@@ -12,15 +12,27 @@ import {
   TableRow,
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Checkbox,
+  TextField
 } from '@mui/material';
 import { getAllProduct } from 'services/admin/product/productService';
 import { createSerialNumberSold } from 'services/admin/serialNumberSold/serialNumberSoldService';
+import { Box } from '@mui/system';
 
 function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }) {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  // Dialog
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const fetchProduct = async () => {
     const response = await getAllProduct();
@@ -31,8 +43,8 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
 
   const handleSelect = async (productId) => {
     const data = {
-      idSanPham: productId,
-      maHoaDon: id
+      listSerialNumberId: [1, 2, 3, 4, 5, 6, 7, 8, 42, 41, 40, 39],
+      billCode: id
     };
 
     const response = await createSerialNumberSold(data);
@@ -48,6 +60,21 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
         onProductSelected();
       }
     }
+  };
+
+  const handleOpenDialog = (product) => {
+    // setSelectedProduct(product);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedRows([]);
+    setSelectedProduct(null);
+  };
+
+  const handleSelectRow = (id) => {
+    setSelectedRows((prevSelected) => (prevSelected.includes(id) ? prevSelected.filter((rowId) => rowId !== id) : [...prevSelected, id]));
   };
 
   useEffect(() => {
@@ -101,7 +128,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
                   <Typography color="error">{parseInt(product.giaBan).toLocaleString()} VNĐ</Typography>
                 </TableCell>
                 <TableCell>
-                  <Button variant="contained" color="primary" onClick={() => handleSelect(product.id)}>
+                  <Button variant="contained" color="primary" onClick={() => handleOpenDialog(product)}>
                     Chọn
                   </Button>
                 </TableCell>
@@ -110,6 +137,61 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        PaperProps={{
+          style: {
+            width: '500px'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial</span>
+            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} />
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Chọn</TableCell>
+                  <TableCell>Mã</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[
+                  { id: 1, code: 'A001', status: 'Có sẵn' },
+                  { id: 2, code: 'A002', status: 'Hết hàng' }
+                ].map((row) => (
+                  <TableRow key={row.id}>
+                    <Checkbox checked={selectedRows.includes(row.id)} onChange={() => handleSelectRow(row.id)} />
+                    <TableCell>{row.code}</TableCell>
+                    <TableCell>{row.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button
+            onClick={() => {
+              console.log('Selected rows:', selectedRows);
+              handleCloseDialog();
+            }}
+            variant="contained"
+            color="primary"
+          >
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar open={notification.open} autoHideDuration={3000} onClose={() => setNotification({ ...notification, open: false })}>
         <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity}>

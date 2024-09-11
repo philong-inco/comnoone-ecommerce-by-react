@@ -23,6 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ProductList from './ProductList';
 import { deletedById, getAllSerialNumberSoldByBillId } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getBillByCode } from 'services/admin/bill/billService';
+import { Update } from '@mui/icons-material';
 
 function ProductInBill(props) {
   const { handleLoading, bill, fetchBill } = props;
@@ -118,8 +119,8 @@ function ProductInBill(props) {
                   <TableCell>Tên sản phẩm</TableCell>
                   <TableCell>Giá</TableCell>
                   <TableCell>Số lượng</TableCell>
-                  <TableCell>Hành động</TableCell>
                   <TableCell>Serial</TableCell>
+                  <TableCell>Hành động</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -128,8 +129,8 @@ function ProductInBill(props) {
                     <TableCell>
                       <img src="https://via.placeholder.com/50" alt="Product" width="50" />
                     </TableCell>
-                    <TableCell>{product.maSPCT}</TableCell>
-                    <TableCell>{product.tenSanPham}</TableCell>
+                    <TableCell>{product.productDetailCode}</TableCell>
+                    <TableCell>{product.productName}</TableCell>
                     <TableCell>
                       <strong>{parseInt(product.gia).toLocaleString()} VNĐ</strong>
                     </TableCell>
@@ -137,9 +138,22 @@ function ProductInBill(props) {
                       <strong>{product.soLuong} </strong>
                     </TableCell>
                     <TableCell>
+                      <strong>
+                        {product.serialNumbers.map((serial, index) => (
+                          <span key={serial.serialNumberId}>
+                            {serial.serialNumberCode}
+                            {index < product.serialNumbers.length - 1 && ', '}
+                          </span>
+                        ))}
+                      </strong>
+                    </TableCell>
+                    <TableCell>
                       <IconButton color="error" onClick={() => handleDelete(product.id)}>
-                        <DeleteIcon />
+                        <Update color="warning" />
                       </IconButton>
+                      {/* <IconButton color="error" onClick={() => handleDelete(product.id)}>
+                        <DeleteIcon />
+                      </IconButton> */}
                     </TableCell>
                   </TableRow>
                 ))}
