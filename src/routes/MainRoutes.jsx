@@ -26,6 +26,7 @@ const ComNo1PageDemo = Loadable(lazy(() => import('views/utilities/ComNo1PageDem
 const DanhSachPhieuGiamGia = Loadable(lazy(() => import('views/pages/phieugiamgia/PhieuGiamGia.jsx')));
 const  PhieuGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/phieugiamgia/PhieuGiamGiaConfiguration.jsx')));
 
+
 // Sản phẩm
 const DanhSachSanPham = Loadable(lazy(() => import('views/pages/sanpham/DanhSachSanPham.jsx')));
 const ThemSanPham = Loadable(lazy(() => import('views/pages/sanpham/ThemSanPham.jsx')));
@@ -45,7 +46,6 @@ const DanhSachWebcam = Loadable(lazy(() => import('views/pages/sanpham/webcam/Da
 const DanhSachNhuCau = Loadable(lazy(() => import('views/pages/sanpham/nhucau/DanhSachNhuCau.jsx')));
 const DanhSachThuongHieu = Loadable(lazy(() => import('views/pages/sanpham/thuonghieu/DanhSachThuongHieu.jsx')));
 
-// ==============================|| MAIN ROUTING ||============================== //
 
 // ==============================||  NHÂN VIÊN ||============================== //
 const DanhSachNhanVien = Loadable(lazy(() => import('views/pages/nhanvien/NhanVien.jsx')));
@@ -111,7 +111,7 @@ const MainRoutes = {
             {
               path: 'danhsach',
               element: <ErrorBoundary><DanhSachRam /></ErrorBoundary>
-            }// Thêm các route add update detail ở đây
+            }
           ]
         },
         {
@@ -206,46 +206,27 @@ const MainRoutes = {
         }
       ]
     },
-
-    // Đợt giảm giá
-    {
-      path: 'dotgiamgia',
-      children: [
-        {
-          path: 'danhsach',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        },
-        {
-          path: 'them',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        },
-        {
-          path: 'sua',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        },
-        {
-          path: 'xoa',
-          element: <ErrorBoundary><ComNo1PageDemo /></ErrorBoundary>
-        }
-      ]
-    },
-
-    //Phiếu giảm giá
     {
       path: 'phieugiamgia',
       children: [
         {
           path: 'danhsachphieugiamgia',
           element: <DanhSachPhieuGiamGia />
-        }, 
+        },
         {
           path: 'cauhinhphieugiamgia',
+          element: <PhieuGiamGiaConfiguration />
+        },
+        {
+          path: 'cauhinhphieugiamgia/:id',
+          element: <PhieuGiamGiaConfiguration />
+        },
+        {
+          path: 'chitietphieugiamgia/:id',
           element: <PhieuGiamGiaConfiguration />
         }
       ]
     },
-
-    // Nhân viên
     {
       path: 'nhanvien',
       children: [
@@ -306,10 +287,6 @@ const MainRoutes = {
         }
       ]
     },
-
-
-
-    // Default của giao diện cứ để lại đây sau làm thống kê
     {
       path: '/',
       element: <ErrorBoundary><DashboardDefault /></ErrorBoundary>

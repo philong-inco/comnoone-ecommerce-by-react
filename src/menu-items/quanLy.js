@@ -110,19 +110,19 @@ const quanLy = {
       ]
     },
     {
-      id: 'khuyenmai',
+      id: 'phieugiamgia',
       title: 'Giảm giá',
       type: 'collapse',
       icon: icons.IconReceipt2,
       children: [
         {
-          id: 'phieugiamgia',
-          title: 'Phiếu giảm giá',
+          id: 'phieugiamgia-danhsach',
+          title: 'Danh sách phiếu giảm giá',
           type: 'item',
           url: '/phieugiamgia/danhsachphieugiamgia'
         },
         {
-          id: 'cauhinhphieu',
+          id: 'phieugiamgia-cauhinh',
           title: 'Cấu hình phiếu giảm giá',
           type: 'item',
           url: '/phieugiamgia/cauhinhphieugiamgia'

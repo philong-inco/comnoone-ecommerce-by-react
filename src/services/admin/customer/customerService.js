@@ -11,6 +11,17 @@ export const getAll = async (page) => {
     }
 }
 
+export const getAllChangePageSize = async (page, size) => {
+    try {
+        const result = await get(`/khachhang/all?pageNo=${page}&pageSize=${size}`);
+        return result;
+    } catch (error) {
+        console.log('Error fetching Customer', error);
+        throw error;
+    }
+};
+
+
 export const getDanhSachKhachHang = async () => {
     try {
         const result = await get('/khachhang/danhsachkhachhang');
