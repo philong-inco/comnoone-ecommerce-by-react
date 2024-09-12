@@ -57,6 +57,10 @@ const CalendarWork = Loadable(lazy(() => import('views/pages/calendarwork/Calend
 const Bill = Loadable(lazy(() => import('views/pages/bill/index.jsx')));
 const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetail.jsx')));
 
+// Bán hàng
+
+const Sell = Loadable(lazy(() => import('views/pages/ban-hang/index.jsx')));
+
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -77,7 +81,20 @@ const MainRoutes = {
         // Thêm các route add update detail ở đây
       ]
     },
-
+    // Bán hàng tại quầy
+    {
+      path: 'ban-hang',
+      children: [
+        {
+          path: '',
+          element: <Sell />
+        },
+        {
+          path: 'hoa-don/:id',
+          element: <Sell />
+        }
+      ]
+    },
     // Sản phẩm
     {
       path: 'sanpham',
