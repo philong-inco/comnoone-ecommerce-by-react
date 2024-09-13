@@ -1,16 +1,5 @@
 import { get, post, patch, put, del, del2 } from 'utils/request';
 
-// export const getPGG = async () => {
-//   try {
-//     const result = await get('v1/coupons')
-//     return result
-//   } catch (error) {
-//     console.error('Error fetching product list:', error)
-//     throw error
-//   }
-// }
-
-// http://localhost:8080/api/v1/coupons/all?page=0&size=100&sort=id,DESC&filter=(ma ~~ '') and phamViApDung = 2 and trangThai = 1
 export const filterCoupons = async (page, size, path) => {
   try {
     console.log('PATH : ', path);
@@ -74,8 +63,6 @@ export const updatedPGG = async (id, pgg) => {
   }
 };
 
-// api 2
-
 export const getKHPGGById = async (id, page, size) => {
   try {
     const result = await get(`v1/coupons/customer-coupons/${id}?page=${page - 1}&size=${size}`);
@@ -87,7 +74,6 @@ export const getKHPGGById = async (id, page, size) => {
   }
 };
 
-// huy phiếu của kh
 
 export const deleteKhPGG = async (id, status) => {
   try {

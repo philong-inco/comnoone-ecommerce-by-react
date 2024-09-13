@@ -201,7 +201,7 @@ function KhachHangConfiguration() {
                 setSnackbarOpen(true);
                 setTimeout(() => {
                     handleNavigate();
-                }, 1000);
+                }, 3000);
             } else {
                 throw new Error('Unexpected response status');
             }

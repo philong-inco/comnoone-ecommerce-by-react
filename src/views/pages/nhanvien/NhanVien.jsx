@@ -28,7 +28,7 @@ import {
     Select,
     MenuItem,
     Avatar,
-    Chip
+    Chip, Fab
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -100,6 +100,7 @@ const DanhSachNhanVien = () => {
             case 0:
                 return (
                     <Chip
+                    
                         label="Đã Nghỉ Việc"
                         color="default"
                         style={{ backgroundColor: '#f44336', color: '#fff' }}
@@ -230,181 +231,157 @@ const DanhSachNhanVien = () => {
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
             <Box
-    display="flex"
-    justifyContent="space-between"
-    alignItems="center"
-    width="100%"
-    mb={2}
-    p={2}
-    sx={{
-        backgroundColor: 'white',
-        boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.2, 0.3)',
-        borderRadius: '8px',
-    }}
->
-    <Box display="flex" justifyContent="center" alignItems="center" width="80%">
-        <Box flex={1.2} display="flex" alignItems="center" mr={2}>
-            <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                Tìm Kiếm
-            </FormLabel>
-            <TextField
-                label="Tìm kiếm theo mã, tên, email, số điện thoại"
-                value={searchKeyWord}
-                onChange={handleSearchKeyWord}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-            />
-        </Box>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-
-        <Box flex={0.8} display="flex" alignItems="center" mr={2}>
-            <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                Giới Tính
-            </FormLabel>
-            <FormControl fullWidth margin="dense">
-                <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
-                <Select
-                    labelId="gender-select-label"
-                    id="gender-select"
-                    value={selectGioiTinh}
-                    label="Giới tính"
-                    onChange={handleSelectChange}
-                >
-                    <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
-                    <MenuItem value={1}>Nam</MenuItem>
-                    <MenuItem value={0}>Nữ</MenuItem>
-                </Select>
-            </FormControl>
-        </Box>
-
-        <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-
-        <Box flex={1.7} display="flex" alignItems="center" mr={2}>
-            <FormLabel component="legend" sx={{ mr: 3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                Trạng thái
-            </FormLabel>
-            <FormControl component="fieldset" fullWidth>
-                <RadioGroup
-                    row
-                    value={searchRadio}
-                    onChange={handleRadioChange}
-                >
-                    {statuses.map((status) => (
-                        <FormControlLabel
-                            key={status.id}
-                            value={status.id}
-                            control={<Radio />}
-                            label={status.name}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+                mb={2}
+                p={2}
+                sx={{
+                    backgroundColor: 'white',
+                    boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.2, 0.3)',
+                    borderRadius: '8px',
+                }}
+            >
+                <Box display="flex" justifyContent="center" alignItems="center" width="80%">
+                    <Box flex={1.2} display="flex" alignItems="center" mr={2}>
+                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                            Tìm Kiếm
+                        </FormLabel>
+                        <TextField
+                            label="Tìm kiếm theo mã, tên, email, số điện thoại"
+                            value={searchKeyWord}
+                            onChange={handleSearchKeyWord}
+                            variant="outlined"
+                            margin="normal"
+                            fullWidth
                         />
-                    ))}
-                </RadioGroup>
-            </FormControl>
-        </Box>
-    </Box>
+                    </Box>
 
-    <Box width="20%" display="flex" flexDirection="column" alignItems="center">
-        <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNavigate}
-            sx={{
-                height: '45px',
-                minWidth: '200px',
-                padding: '8px 10px',
-                borderRadius: '20px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                '&:hover': {
-                    backgroundColor: '#0056b3',
-                    boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
-                    transform: 'translateY(-3px)',
-                },
-                '&:active': {
-                    backgroundColor: '#004080',
-                    boxShadow: '0px 5px 10px rgba(0, 64, 128, 0.2)',
-                    transform: 'translateY(1px)',
-                },
-            }}
-        >
-            <AddIcon
-                sx={{
-                    position: 'absolute',
-                    left: '16px',
-                    backgroundColor: '#9c27b0',
-                    color: '#fff',
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '5px',
-                }}
-            />
-            <span style={{ marginLeft: '25px' }}>Thêm Nhân Viên</span>
-        </Button>
+                    <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
 
-        <Button
-            variant="contained"
-            color="primary"
-            onClick={handleExportExcel}
-            sx={{
-                marginTop: '10px',
-                height: '45px',
-                minWidth: '200px',
-                padding: '8px 10px',
-                borderRadius: '20px',
-                backgroundColor: '#28a745',
-                color: '#fff',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                boxShadow: '0px 8px 15px rgba(40, 167, 69, 0.3)',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                '&:hover': {
-                    backgroundColor: '#218838',
-                    boxShadow: '0px 15px 20px rgba(33, 136, 56, 0.4)',
-                    transform: 'translateY(-3px)',
-                },
-                '&:active': {
-                    backgroundColor: '#1e7e34',
-                    boxShadow: '0px 5px 10px rgba(30, 126, 52, 0.2)',
-                    transform: 'translateY(1px)',
-                },
-            }}
-        >
-            <InsertDriveFileIcon
-                sx={{
-                    position: 'absolute',
-                    left: '16px',
-                    backgroundColor: '#ffffff',
-                    color: '#28a745',
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '5px',
-                }}
-            />
-            <span style={{ marginLeft: '25px' }}>Danh Sách Nhân Viên</span>
-        </Button>
-    </Box>
-</Box>
+                    <Box flex={0.8} display="flex" alignItems="center" mr={2}>
+                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                            Giới Tính
+                        </FormLabel>
+                        <FormControl fullWidth margin="dense">
+                            <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
+                            <Select
+                                labelId="gender-select-label"
+                                id="gender-select"
+                                value={selectGioiTinh}
+                                label="Giới tính"
+                                onChange={handleSelectChange}
+                            >
+                                <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
+                                <MenuItem value={1}>Nam</MenuItem>
+                                <MenuItem value={0}>Nữ</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                    <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+
+                    <Box flex={1.7} display="flex" alignItems="center" mr={2}>
+                        <FormLabel component="legend" sx={{ mr: 3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                            Trạng thái
+                        </FormLabel>
+                        <FormControl component="fieldset" fullWidth>
+                            <RadioGroup
+                                row
+                                value={searchRadio}
+                                onChange={handleRadioChange}
+                            >
+                                {statuses.map((status) => (
+                                    <FormControlLabel
+                                        key={status.id}
+                                        value={status.id}
+                                        control={<Radio />}
+                                        label={status.name}
+                                    />
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                </Box>
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        bottom: 16, 
+                        right: 16,  
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        zIndex: 1300,
+                    }}
+                >
+                    <Fab
+                        color="primary"
+                        aria-label="add"
+                        sx={{
+                            height: '60px',
+                            width: '60px',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
+                            transition: 'all 0.3s ease',
+                            marginBottom: '10px', 
+                            '&:hover': {
+                                backgroundColor: '#0056b3',
+                                boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
+                                transform: 'translateY(-3px)',
+                            },
+                            '&:active': {
+                                backgroundColor: '#004080',
+                                boxShadow: '0px 5px 10px rgba(0, 64, 128, 0.2)',
+                                transform: 'translateY(1px)',
+                            },
+                        }}
+                        onClick={handleNavigate}
+                    >
+                        <AddIcon sx={{ fontSize: '30px' }} />
+                    </Fab>
+                </Box>
+
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        bottom: 100,
+                        right: 16,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        zIndex: 1300, 
+                    }}
+                >
+                    <Fab
+                        color="primary"
+                        aria-label="export"
+                        sx={{
+                            height: '60px',
+                            width: '60px',
+                            backgroundColor: '#28a745',
+                            color: '#fff',
+                            boxShadow: '0px 8px 15px rgba(40, 167, 69, 0.3)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                backgroundColor: '#218838',
+                                boxShadow: '0px 15px 20px rgba(33, 136, 56, 0.4)',
+                                transform: 'translateY(-3px)',
+                            },
+                            '&:active': {
+                                backgroundColor: '#1e7e34',
+                                boxShadow: '0px 5px 10px rgba(30, 126, 52, 0.2)',
+                                transform: 'translateY(1px)',
+                            },
+                        }}
+                        onClick={handleExportExcel}
+                    >
+                        <InsertDriveFileIcon sx={{ fontSize: '30px' }} />
+                    </Fab>
+                </Box>
+
+            </Box>
 
 
             <TableContainer component={Paper}>
