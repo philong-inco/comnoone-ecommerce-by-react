@@ -19,28 +19,36 @@ import {
   DialogContentText,
   DialogActions,
   Checkbox,
-  TextField
+  TextField,
+  Chip,
+  TablePagination,
+  Pagination
 } from '@mui/material';
 import { getAllProduct } from 'services/admin/product/productService';
 import { createSerialNumberSold } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { Box } from '@mui/system';
+import { getAllSerialNumberByProductId } from 'services/admin/serial-number/serialNumber';
+import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
-function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }) {
+function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, selectedSerialIds = [] }) {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   // Dialog
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedRows, setSelectedRows] = useState([]);
-
+  const [selectedRows, setSelectedRows] = useState(selectedSerialIds);
+  const [serials, setSerials] = useState([]);
+  const [productId, setProductId] = useState(null);
+  const [pageSerial, setPageSerial] = useState(1);
+  const [sizeSerial, setSizeSerial] = useState(5);
+  const [totalSerial, setTotalSerial] = useState(0);
   const fetchProduct = async () => {
     const response = await getAllProduct();
     if (response.code === 200) {
       setProducts(response.data);
     }
   };
-
   const handleSelect = async (productId) => {
     const data = {
       listSerialNumberId: [1, 2, 3, 4, 5, 6, 7, 8, 42, 41, 40, 39],
@@ -61,25 +69,51 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
       }
     }
   };
-
-  const handleOpenDialog = (product) => {
-    // setSelectedProduct(product);
+  const fetchSerialNumberByProduct = async (productId, page, size) => {
+    const response = await getAllSerialNumberByProductId(productId, page - 1, size);
+    if (response.status_code === 200) {
+      setSerials(response.data.result);
+      setTotalSerial(response.data.meta.total);
+      setPageSerial(response.data.meta.page + 1);
+    }
+  };
+  const handleOpenDialog = (id) => {
+    setProductId(id);
+    fetchSerialNumberByProduct(id, pageSerial, 5);
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedRows([]);
+    setPageSerial(1);
+    setProductId(null);
     setSelectedProduct(null);
   };
 
   const handleSelectRow = (id) => {
-    setSelectedRows((prevSelected) => (prevSelected.includes(id) ? prevSelected.filter((rowId) => rowId !== id) : [...prevSelected, id]));
+    setSelectedRows((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter((rowId) => rowId !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
   };
-
   useEffect(() => {
     fetchProduct();
   }, []);
+
+  const handleChangePageSerial = (newPage) => {
+    setSelectedRows(selectedRows);
+    setPageSerial(newPage);
+    fetchSerialNumberByProduct(productId, newPage, sizeSerial);
+  };
+
+  const handleChangeSizeSerial = (event) => {
+    setSizeSerial(parseInt(event.target.value, 10));
+    setPageSerial(1);
+  };
 
   return (
     <Paper sx={{ padding: 2 }}>
@@ -128,7 +162,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
                   <Typography color="error">{parseInt(product.giaBan).toLocaleString()} VNĐ</Typography>
                 </TableCell>
                 <TableCell>
-                  <Button variant="contained" color="primary" onClick={() => handleOpenDialog(product)}>
+                  <Button variant="contained" color="primary" onClick={() => handleOpenDialog(product.id)}>
                     Chọn
                   </Button>
                 </TableCell>
@@ -143,7 +177,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
         onClose={handleCloseDialog}
         PaperProps={{
           style: {
-            width: '500px'
+            width: '700px'
           }
         }}
       >
@@ -164,25 +198,33 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine }
                 </TableRow>
               </TableHead>
               <TableBody>
-                {[
-                  { id: 1, code: 'A001', status: 'Có sẵn' },
-                  { id: 2, code: 'A002', status: 'Hết hàng' }
-                ].map((row) => (
+                {serials.map((row) => (
                   <TableRow key={row.id}>
                     <Checkbox checked={selectedRows.includes(row.id)} onChange={() => handleSelectRow(row.id)} />
-                    <TableCell>{row.code}</TableCell>
-                    <TableCell>{row.status}</TableCell>
+                    <TableCell>{row.ma}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={row.trangThai == 0 ? 'Còn hàng' : row.trangThai == 2 ? 'Đã bán' : 'Hủy'}
+                        style={{ backgroundColor: getStatusSerialColor(row.trangThai), color: '#fff' }}
+                        size="small"
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
+          <Pagination
+            sx={{ marginTop: '10px', textAlign: 'center' }}
+            count={Math.ceil(totalSerial / sizeSerial)}
+            page={pageSerial}
+            onChange={(event, value) => handleChangePageSerial(value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Hủy</Button>
           <Button
             onClick={() => {
-              console.log('Selected rows:', selectedRows);
               handleCloseDialog();
             }}
             variant="contained"

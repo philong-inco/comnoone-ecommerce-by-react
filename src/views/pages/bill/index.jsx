@@ -51,8 +51,6 @@ function Bill() {
 
     try {
       const response = await getBillFilter(page - 1, pageSize, filter);
-      console.log(response);
-
       if (response.status_code === 200) {
         setBills(response.data.result);
         setPage(response.data.meta.page + 1);
