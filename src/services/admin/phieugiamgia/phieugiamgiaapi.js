@@ -2,7 +2,7 @@ import { get, post, del, patch, put } from '../../../utils/request.js';
 
 export const getAllDanhSachPhieu = async (page) => {
     try {
-        const result = await get(`http://localhost:8080/api/v1/coupons?page=${page}`);
+        const result = await get(`/api/coupons?page=${page}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees:', error);
@@ -12,7 +12,7 @@ export const getAllDanhSachPhieu = async (page) => {
 
 export const getDetailDanhSachPhieu = async (id) => {
     try {
-        const result = await get(`http://localhost:8080/api/v1/coupons/detail/${id}`);
+        const result = await get(`/api/coupons/detail/${id}`);
         return result;
     } catch (error) {
         console.error('Error fetching Employees:', error);
@@ -22,7 +22,7 @@ export const getDetailDanhSachPhieu = async (id) => {
 
 export const deletePhieuGiamGia = async (id) => {
     try {
-        const result = await get(`/api/v1/coupons/delete/id=${id}`);
+        const result = await del(`/api/coupons/delete/id=${id}`);
         return result;
     } catch (error) {
         console.log(error);

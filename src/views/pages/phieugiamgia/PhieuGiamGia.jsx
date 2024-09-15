@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import {
   Radio, FormControlLabel, RadioGroup, FormLabel, FormControl,
   TextField, Grid, IconButton, Tooltip, Box, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Fab
+  TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Fab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { filterCoupons } from 'services/admin/coupons/couponsService';
+import { filterCoupons, deletedCoupons } from 'services/admin/coupons/couponsService';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 function PhieuGiamGia() {
@@ -26,8 +27,14 @@ function PhieuGiamGia() {
   const [loaiPhieu, setLoaiPhieu] = useState('');
   const [ngayBatDau, setNgayBatDau] = useState(null);
   const [ngayHetHan, setNgayHetHan] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // Trạng thái mở hộp thoại xác nhận
+  const [selectedCouponId, setSelectedCouponId] = useState(null);
   const navigate = useNavigate();
 
+  
   const fetchApi = async (currentPage, size) => {
     try {
       let filterString = `(ma ~~ '${ma}')`;
@@ -43,17 +50,18 @@ function PhieuGiamGia() {
       if (ngayBatDau && ngayHetHan) {
         filterString += ` and ngayBatDau >= '${ngayBatDau.format('YYYY-MM-DD')}' and ngayHetHan <= '${ngayHetHan.format('YYYY-MM-DD')}'`;
       }
-
+  
       const response = await filterCoupons(currentPage, size, filterString);
+      console.log(response.data.meta);  // Debug response
       if (response.status_code === 200) {
         setDanhSachPhieuGiamGia(response.data.result);
-        setTotalPages(response.data.meta.totalPages);
+        setTotalPages(response.data.meta.pages);  // Cập nhật đúng số trang
       }
     } catch (error) {
       console.error(error);
     }
   };
-
+  
 
   useEffect(() => {
     fetchApi(currentPage, size);
@@ -63,9 +71,9 @@ function PhieuGiamGia() {
     { id: 0, name: 'Chưa áp dụng', color: 'gray' },
     { id: 1, name: 'Đang áp dụng', color: 'green' },
     { id: 2, name: 'Đã hết hạn', color: 'red' },
-    { id: 3, name: 'Đã hủy', color: 'orange' },
+    { id: 3, name: 'Đã hủy', color: '#FFA500'  },
   ];
-  // Các hàm reset các trường lọc
+
   const resetFilters = () => {
     setPhamViApDung('');
     setLoaiGiamGia('');
@@ -77,7 +85,7 @@ function PhieuGiamGia() {
 
   const handleSearchChange = (e) => {
     setMa(e.target.value);
-    resetFilters(); // Reset các trường khác khi thay đổi tìm kiếm
+    resetFilters(); 
   };
 
   const handleLoaiGiamGiaChange = (e) => {
@@ -111,6 +119,7 @@ function PhieuGiamGia() {
     const status = statuses.find((s) => s.id === statusId);
     return status ? status.name : 'Không xác định';
   };
+  
   const handleNavigate = () => {
     navigate('/phieugiamgia/cauhinhphieugiamgia');
   };
@@ -122,6 +131,42 @@ function PhieuGiamGia() {
   const handleViewCoupon = (id) => {
     navigate(`/phieugiamgia/chitietphieugiamgia/${id}`);
   };
+
+  const handleOpenConfirmDialog = (id) => {
+    setSelectedCouponId(id); 
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false); 
+    setSelectedCouponId(null); 
+  };
+
+  const handleDelete = async () => {
+    try {
+      debugger;
+      const response = await deletedCoupons(selectedCouponId); 
+      if (response.trangThai === 3) {
+        setSnackbarMessage('Phiếu đã được hủy thành công!');
+        setSnackbarSeverity('success');
+        fetchApi(currentPage, 5); 
+      } else {
+        setSnackbarMessage('Hủy phiếu thất bại.');
+        setSnackbarSeverity('error');
+        console.log(error);
+      }
+    } catch (error) {
+      setSnackbarMessage('Đã xảy ra lỗi.');
+      setSnackbarSeverity('error');
+    }
+    setOpenSnackbar(true);
+    handleCloseConfirmDialog(); 
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -182,7 +227,7 @@ function PhieuGiamGia() {
                     bottom: 16,
                     right: 16,
                   }}
-                  onClick={handleNavigate} 
+                  onClick={handleNavigate}
                 >
                   <AddIcon />
                 </Fab>
@@ -225,23 +270,36 @@ function PhieuGiamGia() {
                       {getStatusName(phieu.trangThai)}
                     </Box>
                   </TableCell>
+
                   <TableCell>
                     <Tooltip title="Xem chi tiết">
                       <IconButton onClick={() => handleViewCoupon(phieu.id)}>
                         <VisibilityIcon />
                       </IconButton>
                     </Tooltip>
-                    {phieu.trangThai == 0 && (
-                      <IconButton
-                        color="secondary"
-                        onClick={() => handleEdit(phieu.id)}
-                      >
-                        <Tooltip title="Chỉnh sửa">
-                          <EditIcon />
-                        </Tooltip>
-                      </IconButton>
+                    {/* Hiển thị nút chỉnh sửa và hủy chỉ khi trạng thái là 0 */}
+                    {phieu.trangThai === 0 && (
+                      <>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => handleEdit(phieu.id)}
+                        >
+                          <Tooltip title="Chỉnh sửa">
+                            <EditIcon />
+                          </Tooltip>
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenConfirmDialog(phieu.id)}
+                        >
+                          <Tooltip title="Hủy phiếu">
+                            <DeleteIcon />
+                          </Tooltip>
+                        </IconButton>
+                      </>
                     )}
                   </TableCell>
+
                 </TableRow>
               ))
             ) : (
@@ -258,9 +316,43 @@ function PhieuGiamGia() {
           count={totalPages}
           page={currentPage}
           onChange={handlePageChange}
+          color="primary"
         />
       </Box>
-    </div>
+
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+      >
+        <DialogTitle>Xác nhận hủy phiếu</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn hủy phiếu này? Hành động này không thể hoàn tác.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog} color="primary">
+            Hủy bỏ
+          </Button>
+          <Button onClick={handleDelete} color="secondary" autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar component */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} variant="filled">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+    </div>    
   );
 }
 
