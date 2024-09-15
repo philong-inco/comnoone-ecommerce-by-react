@@ -45,7 +45,6 @@ export const createPGG = async (options) => {
 
 export const deletedCoupons = async (id) => {
   try {
-    debugger;
     const result = await del(`coupons/delete/${id}`);
     return result;
   } catch (error) {
@@ -74,7 +73,6 @@ export const getKHPGGById = async (id, page, size) => {
     throw error;
   }
 };
-
 
 export const deleteKhPGG = async (id, status) => {
   try {

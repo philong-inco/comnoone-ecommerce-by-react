@@ -31,16 +31,21 @@ function ProductInBill(props) {
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
+  const [serialNumberInBill, setSerialNumberInBill] = useState([]);
   const [serialNumberSold, setSerialNumberSold] = useState([]);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
   const fetchSerialNumberSold = async () => {
     const response = await getAllSerialNumberSoldByBillId(id);
+    console.log('API :', response);
+
     if (response.status_code === 200) {
       setSerialNumberSold(response.data);
+      const allSerialNumberIds = response.data.flatMap((product) => product.serialNumbers.map((serial) => serial.serialNumberId));
+      setSerialNumberInBill(allSerialNumberIds);
     }
   };
+  console.log('DATA : ', serialNumberInBill);
 
   const fetchDelete = async (idSerialNumber) => {
     const response = await deletedById(idSerialNumber);
@@ -104,6 +109,7 @@ function ProductInBill(props) {
                 handleLoading={handleLoadingProductInBill}
                 handleLoadingTimeLine={handleLoading}
                 onProductSelected={handleProductSelected}
+                selectedSerialIds={serialNumberInBill}
               />
             </DialogContent>
           </Dialog>
