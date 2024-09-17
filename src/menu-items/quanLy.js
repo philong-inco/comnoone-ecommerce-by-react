@@ -148,21 +148,21 @@ const quanLy = {
           url: '/khachhang/danhsachkhachhang'
         }
       ]
-    },
-    {
-      id: 'lichlamviec',
-      title: 'Lịch làm việc',
-      type: 'collapse',
-      icon: icons.IconReceipt2,
-      children: [
-        {
-          id: 'lichlamviec',
-          title:'Lịch làm việc',
-          type: 'item',
-          url: '/lichlamviec/hienthilich'
-        }
-      ]
     }
+    // {
+    //   id: 'lichlamviec',
+    //   title: 'Lịch làm việc',
+    //   type: 'collapse',
+    //   icon: icons.IconReceipt2,
+    //   children: [
+    //     {
+    //       id: 'lichlamviec',
+    //       title:'Lịch làm việc',
+    //       type: 'item',
+    //       url: '/lichlamviec/hienthilich'
+    //     }
+    //   ]
+    // }
   ]
 };
 

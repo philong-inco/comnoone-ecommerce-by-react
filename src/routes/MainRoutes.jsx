@@ -329,15 +329,15 @@ const MainRoutes = {
       ]
     },
 
-    {
-      path: 'lichlamviec',
-      children: [
-        {
-          path: 'hienthilich',
-          element: <CalendarWork />
-        }
-      ]
-    },
+    // {
+    //   path: 'lichlamviec',
+    //   children: [
+    //     {
+    //       path: 'hienthilich',
+    //       element: <CalendarWork />
+    //     }
+    //   ]
+    // },
 
     {
       path: 'thongke',

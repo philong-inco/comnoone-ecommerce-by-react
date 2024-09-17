@@ -33,13 +33,28 @@ function PhieuGiamGiaConfiguration() {
     tenPhieu: yup.string().required('Tên phiếu giảm giá là bắt buộc'),
   
     giaTri: yup
-      .string()
-      .required('Giá trị là bắt buộc')
-      .test('is-big-decimal', 'Giá trị phải lớn hơn 0', (value) => {
-        if (!value) return false;
-        const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
-        return bigNumberValue.isGreaterThan(0);
-      }),
+    .string()
+    .required('Giá trị là bắt buộc')
+    .test('is-valid-value', (value, context) => {
+
+      if (!value) return context.createError({ message: 'Giá trị là bắt buộc' });
+      const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
+      if (currencyType === '%') {
+        if (!bigNumberValue.isGreaterThan(0)) {
+          return context.createError({ message: 'Giá trị phải lớn hơn 0%' });
+        }
+        if (!bigNumberValue.isLessThanOrEqualTo(100)) {
+          return context.createError({ message: 'Giá trị không được vượt quá 100%' });
+        }
+      } else if (currencyType === '$') {
+        if (!bigNumberValue.isGreaterThan(0)) {
+          return context.createError({ message: 'Giá trị phải lớn hơn 0$' });
+        }
+      } else {
+        return context.createError({ message: 'Loại phiếu không hợp lệ' });
+      }
+      return true;
+    }),
   
     giaTriToiDa: yup
       .string()
@@ -108,7 +123,7 @@ function PhieuGiamGiaConfiguration() {
   const getAllDanhSachKhachHang = async () => {
     try {
       const result = await getDanhSachKhachHang();
-      setKhachHang(result); // Assuming `result` contains the list of customers.
+      setKhachHang(result); 
     } catch (error) {
       console.error(error);
     }
@@ -716,7 +731,7 @@ function PhieuGiamGiaConfiguration() {
                     <TableCell>{row.ten}</TableCell>
                     <TableCell>{row.sdt}</TableCell>
                     <TableCell>{formatDate(row.ngaySinh)}</TableCell>
-                    <TableCell>{row.hangKhachHang}</TableCell>
+                    <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

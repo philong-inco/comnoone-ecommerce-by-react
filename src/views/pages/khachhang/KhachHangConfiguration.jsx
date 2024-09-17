@@ -21,7 +21,8 @@ import {
     Alert,
     RadioGroup,
     Radio,
-    CircularProgress
+    CircularProgress,
+    FormControlLabel
 } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
@@ -219,10 +220,49 @@ function KhachHangConfiguration() {
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
                 Thêm Khách Hàng
             </Typography>
-            <form onSubmit={handleSubmit(onSubmit)} >
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={3}>
+                    {/* Avatar Section */}
+                    <Grid item xs={12} md={4}>
+                        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt="Ảnh đại diện"
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
+                                />
+                            ) : (
+                                <img
+                                    src='../src/assets/images/images.jpg'
+                                    alt="Ảnh đại diện"
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
+                                />
+                            )}
+                        </Box>
+                    </Grid>
+
+                    {/* Form Fields Section */}
                     <Grid item xs={12} md={8}>
                         <Grid container spacing={3}>
+                            {/* Personal Information */}
                             <Grid item xs={12} md={6}>
                                 <Controller
                                     name="ten"
@@ -250,19 +290,17 @@ function KhachHangConfiguration() {
                                             fullWidth
                                             label="Số điện thoại"
                                             variant="outlined"
-                                            {...register('sdt')}
                                             InputLabelProps={{ shrink: true }}
+                                            {...register('sdt')}
                                             error={!!errors.sdt}
                                             helperText={errors.sdt?.message}
                                             sx={{ mb: 2 }}
-
                                         />
                                     )}
                                 />
                             </Grid>
-                        </Grid>
 
-                        <Grid container spacing={3}>
+                            {/* Email & Date of Birth */}
                             <Grid item xs={12} md={6}>
                                 <Controller
                                     name="email"
@@ -272,8 +310,8 @@ function KhachHangConfiguration() {
                                             fullWidth
                                             label="Email"
                                             variant="outlined"
-                                            {...register('email')}
                                             InputLabelProps={{ shrink: true }}
+                                            {...register('email')}
                                             error={!!errors.email}
                                             helperText={errors.email?.message}
                                             sx={{ mb: 2 }}
@@ -281,10 +319,6 @@ function KhachHangConfiguration() {
                                     )}
                                 />
                             </Grid>
-                            {/* Thiếu 1 */}
-                        </Grid>
-
-                        <Grid container spacing={3}>
                             <Grid item xs={12} md={6}>
                                 <Controller
                                     name="ngay_sinh"
@@ -304,7 +338,9 @@ function KhachHangConfiguration() {
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
+
+                            {/* Gender */}
+                            <Grid item xs={12}>
                                 <FormControl component="fieldset" error={!!errors.gioi_tinh}>
                                     <FormLabel component="legend">Giới tính *</FormLabel>
                                     <Controller
@@ -312,31 +348,24 @@ function KhachHangConfiguration() {
                                         control={control}
                                         render={({ field }) => (
                                             <RadioGroup {...field} row>
-                                                <div>
-                                                    <Radio
-                                                        value="1"
-                                                        checked={field.value === "1"}
-                                                        onChange={field.onChange}
-                                                    />
-                                                    Nam
-                                                </div>
-                                                <div style={{ marginLeft: '16px' }}>
-                                                    <Radio
-                                                        value="0"
-                                                        checked={field.value === "0"}
-                                                        onChange={field.onChange}
-                                                    />
-                                                    Nữ
-                                                </div>
+                                                <FormControlLabel
+                                                    value="1"
+                                                    control={<Radio />}
+                                                    label="Nam"
+                                                />
+                                                <FormControlLabel
+                                                    value="0"
+                                                    control={<Radio />}
+                                                    label="Nữ"
+                                                />
                                             </RadioGroup>
                                         )}
                                     />
                                     {errors.gioi_tinh && <FormHelperText>{errors.gioi_tinh.message}</FormHelperText>}
                                 </FormControl>
                             </Grid>
-                        </Grid>
 
-                        <Grid container spacing={3}>
+                            {/* Address Section */}
                             <Grid item xs={12} md={4}>
                                 <FormControl fullWidth sx={{ mb: 2 }}>
                                     <InputLabel>Tỉnh/Thành Phố *</InputLabel>
@@ -350,13 +379,16 @@ function KhachHangConfiguration() {
                                                 onChange={(e) => setSelectedProvince(e.target.value)}
                                             >
                                                 {provinces.map((province) => (
-                                                    <MenuItem key={province.id} value={province.id}>{province.name}</MenuItem>
+                                                    <MenuItem key={province.id} value={province.id}>
+                                                        {province.name}
+                                                    </MenuItem>
                                                 ))}
                                             </Select>
                                         )}
                                     />
                                 </FormControl>
                             </Grid>
+
                             <Grid item xs={12} md={4}>
                                 <FormControl fullWidth sx={{ mb: 2 }}>
                                     <InputLabel>Quận/Huyện *</InputLabel>
@@ -371,13 +403,16 @@ function KhachHangConfiguration() {
                                             >
                                                 <MenuItem value="">Chọn quận/huyện</MenuItem>
                                                 {districts.map((district) => (
-                                                    <MenuItem key={district.id} value={district.id}>{district.ten}</MenuItem>
+                                                    <MenuItem key={district.id} value={district.id}>
+                                                        {district.ten}
+                                                    </MenuItem>
                                                 ))}
                                             </Select>
                                         )}
                                     />
                                 </FormControl>
                             </Grid>
+
                             <Grid item xs={12} md={4}>
                                 <FormControl fullWidth sx={{ mb: 2 }}>
                                     <InputLabel>Phường/Xã *</InputLabel>
@@ -392,78 +427,55 @@ function KhachHangConfiguration() {
                                             >
                                                 <MenuItem value="">Chọn phường/xã</MenuItem>
                                                 {wards.map((ward) => (
-                                                    <MenuItem key={ward.id} value={ward.id}>{ward.ten}</MenuItem>
+                                                    <MenuItem key={ward.id} value={ward.id}>
+                                                        {ward.ten}
+                                                    </MenuItem>
                                                 ))}
                                             </Select>
                                         )}
                                     />
                                 </FormControl>
                             </Grid>
+
+                            {/* Full Address */}
+                            <Grid item xs={12}>
+                                <Controller
+                                    name="dia_chi"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            label="Địa chỉ Nhận Hàng"
+                                            multiline
+                                            rows={4}
+                                            style={{ marginBottom: '30px' }}
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            error={!!errors.dia_chi}
+                                            helperText={errors.dia_chi?.message}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            {/* Save Button */}
+                            <Grid item xs={12}>
+                                <Box display="flex" justifyContent="center">
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        style={{ width: '150px' }}
+                                    >
+                                        {loading ? <CircularProgress size={24} /> : 'Lưu'}
+                                    </Button>
+                                </Box>
+                                {error && <FormHelperText error>{error}</FormHelperText>}
+                            </Grid>
                         </Grid>
-
-                        <Controller
-                            name="dia_chi"
-                            control={control}
-                            render={({ field }) => (
-                                <TextField
-                                    {...field}
-                                    label="Địa chỉ Nhận Hàng"
-                                    multiline
-                                    rows={4}
-                                    style={{ marginBottom: '30px' }}
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    error={!!errors.dia_chi}
-                                    helperText={errors.dia_chi?.message}
-                                />
-                            )}
-                        />
-                        <Button style={{ width: '10%', marginLeft: '50%' }} type="submit" variant="contained" color="primary" fullWidth>
-                            {loading ? <CircularProgress size={24} /> : 'Lưu'}
-                        </Button>
-                        {error && <FormHelperText error>{error}</FormHelperText>}
-                    </Grid>
-
-                    {/* Image Preview */}
-                    <Grid item xs={12} md={4}>
-                        <Box display="flex" flexDirection="column" alignItems="center" height="100%">
-                            {imageUrl ? (
-                                <img
-                                    src={imageUrl}
-                                    alt="Ảnh đại diện"
-                                    style={{
-                                        width: '250px',
-                                        height: '250px',
-                                        objectFit: 'cover',
-                                        cursor: 'pointer',
-                                        borderRadius: '50%',
-                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                                        transition: 'all 0.3s ease',
-                                    }}
-                                    onClick={openCloudinaryWidget}
-                                />
-                            ) : (
-                                <img
-                                    src='../src/assets/images/images.jpg'
-                                    alt="Ảnh đại diện"
-                                    style={{
-                                        width: '250px',
-                                        height: '250px',
-                                        objectFit: 'cover',
-                                        cursor: 'pointer',
-                                        borderRadius: '50%', // Make the image circular
-                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)', // Add shadow for pop-up effect
-                                        transition: 'all 0.3s ease', // Smooth transition for hover effect
-                                    }}
-                                    onClick={openCloudinaryWidget} // Trigger the image upload widget on click
-                                />
-                            )}
-                        </Box>
                     </Grid>
                 </Grid>
             </form>
-
-            {/* Snackbar for Success and Error Messages */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={6000}

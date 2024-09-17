@@ -30,7 +30,8 @@ import {
     Select,
     MenuItem,
     Grid,
-    Typography
+    Typography,
+    Fab
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 const KhachHang = () => {
@@ -319,31 +320,27 @@ const KhachHang = () => {
                     </Grid>
                 </Grid>
                 <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    ml={2}
+                    sx={{
+                        position: 'fixed',
+                        bottom: 16, 
+                        right: 16,  
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        zIndex: 1300,
+                    }}
                 >
-                    <Button
-                        variant="contained"
+                    <Fab
                         color="primary"
-                        onClick={handleNavigate}
+                        aria-label="add"
                         sx={{
-                            height: '45px',
-                            minWidth: '200px',
-                            padding: '8px 10px',
-                            borderRadius: '20px',
+                            height: '60px',
+                            width: '60px',
                             backgroundColor: '#007bff',
                             color: '#fff',
-                            fontWeight: 'bold',
-                            fontSize: '13px',
                             boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
                             transition: 'all 0.3s ease',
-                            position: 'relative',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            marginBottom: '10px', 
                             '&:hover': {
                                 backgroundColor: '#0056b3',
                                 boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
@@ -355,45 +352,33 @@ const KhachHang = () => {
                                 transform: 'translateY(1px)',
                             },
                         }}
+                        onClick={handleNavigate}
                     >
-                        <AddIcon
-                            sx={{
-                                position: 'absolute',
-                                left: '16px',
-                                backgroundColor: '#9c27b0',
-                                color: '#fff',
-                                borderRadius: '50%',
-                                width: '24px',
-                                height: '24px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '5px',
-                            }}
-                        />
-                        <span style={{ marginLeft: '25px' }}>Thêm Khách Hàng</span>
-                    </Button>
+                        <AddIcon sx={{ fontSize: '30px' }} />
+                    </Fab>
+                </Box>
 
-                    <Button
-                        variant="contained"
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        bottom: 100,
+                        right: 16,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        zIndex: 1300, 
+                    }}
+                >
+                    <Fab
                         color="primary"
-                        onClick={handleExportExcel}
+                        aria-label="export"
                         sx={{
-                            marginTop: '10px',
-                            height: '45px',
-                            minWidth: '200px',
-                            padding: '8px 10px',
-                            borderRadius: '20px',
+                            height: '60px',
+                            width: '60px',
                             backgroundColor: '#28a745',
                             color: '#fff',
-                            fontWeight: 'bold',
-                            fontSize: '13px',
                             boxShadow: '0px 8px 15px rgba(40, 167, 69, 0.3)',
                             transition: 'all 0.3s ease',
-                            position: 'relative',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
                             '&:hover': {
                                 backgroundColor: '#218838',
                                 boxShadow: '0px 15px 20px rgba(33, 136, 56, 0.4)',
@@ -405,24 +390,10 @@ const KhachHang = () => {
                                 transform: 'translateY(1px)',
                             },
                         }}
+                        onClick={handleExportExcel}
                     >
-                        <InsertDriveFileIcon
-                            sx={{
-                                position: 'absolute',
-                                left: '16px',
-                                backgroundColor: '#ffffff',
-                                color: '#28a745',
-                                borderRadius: '50%',
-                                width: '24px',
-                                height: '24px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '5px',
-                            }}
-                        />
-                        <span style={{ marginLeft: '25px' }}>Danh Sách Khách Hàng</span>
-                    </Button>
+                        <InsertDriveFileIcon sx={{ fontSize: '30px' }} />
+                    </Fab>
                 </Box>
             </Box>
             <TableContainer component={Paper}>
