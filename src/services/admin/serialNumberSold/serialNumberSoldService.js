@@ -20,9 +20,11 @@ export const getAllSerialNumberSoldByBillId = async (codeBill) => {
   }
 };
 
-export const deletedById = async (id) => {
+export const deletedById = async (data) => {
+  console.log('DATA : ', data);
+
   try {
-    const result = await del(`serial-number-sold/${id}`);
+    const result = await del(`serial-number-sold/delete`, data);
     return result;
   } catch (error) {
     console.error('Error del all:', error);

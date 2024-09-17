@@ -7,6 +7,9 @@ function TimeLine(props) {
   const { billHistory, handleLoading } = props;
   const { id } = useParams();
 
+  const handleSomeEvent = () => {
+    handleLoading();
+  };
   const handleRevertBillStatus = async () => {
     try {
       const response = await revertBillStatus(id);
@@ -18,7 +21,7 @@ function TimeLine(props) {
         //     showProgress: true,
         //     duration: 2,
         //   })
-        handleLoading();
+        handleSomeEvent();
       }
     } catch (error) {
       console.log(error);

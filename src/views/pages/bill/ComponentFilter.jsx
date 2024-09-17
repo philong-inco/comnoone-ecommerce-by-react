@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button, TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Grid, Divider } from '@mui/material';
 import { Search, Add, FileDownload } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 function ComponentFilter(props) {
   const { handleSearch, handleCreateBill, onDateChange, fromDate, toDate, handleBillTypeChange } = props;
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     onDateChange(name, value);
@@ -27,7 +29,15 @@ function ComponentFilter(props) {
           <Button variant="outlined" color="primary" startIcon={<FileDownload />}>
             Quét mã
           </Button>
-          <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreateBill} style={{ marginLeft: '10px' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Add />}
+            onClick={() => {
+              navigate('/ban-hang');
+            }}
+            style={{ marginLeft: '10px' }}
+          >
             Tạo hóa đơn
           </Button>
         </Grid>

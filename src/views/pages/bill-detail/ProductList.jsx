@@ -91,6 +91,21 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, 
     setSelectedProduct(null);
   };
 
+  const handleSubmitSerials = async () => {
+    const data = {
+      billCode: id,
+      listSerialNumberId: selectedRows
+    };
+    const response = await createSerialNumberSold(data);
+    if (response.status_code === 201) {
+      setOpenDialog(false);
+      setSelectedRows([]);
+      setPageSerial(1);
+      setProductId(null);
+      setSelectedProduct(null);
+    }
+  };
+
   const handleSelectRow = (id) => {
     setSelectedRows((prevSelected) => {
       if (prevSelected.includes(id)) {
@@ -225,7 +240,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, 
           <Button onClick={handleCloseDialog}>Hủy</Button>
           <Button
             onClick={() => {
-              handleCloseDialog();
+              handleSubmitSerials();
             }}
             variant="contained"
             color="primary"

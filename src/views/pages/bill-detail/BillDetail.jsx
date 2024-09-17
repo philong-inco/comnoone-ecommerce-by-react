@@ -20,14 +20,12 @@ function BillDetail() {
     if (response.status_code === 200) {
       setBillHistory(response.data);
     }
-    console.log(response);
   };
 
   const fetchBill = async () => {
     const response = await getBillByCode(id);
     if (response.status_code === 200) {
       setBill(response.data);
-      console.log(response);
     }
   };
   useEffect(() => {
@@ -36,7 +34,7 @@ function BillDetail() {
   }, [id, loading]);
 
   const handleLoading = () => {
-    setLoading(!loading);
+    setLoading((prevLoading) => !prevLoading);
   };
 
   return (
@@ -55,7 +53,7 @@ function BillDetail() {
           <Typography variant="h5">Thông tin đơn hàng</Typography>
         </Grid>
         <Grid item xs={2} container justifyContent="flex-end">
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" disabled={bill.trangThai === 'HUY'}>
             Cập nhập
           </Button>
         </Grid>
