@@ -23,6 +23,7 @@ import { useParams } from 'react-router-dom';
 
 function BillHistory(props) {
   const { id } = useParams();
+
   const { billHistory, handleLoading, bill } = props;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -32,6 +33,10 @@ function BillHistory(props) {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+  };
+
+  const handleSomeEvent = () => {
+    handleLoading();
   };
 
   const columns = [
@@ -45,7 +50,7 @@ function BillHistory(props) {
   const handleCancelled = async () => {
     const response = await updateStatusByCode(id, 'HUY');
     if (response.status_code == 204) {
-      handleLoading();
+      handleSomeEvent();
       alert(`Thông báo : Hủy hóa đơn ${id} thành công`);
     }
     console.log(response.status_code);
@@ -58,7 +63,9 @@ function BillHistory(props) {
           <Button variant="contained" color="error" onClick={handleCancelled} disabled={bill.trangThai === 'HUY'} sx={{ marginRight: 2 }}>
             HỦY
           </Button>
-          <Button variant="contained">XÁC NHẬN</Button>
+          <Button variant="contained" disabled={bill.trangThai === 'HUY'}>
+            XÁC NHẬN
+          </Button>
         </Grid>
         <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="contained" sx={{ marginRight: 2 }}>

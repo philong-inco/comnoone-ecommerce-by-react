@@ -37,22 +37,20 @@ function ProductInBill(props) {
 
   const fetchSerialNumberSold = async () => {
     const response = await getAllSerialNumberSoldByBillId(id);
-    console.log('API :', response);
-
     if (response.status_code === 200) {
       setSerialNumberSold(response.data);
       const allSerialNumberIds = response.data.flatMap((product) => product.serialNumbers.map((serial) => serial.serialNumberId));
       setSerialNumberInBill(allSerialNumberIds);
     }
   };
-  console.log('DATA : ', serialNumberInBill);
 
-  const fetchDelete = async (idSerialNumber) => {
-    const response = await deletedById(idSerialNumber);
+  const fetchDelete = async (billCodeRequest, serialNumberIdsRequest) => {
+    const response = await deletedById(billCodeRequest, serialNumberIdsRequest);
     if (response.status_code === 200) {
       setNotification({ open: true, message: response.message, severity: 'success' });
       fetchSerialNumberSold();
       fetchBill();
+      alert('Oke');
     }
   };
 
@@ -83,8 +81,18 @@ function ProductInBill(props) {
     setShowModal(false);
   };
 
-  const handleDelete = (id) => {
-    fetchDelete(id);
+  const handleDelete = (value) => {
+    console.log('Value : ', value);
+
+    const serialNumberIds = value.serialNumbers.map((item) => item.serialNumberId);
+
+    const data = {
+      billCode: id,
+      serialNumberIds: serialNumberIds
+    };
+    console.log('data : ', data);
+
+    fetchDelete(id, serialNumberIds);
   };
 
   return (
@@ -94,8 +102,8 @@ function ProductInBill(props) {
           <Grid container spacing={2}>
             <Grid item xs={12} container justifyContent="space-between" alignItems="center">
               <Typography variant="h5">Danh sách sản phẩm</Typography>
-              <Button variant="contained" color="warning" onClick={handleShowModal}>
-                Thêm mới sản phẩm
+              <Button variant="contained" color="warning" onClick={handleShowModal} disabled={bill.trangThai == 'HUY'}>
+                Thêm sản phẩm
               </Button>
             </Grid>
           </Grid>
@@ -125,6 +133,7 @@ function ProductInBill(props) {
                   <TableCell>Tên sản phẩm</TableCell>
                   <TableCell>Giá</TableCell>
                   <TableCell>Số lượng</TableCell>
+                  <TableCell>Thành tiền</TableCell>
                   <TableCell>Serial</TableCell>
                   <TableCell>Hành động</TableCell>
                 </TableRow>
@@ -138,10 +147,13 @@ function ProductInBill(props) {
                     <TableCell>{product.productDetailCode}</TableCell>
                     <TableCell>{product.productName}</TableCell>
                     <TableCell>
-                      <strong>{parseInt(product.gia).toLocaleString()} VNĐ</strong>
+                      <strong>{parseInt(product.price).toLocaleString()} VNĐ</strong>
                     </TableCell>
                     <TableCell>
-                      <strong>{product.soLuong} </strong>
+                      <strong>{product.quantity} </strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>{parseInt(product.quantity * product.price).toLocaleString()} VNĐ</strong>
                     </TableCell>
                     <TableCell>
                       <strong>
@@ -154,24 +166,15 @@ function ProductInBill(props) {
                       </strong>
                     </TableCell>
                     <TableCell>
-                      <IconButton color="error" onClick={() => handleDelete(product.id)}>
+                      <IconButton color="error" onClick={() => handleDelete(product)}>
                         <Update color="warning" />
                       </IconButton>
-                      {/* <IconButton color="error" onClick={() => handleDelete(product.id)}>
-                        <DeleteIcon />
-                      </IconButton> */}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-
-          <Snackbar open={notification.open} autoHideDuration={3000} onClose={() => setNotification({ ...notification, open: false })}>
-            <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity}>
-              {notification.message}
-            </Alert>
-          </Snackbar>
         </Paper>
       </Grid>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 1, borderRadius: 4 }}>

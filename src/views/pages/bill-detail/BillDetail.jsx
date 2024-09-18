@@ -8,6 +8,7 @@ import { Box } from '@mui/system';
 import PaymentHistory from './PaymentHistory';
 import BillHistory from './BillHistory';
 import ProductInBill from './ProductInBill';
+import AddressDialog from './AddressDialog ';
 
 function BillDetail() {
   const { id } = useParams();
@@ -20,14 +21,12 @@ function BillDetail() {
     if (response.status_code === 200) {
       setBillHistory(response.data);
     }
-    console.log(response);
   };
 
   const fetchBill = async () => {
     const response = await getBillByCode(id);
     if (response.status_code === 200) {
       setBill(response.data);
-      console.log(response);
     }
   };
   useEffect(() => {
@@ -36,7 +35,7 @@ function BillDetail() {
   }, [id, loading]);
 
   const handleLoading = () => {
-    setLoading(!loading);
+    setLoading((prevLoading) => !prevLoading);
   };
 
   return (
@@ -55,9 +54,7 @@ function BillDetail() {
           <Typography variant="h5">Thông tin đơn hàng</Typography>
         </Grid>
         <Grid item xs={2} container justifyContent="flex-end">
-          <Button variant="contained" color="primary">
-            Cập nhập
-          </Button>
+          <AddressDialog />
         </Grid>
         <Grid item xs={4}>
           <Typography variant="body1">Mã:</Typography>
