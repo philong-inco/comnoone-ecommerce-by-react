@@ -63,6 +63,13 @@ function PhieuGiamGiaConfiguration() {
         if (!value) return false;
         const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
         return bigNumberValue.isGreaterThan(0);
+      })
+      .test('is-less-than-or-equal-to-dieuKien', 'Giá trị tối đa phải nhỏ hơn hoặc bằng điều kiện', function (value) {
+        const { dieuKien } = this.parent;
+        if (!value || !dieuKien) return false;
+        const bigNumberGiaTriToiDa = new BigNumber(value.replace(/\./g, ''));
+        const bigNumberDieuKien = new BigNumber(dieuKien.replace(/\./g, ''));
+        return bigNumberGiaTriToiDa.isLessThanOrEqualTo(bigNumberDieuKien);
       }),
   
     soLuong: yup
@@ -89,7 +96,7 @@ function PhieuGiamGiaConfiguration() {
       .min(yup.ref('tuNgay'), 'Đến ngày phải sau từ ngày')
       .required('Đến ngày là bắt buộc'),
   });
-  
+
 
   useEffect(() => {
     fetchKhachHang();
@@ -123,7 +130,7 @@ function PhieuGiamGiaConfiguration() {
   const getAllDanhSachKhachHang = async () => {
     try {
       const result = await getDanhSachKhachHang();
-      setKhachHang(result); 
+      setKhachHang(result);
     } catch (error) {
       console.error(error);
     }
@@ -449,7 +456,7 @@ function PhieuGiamGiaConfiguration() {
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
-                  label="Giá trị"
+                  label="Giá trị phiếu"
                   name="giaTri"
                   fullWidth
                   margin="normal"
@@ -524,13 +531,13 @@ function PhieuGiamGiaConfiguration() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Điều kiện"
+                  label="Điều kiện "
                   name="dieuKien"
                   fullWidth
                   margin="normal"
                   InputProps={{
                     readOnly: isChiTietPage,
-                  }} 
+                  }}
                   value={formatNumber(formik.values.dieuKien)}
                   onChange={formik.handleChange}
                   error={formik.touched.dieuKien && Boolean(formik.errors.dieuKien)}

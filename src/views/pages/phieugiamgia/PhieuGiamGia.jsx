@@ -62,6 +62,13 @@ function PhieuGiamGia() {
     }
   };
   
+  useEffect(() => {
+    fetchApi(currentPage, size);
+    const intervalId = setInterval(() => {
+      fetchApi(currentPage, size);
+    }, 2000); // 2 seconds
+    return () => clearInterval(intervalId);
+  }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
 
   useEffect(() => {
     fetchApi(currentPage, size);
