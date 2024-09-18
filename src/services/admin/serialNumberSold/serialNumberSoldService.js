@@ -20,11 +20,14 @@ export const getAllSerialNumberSoldByBillId = async (codeBill) => {
   }
 };
 
-export const deletedById = async (data) => {
-  console.log('DATA : ', data);
+export const deletedById = async (billCodeRequest, serialNumberIdsRequest) => {
+  console.log('DATA : ', billCodeRequest + ' , ', serialNumberIdsRequest);
 
   try {
-    const result = await del(`serial-number-sold/delete`, data);
+    const result = await post(`serial-number-sold/delete`, {
+      billCode: billCodeRequest,
+      serialNumberIds: serialNumberIdsRequest
+    });
     return result;
   } catch (error) {
     console.error('Error del all:', error);

@@ -44,12 +44,13 @@ function ProductInBill(props) {
     }
   };
 
-  const fetchDelete = async (data) => {
-    const response = await deletedById(data);
+  const fetchDelete = async (billCodeRequest, serialNumberIdsRequest) => {
+    const response = await deletedById(billCodeRequest, serialNumberIdsRequest);
     if (response.status_code === 200) {
       setNotification({ open: true, message: response.message, severity: 'success' });
       fetchSerialNumberSold();
       fetchBill();
+      alert('Oke');
     }
   };
 
@@ -89,7 +90,9 @@ function ProductInBill(props) {
       billCode: id,
       serialNumberIds: serialNumberIds
     };
-    fetchDelete(data);
+    console.log('data : ', data);
+
+    fetchDelete(id, serialNumberIds);
   };
 
   return (
@@ -100,7 +103,7 @@ function ProductInBill(props) {
             <Grid item xs={12} container justifyContent="space-between" alignItems="center">
               <Typography variant="h5">Danh sách sản phẩm</Typography>
               <Button variant="contained" color="warning" onClick={handleShowModal} disabled={bill.trangThai == 'HUY'}>
-                Thêm mới sản phẩm
+                Thêm sản phẩm
               </Button>
             </Grid>
           </Grid>
@@ -172,12 +175,6 @@ function ProductInBill(props) {
               </TableBody>
             </Table>
           </TableContainer>
-
-          <Snackbar open={notification.open} autoHideDuration={3000} onClose={() => setNotification({ ...notification, open: false })}>
-            <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity}>
-              {notification.message}
-            </Alert>
-          </Snackbar>
         </Paper>
       </Grid>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 1, borderRadius: 4 }}>

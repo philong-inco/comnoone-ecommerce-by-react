@@ -103,6 +103,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, 
       setPageSerial(1);
       setProductId(null);
       setSelectedProduct(null);
+      alert('Oke');
     }
   };
 
