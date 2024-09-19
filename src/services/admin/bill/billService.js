@@ -42,6 +42,15 @@ export const createBill = async () => {
   }
 };
 
+export const addCustomerToBill = async (customerId, codeBill) => {
+  try {
+    const result = await post(`bills/add-customer-to-bill?customerId=${customerId}&codeBill=${codeBill}`);
+    return result;
+  } catch (error) {
+    console.error('Error creating :', error);
+    throw error;
+  }
+};
 export const updateStatusByCode = async (code, status) => {
   try {
     const result = await post(`bills/update-status/${code}?status=${status}`);

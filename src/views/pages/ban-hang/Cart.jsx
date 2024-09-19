@@ -23,9 +23,11 @@ import {
   Radio
 } from '@mui/material';
 import { Box } from '@mui/system';
+import { useConfirm } from 'material-ui-confirm';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getBillByCode } from 'services/admin/bill/billService';
+import { toast } from 'react-toastify';
+import { addCustomerToBill, getBillByCode } from 'services/admin/bill/billService';
 import { getAll } from 'services/admin/customer/customerService';
 
 import { getAllProduct } from 'services/admin/product/productService';
@@ -39,10 +41,9 @@ import {
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
 function Cart(bill) {
-  console.log('Vill : ', bill);
-
   const { id } = useParams();
 
+  const [billInFo, setBillInFo] = useState({});
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [serialNumberInBill, setSerialNumberInBill] = useState([]);
@@ -61,8 +62,15 @@ function Cart(bill) {
   const [sizeSerial, setSizeSerial] = useState(5);
   const [totalSerial, setTotalSerial] = useState(0);
   // customer
+  const [customer, setCustomer] = useState({
+    ten: '',
+    sdt: '',
+    email: ''
+  });
   const [customers, setCustomers] = useState([]);
   const [showDiaLogCustomer, setShowDiaLogCustomer] = useState(false);
+  const [pageCustomer, setPageCustomer] = useState(1);
+  const [totalCustomers, setTotalCustomers] = useState(0);
 
   // hóa đơn ct
   const fetchSerialNumberSold = async () => {
@@ -74,8 +82,6 @@ function Cart(bill) {
       setSelectedRows(allSerialNumberIds);
     }
   };
-  console.log('SelectedRows : ', selectedRows);
-  console.log('serialNumberSold  : ', serialNumberSold);
 
   const fetchDelete = async (billCodeRequest, serialNumberIdsRequest) => {
     const response = await deletedById(billCodeRequest, serialNumberIdsRequest);
@@ -88,13 +94,24 @@ function Cart(bill) {
 
   const fetchBillInFo = async () => {
     const response = await getBillByCode(id);
+    console.log('DATA KH : ', response);
+
     if (response.status_code === 200) {
-      setBill(response.data);
+      setBillInFo(response.data);
+      setCustomer({
+        ten: response.data.tenKhachHang,
+        sdt: response.data.sdt,
+        email: response.data.email,
+        diaChi: response.data.diaChi
+      });
     }
   };
 
   useEffect(() => {
     fetchSerialNumberSold();
+    if (id) {
+      fetchBillInFo();
+    }
   }, [loading, id]);
 
   const handleCancel = () => {
@@ -112,8 +129,8 @@ function Cart(bill) {
   const handleProductSelected = () => {
     setShowModal(false);
   };
+  console.log('Customer : ', customer);
 
-  console.log('Data serialNumberSold : ', serialNumberSold);
   // xóa toàn bộ sản phẩm
   const handleDelete = (value) => {
     const serialNumberIds = value.serialNumbers.map((item) => item.serialNumberId);
@@ -144,12 +161,19 @@ function Cart(bill) {
       setPageSerial(response.data.meta.page + 1);
     }
   };
+
+  const handleChangePageSerial = (newPage) => {
+    setSelectedRows(selectedRows);
+    setPageSerial(newPage);
+    fetchSerialNumberByProduct(productId, newPage, sizeSerial);
+  };
   // thêm serial
   const handleSubmitSerials = async () => {
     const data = {
       billCode: id,
       listSerialNumberId: selectedRows
     };
+
     console.log('Thêm serial : ', data);
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {
@@ -159,6 +183,7 @@ function Cart(bill) {
       setProductId(null);
       setSelectedProduct(null);
       fetchSerialNumberSold();
+      fetchBillInFo();
     }
   };
   // tích chọn serial
@@ -178,7 +203,6 @@ function Cart(bill) {
     fetchSerialNumberByProduct(id, pageSerial, 5);
     setOpenDialog(true);
   };
-  console.log('Product Id : ', productId);
 
   // đóng chọn serial
   const handleCloseDialog = () => {
@@ -191,16 +215,39 @@ function Cart(bill) {
   // api khách hàng
   const fetchApiAllCustomer = async (page) => {
     try {
-      const response = await getAll(0);
+      const response = await getAll(page - 1);
       if (response) {
         setCustomers(response.content);
+        setTotalCustomers(response.totalPages);
       } else {
       }
     } catch (error) {}
   };
+
+  const handleAddCustomerToBill = async (customerId) => {
+    try {
+      const response = await addCustomerToBill(customerId, id);
+      if (response.status_code) {
+        alert('Thêm oke');
+        setCustomer({
+          ten: response.data.tenKhachHang,
+          sdt: response.data.sdt,
+          email: response.data.email
+        });
+        handleCloseShowDiaLogCustomer();
+      } else {
+      }
+    } catch (error) {}
+  };
+  const handleChangePageCustomer = (newPage) => {
+    setPageCustomer(newPage);
+    console.log('Trang : ', newPage);
+
+    fetchApiAllCustomer(newPage);
+  };
   const handleShowDiaLogCustomer = (id) => {
     setShowDiaLogCustomer(true);
-    fetchApiAllCustomer(0);
+    fetchApiAllCustomer(pageCustomer);
   };
 
   // đóng chọn serial
@@ -208,136 +255,164 @@ function Cart(bill) {
     setShowDiaLogCustomer(false);
     setCustomers([]);
   };
-  console.log('KK : ', customers);
 
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
-        <Paper
-          sx={{
-            padding: 2,
-            marginTop: 2,
-            marginBottom: 2,
-            borderRadius: 4,
-            width: '100%',
-            boxShadow: 3
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={12} container justifyContent="space-between" alignItems="center">
-              <Typography variant="h3">Giỏ hàng</Typography>
-              <Button variant="contained" color="warning" onClick={handleShowModal} disabled={bill.trangThai == 'HUY'}>
-                Thêm sản phẩm
-              </Button>
-            </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+            <Typography variant="h3">Giỏ hàng</Typography>
+            <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
+              Thêm sản phẩm
+            </Button>
           </Grid>
-          <Divider sx={{ marginY: 2 }} />
-          <TableContainer component={Paper} sx={{ width: '100%' }}>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ảnh</TableCell>
-                  <TableCell>Mã SP</TableCell>
-                  <TableCell>Tên sản phẩm</TableCell>
-                  <TableCell>Số lượng</TableCell>
-                  <TableCell>Thành tiền</TableCell>
-                  <TableCell>Serial</TableCell>
-                  <TableCell>Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {serialNumberSold.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <img src="https://via.placeholder.com/50" alt="Product" width="50" />
-                    </TableCell>
-                    <TableCell>{product.productDetailCode}</TableCell>
-                    <TableCell>
-                      {product.productName} <br />
-                      <strong style={{ color: 'red' }}>{parseInt(product.price).toLocaleString()} VNĐ</strong>
-                    </TableCell>
+        </Grid>
+        <Divider sx={{ marginY: 2 }} />
+        <TableContainer component={Paper} sx={{ width: '100%' }}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Ảnh</TableCell>
+                <TableCell>Mã SP</TableCell>
+                <TableCell>Tên sản phẩm</TableCell>
+                <TableCell>Số lượng</TableCell>
+                <TableCell>Thành tiền</TableCell>
+                <TableCell>Serial</TableCell>
+                <TableCell>Hành động</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {serialNumberSold.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <img src="https://via.placeholder.com/50" alt="Product" width="50" />
+                  </TableCell>
+                  <TableCell>{product.productDetailCode}</TableCell>
+                  <TableCell>
+                    {product.productName} <br />
+                    <strong style={{ color: 'red' }}>{parseInt(product.price).toLocaleString()} VNĐ</strong>
+                  </TableCell>
 
-                    <TableCell>
-                      <strong>{product.quantity} </strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong style={{ color: 'red' }}>{parseInt(product.quantity * product.price).toLocaleString()} VNĐ</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>
-                        {product.serialNumbers.map((serial, index) => (
-                          <span key={serial.serialNumberId}>
-                            {serial.serialNumberCode}
-                            {index < product.serialNumbers.length - 1 && ', '}
-                          </span>
-                        ))}
-                      </strong>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        sx={{ color: 'white', marginRight: '5px', backgroundColor: '#4CAF50', '&:hover': { backgroundColor: '#388E3C' } }}
-                        onClick={() => handleOpenDialog(product.productDetailId)}
-                      >
-                        Cập nhập
-                      </Button>
-                      <Button
-                        sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
-                        onClick={() => handleDelete(product)}
-                      >
-                        Hủy
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          Tổng tiền :
-        </Paper>
+                  <TableCell>
+                    <strong>{product.quantity} </strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong style={{ color: 'red' }}>{parseInt(product.quantity * product.price).toLocaleString()} VNĐ</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>
+                      {product.serialNumbers.map((serial, index) => (
+                        <span key={serial.serialNumberId}>
+                          {serial.serialNumberCode}
+                          {index < product.serialNumbers.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </strong>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      sx={{ color: 'white', marginRight: '5px', backgroundColor: '#4CAF50', '&:hover': { backgroundColor: '#388E3C' } }}
+                      onClick={() => handleOpenDialog(product.productDetailId)}
+                    >
+                      Cập nhập
+                    </Button>
+                    <Button
+                      sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
+                      onClick={() => handleDelete(product)}
+                    >
+                      Hủy
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Grid container justifyContent="end" alignItems="center" mt={2}>
+          <Typography variant="h4">
+            Tổng tiền : <strong style={{ color: 'red' }}>{billInFo.tongTienBanDau}</strong> VNĐ
+          </Typography>
+        </Grid>
       </Grid>
       <>
         <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
-          <Paper
-            sx={{
-              padding: 2,
-              marginTop: 2,
-              marginBottom: 2,
-              borderRadius: 4,
-              width: '100%',
-              boxShadow: 3
-            }}
-          >
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Typography variant="h3">Khách hàng</Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  handleShowDiaLogCustomer();
-                }}
-              >
-                Chọn khách hàng
-              </Button>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Typography variant="h3">Khách hàng</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                handleShowDiaLogCustomer();
+              }}
+              disabled={id ? false : true}
+            >
+              Chọn khách hàng
+            </Button>
+          </Grid>
+          <Grid container spacing={2} paddingY={2} borderBottom={1} borderColor="grey.300">
+            <Grid item xs={6}>
+              <Typography variant="subtitle1">Tên khách hàng : {customer.ten}</Typography>
             </Grid>
-            <Grid container spacing={2} paddingY={2} borderBottom={1} borderColor="grey.300">
-              <Grid item xs={6}>
-                <Typography variant="subtitle1">Tên khách hàng</Typography>
-                <Typography variant="body1">Nguyễn Phùng Dũng</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="subtitle1">Email</Typography>
-                <Typography variant="body1">dung@gmail.com</Typography>
-              </Grid>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1">Email : {customer.email}</Typography>
             </Grid>
-            <Grid container spacing={2} paddingY={2}>
-              <Grid item xs={6}>
-                <Typography variant="subtitle1">Số điện thoại</Typography>
-                <Typography variant="body1">0395561234</Typography>
-              </Grid>
+          </Grid>
+          <Grid container spacing={2} paddingY={2}>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1">Số điện thoại : {customer.sdt}</Typography>
             </Grid>
-          </Paper>
+            <Grid item xs={6}>
+              <Typography variant="subtitle1">Địa chỉ : {customer.diaChi}</Typography>
+            </Grid>
+          </Grid>
+          {/* </Paper> */}
         </Grid>
       </>
+      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
+        <Grid item xs={9}>
+          <Typography variant="h3">Thông tin đơn hàng </Typography>
+        </Grid>
+        <Grid item xs={3}>
+          <Box display="flex" justifyContent="end">
+            <Button variant="outlined">Bán Giao Hàng</Button>
+            <Button variant="contained" color="primary" sx={{ marginLeft: 2, padding: 1 }}>
+              Tiến hành thanh toán
+            </Button>
+          </Box>
+        </Grid>
+        <Grid mt={2} item xs={12} sx={{ borderTop: 1 }} />
+
+        <Grid item xs={9}>
+          GHN{' '}
+        </Grid>
+        <Grid item xs={3}>
+          <TextField label="Mã Giảm Giá" defaultValue="VOUCHER122" variant="outlined" size="small" />
+          <Button variant="contained" color="warning" size="small" sx={{ padding: 1, borderRadius: 3, marginLeft: 2 }}>
+            Chọn Mã Giảm Giá
+          </Button>
+          <Typography mt={1} variant="h4">
+            {' '}
+            Tổng tiền hàng: 64.000.000 đ{' '}
+          </Typography>
+          <Typography mt={1} variant="h4">
+            {' '}
+            Giảm giá: 7.000.000 đ{' '}
+          </Typography>
+          <Typography mt={1} variant="h4" fontWeight="bold" color="error">
+            Khách cần trả: 57.000.000 đ
+          </Typography>
+          <Typography mt={1} variant="h4" fontWeight="bold">
+            Khách thanh toán: 0 đ
+          </Typography>
+          <Typography mt={1} variant="h4">
+            {' '}
+            Tiền thừa trả khách: -57.000.000 đ{' '}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      {/* </Box> */}
+
       {/* ------------------ DIALOG ------------------- */}
       {/* Dialog  Danh sách sản phẩm*/}
       <Dialog open={showModal} onClose={handleCancel} maxWidth="xl" fullWidth>
@@ -494,7 +569,13 @@ function Cart(bill) {
                     <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
                     <TableCell>
                       {' '}
-                      <Button onClick={() => {}} variant="contained" color="primary">
+                      <Button
+                        onClick={() => {
+                          handleAddCustomerToBill(customer.id);
+                        }}
+                        variant="contained"
+                        color="primary"
+                      >
                         Chọn
                       </Button>
                     </TableCell>
@@ -504,6 +585,12 @@ function Cart(bill) {
             </Table>
           </TableContainer>
         </DialogContent>
+        <Pagination
+          sx={{ marginTop: '10px', textAlign: 'center' }}
+          count={totalCustomers}
+          page={pageCustomer}
+          onChange={(event, value) => handleChangePageCustomer(value)}
+        />
         <DialogActions>
           <Button onClick={handleCloseShowDiaLogCustomer} color="primary">
             Đóng
