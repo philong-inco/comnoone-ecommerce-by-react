@@ -38,8 +38,19 @@ const validationSchema = Yup.object().shape({
         .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
         .required('Số điện thoại không được để trống'),
     ngay_sinh: Yup.date()
-        .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
-        .required('Ngày sinh không được để trống'),
+    .required('Ngày sinh không được để trống')
+    .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
+    .test('age', 'Khách hàng phải từ 10 tuổi trở lên', value => {
+        if (!value) return false;
+        const today = new Date();
+        const birthDate = new Date(value);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 10;
+    }),
     gioi_tinh: Yup.number().required('Giới tính không được để trống'),
     hinhAnh: Yup.string(),
 });

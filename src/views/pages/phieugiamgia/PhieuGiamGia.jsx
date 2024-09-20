@@ -51,7 +51,7 @@ function PhieuGiamGia() {
         filterString += ` and ngayBatDau >= '${ngayBatDau.format('YYYY-MM-DD')}' and ngayHetHan <= '${ngayHetHan.format('YYYY-MM-DD')}'`;
       }
   
-      const response = await filterCoupons(currentPage, size, filterString);
+      const response = await filterCoupons(currentPage, 6, filterString);
       console.log(response.data.meta);  // Debug response
       if (response.status_code === 200) {
         setDanhSachPhieuGiamGia(response.data.result);
@@ -88,21 +88,6 @@ function PhieuGiamGia() {
     setTrangThai('');
     setNgayBatDau(null);
     setNgayHetHan(null);
-  };
-
-  const handleSearchChange = (e) => {
-    setMa(e.target.value);
-    resetFilters(); 
-  };
-
-  const handleLoaiGiamGiaChange = (e) => {
-    setLoaiGiamGia(e.target.value);
-    resetFilters();
-  };
-
-  const handlePhamViFChange = (e) => {
-    setPhamViApDung(e.target.value);
-    resetFilters();
   };
 
   const handleDateChange = (name, value) => {
@@ -226,6 +211,7 @@ function PhieuGiamGia() {
                     <FormControlLabel value="2" control={<Radio />} label="VND" />
                   </RadioGroup>
                 </FormControl>
+                </Grid>
                 <Fab
                   color="primary"
                   aria-label="add"
@@ -237,8 +223,7 @@ function PhieuGiamGia() {
                   onClick={handleNavigate}
                 >
                   <AddIcon />
-                </Fab>
-              </Grid>
+                </Fab>           
             </Grid>
           </Box>
         </Box>

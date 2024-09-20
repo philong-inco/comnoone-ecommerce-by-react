@@ -127,6 +127,13 @@ const quanLy = {
           type: 'item',
           url: '/phieugiamgia/cauhinhphieugiamgia'
         }
+        ,
+        {
+          id: 'dotgiamgia-danhsach',
+          title: 'Danh sách đợt giảm giá',
+          type: 'item',
+          url: '/dotgiamgia/danhsachdotgiamgia'
+        }
       ]
     },
     {

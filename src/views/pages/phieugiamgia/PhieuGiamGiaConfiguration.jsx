@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';  // Để lấy id từ URL
-import { MenuItem, Select, Divider, FormControl, Chip, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead, Table, TableContainer, Typography, TextField, Grid, Paper, RadioGroup, FormControlLabel, Radio, Button, InputAdornment, IconButton } from '@mui/material';
+import { MenuItem, Select, Divider, FormControl, Chip, Snackbar,Fab, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead, Table, TableContainer, Typography, TextField, Grid, Paper, RadioGroup, FormControlLabel, Radio, Button, InputAdornment, IconButton } from '@mui/material';
 import PercentIcon from '@mui/icons-material/Percent';
 import AddIcon from '@mui/icons-material/Add';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { getAllChangePageSize } from 'services/admin/customer/customerService.js';
 import axios from 'axios';  // Axios for API calls
 import { useNavigate } from 'react-router-dom';
 import { getAll, getSearchKeyWord, getSelectHangKhachHang, getDanhSachKhachHang } from 'services/admin/customer/customerService.js';
 import BigNumber from 'bignumber.js';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 function PhieuGiamGiaConfiguration() {
   const [currencyType, setCurrencyType] = useState('%');
   const [khachHang, setKhachHang] = useState([]);
@@ -106,11 +105,11 @@ function PhieuGiamGiaConfiguration() {
     setLoading(true);
     try {
       let result;
-      if (searchKeyWord) {
+      if (searchKeyWord && selectHangKhachHang == '') {
         result = await getSearchKeyWord(currentPage - 1, searchKeyWord);
-      } else if (selectHangKhachHang !== '') {
+      } else if (selectHangKhachHang !== '' && searchKeyWord == "") {
         result = await getSelectHangKhachHang(currentPage - 1, selectHangKhachHang);
-      } else {
+      } else if(selectHangKhachHang == '' && searchKeyWord ==""){
         result = await getAll(currentPage - 1);
       }
       setKhachHang(result.content);
@@ -129,8 +128,8 @@ function PhieuGiamGiaConfiguration() {
 
   const getAllDanhSachKhachHang = async () => {
     try {
-      const result = await getDanhSachKhachHang();
-      setKhachHang(result);
+      const result = await getAll(currentPage - 1);
+      setKhachHang(result.content);
     } catch (error) {
       console.error(error);
     }
@@ -226,7 +225,7 @@ function PhieuGiamGiaConfiguration() {
   };
 
   const handleNavigate = () => {
-    navigate('/phieugiamgia/cauhinhphieugiamgia');
+    navigate('/phieugiamgia/danhsachphieugiamgia');
   };
 
   useEffect(() => {
@@ -696,7 +695,7 @@ function PhieuGiamGiaConfiguration() {
                       backgroundColor: 'white',
                     }}
                   >
-                    <MenuItem value=""><em>-- Chọn hạng khách hàng --</em></MenuItem>
+                    <MenuItem value="">-- Tất cả khách hàng --</MenuItem>
                     <MenuItem value={0}>Đồng</MenuItem>
                     <MenuItem value={1}>Bạc</MenuItem>
                     <MenuItem value={2}>Vàng</MenuItem>
@@ -705,6 +704,18 @@ function PhieuGiamGiaConfiguration() {
                   </Select>
                 </FormControl>
               </Grid>
+              <Fab
+  color="primary"
+  aria-label="back"
+  sx={{
+    position: 'fixed',
+    bottom: 16,
+    right: 16,
+  }}
+  onClick={handleNavigate}
+>
+  <ArrowBackIcon />  {/* Icon quay lại */}
+</Fab>
             </Grid>
           </Box>
           <TableContainer>
