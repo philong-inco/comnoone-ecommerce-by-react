@@ -84,3 +84,13 @@ export const deleteKhPGG = async (id, status) => {
     throw error;
   }
 };
+
+export const getAllCouponsToBill = async (billCode) => {
+  try {
+    const result = await get(`coupons/to-bill/${billCode}`);
+    return result;
+  } catch (error) {
+    console.log('Error get :', error);
+    throw error;
+  }
+};

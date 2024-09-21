@@ -47,10 +47,31 @@ export const addCustomerToBill = async (customerId, codeBill) => {
     const result = await post(`bills/add-customer-to-bill?customerId=${customerId}&codeBill=${codeBill}`);
     return result;
   } catch (error) {
-    console.error('Error creating :', error);
+    console.error('Error creating addCustomerToBill :', error);
     throw error;
   }
 };
+
+export const addCouponToBill = async (couponId, codeBill) => {
+  try {
+    const result = await post(`bills/add-coupon-by-id?couponId=${couponId}&codeBill=${codeBill}`);
+    return result;
+  } catch (error) {
+    console.error('Error creating addCouponToBill :', error);
+    throw error;
+  }
+};
+
+export const addCouponToBillByCode = async (couponCode, codeBill) => {
+  try {
+    const result = await post(`bills/add-coupon-by-code?couponCode=${couponCode}&codeBill=${codeBill}`);
+    return result;
+  } catch (error) {
+    console.error('Error creating addCouponToBillByCode :', error);
+    throw error;
+  }
+};
+
 export const updateStatusByCode = async (code, status) => {
   try {
     const result = await post(`bills/update-status/${code}?status=${status}`);

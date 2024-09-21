@@ -23,15 +23,13 @@ import {
   Radio
 } from '@mui/material';
 import { Box } from '@mui/system';
-import { useConfirm } from 'material-ui-confirm';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { addCustomerToBill, getBillByCode } from 'services/admin/bill/billService';
+import { addCouponToBill, addCouponToBillByCode, addCustomerToBill, getBillByCode } from 'services/admin/bill/billService';
+import { getAllCouponsToBill } from 'services/admin/coupons/couponsService';
 import { getAll } from 'services/admin/customer/customerService';
-
 import { getAllProduct } from 'services/admin/product/productService';
-
 import { getAllSerialNumberByProductId } from 'services/admin/serial-number/serialNumber';
 import {
   createSerialNumberSold,
@@ -42,6 +40,7 @@ import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
 function Cart(bill) {
   const { id } = useParams();
+  const inputRef = useRef(null);
 
   const [billInFo, setBillInFo] = useState({});
   const [loading, setLoading] = useState(false);
@@ -71,6 +70,9 @@ function Cart(bill) {
   const [showDiaLogCustomer, setShowDiaLogCustomer] = useState(false);
   const [pageCustomer, setPageCustomer] = useState(1);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  // phiếu giảm giá
+  const [showDiaLogCoupon, setShowDiaLogCoupon] = useState(false);
+  const [coupons, setCoupons] = useState([]);
 
   // hóa đơn ct
   const fetchSerialNumberSold = async () => {
@@ -87,7 +89,7 @@ function Cart(bill) {
     const response = await deletedById(billCodeRequest, serialNumberIdsRequest);
     if (response.status_code === 200) {
       fetchSerialNumberSold();
-      fetchBill();
+      fetchBillInFo();
       alert('Oke');
     }
   };
@@ -140,6 +142,7 @@ function Cart(bill) {
     };
     console.log('data : ', data);
     fetchDelete(id, serialNumberIds);
+    fetchBillInFo();
   };
 
   // sản phẩm
@@ -212,6 +215,7 @@ function Cart(bill) {
     setProductId(null);
     setSelectedProduct(null);
   };
+
   // api khách hàng
   const fetchApiAllCustomer = async (page) => {
     try {
@@ -239,12 +243,14 @@ function Cart(bill) {
       }
     } catch (error) {}
   };
+
   const handleChangePageCustomer = (newPage) => {
     setPageCustomer(newPage);
     console.log('Trang : ', newPage);
 
     fetchApiAllCustomer(newPage);
   };
+
   const handleShowDiaLogCustomer = (id) => {
     setShowDiaLogCustomer(true);
     fetchApiAllCustomer(pageCustomer);
@@ -254,6 +260,63 @@ function Cart(bill) {
   const handleCloseShowDiaLogCustomer = () => {
     setShowDiaLogCustomer(false);
     setCustomers([]);
+  };
+
+  // api phiếu giảm giá
+  const fetchApiGetAllCouponsToBill = async () => {
+    try {
+      const response = await getAllCouponsToBill(billInFo.ma);
+      if (response.status_code === 200) {
+        setCoupons(response.data);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const handleAddCouponToBill = async (couponId) => {
+    try {
+      const response = await addCouponToBill(couponId, id);
+      if (response.status_code === 201) {
+        alert('Thêm phiếu giảm giá thành công');
+        fetchBillInFo();
+        handleCloseDiaLogCoupon();
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const handleAddCouponToBillByCode = async (couponCode) => {
+    try {
+      const response = await addCouponToBillByCode(couponCode, id);
+      if (response.status_code === 201) {
+        alert('Thêm phiếu giảm giá thành công');
+        fetchBillInFo();
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
+      } else {
+        alert('Thêm thất bại');
+      }
+    } catch (error) {
+      alert('Phiếu giảm giá không tồn tại');
+    }
+  };
+
+  const handleSubmitFormCoupon = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const maPGG = formData.get('maPGG');
+    // addCouponToBillByCode
+    handleAddCouponToBillByCode(maPGG.trim());
+  };
+
+  const handleShowDiaLogCoupon = (id) => {
+    setShowDiaLogCoupon(true);
+    fetchApiGetAllCouponsToBill();
+  };
+  const handleCloseDiaLogCoupon = () => {
+    setShowDiaLogCoupon(false);
+    setCoupons([]);
   };
 
   return (
@@ -330,7 +393,7 @@ function Cart(bill) {
         </TableContainer>
         <Grid container justifyContent="end" alignItems="center" mt={2}>
           <Typography variant="h4">
-            Tổng tiền : <strong style={{ color: 'red' }}>{billInFo.tongTienBanDau}</strong> VNĐ
+            Tổng tiền : <strong style={{ color: 'red' }}> {parseInt(billInFo.tongTienBanDau || 0).toLocaleString() || '0'} </strong> VNĐ
           </Typography>
         </Grid>
       </Grid>
@@ -369,10 +432,10 @@ function Cart(bill) {
         </Grid>
       </>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
-        <Grid item xs={9}>
+        <Grid item xs={8}>
           <Typography variant="h3">Thông tin đơn hàng </Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           <Box display="flex" justifyContent="end">
             <Button variant="outlined">Bán Giao Hàng</Button>
             <Button variant="contained" color="primary" sx={{ marginLeft: 2, padding: 1 }}>
@@ -386,28 +449,40 @@ function Cart(bill) {
           GHN{' '}
         </Grid>
         <Grid item xs={3}>
-          <TextField label="Mã Giảm Giá" defaultValue="VOUCHER122" variant="outlined" size="small" />
-          <Button variant="contained" color="warning" size="small" sx={{ padding: 1, borderRadius: 3, marginLeft: 2 }}>
-            Chọn Mã Giảm Giá
+          <form onSubmit={handleSubmitFormCoupon}>
+            <TextField label="Mã Giảm Giá" name="maPGG" variant="outlined" size="small" inputRef={inputRef} fullWidth />
+          </form>
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            sx={{ padding: 1, borderRadius: 3, marginLeft: 2 }}
+            onClick={() => {
+              handleShowDiaLogCoupon();
+            }}
+            disabled={id ? false : true}
+          >
+            Chọn Mã Giảm Giá :
           </Button>
           <Typography mt={1} variant="h4">
-            {' '}
-            Tổng tiền hàng: 64.000.000 đ{' '}
+            Tổng tiền hàng: {parseInt(billInFo.tongTienBanDau || 0).toLocaleString() || '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4">
-            {' '}
-            Giảm giá: 7.000.000 đ{' '}
+            Phiếu giảm giá : {billInFo.maPGG || ''}
+          </Typography>
+          <Typography mt={1} variant="h4">
+            Giảm giá: {parseInt(billInFo.giaTriPhieuGiamGia || 0).toLocaleString() || '0'} {billInFo.loaiPGG === 1 ? '%' : 'VNĐ' || ''}
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Khách cần trả: 57.000.000 đ
+            Khách cần trả: {parseInt(billInFo.tongTienPhaiTra || 0).toLocaleString() || '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold">
             Khách thanh toán: 0 đ
           </Typography>
-          <Typography mt={1} variant="h4">
+          {/* <Typography mt={1} variant="h4">
             {' '}
             Tiền thừa trả khách: -57.000.000 đ{' '}
-          </Typography>
+          </Typography> */}
         </Grid>
       </Grid>
 
@@ -593,6 +668,58 @@ function Cart(bill) {
         />
         <DialogActions>
           <Button onClick={handleCloseShowDiaLogCustomer} color="primary">
+            Đóng
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Phiếu giảm giá */}
+      <Dialog open={showDiaLogCoupon} onClose={handleCloseDiaLogCoupon} maxWidth="md" fullWidth>
+        <DialogTitle>Danh sách khách hàng</DialogTitle>
+        <DialogContent>
+          <TableContainer component={Paper} style={{ maxHeight: '500px' }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Mã phiếu</TableCell>
+                  {/* <TableCell>Tên </TableCell> */}
+                  <TableCell>Giá trị </TableCell>
+                  <TableCell>Giá trị đối đa </TableCell>
+                  <TableCell>Số lượng</TableCell>
+                  <TableCell>Hành động</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {coupons.map((coupon) => (
+                  <TableRow key={coupon.id}>
+                    <TableCell></TableCell>
+                    <TableCell>{coupon.ma} </TableCell>
+                    {/* <TableCell>{coupon.ten}</TableCell> */}
+                    <TableCell>
+                      {parseInt(coupon.giaTriGiamGia || 0).toLocaleString() || '0'} {coupon.loaiGiamGia === 1 ? '%' : 'VNĐ' || ''}
+                    </TableCell>
+                    <TableCell>{parseInt(coupon.giamToiDa || 0).toLocaleString() || '0'} VNĐ </TableCell>
+                    <TableCell>{coupon.soLuong}</TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={() => {
+                          handleAddCouponToBill(coupon.id);
+                        }}
+                        variant="contained"
+                        color="primary"
+                        disabled={billInFo.idPhieuGiamGia === coupon.id ? true : false || false}
+                      >
+                        Chọn
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDiaLogCoupon} color="primary">
             Đóng
           </Button>
         </DialogActions>
