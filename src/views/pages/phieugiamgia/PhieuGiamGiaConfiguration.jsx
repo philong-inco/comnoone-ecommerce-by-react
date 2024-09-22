@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';  // Để lấy id từ URL
-import { MenuItem, Select, Divider, FormControl, Chip, Snackbar,Fab, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead, Table, TableContainer, Typography, TextField, Grid, Paper, RadioGroup, FormControlLabel, Radio, Button, InputAdornment, IconButton } from '@mui/material';
+import { MenuItem, Select, Divider, FormControl, Chip, Snackbar, Fab, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead, Table, TableContainer, Typography, TextField, Grid, Paper, RadioGroup, FormControlLabel, Radio, Button, InputAdornment, IconButton } from '@mui/material';
 import PercentIcon from '@mui/icons-material/Percent';
 import AddIcon from '@mui/icons-material/Add';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -30,31 +30,31 @@ function PhieuGiamGiaConfiguration() {
 
   const validationSchema = yup.object({
     tenPhieu: yup.string().required('Tên phiếu giảm giá là bắt buộc'),
-  
-    giaTri: yup
-    .string()
-    .required('Giá trị là bắt buộc')
-    .test('is-valid-value', (value, context) => {
 
-      if (!value) return context.createError({ message: 'Giá trị là bắt buộc' });
-      const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
-      if (currencyType === '%') {
-        if (!bigNumberValue.isGreaterThan(0)) {
-          return context.createError({ message: 'Giá trị phải lớn hơn 0%' });
+    giaTri: yup
+      .string()
+      .required('Giá trị là bắt buộc')
+      .test('is-valid-value', (value, context) => {
+
+        if (!value) return context.createError({ message: 'Giá trị là bắt buộc' });
+        const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
+        if (currencyType === '%') {
+          if (!bigNumberValue.isGreaterThan(0)) {
+            return context.createError({ message: 'Giá trị phải lớn hơn 0%' });
+          }
+          if (!bigNumberValue.isLessThanOrEqualTo(100)) {
+            return context.createError({ message: 'Giá trị không được vượt quá 100%' });
+          }
+        } else if (currencyType === '$') {
+          if (!bigNumberValue.isGreaterThan(0)) {
+            return context.createError({ message: 'Giá trị phải lớn hơn 0$' });
+          }
+        } else {
+          return context.createError({ message: 'Loại phiếu không hợp lệ' });
         }
-        if (!bigNumberValue.isLessThanOrEqualTo(100)) {
-          return context.createError({ message: 'Giá trị không được vượt quá 100%' });
-        }
-      } else if (currencyType === '$') {
-        if (!bigNumberValue.isGreaterThan(0)) {
-          return context.createError({ message: 'Giá trị phải lớn hơn 0$' });
-        }
-      } else {
-        return context.createError({ message: 'Loại phiếu không hợp lệ' });
-      }
-      return true;
-    }),
-  
+        return true;
+      }),
+
     giaTriToiDa: yup
       .string()
       .required('Giá trị tối đa là bắt buộc')
@@ -70,12 +70,12 @@ function PhieuGiamGiaConfiguration() {
         const bigNumberDieuKien = new BigNumber(dieuKien.replace(/\./g, ''));
         return bigNumberGiaTriToiDa.isLessThanOrEqualTo(bigNumberDieuKien);
       }),
-  
+
     soLuong: yup
       .number('Chỉ được nhập số')
       .required('Số lượng là bắt buộc')
       .positive('Số lượng phải lớn hơn 0'),
-  
+
     dieuKien: yup
       .string()
       .required('Điều kiện là bắt buộc')
@@ -84,12 +84,12 @@ function PhieuGiamGiaConfiguration() {
         const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
         return bigNumberValue.isGreaterThan(10);
       }),
-  
+
     tuNgay: yup
       .date()
       .min(new Date(), 'Từ ngày phải là ngày trong tương lai')
       .required('Từ ngày là bắt buộc'),
-  
+
     denNgay: yup
       .date()
       .min(yup.ref('tuNgay'), 'Đến ngày phải sau từ ngày')
@@ -109,7 +109,7 @@ function PhieuGiamGiaConfiguration() {
         result = await getSearchKeyWord(currentPage - 1, searchKeyWord);
       } else if (selectHangKhachHang !== '' && searchKeyWord == "") {
         result = await getSelectHangKhachHang(currentPage - 1, selectHangKhachHang);
-      } else if(selectHangKhachHang == '' && searchKeyWord ==""){
+      } else if (selectHangKhachHang == '' && searchKeyWord == "") {
         result = await getAll(currentPage - 1);
       }
       setKhachHang(result.content);
@@ -705,17 +705,17 @@ function PhieuGiamGiaConfiguration() {
                 </FormControl>
               </Grid>
               <Fab
-  color="primary"
-  aria-label="back"
-  sx={{
-    position: 'fixed',
-    bottom: 16,
-    right: 16,
-  }}
-  onClick={handleNavigate}
->
-  <ArrowBackIcon />  {/* Icon quay lại */}
-</Fab>
+                color="primary"
+                aria-label="back"
+                sx={{
+                  position: 'fixed',
+                  bottom: 16,
+                  right: 16,
+                }}
+                onClick={handleNavigate}
+              >
+                <ArrowBackIcon />
+              </Fab>
             </Grid>
           </Box>
           <TableContainer>

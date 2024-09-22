@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import {
-    MenuItem, Select, Divider, FormControl, Chip, Snackbar, Alert, Dialog, DialogActions, DialogContent,
+    Fab, Select, Divider, FormControl, Chip, Snackbar, Alert, Dialog, DialogActions, DialogContent,
     DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead,
     Table, TableContainer, Typography, TextField, Grid, Paper, Button, InputAdornment, IconButton, Tabs, Tab
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import axios from 'axios';
@@ -36,7 +37,7 @@ function DotGiamGiaConfiguration() {
     }, [currentPage, pageSize]);
 
     useEffect(() => {
-        if (location.pathname.includes('/view') || id) {
+        if (location.pathname.includes('/dotgiamgia/cauhinhdotgiamgia/view')) {
             setIsChiTietPage(true);
         } else {
             setIsChiTietPage(false);
@@ -44,9 +45,37 @@ function DotGiamGiaConfiguration() {
     }, [location, id]);
 
     useEffect(() => {
-        loadData(currentPage, pageSize);
+        const fetchSanPhamChiTiet = async () => {
+            debugger;
+            try {
+                const fetchedSanPhamChiTiet = await Promise.all(
+                    selectedSanPham.map(async (sanPhamId) => {
+                        const response = await getDataProductsDetail(sanPhamId);
+                        return { sanPhamId, productDetails: response.data.data };
+                    })
+                );
+                setSanPhamChiTiet(prevState => {
+                    const updatedState = { ...prevState };
+                    fetchedSanPhamChiTiet.forEach(({ sanPhamId, productDetails }) => {
+                        updatedState[sanPhamId] = productDetails;
+                    });
+                    return updatedState;
+                });
+            } catch (error) {
+                setSnackbar({ open: true, message: 'Lỗi khi tải sản phẩm chi tiết', severity: 'error' });
+            }
+        };
+
+        if (selectedSanPham.length > 0) {
+            fetchSanPhamChiTiet();
+        }
+    }, [selectedSanPham]);
+
+    useEffect(() => {
         fetchDggDetail(id);
-      }, [id]);
+        loadData(currentPage, pageSize);
+
+    }, [id]);
 
     const loadData = async (page, pageSize) => {
         setLoading(true);
@@ -66,45 +95,54 @@ function DotGiamGiaConfiguration() {
         setCurrentPage(newPage);
     };
 
+    const handleNavigate = () => {
+        navigate('/dotgiamgia/danhsachdotgiamgia');
+    };
+
     const handleSelectSanPham = async (sanPhamId) => {
+        debugger;
         setSelectedSanPham((prev) => {
-            if (prev.includes(sanPhamId)) {
-                return prev.filter((id) => id !== sanPhamId);
-            } else {
-                return [...prev, sanPhamId];
+            const newSelected = prev.includes(sanPhamId)
+                ? prev.filter((id) => id !== sanPhamId)
+                : [...prev, sanPhamId];
+            if (!sanPhamChiTiet[sanPhamId]) {
+                (async () => {
+                    try {
+                        const response = await getDataProductsDetail(sanPhamId);
+                        const productDetails = response.data.data;
+                        setSanPhamChiTiet((prev) => ({
+                            ...prev,
+                            [sanPhamId]: productDetails,
+                        }));
+                    } catch (error) {
+                        setSnackbar({ open: true, message: 'Lỗi khi tải sản phẩm chi tiết', severity: 'error' });
+                    }
+                })();
             }
-        });
 
-        if (!sanPhamChiTiet[sanPhamId]) {
-            try {
-                const response = await getDataProductsDetail(sanPhamId);
-                const productDetails = response.data.data;
-                setSanPhamChiTiet((prev) => ({
-                    ...prev,
-                    [sanPhamId]: productDetails,
-                }));
-            } catch (error) {
-                setSnackbar({ open: true, message: 'Lỗi khi tải sản phẩm chi tiết', severity: 'error' });
-            }
-        }
+            return newSelected;
+        });
     };
 
-    const handleSelectSanPhamChiTiet = (sanPhamId, sanPhamChiTietItemId) => {
-        setSelectedSanPhamChiTiet((prev) => {
-            const chiTietIds = prev[sanPhamId] || [];
-            if (chiTietIds.includes(sanPhamChiTietItemId)) {
+    const handleSelectSanPhamChiTiet = (sanPhamId, sanPhamChiTietItem) => {
+        debugger;
+        setSelectedSanPhamChiTiet((prevState) => {
+            const currentItems = prevState[sanPhamId] || [];
+
+            if (currentItems.includes(sanPhamChiTietItem.id)) {
                 return {
-                    ...prev,
-                    [sanPhamId]: chiTietIds.filter((id) => id !== sanPhamChiTietItemId),
+                    ...prevState,
+                    [sanPhamId]: currentItems.filter(id => id !== sanPhamChiTietItem.id),
                 };
             } else {
                 return {
-                    ...prev,
-                    [sanPhamId]: [...chiTietIds, sanPhamChiTietItemId],
+                    ...prevState,
+                    [sanPhamId]: [...currentItems, sanPhamChiTietItem.id],
                 };
             }
         });
     };
+
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
@@ -168,7 +206,6 @@ function DotGiamGiaConfiguration() {
                 debugger;
                 setIsSubmitting(true);
                 const listSanPhamChiTiet = Object.values(selectedSanPhamChiTiet).flat();
-                const listIdSanPhamChiTiet = listSanPhamChiTiet.map(sanPham => sanPham.id);
                 const data = {
                     ten: values.tenPhieu,
                     moTa: values.moTa,
@@ -176,7 +213,7 @@ function DotGiamGiaConfiguration() {
                     loaiChietKhau: currencyType === '%' ? 1 : 2,
                     thoiGianBatDau: addSeconds(values.tuNgay),
                     thoiGianKetThuc: addSeconds(values.denNgay),
-                    listSanPhamChiTiet: listIdSanPhamChiTiet
+                    listSanPhamChiTiet: listSanPhamChiTiet
                 }
 
                 let response;
@@ -187,6 +224,9 @@ function DotGiamGiaConfiguration() {
                     response = await axios.post('http://localhost:8080/api/v1/discounts/add', data);
                     setSnackbar({ open: true, message: 'Đợt giảm giá đã được tạo thành công!', severity: 'success' });
                 }
+                setTimeout(() => {
+                    navigate('/dotgiamgia/danhsachdotgiamgia');
+                }, 3000);
             } catch (error) {
                 console.log(error);
                 setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
@@ -211,9 +251,10 @@ function DotGiamGiaConfiguration() {
 
     const fetchDggDetail = async () => {
         try {
+            debugger
             const response = await axios.get(`http://localhost:8080/api/v1/discounts/${id}`);
             const data = response.data;
-            
+
             formik.setValues({
                 stat: data.trangThai,
                 maPhieu: data.ma,
@@ -223,35 +264,37 @@ function DotGiamGiaConfiguration() {
                 tuNgay: data.thoiGianBatDau,
                 denNgay: data.thoiGianKetthuc
             });
-            debugger;
+
             setCurrencyType(data.loaiChietKhau === 1 ? '%' : "$");
-            
+
             const sanPhamChiTietIds = data.spctDotGiamGias || [];
-            
-            // Lấy chi tiết sản phẩm và sản phẩm tương ứng
             const sanPhamChiTietData = await Promise.all(
                 sanPhamChiTietIds.map(async (idSanPhamChiTiet) => {
                     const spctResponse = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSanPhamChiTiet}`);
-                    return spctResponse.data.data; // Truy cập vào `data` của response
+                    return spctResponse.data.data;
                 })
             );
-            
-            // Tạo danh sách sản phẩm và sản phẩm chi tiết
-            const sanPhamIds = sanPhamChiTietData.map(item => item.sanPham.id); // Lấy id sản phẩm từ `sanPham`
+
+            const sanPhamIds = sanPhamChiTietData
+                .map(item => parseInt(item.sanPhamId))  // Chuyển chuỗi thành số nguyên
+                .filter((value, index, self) =>
+                    !isNaN(value) && self.indexOf(value) === index
+                );
+
             const selectedSanPhamChiTietData = sanPhamChiTietData.reduce((acc, item) => {
-                acc[item.sanPham.id] = acc[item.sanPham.id] ? [...acc[item.sanPham.id], item.id] : [item.id];
+                if (!acc[item.sanPhamId]) {
+                    acc[item.sanPhamId] = [];
+                }
+                acc[item.sanPhamId].push(item.id);
                 return acc;
             }, {});
-    
-            // Cập nhật state
             setSelectedSanPham(sanPhamIds);
             setSelectedSanPhamChiTiet(selectedSanPhamChiTietData);
-    
+
         } catch (error) {
             console.error('Error fetching DGG detail:', error);
         }
     };
-    
 
     return (
         <Grid container spacing={2}>
@@ -416,15 +459,28 @@ function DotGiamGiaConfiguration() {
                     </Box>
                 </Paper>
 
-
+                <Fab
+                    color="primary"
+                    aria-label="back"
+                    sx={{
+                        position: 'fixed',
+                        bottom: 16,
+                        right: 16,
+                    }}
+                    onClick={handleNavigate}
+                >
+                    <ArrowBackIcon />  {/* Icon quay lại */}
+                </Fab>
             </Grid>
             <Box sx={{ marginTop: 4 }}>
                 <Tabs value={tabIndex} onChange={handleTabChange}>
-                    {selectedSanPham.map(sanPhamId => (
-                        <Tab key={sanPhamId} label={`Sản phẩm ${sanPhamId}`} />
-                    ))}
+                    {selectedSanPham.map(sanPhamId => {
+                        const sanPham = sanPhamList.find(sp => sp.id === sanPhamId);
+                        return (
+                            <Tab key={sanPhamId} label={sanPham ? `Sản phẩm: ${sanPham.ten}` : `Sản phẩm ${sanPhamId}`} />
+                        );
+                    })}
                 </Tabs>
-
                 {selectedSanPham.map(sanPhamId => (
                     tabIndex === selectedSanPham.indexOf(sanPhamId) && (
                         <Box key={sanPhamId} sx={{ marginTop: 2 }}>
@@ -452,7 +508,7 @@ function DotGiamGiaConfiguration() {
                                             <TableRow key={sanPhamChiTietItem.id}>
                                                 <TableCell>
                                                     <Checkbox
-                                                        checked={(selectedSanPhamChiTiet[sanPhamId] || []).some(item => item.id === sanPhamChiTietItem.id)}
+                                                        checked={selectedSanPhamChiTiet[sanPhamId]?.includes(sanPhamChiTietItem.id) || false}
                                                         onChange={() => handleSelectSanPhamChiTiet(sanPhamId, sanPhamChiTietItem)}
                                                     />
                                                 </TableCell>

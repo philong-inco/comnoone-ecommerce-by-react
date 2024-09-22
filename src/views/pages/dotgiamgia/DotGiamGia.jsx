@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Radio, FormControlLabel, RadioGroup, FormLabel, FormControl,
+     FormControl,
     TextField, Grid, IconButton, Tooltip, Box, Table, TableBody, Fab, InputAdornment, InputLabel,
     TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Snackbar, Alert, MenuItem, Select
 } from '@mui/material';
@@ -40,13 +40,13 @@ function DotGiamGia() {
     };
 
     useEffect(() => {
+        fetchCoupons(currentPage);
         const intervalId = setInterval(() => {
-            fetchCoupons();
+            fetchCoupons(currentPage);
         }, 2000);
-
+    
         return () => clearInterval(intervalId); 
-    }, []); 
-
+    }, [currentPage]);
     
     useEffect(() => {
         fetchCoupons();

@@ -54,7 +54,7 @@ const KhachHangAddress = Loadable(lazy(() => import('views/pages/khachhang/Khach
 const CalendarWork = Loadable(lazy(() => import('views/pages/calendarwork/Calendarwork.jsx')));
 // ==============================|| ĐỢT GIẢM GIÁ ||============================== //
 const DanhSachDotGiamGia = Loadable(lazy(() => import('views/pages/dotgiamgia/DotGiamGia.jsx')));
-const DotGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/dotgiamgia/DotGiamGiaConfiguration.jsx')));
+const DotGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/dotgiamgia/DotGiamGiaConfiguation.jsx')));
 // hóa đơn
 const Bill = Loadable(lazy(() => import('views/pages/bill/index.jsx')));
 const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetail.jsx')));
