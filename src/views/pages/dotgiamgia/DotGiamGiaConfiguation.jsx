@@ -477,7 +477,7 @@ function DotGiamGiaConfiguration() {
                     {selectedSanPham.map(sanPhamId => {
                         const sanPham = sanPhamList.find(sp => sp.id === sanPhamId);
                         return (
-                            <Tab key={sanPhamId} label={sanPham ? `Sản phẩm: ${sanPham.ten}` : `Sản phẩm ${sanPhamId}`} />
+                            <Tab key={sanPhamId} label={sanPham ? `${sanPham.ten}` : `Sản phẩm ${sanPhamId}`} />
                         );
                     })}
                 </Tabs>
@@ -489,7 +489,6 @@ function DotGiamGiaConfiguration() {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Chọn</TableCell>
-                                            <TableCell>Mã</TableCell>
                                             <TableCell>Giá bán</TableCell>
                                             <TableCell>Bàn phím</TableCell>
                                             <TableCell>CPU</TableCell>
@@ -497,7 +496,6 @@ function DotGiamGiaConfiguration() {
                                             <TableCell>Màn hình</TableCell>
                                             <TableCell>Màu sắc</TableCell>
                                             <TableCell>RAM</TableCell>
-                                            <TableCell>Sản phẩm</TableCell>
                                             <TableCell>VGA</TableCell>
                                             <TableCell>Webcam</TableCell>
                                             <TableCell>Trạng thái</TableCell>
@@ -512,7 +510,6 @@ function DotGiamGiaConfiguration() {
                                                         onChange={() => handleSelectSanPhamChiTiet(sanPhamId, sanPhamChiTietItem)}
                                                     />
                                                 </TableCell>
-                                                <TableCell>{sanPhamChiTietItem.ma}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.giaBan}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.banPhim}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.cpu}</TableCell>
@@ -520,7 +517,6 @@ function DotGiamGiaConfiguration() {
                                                 <TableCell>{sanPhamChiTietItem.manHinh}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.mauSac}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.ram}</TableCell>
-                                                <TableCell>{sanPhamChiTietItem.sanPham}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.vga}</TableCell>
                                                 <TableCell>{sanPhamChiTietItem.webcam}</TableCell>
                                                 <TableCell> <Box
