@@ -28,7 +28,12 @@ import {
     RadioGroup,
     Alert,
     Radio,
-    FormControlLabel 
+    FormControlLabel,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
 } from '@mui/material';
 const schema = Yup.object().shape({
     ten: Yup.string().required('Họ và tên không được để trống').max(255, 'Tên không được vượt quá 255 ký tự').typeError("Tên xảy ra lỗi !"),
@@ -61,7 +66,23 @@ function NhanVienConfiguration() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [formData, setFormData] = useState({});
     const navigate = useNavigate();
+    const [openDialog, setOpenDialog] = useState(false);
+    const handleOpenDialog = (data) => {
+        setFormData(data);
+        setOpenDialog(true); 
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const handleConfirmSubmit = async () => {
+        console.log('Dữ liệu form:', formData);
+        setOpenDialog(false);
+        await onSubmit(formData);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -185,12 +206,15 @@ function NhanVienConfiguration() {
             const response = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
             const nhanVienData = response.data;
             const responseVaiTro = await axios.get(`http://localhost:8080/api/vaitro/findbynhanvien/${response.data.id}`)
+            const gioiTinhString = nhanVienData.gioiTinh !== undefined ? nhanVienData.gioiTinh.toString() : "1";
+            console.log("Giới tính sau khi convert: ", gioiTinhString);
+            setValue('gioi_tinh', gioiTinhString);
             setValue('ten', nhanVienData.ten);
             setValue('sdt', nhanVienData.sdt);
             setValue('email', nhanVienData.email);
             setValue('tai_khoan_ngan_hang', nhanVienData.taiKhoanNganHang);
             setValue('hinh_anh', nhanVienData.hinhAnh);
-            setValue('gioi_tinh', nhanVienData.gioiTinh.toString());
+
             if (nhanVienData.hinhAnh) {
                 setImageUrl(nhanVienData.hinhAnh);
             } else {
@@ -311,7 +335,7 @@ function NhanVienConfiguration() {
             formData.list_vai_tro = selectedRoles;
 
             await schema.validate(formData);
-
+            debugger;
             const url = id ? `http://localhost:8080/api/nhan_vien/update/${id}` : 'http://localhost:8080/api/nhan_vien/create';
             const method = id ? 'put' : 'post';
 
@@ -373,291 +397,319 @@ function NhanVienConfiguration() {
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
                 {id ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên mới'}
             </Typography>
-            <form onSubmit={handleSubmit(onSubmit)}>
-    <Grid container spacing={3}>
-        {/* Hình ảnh đại diện */}
-        <Grid item xs={12} md={4}>
-            <Box display="flex" flexDirection="column" alignItems="center" height="100%">
-                {imageUrl ? (
-                    <img
-                        src={imageUrl}
-                        alt="Ảnh đại diện"
-                        style={{
-                            width: '250px',
-                            height: '250px',
-                            objectFit: 'cover',
-                            cursor: 'pointer',
-                            borderRadius: '50%',
-                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                            transition: 'all 0.3s ease',
-                        }}
-                        onClick={openCloudinaryWidget}
-                    />
-                ) : (
-                    <img
-                        src='../src/assets/images/images.jpg'
-                        alt="Ảnh đại diện"
-                        style={{
-                            width: '250px',
-                            height: '250px',
-                            objectFit: 'cover',
-                            cursor: 'pointer',
-                            borderRadius: '50%',
-                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                            transition: 'all 0.3s ease',
-                        }}
-                        onClick={openCloudinaryWidget}
-                    />
-                )}
-            </Box>
-        </Grid>
-
-        {/* Thông tin người dùng */}
-        <Grid item xs={12} md={8}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                    <Controller
-                        name="ten"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                fullWidth
-                                label="Họ và tên"
-                                variant="outlined"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                                error={!!errors.ten}
-                                helperText={errors.ten?.message}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Controller
-                        name="sdt"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                fullWidth
-                                label="Số điện thoại"
-                                variant="outlined"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                                error={!!errors.sdt}
-                                helperText={errors.sdt?.message}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                    <Controller
-                        name="email"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                fullWidth
-                                label="Email"
-                                variant="outlined"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                    <Controller
-                        name="ngay_sinh"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                type="date"
-                                fullWidth
-                                label="Ngày sinh"
-                                variant="outlined"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                                error={!!errors.ngay_sinh}
-                                helperText={errors.ngay_sinh?.message}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
-                </Grid>
-
-                {/* Giới tính */}
-                <Grid item xs={12} md={6}>
-                    <FormControl component="fieldset" error={!!errors.gioi_tinh}>
-                        <FormLabel component="legend">Giới tính *</FormLabel>
-                        <Controller
-                            name="gioi_tinh"
-                            control={control}
-                            render={({ field }) => (
-                                <RadioGroup {...field} row>
-                                    <FormControlLabel value="1" control={<Radio />} label="Nam" />
-                                    <FormControlLabel value="0" control={<Radio />} label="Nữ" />
-                                </RadioGroup>
+            <form onSubmit={handleSubmit(handleOpenDialog)}>
+                <Grid container spacing={3}>
+                    {/* Hình ảnh đại diện */}
+                    <Grid item xs={12} md={4}>
+                        <Box display="flex" flexDirection="column" alignItems="center" height="100%">
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt="Ảnh đại diện"
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
+                                />
+                            ) : (
+                                <img
+                                    src='../src/assets/images/images.jpg'
+                                    alt="Ảnh đại diện"
+                                    style={{
+                                        width: '250px',
+                                        height: '250px',
+                                        objectFit: 'cover',
+                                        cursor: 'pointer',
+                                        borderRadius: '50%',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        transition: 'all 0.3s ease',
+                                    }}
+                                    onClick={openCloudinaryWidget}
+                                />
                             )}
-                        />
-                        {errors.gioi_tinh && <FormHelperText>{errors.gioi_tinh.message}</FormHelperText>}
-                    </FormControl>
-                </Grid>
+                        </Box>
+                    </Grid>
 
-                {/* Vai trò */}
-                <Grid item xs={12} md={6}>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel>Vai trò</InputLabel>
-                        <Controller
-                            name="list_vai_tro"
-                            control={control}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    multiple
-                                    value={selectedRoles}
-                                    onChange={(e) => setSelectedRoles(e.target.value)}
-                                    renderValue={(selected) => (
-                                        <div>
-                                            {selected.map((value) => (
-                                                <Chip key={value} label={roles.find((role) => role.ten === value)?.ten} />
-                                            ))}
-                                        </div>
-                                    )}
-                                >
-                                    {roles.map((role) => (
-                                        <MenuItem key={role.ten} value={role.ten}>
-                                            <Checkbox checked={selectedRoles.indexOf(role.ten) > -1} />
-                                            <ListItemText primary={role.ten} />
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            )}
-                        />
-                    </FormControl>
-                </Grid>
-
-                {/* Địa chỉ */}
-                <Grid item xs={12}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={4}>
-                            <FormControl fullWidth sx={{ mb: 2 }}>
-                                <InputLabel>Tỉnh/Thành Phố *</InputLabel>
+                    {/* Thông tin người dùng */}
+                    <Grid item xs={12} md={8}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} md={6}>
                                 <Controller
-                                    name="province"
+                                    name="ten"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select
+                                        <TextField
+                                            fullWidth
+                                            label="Họ và tên"
+                                            variant="outlined"
+                                            InputLabelProps={{ shrink: true }}
                                             {...field}
-                                            value={selectedProvince}
-                                            onChange={(e) => setSelectedProvince(e.target.value)}
-                                        >
-                                            {provinces.map((province) => (
-                                                <MenuItem key={province.id} value={province.id}>
-                                                    {province.name}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
+                                            error={!!errors.ten}
+                                            helperText={errors.ten?.message}
+                                            sx={{ mb: 2 }}
+                                        />
                                     )}
                                 />
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12} md={4}>
-                            <FormControl fullWidth sx={{ mb: 2 }}>
-                                <InputLabel>Quận/Huyện *</InputLabel>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
                                 <Controller
-                                    name="district"
+                                    name="sdt"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select
+                                        <TextField
+                                            fullWidth
+                                            label="Số điện thoại"
+                                            variant="outlined"
+                                            InputLabelProps={{ shrink: true }}
                                             {...field}
-                                            value={selectedDistrict}
-                                            onChange={(e) => setSelectedDistrict(e.target.value)}
-                                        >
-                                            <MenuItem value="">Chọn quận/huyện</MenuItem>
-                                            {districts.map((district) => (
-                                                <MenuItem key={district.id} value={district.id}>
-                                                    {district.ten}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
+                                            error={!!errors.sdt}
+                                            helperText={errors.sdt?.message}
+                                            sx={{ mb: 2 }}
+                                        />
                                     )}
                                 />
-                            </FormControl>
-                        </Grid>
+                            </Grid>
 
-                        <Grid item xs={12} md={4}>
-                            <FormControl fullWidth sx={{ mb: 2 }}>
-                                <InputLabel>Phường/Xã *</InputLabel>
+                            <Grid item xs={12} md={6}>
                                 <Controller
-                                    name="ward"
+                                    name="email"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select
+                                        <TextField
+                                            fullWidth
+                                            label="Email"
+                                            variant="outlined"
+                                            InputLabelProps={{ shrink: true }}
                                             {...field}
-                                            value={selectedWard}
-                                            onChange={(e) => setSelectedWard(e.target.value)}
-                                        >
-                                            <MenuItem value="">Chọn phường/xã</MenuItem>
-                                            {wards.map((ward) => (
-                                                <MenuItem key={ward.id} value={ward.id}>
-                                                    {ward.ten}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
+                                            error={!!errors.email}
+                                            helperText={errors.email?.message}
+                                            sx={{ mb: 2 }}
+                                        />
                                     )}
                                 />
-                            </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <Controller
+                                    name="ngay_sinh"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextField
+                                            type="date"
+                                            fullWidth
+                                            label="Ngày sinh"
+                                            variant="outlined"
+                                            InputLabelProps={{ shrink: true }}
+                                            {...field}
+                                            error={!!errors.ngay_sinh}
+                                            helperText={errors.ngay_sinh?.message}
+                                            sx={{ mb: 2 }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <FormControl component="fieldset" error={!!errors.gioi_tinh}>
+                                    <FormLabel component="legend">Giới tính *</FormLabel>
+                                    <Controller
+                                        name="gioi_tinh"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <RadioGroup
+                                                {...field}
+                                                value={field.value || ''} // Giá trị từ form
+                                                onChange={(e) => field.onChange(e.target.value)} // Cập nhật giá trị khi thay đổi
+                                                row
+                                            >
+                                                <FormControlLabel value="1" control={<Radio />} label="Nam" />
+                                                <FormControlLabel value="0" control={<Radio />} label="Nữ" />
+                                            </RadioGroup>
+                                        )}
+                                    />
+                                    {errors.gioi_tinh && <FormHelperText>{errors.gioi_tinh.message}</FormHelperText>}
+                                </FormControl>
+                            </Grid>
+
+
+
+                            {/* Vai trò */}
+                            <Grid item xs={12} md={6}>
+                                <FormControl fullWidth sx={{ mb: 2 }}>
+                                    <InputLabel>Vai trò</InputLabel>
+                                    <Controller
+                                        name="list_vai_tro"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                {...field}
+                                                multiple
+                                                value={selectedRoles}
+                                                onChange={(e) => setSelectedRoles(e.target.value)}
+                                                renderValue={(selected) => (
+                                                    <div>
+                                                        {selected.map((value) => (
+                                                            <Chip key={value} label={roles.find((role) => role.ten === value)?.ten} />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            >
+                                                {roles.map((role) => (
+                                                    <MenuItem key={role.ten} value={role.ten}>
+                                                        <Checkbox checked={selectedRoles.indexOf(role.ten) > -1} />
+                                                        <ListItemText primary={role.ten} />
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            {/* Địa chỉ */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} md={4}>
+                                        <FormControl fullWidth sx={{ mb: 2 }}>
+                                            <InputLabel>Tỉnh/Thành Phố *</InputLabel>
+                                            <Controller
+                                                name="province"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        value={selectedProvince}
+                                                        onChange={(e) => setSelectedProvince(e.target.value)}
+                                                    >
+                                                        {provinces.map((province) => (
+                                                            <MenuItem key={province.id} value={province.id}>
+                                                                {province.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                )}
+                                            />
+                                        </FormControl>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={4}>
+                                        <FormControl fullWidth sx={{ mb: 2 }}>
+                                            <InputLabel>Quận/Huyện *</InputLabel>
+                                            <Controller
+                                                name="district"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        value={selectedDistrict}
+                                                        onChange={(e) => setSelectedDistrict(e.target.value)}
+                                                    >
+                                                        <MenuItem value="">Chọn quận/huyện</MenuItem>
+                                                        {districts.map((district) => (
+                                                            <MenuItem key={district.id} value={district.id}>
+                                                                {district.ten}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                )}
+                                            />
+                                        </FormControl>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={4}>
+                                        <FormControl fullWidth sx={{ mb: 2 }}>
+                                            <InputLabel>Phường/Xã *</InputLabel>
+                                            <Controller
+                                                name="ward"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        {...field}
+                                                        value={selectedWard}
+                                                        onChange={(e) => setSelectedWard(e.target.value)}
+                                                    >
+                                                        <MenuItem value="">Chọn phường/xã</MenuItem>
+                                                        {wards.map((ward) => (
+                                                            <MenuItem key={ward.id} value={ward.id}>
+                                                                {ward.ten}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                )}
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            {/* Địa chỉ chi tiết */}
+                            <Grid item xs={12}>
+                                <Controller
+                                    name="dia_chi"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            label="Địa chỉ"
+                                            multiline
+                                            rows={4}
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            error={!!errors.dia_chi}
+                                            helperText={errors.dia_chi?.message}
+                                            sx={{ mb: 2 }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
 
-                {/* Địa chỉ chi tiết */}
-                <Grid item xs={12}>
-                    <Controller
-                        name="dia_chi"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                label="Địa chỉ"
-                                multiline
-                                rows={4}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                error={!!errors.dia_chi}
-                                helperText={errors.dia_chi?.message}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
+                    {/* Nút Lưu */}
+                    <Grid item xs={12}>
+                        <Box display="flex" justifyContent="center">
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                style={{ width: '150px' }}
+                            >
+                                {loading ? <CircularProgress size={24} /> : 'Lưu'}
+                            </Button>
+                        </Box>
+                        {error && <FormHelperText error>{error}</FormHelperText>}
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Grid>
-
-        {/* Nút Lưu */}
-        <Grid item xs={12}>
-                    <Box display="flex" justifyContent="center">
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            style={{ width: '150px' }}
-                        >
-                            {loading ? <CircularProgress size={24} /> : 'Lưu'}
-                        </Button>
-                    </Box>
-                    {error && <FormHelperText error>{error}</FormHelperText>}
-                </Grid>
-    </Grid>
-</form>
-
+            </form>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {formData.id ? 'Xác nhận cập nhật nhân viên' : 'Xác nhận thêm nhân viên'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {formData.id ? 'Bạn có chắc chắn muốn cập nhật thông tin nhân viên này?' : 'Bạn có chắc chắn muốn thêm nhân viên này?'}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                        Hủy
+                    </Button>
+                    <Button onClick={handleConfirmSubmit} color="primary" autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Snackbar
                 open={snackbarOpen}

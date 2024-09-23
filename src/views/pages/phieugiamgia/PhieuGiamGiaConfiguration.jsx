@@ -74,8 +74,8 @@ function PhieuGiamGiaConfiguration() {
     soLuong: yup
       .number('Chỉ được nhập số')
       .required('Số lượng là bắt buộc')
-      .positive('Số lượng phải lớn hơn 0'),
-
+      .positive('Số lượng phải lớn hơn 0')
+      .integer('Số lượng phải là số nguyên'),
     dieuKien: yup
       .string()
       .required('Điều kiện là bắt buộc')
@@ -268,6 +268,15 @@ function PhieuGiamGiaConfiguration() {
           });
           return;
         }
+
+        if(values.kieu === '2' && selectedKhachHang.length < 1){
+          setSnackbar({
+            open: true,
+            message: `Vui lòng chọn khách hàng cho phiếu giảm giá.`,
+            severity: 'error',
+          });
+          return;
+        }
         debugger;
         const data = {
           ten: values.tenPhieu,
@@ -293,13 +302,20 @@ function PhieuGiamGiaConfiguration() {
           navigate('/phieugiamgia/danhsachphieugiamgia');
         }, 3000);
       } catch (error) {
-        console.log(error);
-        setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+        const errorMessage = error.response?.data?.error || 'Đã xảy ra lỗi!';
+        const extractedMessage = errorMessage.split(':')[1].split(':')[0].trim();
+        setSnackbar({
+          open: true,
+          message: `Lỗi: ${extractedMessage}`,
+          severity: 'error',
+        });
       } finally {
         setIsSubmitting(false);
       }
     },
   });
+
+  
 
   const handleCurrencyChange = (type) => {
     setCurrencyType(type);
@@ -455,7 +471,7 @@ function PhieuGiamGiaConfiguration() {
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
-                  label="Giá trị phiếu"
+                  label="Giá trị giảm giá"
                   name="giaTri"
                   fullWidth
                   margin="normal"
@@ -494,7 +510,7 @@ function PhieuGiamGiaConfiguration() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Giá trị tối đa"
+                  label=" Giá trị giảm giá tối đa"
                   name="giaTriToiDa"
                   fullWidth
                   margin="normal"
@@ -517,7 +533,7 @@ function PhieuGiamGiaConfiguration() {
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
-                  label="Số lượng phiếu"
+                  label="Số lượng"
                   value={formik.values.soLuong}
                   onChange={formik.handleChange}
                   variant="outlined"
@@ -530,7 +546,7 @@ function PhieuGiamGiaConfiguration() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Điều kiện "
+                  label="Giá trị đơn tối thiểu"
                   name="dieuKien"
                   fullWidth
                   margin="normal"
@@ -616,7 +632,7 @@ function PhieuGiamGiaConfiguration() {
 
             </Grid>
             {!isChiTietPage && (
-              <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={handleSubmitWithConfirm}>
+              <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={handleSubmitWithConfirm} disabled={isSubmitting}>
                 Lưu
               </Button>
             )}
@@ -727,7 +743,7 @@ function PhieuGiamGiaConfiguration() {
                       indeterminate={selectedKhachHang.length > 0 && selectedKhachHang.length < khachHang.length}
                       checked={selectAll}
                       onChange={handleSelectAll}
-                      disabled={isChiTietPage}
+                      disabled={isChiTietPage || formik.values.kieu === "1"}
                     />
                   </TableCell>
                   <TableCell>Tên khách hàng</TableCell>
@@ -743,7 +759,7 @@ function PhieuGiamGiaConfiguration() {
                       <Checkbox
                         checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
                         onChange={() => handleSelectKhachHang(row.id)}
-                        disabled={isChiTietPage}
+                        disabled={isChiTietPage || formik.values.kieu === "1"}
                       />
                     </TableCell>
                     <TableCell>{row.ten}</TableCell>
