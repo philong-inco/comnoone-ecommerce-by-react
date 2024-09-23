@@ -22,7 +22,8 @@ import {
     RadioGroup,
     Radio,
     CircularProgress,
-    FormControlLabel
+    FormControlLabel,
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
@@ -38,19 +39,19 @@ const validationSchema = Yup.object().shape({
         .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
         .required('Số điện thoại không được để trống'),
     ngay_sinh: Yup.date()
-    .required('Ngày sinh không được để trống')
-    .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
-    .test('age', 'Khách hàng phải từ 10 tuổi trở lên', value => {
-        if (!value) return false;
-        const today = new Date();
-        const birthDate = new Date(value);
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDifference = today.getMonth() - birthDate.getMonth();
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age >= 10;
-    }),
+        .required('Ngày sinh không được để trống')
+        .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
+        .test('age', 'Khách hàng phải từ 10 tuổi trở lên', value => {
+            if (!value) return false;
+            const today = new Date();
+            const birthDate = new Date(value);
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 10;
+        }),
     gioi_tinh: Yup.number().required('Giới tính không được để trống'),
     hinhAnh: Yup.string(),
 });
@@ -178,6 +179,7 @@ function KhachHangConfiguration() {
     }
 
     const onSubmit = async (data) => {
+        setConfirmDialogOpen(true);
         setLoading(true);
         try {
             debugger;
@@ -208,7 +210,7 @@ function KhachHangConfiguration() {
             })
 
             if (response.status === 200) {
-                setSnackbarMessage('Dữ liệu đã được gửi thành công!');
+                setSnackbarMessage('Dữ liệu khách hàng được thêm thành công!');
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
                 setTimeout(() => {
@@ -218,14 +220,33 @@ function KhachHangConfiguration() {
                 throw new Error('Unexpected response status');
             }
         } catch (error) {
-            setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+            if (error.response && error.response.data && error.response.data.message) {
+                const errorMessage = error.response.data.error;
+                const errorDetails = errorMessage.split(':').pop().trim();
+
+                setSnackbarMessage(errorDetails);
+            } else if (error.response && error.response.data && error.response.data.error) {
+                setSnackbarMessage(error.response.data.error); 
+            } else if (error.message) {
+                setSnackbarMessage(error.message);
+            } else {
+                setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+            }
             setSnackbarSeverity('error');
             setSnackbarOpen(true);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
+    const handleConfirmClose = (isConfirmed) => {
+        setConfirmDialogOpen(false);
+        if (isConfirmed) {
+            onSubmit(); 
+        }
+    };
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
@@ -469,7 +490,7 @@ function KhachHangConfiguration() {
                                 />
                             </Grid>
 
-                            {/* Save Button */}
+                          
                             <Grid item xs={12}>
                                 <Box display="flex" justifyContent="center">
                                     <Button
@@ -497,6 +518,26 @@ function KhachHangConfiguration() {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={() => handleConfirmClose(false)}
+            >
+                <DialogTitle>Xác nhận lưu</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn có chắc chắn muốn lưu thông tin này không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => handleConfirmClose(false)} color="primary">
+                        Hủy
+                    </Button>
+                    <Button onClick={() => handleConfirmClose(true)} color="primary" autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </LocalizationProvider>
     );
 }

@@ -31,7 +31,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  DialogContentText
 } from '@mui/material';
 import { textAlign } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
@@ -129,7 +130,7 @@ function KhachHangAddress() {
   const [openSetDefaultDialog, setOpenSetDefaultDialog] = useState(false);
   const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
   const [defaultAddressId, setDefaultAddressId] = useState(selectedAddress?.isDefault ? selectedAddress.id : null);
-
+  const [formData, setFormData] = useState({});
   useEffect(() => {
     if (isProvincesLoaded && id) {
       fetchKhachHangInfo(id);
@@ -352,9 +353,21 @@ function KhachHangAddress() {
   const handleNavigate = () => {
     navigate('/khachhang/danhsachkhachhang');
   }
+
+  const handleOpenDialog = (data) => {
+    setFormData(data); // Lưu dữ liệu form để xác nhận sau khi nhấn submit
+    setOpenDialog(true); // Mở hộp thoại
+  };
+  
+  // Hàm xác nhận và cập nhật dữ liệu sau khi người dùng chọn "Xác nhận"
+  const handleConfirmUpdateCustomer = async () => {
+    setOpenDialog(false); // Đóng dialog
+    await onSubmit(formData); // Thực hiện submit với dữ liệu đã lưu
+  };
+
   const onSubmit = async (data) => {
     try {
-      let formData = {
+      let updatedData = {
         ten: data.ten,
         sdt: data.sdt,
         email: data.email,
@@ -372,6 +385,7 @@ function KhachHangAddress() {
       if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
+
       if (age < 18) {
         setSnackbarMessage('Tuổi phải lớn hơn hoặc bằng 18!');
         setSnackbarSeverity('error');
@@ -382,17 +396,13 @@ function KhachHangAddress() {
         return;
       }
 
-      await validationSchema.validate(formData);
+      await validationSchema.validate(updatedData);
       const url = `http://localhost:8080/api/khachhang/update/${id}`;
-      const method = 'put'
-      const response = await axios({
-        method: method,
-        url: url,
-        data: formData,
+      const response = await axios.put(url, updatedData, {
         headers: {
           'Content-Type': 'application/json'
         }
-      })
+      });
 
       if (response.status === 200) {
         setSnackbarMessage('Cập nhật thành công khách hàng!');
@@ -408,7 +418,6 @@ function KhachHangAddress() {
       setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
-
       setTimeout(() => {
         handleCloseSnackbar();
       }, 1000);
@@ -551,7 +560,8 @@ function KhachHangAddress() {
         <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center' }}>
           Thông tin khách hàng
         </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleOpenDialog)}>
+
           <Grid container spacing={2}>
             {/* Image Preview */}
             <Grid item xs={12}>
@@ -771,7 +781,6 @@ function KhachHangAddress() {
         <Box sx={{ width: '400px', bgcolor: 'background.paper', p: 4, mx: 'auto', mt: 4 }}>
           <Typography variant="h4">Địa Chỉ Của Tôi</Typography>
           <form onSubmit={handleSubmitAddress(onAddressSubmit)}>
-
             <TextField
               label="ID"
               fullWidth
@@ -928,7 +937,7 @@ function KhachHangAddress() {
       </Dialog>
 
       <Dialog
-         open={openSetDefaultDialog}
+        open={openSetDefaultDialog}
         onClose={() => setOpenSetDefaultDialog(false)}
       >
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
@@ -963,8 +972,22 @@ function KhachHangAddress() {
           </Button>
         </DialogActions>
       </Dialog>
-
-
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Xác nhận cập nhật</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn cập nhật thông tin khách hàng này không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmUpdateCustomer} color="primary" autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
