@@ -19,19 +19,12 @@ const quanLy = {
           type: 'item',
           url: '/hoa-don/danh-sach'
         },
-        // {
-        //   id: 'chi-tiet',
-        //   title: 'Danh sách',
-        //   type: 'item',
-        //   url: '/hoa-don:id'
-        // },
+
         {
           id: 'hoadoncho',
           title: 'Chờ xác nhận',
           type: 'item',
           url: '/hoadon/choxacnhan'
-          // nếu muốn ẩn điều hướng thì đặt thêm thuộc tính breadcrumbs: false
-          // nếu muốn bấm vào mở ra tab mới thì thêm target: true
         },
         {
           id: 'danhsachhoadon',
@@ -117,20 +110,13 @@ const quanLy = {
       children: [
         {
           id: 'phieugiamgia-danhsach',
-          title: 'Danh sách phiếu giảm giá',
+          title: 'Phiếu giảm giá',
           type: 'item',
           url: '/phieugiamgia/danhsachphieugiamgia'
         },
         {
-          id: 'phieugiamgia-cauhinh',
-          title: 'Cấu hình phiếu giảm giá',
-          type: 'item',
-          url: '/phieugiamgia/cauhinhphieugiamgia'
-        }
-        ,
-        {
           id: 'dotgiamgia-danhsach',
-          title: 'Danh sách đợt giảm giá',
+          title: 'Đợt giảm giá',
           type: 'item',
           url: '/dotgiamgia/danhsachdotgiamgia'
         }
