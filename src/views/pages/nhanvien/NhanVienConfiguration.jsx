@@ -71,7 +71,7 @@ function NhanVienConfiguration() {
     const [openDialog, setOpenDialog] = useState(false);
     const handleOpenDialog = (data) => {
         setFormData(data);
-        setOpenDialog(true); 
+        setOpenDialog(true);
     };
 
     const handleCloseDialog = () => {
@@ -368,9 +368,15 @@ function NhanVienConfiguration() {
             }
             console.log(response);
         } catch (error) {
-            setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            const errorMessage = error.response?.data?.error
+                ? translateErrorMessage(error.response.data.message)
+                : 'Đã xảy ra lỗi khi xử lý yêu cầu!';
+
+                setSnackbar({
+                    open: true,
+                    message: `Lỗi: ${errorMessage}`,
+                    severity: 'error',
+                  });
         } finally {
             setLoading(false);
         }

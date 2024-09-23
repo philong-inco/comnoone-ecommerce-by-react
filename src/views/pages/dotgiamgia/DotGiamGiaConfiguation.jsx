@@ -385,6 +385,7 @@ function DotGiamGiaConfiguration() {
                             fullWidth
                             margin="normal"
                             value={formik.values.moTa}
+                            InputLabelProps={{ shrink: true }}
                             onChange={formik.handleChange}
                             error={formik.touched.moTa && Boolean(formik.errors.moTa)}
                             helperText={formik.touched.moTa && formik.errors.moTa}
@@ -432,6 +433,7 @@ function DotGiamGiaConfiguration() {
                                                     <Checkbox
                                                         checked={selectedSanPham.includes(sanPham.id)}
                                                         onChange={() => handleSelectSanPham(sanPham.id)}
+                                                        disabled={isChiTietPage}
                                                     />
                                                 </TableCell>
                                             </TableRow>
@@ -508,6 +510,7 @@ function DotGiamGiaConfiguration() {
                                                     <Checkbox
                                                         checked={selectedSanPhamChiTiet[sanPhamId]?.includes(sanPhamChiTietItem.id) || false}
                                                         onChange={() => handleSelectSanPhamChiTiet(sanPhamId, sanPhamChiTietItem)}
+                                                        disabled={isChiTietPage}
                                                     />
                                                 </TableCell>
                                                 <TableCell>{sanPhamChiTietItem.giaBan}</TableCell>
