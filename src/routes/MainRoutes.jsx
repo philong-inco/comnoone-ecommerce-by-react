@@ -52,7 +52,9 @@ const KhachHangConfiguration = Loadable(lazy(() => import('views/pages/khachhang
 const KhachHangAddress = Loadable(lazy(() => import('views/pages/khachhang/KhachHangAddress.jsx')));
 // ==============================|| CALENDA WORK ||============================== //
 const CalendarWork = Loadable(lazy(() => import('views/pages/calendarwork/Calendarwork.jsx')));
-
+// ==============================|| ĐỢT GIẢM GIÁ ||============================== //
+const DanhSachDotGiamGia = Loadable(lazy(() => import('views/pages/dotgiamgia/DotGiamGia.jsx')));
+const DotGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/dotgiamgia/DotGiamGiaConfiguation.jsx')));
 // hóa đơn
 const Bill = Loadable(lazy(() => import('views/pages/bill/index.jsx')));
 const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetail.jsx')));
@@ -290,6 +292,27 @@ const MainRoutes = {
         {
           path: 'chitietphieugiamgia/:id',
           element: <PhieuGiamGiaConfiguration />
+        }
+      ]
+    },
+    {
+      path: 'dotgiamgia',
+      children: [
+        {
+          path: 'danhsachdotgiamgia',
+          element: <DanhSachDotGiamGia />
+        },
+        {
+          path: 'cauhinhdotgiamgia',
+          element: <DotGiamGiaConfiguration />
+        },
+        {
+          path: 'cauhinhdotgiamgia/edit/:id',
+          element: <DotGiamGiaConfiguration />
+        },
+        {
+          path: 'cauhinhdotgiamgia/view/:id',
+          element: <DotGiamGiaConfiguration />
         }
       ]
     },
