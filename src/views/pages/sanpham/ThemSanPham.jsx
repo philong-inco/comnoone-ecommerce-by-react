@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import { Button, TextField, Autocomplete, Card, CardMedia, CardContent, Typography, CardActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import ListVariant from '../sanpham/ui-component/ListVariant.jsx';
 import TableVariant from '../sanpham/ui-component/TableVariant.jsx';
 import SelectDropdownForAdd from '../sanpham/ui-component/SelectDropDownForAdd.jsx';
 import AlertDialogSlide from '../sanpham/ui-component/AlertDialogSlide.jsx';
-import SelectDropOneValue from '../sanpham/ui-component/SelectDropOneValue.jsx';
+import SelectDropOneValue from './ui-component/SelectDropOneValue.jsx';
 import { IconCheck } from '@tabler/icons-react';
 import UploadWidget from 'ui-component/cloudinary/UploadWidget.jsx';
-import { width } from '@mui/system';
+import { margin, width } from '@mui/system';
 import { createSanPham } from 'api/sanpham/sanPham.js';
 import { checkToAdd, createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham.js';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification.js';
 
 const ThemSanPham = () => {
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [urlImages, setUrlImages] = useState([]);
+  const [urlImages, setUrlImages] = useState(['https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg','https://photo.znews.vn/w660/Uploaded/mdf_eioxrd/2021_07_06/2.jpg']);
 
   // Data for filters
   const [sanPham, setSanPham] = useState([]);
@@ -52,24 +55,28 @@ const ThemSanPham = () => {
   const [tenSanPham, setTenSanPham] = useState('');
   const [moTa, setMota] = useState('');
 
+
+  // cho phép upload ảnh tiếp
+  const [isValidToUpload, setIsValidToUpload] = useState(true);
+
   useEffect(() => {
     loadAttributes();
   }, []);
 
   const loadAttributes = async () => {
     // get các bảng
-    const sanPhamResult = await axios.get(`http://localhost:8080/api/san-pham/all-list`);
-    const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list`);
-    const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list`);
-    const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list`);
-    const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list`);
-    const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list`);
-    const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list`);
-    const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list`);
-    const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list`);
-    const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list`);
-    const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list`);
-    const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list`);
+    const sanPhamResult = await axios.get(`http://localhost:8080/api/san-pham/all-list-active`);
+    const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
+    const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
+    const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
+    const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
+    const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
+    const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
+    const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
+    const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
+    const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
+    const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
+    const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
 
     setSanPham(sanPhamResult.data.data);
     setNhuCau(nhuCauResult.data.data);
@@ -91,10 +98,18 @@ const ThemSanPham = () => {
   const [resultVariant, setResultVariant] = useState([]); // thằng này nhận kết quả cuối cùng của TableVariant
 
   useEffect(() => {
-    // thực hiện kiểm tra lại các thuộc tính chung và sửa đổi vào result rồi sau đó tạo sản phẩm
-    if (resultVariant.length > 0) {
+    let check = true;
+    if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' ||heDieuHanhChecked === '' || manHinhChecked === '' || webcamChecked === '' || nhuCauChecked === '' || thuongHieuChecked === '')
+    {
+      check = false;
+      showAlertMessage('Hãy nhập thông tin sản phẩm')
+    }
+    //thực hiện kiểm tra lại các thuộc tính chung và sửa đổi vào result rồi sau đó tạo sản phẩm
+    if (check == true && resultVariant.length > 0) {
       handleCreateProduct();
     }
+
+    console.log('resultVariant truyền lên cha: ', resultVariant)
   }, [resultVariant])
 
   useEffect(() => {
@@ -104,13 +119,17 @@ const ThemSanPham = () => {
       keys.sort((a, b) => {
         return selectAttribute[a].length - selectAttribute[b].length;
       });
-      setSelectedKey(keys);
+      const removeKeyMauSac = keys.filter(i => i !== "mauSac");
+      removeKeyMauSac.push("mauSac");
+      console.log('Key sau khi đổi chỗ: ',removeKeyMauSac);
+      setSelectedKey(removeKeyMauSac);
     }
   }, [selectAttribute]);
 
   const [selectedKeyToChild, setSelectedKeyToChild] = useState([]);
 
   useEffect(() => {
+    console.log('Giá trị selectedKey: ', selectedKey);
     if (selectedKey.length === 4) {
       generateVariant(0, defaultVariant);
       setSelectedKeyToChild(selectedKey);
@@ -118,6 +137,20 @@ const ThemSanPham = () => {
       showAlertMessage('Thiếu thông tin để tạo biến thể', 'Vui lòng chọn đủ 4 thuộc tính Ram, Cpu, Ổ cứng, màu sắc')
     }
   }, [selectedKey]);
+
+
+  useEffect(() => { // nếu quá số ảnh cho phép sẽ ẩn nút tải anh
+    if (urlImages.length >= (mauSacChecked.length * 3)){
+      setIsValidToUpload(false);
+    }
+    console.log('urlImages: ', urlImages)
+  }, [urlImages])
+
+  useEffect(() => {
+    if (mauSacChecked.length > 0){
+      setIsValidToUpload(true)
+    }
+  }, [mauSacChecked])
 
   const [defaultVariant, setDefaultVariant] = useState({
     giaBan: '',
@@ -131,7 +164,8 @@ const ThemSanPham = () => {
     VGA: null,
     heDieuHanh: null,
     webcam: null,
-    serialNumberList: []
+    serialNumberList: [],
+    anhSanPham: []
   });
 
   const [defaultProduct, setDefaultProduct] = useState({
@@ -311,7 +345,9 @@ const ThemSanPham = () => {
     sanPhamId,
     vgaId,
     webcamId,
-    ocungId
+    ocungId,
+    listSerialNumber,
+    listUrlAnhSanPham
   }) => {
     const res = await createSanPhamChiTiet({
       giaBan,
@@ -325,7 +361,9 @@ const ThemSanPham = () => {
       sanPhamId,
       vgaId,
       webcamId,
-      ocungId
+      ocungId,
+      listSerialNumber,
+      listUrlAnhSanPham
     })
 
     if (!res) {
@@ -336,36 +374,44 @@ const ThemSanPham = () => {
     return res;
   }
 
-  const checkValidToAdd = async ({
-    giaBan,
-    trangThai,
-    banPhimId,
-    cpuId,
-    heDieuHanhId,
-    manHinhId,
-    mauSacId,
-    ramId,
-    sanPhamId,
-    vgaId,
-    webcamId,
-    ocungId
-  }) => {
-    const res = await checkToAdd({
-      giaBan,
-      trangThai,
-      banPhimId,
-      cpuId,
-      heDieuHanhId,
-      manHinhId,
-      mauSacId,
-      ramId,
-      sanPhamId,
-      vgaId,
-      webcamId,
-      ocungId
-    })
+  // const checkValidToAdd = async ({
+  //   giaBan,
+  //   trangThai,
+  //   banPhimId,
+  //   cpuId,
+  //   heDieuHanhId,
+  //   manHinhId,
+  //   mauSacId,
+  //   ramId,
+  //   sanPhamId,
+  //   vgaId,
+  //   webcamId,
+  //   ocungId,
+  //   listSerialNumber,
+  //   listUrlAnhSanPham
+  // }) => {
+  //   const res = await checkToAdd({
+  //     giaBan,
+  //     trangThai,
+  //     banPhimId,
+  //     cpuId,
+  //     heDieuHanhId,
+  //     manHinhId,
+  //     mauSacId,
+  //     ramId,
+  //     sanPhamId,
+  //     vgaId,
+  //     webcamId,
+  //     ocungId,
+  //     listSerialNumber:
+  //       listUrlAnhSanPham
+  //   })
 
-    return res;
+  //   return res;
+  // }
+
+  const handleChangeMauChoAnh = (target) => {
+    console.log(value)
   }
   
   const handleCreateProduct = async() => {
@@ -396,10 +442,18 @@ const ThemSanPham = () => {
         vgaId: variant.VGA,
         webcamId: variant.webcam,
         ocungId: variant.oCung.id,
-        sanPhamId: addProductRes.id
+        sanPhamId: addProductRes.id,
+        listSerialNumber: '',
+        listUrlAnhSanPham: ''
+      }
+      if (variant.serialNumberList.length > 0){
+        product.listSerialNumber = variant.serialNumberList.join(',');
+      }
+      if (variant.anhSanPham.length > 0){
+        product.listUrlAnhSanPham = variant.anhSanPham.join(',')
       }
 
-
+      console.log('product: ', product)
       // const checkRes = await checkValidToAdd(product);
       // console.log({checkRes});
       
@@ -407,7 +461,6 @@ const ThemSanPham = () => {
       //   toast.error(checkRes.message);
       //   return;
       // }
-
       const addDetailRes = await createProductDetail(product);
       if(!addDetailRes || addDetailRes.code === 999){
         toast.error(NotificationStatus.ERROR);
@@ -415,9 +468,32 @@ const ThemSanPham = () => {
       }
       if(index === (resultVariant.length - 1)){
         toast.success(NotificationStatus.CREATED);
+        navigate(`/sanpham/danhsach`);
       }
     })
   }
+
+  const SelectBoxColor = ({ title, options }) => {
+  return (
+    <FormControl sx={{ m: 1, minWidth: 120, width: "90%" }}>
+      <InputLabel id="demo-simple-select-helper-label">{title}</InputLabel>
+      <Select
+        labelId="demo-simple-select-helper-label"
+        id="demo-simple-select-helper"
+        // value={age}
+        label={title}
+        onChange={handleChangeMauChoAnh}
+      >
+        {
+          options && options.map(option =>
+            <MenuItem value={option}>{option}</MenuItem>
+          )
+        }
+      </Select>
+      {/* <FormHelperText>With label + helper text</FormHelperText> */}
+    </FormControl>
+  )
+}
 
   return (
     <>
@@ -515,7 +591,13 @@ const ThemSanPham = () => {
         <div style={{ width: "100%" }}>
           <div style={{ fontWeight: "bolder", fontSize: "20px", textAlign: 'center', width: "100%", display: "flex", justifyContent: "center", }}>Ảnh</div>
           <div style={{ margin: "10px 0", width: "100%", display: "flex", justifyContent: "center", }}>
-            <UploadWidget setUrlImages={setUrlImages} />
+            { isValidToUpload && 
+              <UploadWidget 
+              setUrlImages={setUrlImages} 
+              countMauSac={mauSacChecked.length * 3}
+              showMessage={showAlertMessage}
+              />
+            }
           </div>
         </div>
 
@@ -524,7 +606,7 @@ const ThemSanPham = () => {
             urlImages.map(url =>
               <Card
                 sx={{
-                  width: 300,
+                  width: 150,
                   border: "1px solid rgba(0, 0, 0, 0.12)",
                   borderRadius: "12px",
                   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
@@ -538,7 +620,7 @@ const ThemSanPham = () => {
               >
                 <CardMedia
                   sx={{
-                    height: 350,
+                    height: 150,
                     backgroundSize: "contain",
                     backgroundPosition: "center",
                     filter: "brightness(90%)",
@@ -548,7 +630,6 @@ const ThemSanPham = () => {
                     },
                   }}
                   image={url}
-                  title="green iguana"
                 />
                 <CardContent
                   sx={{
@@ -557,7 +638,10 @@ const ThemSanPham = () => {
                     textAlign: "center",
                   }}
                 >
-                  <SelectBoxColor title={'Màu sắc'} options={mauSacChecked.map(mau => mau.ten)} />
+                  <SelectBoxColor 
+                  title={'Màu sắc'} 
+                  options={mauSacChecked}
+                  />
                 </CardContent>
               </Card>
             )
@@ -573,24 +657,4 @@ const ThemSanPham = () => {
 
 export default ThemSanPham;
 
-const SelectBoxColor = ({ title, options }) => {
-  return (
-    <FormControl sx={{ m: 1, minWidth: 120, width: "90%" }}>
-      <InputLabel id="demo-simple-select-helper-label">{title}</InputLabel>
-      <Select
-        labelId="demo-simple-select-helper-label"
-        id="demo-simple-select-helper"
-        // value={age}
-        label={title}
-      // onChange={handleChange}
-      >
-        {
-          options && options.map(option =>
-            <MenuItem value={option}>{option}</MenuItem>
-          )
-        }
-      </Select>
-      {/* <FormHelperText>With label + helper text</FormHelperText> */}
-    </FormControl>
-  )
-}
+

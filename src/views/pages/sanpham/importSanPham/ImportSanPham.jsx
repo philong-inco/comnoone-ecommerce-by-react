@@ -329,17 +329,17 @@ const ImportSanPham = () => {
 
     const loadFilterOptions = async () => {
         // get các bảng
-        const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list`);
-        const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list`);
-        const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list`);
-        const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list`);
-        const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list`);
-        const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list`);
-        const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list`);
-        const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list`);
-        const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list`);
-        const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list`);
-        const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list`);
+        const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
+        const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
+        const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
+        const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
+        const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
+        const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
+        const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
+        const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
+        const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
+        const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
+        const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
 
         setNhuCau(nhuCauResult.data.data);
         setThuongHieu(thuongHieuResult.data.data);

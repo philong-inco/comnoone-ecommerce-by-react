@@ -14,7 +14,10 @@ export const createSanPhamChiTiet = async ({
     sanPhamId,
     vgaId,
     webcamId,
-    ocungId
+    ocungId,
+    listSerialNumber,
+    listUrlAnhSanPham
+
 }) => {
     try {
         
@@ -30,7 +33,9 @@ export const createSanPhamChiTiet = async ({
             sanPhamId,
             vgaId,
             webcamId,
-            ocungId
+            ocungId,
+            listSerialNumber,
+            listUrlAnhSanPham
         })
 
         return res
