@@ -22,15 +22,16 @@ import {
   Chip,
   Radio
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { addCouponToBill, addCouponToBillByCode, addCustomerToBill, getBillByCode } from 'services/admin/bill/billService';
+import { addCouponToBill, addCouponToBillByCode, addCustomerToBill, getBillByCode, payCounter } from 'services/admin/bill/billService';
 import { getAllCouponsToBill } from 'services/admin/coupons/couponsService';
 import { getAll } from 'services/admin/customer/customerService';
 import { getAllProduct } from 'services/admin/product/productService';
-import { getAllSerialNumberByProductId } from 'services/admin/serial-number/serialNumber';
+import { getAllSerialNumberByProductId, getAllSerialNumberByProductId2 } from 'services/admin/serial-number/serialNumber';
 import {
   createSerialNumberSold,
   deletedById,
@@ -38,7 +39,8 @@ import {
 } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
-function Cart(bill) {
+function Cart(props) {
+  const { bill, onReload } = props;
   const { id } = useParams();
   const inputRef = useRef(null);
 
@@ -74,6 +76,78 @@ function Cart(bill) {
   const [showDiaLogCoupon, setShowDiaLogCoupon] = useState(false);
   const [coupons, setCoupons] = useState([]);
 
+  // tiến hành thanh toán
+  const [amount, setAmount] = useState('0');
+  const [error, setError] = useState('');
+  const [showDiaLogPayment, setShowDiaLogPayment] = useState(false);
+  const [payment, setPayment] = useState({
+    maGiaoDich: '',
+    phuongThuc: '',
+    soTien: ''
+  });
+  const [payments, setPayments] = useState([]);
+
+  const handleAmountChange = (e) => {
+    const value = e.target.value.trim();
+    setAmount(value);
+    if (value === '' || isNaN(value) || Number(value) < 1000) {
+      setError('Số tiền phải là số và lớn hơn 1.000 VND');
+    } else if (value < billInFo.tongTienPhaiTra) {
+      setError('Số tiền chưa đủ');
+    } else {
+      setError('');
+    }
+  };
+
+  const handleOpenPaymentDialog = (id) => {
+    setShowDiaLogPayment(true);
+  };
+
+  const handleClosePaymentDialog = () => {
+    setShowDiaLogPayment(false);
+    // setAmount('');
+    // setError('');
+  };
+
+  const handleBtnTienMat = () => {
+    if (amount === '' || isNaN(amount) || Number(amount) < 1000) {
+      alert('Số tiền phải là số và lớn hơn 1.000 VND');
+      return;
+    }
+    if (amount < billInFo.tongTienPhaiTra) {
+      alert('Số tiền khách trả chưa đủ');
+      return;
+    }
+    if (confirm('Bạn chắc chắn muôn thanh toán bằng tiền mặt')) {
+      // setPayments([..., payment])
+      // call api
+      return;
+    }
+  };
+
+  const handleBtnXacNhanThanhToan = () => {
+    if (amount === '' || isNaN(amount) || Number(amount) < 1000) {
+      alert('Số tiền phải là số và lớn hơn 1.000 VND');
+      return;
+    }
+    if (amount < billInFo.tongTienPhaiTra) {
+      alert('Số tiền khách trả chưa đủ');
+      return;
+    }
+
+    if (confirm(`Xác nhận số tiền bạn nhập là ${parseInt(amount || 0).toLocaleString() || '0'} VNĐ`)) {
+      handleClosePaymentDialog();
+      return;
+    }
+  };
+
+  const apiPayCounter = async () => {
+    const response = await payCounter(id);
+    if (response.status_code === 201) {
+      alert('Xác nhận thành công');
+      handleSomeAction();
+    }
+  };
   // hóa đơn ct
   const fetchSerialNumberSold = async () => {
     const response = await getAllSerialNumberSoldByBillId(id);
@@ -157,7 +231,7 @@ function Cart(bill) {
   }, [id]);
   // fetch Serial Number
   const fetchSerialNumberByProduct = async (productId, page, size) => {
-    const response = await getAllSerialNumberByProductId(productId, page - 1, size);
+    const response = await getAllSerialNumberByProductId2(productId, page - 1, size);
     if (response.status_code === 200) {
       setSerials(response.data.result);
       setTotalSerial(response.data.meta.total);
@@ -298,7 +372,7 @@ function Cart(bill) {
         alert('Thêm thất bại');
       }
     } catch (error) {
-      alert('Phiếu giảm giá không tồn tại');
+      alert('Bạn không đủ điều kiện để sử dụng');
     }
   };
 
@@ -319,6 +393,16 @@ function Cart(bill) {
     setCoupons([]);
   };
 
+  // Kiểm tra hàm onReload
+  console.log('onReload prop:', onReload);
+
+  const handleSomeAction = () => {
+    if (typeof onReload === 'function') {
+      onReload(); // Gọi hàm reload
+    } else {
+      console.error('onReload is not a function');
+    }
+  };
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
@@ -327,6 +411,9 @@ function Cart(bill) {
             <Typography variant="h3">Giỏ hàng</Typography>
             <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
               Thêm sản phẩm
+            </Button>
+            <Button variant="contained" color="warning" onClick={handleSomeAction}>
+              Load
             </Button>
           </Grid>
         </Grid>
@@ -438,7 +525,14 @@ function Cart(bill) {
         <Grid item xs={4}>
           <Box display="flex" justifyContent="end">
             <Button variant="outlined">Bán Giao Hàng</Button>
-            <Button variant="contained" color="primary" sx={{ marginLeft: 2, padding: 1 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ marginLeft: 2, padding: 1 }}
+              onClick={() => {
+                handleOpenPaymentDialog();
+              }}
+            >
               Tiến hành thanh toán
             </Button>
           </Box>
@@ -483,6 +577,16 @@ function Cart(bill) {
             {' '}
             Tiền thừa trả khách: -57.000.000 đ{' '}
           </Typography> */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              apiPayCounter();
+            }}
+            disabled={id ? false : true}
+          >
+            Xác nhận thanh toán
+          </Button>
         </Grid>
       </Grid>
 
@@ -585,11 +689,15 @@ function Cart(bill) {
               <TableBody>
                 {serials.map((row) => (
                   <TableRow key={row.id}>
-                    <Checkbox checked={selectedRows.includes(row.id)} onChange={() => handleSelectRow(row.id)} />
+                    <Checkbox
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => handleSelectRow(row.id)}
+                      disabled={row.trangThai == 1}
+                    />
                     <TableCell>{row.ma}</TableCell>
                     <TableCell>
                       <Chip
-                        label={row.trangThai == 0 ? 'Còn hàng' : row.trangThai == 2 ? 'Đã bán' : 'Hủy'}
+                        label={row.trangThai == 0 ? 'Chưa bán' : row.trangThai == 1 ? 'Đã bán' : 'Hủy'}
                         style={{ backgroundColor: getStatusSerialColor(row.trangThai), color: '#fff' }}
                         size="small"
                       />
@@ -721,6 +829,116 @@ function Cart(bill) {
         <DialogActions>
           <Button onClick={handleCloseDiaLogCoupon} color="primary">
             Đóng
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* DiaLog Tiến Hành Thanh Toán */}
+      <Dialog
+        open={showDiaLogPayment}
+        onClose={() => {
+          setShowDiaLogPayment(false);
+          setAmount('');
+          setError('');
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Thanh toán</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="Số tiền"
+                fullWidth
+                variant="outlined"
+                value={amount}
+                // value={parseInt(amount || 0).toLocaleString() || '0'}
+                error={!!error}
+                helperText={error}
+                onChange={handleAmountChange}
+              />
+            </Grid>
+
+            {/* Tiền mặt và Chuyển khoản buttons */}
+            <Grid item xs={6}>
+              <Button fullWidth variant="outlined" onClick={handleBtnTienMat}>
+                Tiền mặt
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button fullWidth variant="contained" color="primary">
+                Chuyển khoản
+              </Button>
+            </Grid>
+
+            {/* Tổng tiền */}
+            <Grid item xs={12}>
+              <Typography variant="h6" align="right" color="error">
+                5.800.005 VND
+              </Typography>
+            </Grid>
+
+            {/* Table */}
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>STT</TableCell>
+                      <TableCell>Mã giao dịch</TableCell>
+                      <TableCell>Số tiền</TableCell>
+                      <TableCell>Phương thức</TableCell>
+                      <TableCell>Hành động</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>1</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>99.999.999 VND</TableCell>
+                      <TableCell>
+                        <Button size="small" variant="contained" color="success">
+                          Tiền mặt
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton color="error">
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+
+            {/* Số tiền khách thanh toán */}
+            <Grid item xs={12}>
+              <Typography variant="h6">
+                Khách thanh toán:
+                <span style={{ color: 'red', float: 'right' }}>99.999.999 VND</span>
+              </Typography>
+              <Typography variant="h6">
+                Tiền thừa:
+                <span style={{ color: 'blue', float: 'right' }}>94.199.994 VND</span>
+              </Typography>
+            </Grid>
+          </Grid>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowDiaLogPayment(false);
+              setAmount('');
+              setError('');
+            }}
+            color="error"
+          >
+            Huỷ
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleBtnXacNhanThanhToan}>
+            Xác nhận
           </Button>
         </DialogActions>
       </Dialog>

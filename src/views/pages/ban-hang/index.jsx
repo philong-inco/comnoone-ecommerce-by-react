@@ -92,6 +92,12 @@ function Sell() {
     }
   };
 
+  const handleReload = () => {
+    fetchBillCodes();
+    setValue(null);
+    navigate('/ban-hang');
+  };
+
   return (
     <>
       <Box>
@@ -131,7 +137,7 @@ function Sell() {
             />
           </Tabs>
         </Box>
-        <Cart bill={bill} />
+        <Cart bill={bill} onReload={handleReload} />
       </Box>
     </>
   );

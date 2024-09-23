@@ -81,6 +81,16 @@ export const updateStatusByCode = async (code, status) => {
     throw error;
   }
 };
+
+export const payCounter = async (billCode) => {
+  try {
+    const result = await post(`bills/pay-counter/${billCode}`);
+    return result;
+  } catch (error) {
+    console.error('Error pay counter by code :', error);
+    throw error;
+  }
+};
 // lịch sử hóa đơn
 export const getBillHistoryByBillId = async (id) => {
   try {
