@@ -7,8 +7,12 @@ import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
 import { IconButton, InputAdornment } from '@mui/material';
 
-const SelectDropOneValue = ({ list, setValueSelect, name }) => {
+const SelectDropOneValueForUpdate = ({ list, setValueSelect, name, valueOld }) => {
   const [value, setValue] = useState({});
+
+  useEffect(() => {
+    setValue(valueOld)
+  }, [])
 
   useEffect(() => {
     setValueSelect(value.id);
@@ -48,4 +52,4 @@ const SelectDropOneValue = ({ list, setValueSelect, name }) => {
   );
 };
 
-export default SelectDropOneValue;
+export default SelectDropOneValueForUpdate;

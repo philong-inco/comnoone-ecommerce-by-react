@@ -1,7 +1,8 @@
 import { Button } from "@mui/material";
+import { useState } from "react";
 import { useEffect, useRef } from "react";
 
-const UploadWidget = ({ setUrlImages }) => {
+const UploadWidget = ({ setUrlImages, showMessage }) => {
     const cloudinaryRef = useRef();
     const widgetRef = useRef();
 
@@ -12,13 +13,24 @@ const UploadWidget = ({ setUrlImages }) => {
             uploadPreset: "demo_shop"
         }, function (error, result) {
             if (!error && result && result.event === "success") {
-                setUrlImages(prevImages => [...prevImages, result.info.secure_url]);
+                let newImage = {
+                    colorId: 0,
+                    url: result.info.secure_url
+                }
+                setUrlImages(prevImages => [...prevImages, newImage]);
             }
         });
     }, [setUrlImages]);
 
+
+    const handleUpload = () => {
+        
+        widgetRef.current.open()
+        
+    }
+
     return (
-        <Button onClick={() => widgetRef.current.open()}>
+        <Button onClick={handleUpload}>
             Tải ảnh
         </Button>
     );

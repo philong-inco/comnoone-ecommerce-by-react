@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { IconUpload } from '@tabler/icons-react';
 import { color } from 'framer-motion';
 import ImportSerialForm from './ImportSerialForm.jsx';
+import axios from 'axios';
 // import InputSetPriceAll from './InputSetPriceAll.jsx';
 import ListVariant from './ListVariant.jsx';
 
@@ -115,14 +116,28 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 //     setOpentPriceAll(true);
 //   };
 
-  const setSerialFromChild = (obj) => {
+// thay đổi serial number từng hàng
+  const setSerialFromChild = async (obj) => {
     const listSerialExist = [];
-    function uniqueSerial(serial) {
-      if (serial === '1' || serial === '2') {
-        listSerialExist.push(serial);
-        return false; // call API kiểm tra serial tồn tại chưa, tồn tại trả về false
+
+    async function isUniqueSerial(serial) {
+      let isExistSeri = null; // chưa tồn tại API trả về false
+      try{
+        isExistSeri = await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serial}`);
+          
+      } catch(error){
+        if (error.response)
+        {
+          isExistSeri = error.response.data;
+        }
       }
-      return true;
+      console.log(isExistSeri.data);
+      if (isExistSeri.data) {
+        listSerialExist.push(serial);
+        console.log('listSerialExist: ', listSerialExist)
+        return true;
+      }
+      return false;
     }
 
     // console.log('Cha nhận: ', obj);
@@ -130,12 +145,20 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     if (newSerial.length === 1 && newSerial[0] === '') {
       newSerial = [];
     }
+
     const serialValidate = [];
-    newSerial.forEach((serial) => {
-      if (uniqueSerial(serial)) {
-        serialValidate.push(serial);
-      }
-    });
+    console.log('ListValid before: ', serialValidate);
+
+    for (const serial of newSerial) {  
+      const check = await isUniqueSerial(serial); // Đợi kết quả từ isUniqueSerial  
+      console.log('Kết quả hàm: ', check); // Hiển thị kết quả trực tiếp  
+      if (check == false) {  
+          console.log('vào nè');  
+          serialValidate.push(serial);  
+      }  
+  }  
+
+    console.log('ListValid after: ', serialValidate);
 
     const updateVariant = variantList.map((item, idx) => {
       if (idx === obj.index) {
@@ -146,32 +169,63 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
       }
       return item;
     });
+
     if (listSerialExist.length > 0) {
       showMessage('Đã loại bỏ các serial đã tồn tại sau', 'Danh sách: ' + listSerialExist.join(','));
     }
+
     setVariantList(updateVariant);
   };
 
   const handleSetResult = () => {
     const check = validateForm();
+    console.log('check: ', check);
     if (check.check) {
       setResult(variantList);
     } else {
-      showMessage(check.message);
+      let noti = '';
+      if (check.message !== ''){
+        noti += 'Giá không hợp lệ tại dòng ' + check.message
+        noti = noti.substring(0, noti.length - 2)
+      }
+      
+      if (check.isDulicateSeri)
+      {
+        noti += '\n | Serial Number nhập trong danh sách bị trùng lặp.'
+      }
+      showMessage(noti);
     }
   };
 
   const validateForm = () => {
+    console.log('run validate')
     let check = {
       check: true,
-      message: 'Giá bán không hợp lệ tại dòng thứ '
+      message: '',
+      seriVuaNhap: [],
+      isDulicateSeri: false
     };
+    let seriVuaNhap = [];
     variantList.forEach((item, idx) => {
       if (item.giaBan === '' || isNaN(item.giaBan) || parseFloat(item.giaBan) <= 0) {
         check.check = false;
-        check.message += idx + 1 + ' ';
+        check.message += idx + 1 + ', ';
       }
+      if (Array.isArray(item.serialNumberList)){
+        console.log('...item.serialNumberList: ', item.serialNumberList)
+      } else {
+        console.log('k phải array')
+      }
+
+      seriVuaNhap = [...seriVuaNhap, ...item.serialNumberList]
+      // console.log('seriVuaNhap trong for: ',seriVuaNhap)
     });
+    console.log('seriVuaNhap ',seriVuaNhap)
+    if (new Set(seriVuaNhap).size != seriVuaNhap.length){
+        check.check = false;
+        check.isDulicateSeri = true;
+    }
+    
     return check;
   };
 

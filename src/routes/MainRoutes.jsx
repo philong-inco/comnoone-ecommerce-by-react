@@ -115,11 +115,7 @@ const MainRoutes = {
         },
         {
           path: 'sua/:id',
-          element: (
-            <ErrorBoundary>
-              <SuaSanPham />
-            </ErrorBoundary>
-          )
+          element: <SuaSanPham />
         },
         {
           path: 'themnhieusanpham',
