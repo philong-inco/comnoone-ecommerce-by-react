@@ -20,14 +20,23 @@ import {
   DialogActions,
   Checkbox,
   Chip,
-  Radio
+  Radio,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box } from '@mui/system';
+import { Box, display } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { addCouponToBill, addCouponToBillByCode, addCustomerToBill, getBillByCode, payCounter } from 'services/admin/bill/billService';
+import {
+  addCouponToBill,
+  addCouponToBillByCode,
+  addCustomerToBill,
+  getBillByCode,
+  payCounter,
+  updateStatusByCode
+} from 'services/admin/bill/billService';
 import { getAllCouponsToBill } from 'services/admin/coupons/couponsService';
 import { getAll } from 'services/admin/customer/customerService';
 import { getAllProduct } from 'services/admin/product/productService';
@@ -38,6 +47,7 @@ import {
   getAllSerialNumberSoldByBillId
 } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
+import PdfForm from 'utils/pdf/pdf';
 
 function Cart(props) {
   const { bill, onReload } = props;
@@ -87,14 +97,25 @@ function Cart(props) {
   });
   const [payments, setPayments] = useState([]);
 
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
   const handleAmountChange = (e) => {
     const value = e.target.value.trim();
     setAmount(value);
-    if (value === '' || isNaN(value) || Number(value) < 1000) {
-      setError('Số tiền phải là số và lớn hơn 1.000 VND');
+    if (value === '' || isNaN(value) || Number(value) < 0) {
+      setError('Số tiền phải là số ');
     } else if (value < billInFo.tongTienPhaiTra) {
       setError('Số tiền chưa đủ');
     } else {
+      setPayments({
+        phuongThuc: '0'
+      });
       setError('');
     }
   };
@@ -110,12 +131,17 @@ function Cart(props) {
   };
 
   const handleBtnTienMat = () => {
-    if (amount === '' || isNaN(amount) || Number(amount) < 1000) {
-      alert('Số tiền phải là số và lớn hơn 1.000 VND');
+    if (amount === '' || isNaN(amount) || Number(amount) < 0) {
+      setSnackbarMessage('Số tiền phải là số');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+
       return;
     }
     if (amount < billInFo.tongTienPhaiTra) {
-      alert('Số tiền khách trả chưa đủ');
+      setSnackbarMessage('Số tiền khách trả chưa đủ');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
       return;
     }
     if (confirm('Bạn chắc chắn muôn thanh toán bằng tiền mặt')) {
@@ -126,26 +152,61 @@ function Cart(props) {
   };
 
   const handleBtnXacNhanThanhToan = () => {
-    if (amount === '' || isNaN(amount) || Number(amount) < 1000) {
-      alert('Số tiền phải là số và lớn hơn 1.000 VND');
+    if (amount === '' || isNaN(amount) || Number(amount) < 0) {
+      setSnackbarMessage('Số tiền phải là số');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
       return;
     }
     if (amount < billInFo.tongTienPhaiTra) {
-      alert('Số tiền khách trả chưa đủ');
+      setSnackbarMessage('Số tiền khách trả chưa đủ');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
       return;
     }
 
     if (confirm(`Xác nhận số tiền bạn nhập là ${parseInt(amount || 0).toLocaleString() || '0'} VNĐ`)) {
-      handleClosePaymentDialog();
+      ApiUpdateStatusByCode();
       return;
     }
   };
 
+  const ApiUpdateStatusByCode = async () => {
+    try {
+      const response = await updateStatusByCode(id, 'XAC_NHAN');
+      console.log(response); // Kiểm tra phản hồi
+
+      if (response.status_code === 200) {
+        setSnackbarMessage('Xác nhân đơn đơn hàng thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        handleClosePaymentDialog();
+      } else {
+        setSnackbarMessage('Xác nhận đơn hàng thất bại');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      setSnackbarMessage('Xác nhận đơn hàng thất bại');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
   const apiPayCounter = async () => {
-    const response = await payCounter(id);
-    if (response.status_code === 201) {
-      alert('Xác nhận thành công');
-      handleSomeAction();
+    try {
+      const response = await payCounter(id);
+      if (response.status_code === 201) {
+        setSnackbarMessage('Xác nhận thanh toán thành công thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setBillInFo({});
+        handleSomeAction();
+      }
+    } catch (error) {
+      setSnackbarMessage('Hóa đơn chưa được xác nhận');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
   // hóa đơn ct
@@ -164,7 +225,9 @@ function Cart(props) {
     if (response.status_code === 200) {
       fetchSerialNumberSold();
       fetchBillInFo();
-      alert('Oke');
+      setSnackbarMessage('Xóa sản phẩm khoải hóa đơn thành công');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
     }
   };
 
@@ -251,9 +314,11 @@ function Cart(props) {
       listSerialNumberId: selectedRows
     };
 
-    console.log('Thêm serial : ', data);
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {
+      setSnackbarMessage('Thêm sản phẩm thành công');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
       setOpenDialog(false);
       setSelectedRows([]);
       setPageSerial(1);
@@ -306,7 +371,9 @@ function Cart(props) {
     try {
       const response = await addCustomerToBill(customerId, id);
       if (response.status_code) {
-        alert('Thêm oke');
+        setSnackbarMessage('Thêm khách hàng thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         setCustomer({
           ten: response.data.tenKhachHang,
           sdt: response.data.sdt,
@@ -315,13 +382,15 @@ function Cart(props) {
         handleCloseShowDiaLogCustomer();
       } else {
       }
-    } catch (error) {}
+    } catch (error) {
+      setSnackbarMessage('Thêm khách hàng thất bại');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
   };
 
   const handleChangePageCustomer = (newPage) => {
     setPageCustomer(newPage);
-    console.log('Trang : ', newPage);
-
     fetchApiAllCustomer(newPage);
   };
 
@@ -351,28 +420,42 @@ function Cart(props) {
     try {
       const response = await addCouponToBill(couponId, id);
       if (response.status_code === 201) {
-        alert('Thêm phiếu giảm giá thành công');
+        setSnackbarMessage('Thêm phiếu giảm giá thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         fetchBillInFo();
         handleCloseDiaLogCoupon();
       } else {
       }
-    } catch (error) {}
+    } catch (error) {
+      if (response.status_code === 201) {
+        setSnackbarMessage('Thêm phiếu giảm giá thất bại');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
+    }
   };
 
   const handleAddCouponToBillByCode = async (couponCode) => {
     try {
       const response = await addCouponToBillByCode(couponCode, id);
       if (response.status_code === 201) {
-        alert('Thêm phiếu giảm giá thành công');
-        fetchBillInFo();
-        if (inputRef.current) {
-          inputRef.current.value = '';
+        if (response.status_code === 201) {
+          setSnackbarMessage('Thêm phiếu giảm giá thành công');
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+          fetchBillInFo();
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
+        } else {
+          alert('Thêm thất bại');
         }
-      } else {
-        alert('Thêm thất bại');
       }
     } catch (error) {
-      alert('Bạn không đủ điều kiện để sử dụng');
+      setSnackbarMessage('Bạn không đủ điều kiện để sử dụng');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 
@@ -409,12 +492,13 @@ function Cart(props) {
         <Grid container spacing={2}>
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">Giỏ hàng</Typography>
+            {/* <PdfForm serials={serialNumberSold} hiden={true} /> */}
             <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
               Thêm sản phẩm
             </Button>
-            <Button variant="contained" color="warning" onClick={handleSomeAction}>
+            {/* <Button variant="contained" color="warning" onClick={handleSomeAction}>
               Load
-            </Button>
+            </Button> */}
           </Grid>
         </Grid>
         <Divider sx={{ marginY: 2 }} />
@@ -524,7 +608,9 @@ function Cart(props) {
         </Grid>
         <Grid item xs={4}>
           <Box display="flex" justifyContent="end">
-            <Button variant="outlined">Bán Giao Hàng</Button>
+            <Button variant="outlined" disabled={id ? false : true}>
+              Bán Giao Hàng
+            </Button>
             <Button
               variant="contained"
               color="primary"
@@ -532,6 +618,7 @@ function Cart(props) {
               onClick={() => {
                 handleOpenPaymentDialog();
               }}
+              disabled={id ? false : true}
             >
               Tiến hành thanh toán
             </Button>
@@ -571,7 +658,8 @@ function Cart(props) {
             Khách cần trả: {parseInt(billInFo.tongTienPhaiTra || 0).toLocaleString() || '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold">
-            Khách thanh toán: 0 đ
+            Tiền thừa:{' '}
+            {`${(parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
           </Typography>
           {/* <Typography mt={1} variant="h4">
             {' '}
@@ -874,12 +962,12 @@ function Cart(props) {
             {/* Tổng tiền */}
             <Grid item xs={12}>
               <Typography variant="h6" align="right" color="error">
-                5.800.005 VND
+                {`${parseInt(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN')} VNĐ`}
               </Typography>
             </Grid>
 
             {/* Table */}
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
@@ -910,17 +998,22 @@ function Cart(props) {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid>
+            </Grid> */}
 
             {/* Số tiền khách thanh toán */}
             <Grid item xs={12}>
               <Typography variant="h6">
                 Khách thanh toán:
-                <span style={{ color: 'red', float: 'right' }}>99.999.999 VND</span>
+                <span style={{ color: 'red', float: 'right' }}>
+                  {`${parseFloat(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
+                </span>
               </Typography>
               <Typography variant="h6">
                 Tiền thừa:
-                <span style={{ color: 'blue', float: 'right' }}>94.199.994 VND</span>
+                <span style={{ color: 'blue', float: 'right' }}>
+                  {`${(parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
+                  VND
+                </span>
               </Typography>
             </Grid>
           </Grid>
@@ -942,6 +1035,17 @@ function Cart(props) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
