@@ -1,28 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 
 // third-party
@@ -31,13 +26,10 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import UpgradePlanCard from './UpgradePlanCard';
 import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
-
-// ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
   const theme = useTheme();
@@ -49,10 +41,13 @@ const ProfileSection = () => {
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
+
+  // Thêm state để lưu thông tin nhân viên
+  const [nhanVien, setNhanVien] = useState({});
+  const [vaiTro, setVaiTro] = useState({});
+
   const anchorRef = useRef(null);
+
   const handleLogout = async () => {
     console.log('Logout');
   };
@@ -72,6 +67,7 @@ const ProfileSection = () => {
       navigate(route);
     }
   };
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
@@ -84,6 +80,36 @@ const ProfileSection = () => {
 
     prevOpen.current = open;
   }, [open]);
+
+  // Gọi API để lấy thông tin nhân viên
+  useEffect(() => {
+    const fetchNhanVien = async () => {
+      try {
+        debugger;
+        const response = await axios.get('http://localhost:8080/api/nhan_vien/2');
+        setNhanVien(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+      }
+    };
+
+    fetchNhanVien();
+    fetchVaiTro();
+  }, []);
+
+
+  const fetchVaiTro = async () => {
+    try {
+      debugger;
+      const response = await axios.get('http://localhost:8080/api/vaitro/findbynhanvien/2');
+      setVaiTro(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error fetching role data:', error);
+    }
+  };
+
 
   return (
     <>
@@ -109,7 +135,7 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            src={User1}
+            src={nhanVien.hinhAnh || User1}  // Sử dụng ảnh nhân viên hoặc ảnh mặc định
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
@@ -129,6 +155,7 @@ const ProfileSection = () => {
         onClick={handleToggle}
         color="primary"
       />
+
       <Popper
         placement="bottom-end"
         open={open}
@@ -157,76 +184,22 @@ const ProfileSection = () => {
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         <Typography variant="h4">Chào bạn,</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Mạnh Mới Mẻ
+                          {nhanVien.ten || 'Tên nhân viên'}
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Mỗi tội chưa có người yêu</Typography>
+                      <Typography variant="subtitle2">
+                        {vaiTro.length > 0 ? vaiTro.map((role, index) => (
+                          <span key={index}>
+                            {role.ten}
+                            {index < vaiTro.length - 1 ? ', ' : ''}
+                          </span>
+                        )) : 'Chức vụ'}
+                      </Typography>
                     </Stack>
-                    <OutlinedInput
-                      sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
-                      id="input-search-profile"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      placeholder="Tìm gì thì viết vào đây"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <IconSearch stroke={1.5} size="1rem" color={theme.palette.grey[500]} />
-                        </InputAdornment>
-                      }
-                      aria-describedby="search-helper-text"
-                      inputProps={{
-                        'aria-label': 'weight'
-                      }}
-                    />
                     <Divider />
                   </Box>
                   <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                     <Box sx={{ p: 2, pt: 0 }}>
-                      <UpgradePlanCard />
-                      <Divider />
-                      <Card
-                        sx={{
-                          bgcolor: theme.palette.primary.light,
-                          my: 2
-                        }}
-                      >
-                        <CardContent>
-                          <Grid container spacing={3} direction="column">
-                            <Grid item>
-                              <Grid item container alignItems="center" justifyContent="space-between">
-                                <Grid item>
-                                  <Typography variant="subtitle1">Tú Mộng Mơ</Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    color="primary"
-                                    checked={sdm}
-                                    onChange={(e) => setSdm(e.target.checked)}
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                            <Grid item>
-                              <Grid item container alignItems="center" justifyContent="space-between">
-                                <Grid item>
-                                  <Typography variant="subtitle1">Huy Sad boi</Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    checked={notification}
-                                    onChange={(e) => setNotification(e.target.checked)}
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
-                      <Divider />
                       <List
                         component="nav"
                         sx={{
@@ -267,16 +240,7 @@ const ProfileSection = () => {
                                 <Grid item>
                                   <Typography variant="body2">Cập nhật thông tin</Typography>
                                 </Grid>
-                                <Grid item>
-                                  <Chip
-                                    label="đã có ghệ"
-                                    size="small"
-                                    sx={{
-                                      bgcolor: theme.palette.warning.dark,
-                                      color: theme.palette.background.default
-                                    }}
-                                  />
-                                </Grid>
+                                <Grid item></Grid>
                               </Grid>
                             }
                           />
