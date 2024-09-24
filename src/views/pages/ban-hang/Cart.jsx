@@ -1008,13 +1008,16 @@ function Cart(props) {
                   {`${parseFloat(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
                 </span>
               </Typography>
-              <Typography variant="h6">
+              {/* <Typography variant="h6">
                 Tiền thừa:
                 <span style={{ color: 'blue', float: 'right' }}>
-                  {`${(parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
+                  {`${Math.max(0, parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                  })}`}
                   VND
                 </span>
-              </Typography>
+              </Typography> */}
             </Grid>
           </Grid>
         </DialogContent>
