@@ -201,6 +201,8 @@ function Cart(props) {
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         setBillInFo({});
+        setCustomer({});
+        setAmount(0);
         handleSomeAction();
       }
     } catch (error) {
@@ -453,7 +455,7 @@ function Cart(props) {
         }
       }
     } catch (error) {
-      setSnackbarMessage('Bạn không đủ điều kiện để sử dụng');
+      setSnackbarMessage('Thêm phiếu giảm giá thất bại');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
