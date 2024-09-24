@@ -288,7 +288,11 @@ function KhachHangAddress() {
       setValue('email', khachHangData.email);
       setValue('ngay_sinh', khachHangData.ngaySinh.split('T')[0]);
       setValue('gioi_tinh', khachHangData.gioiTinh.toString());
-      setImageUrl(khachHangData.hinhAnh);
+      if (khachHangData.hinhAnh) {
+        setImageUrl(khachHangData.hinhAnh);
+    } else {
+        setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
+    }
 
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;

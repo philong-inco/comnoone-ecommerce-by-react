@@ -24,8 +24,8 @@ const thongKe = {
                     title: 'Sản phẩm bán chạy',
                     type: 'item',
                     url: '/thongke/sanpham'
-                  }
-            ]
+                  }          
+                ]
         }
     ]
 }

@@ -405,7 +405,6 @@ function NhanVienConfiguration() {
             </Typography>
             <form onSubmit={handleSubmit(handleOpenDialog)}>
                 <Grid container spacing={3}>
-                    {/* Hình ảnh đại diện */}
                     <Grid item xs={12} md={4}>
                         <Box display="flex" flexDirection="column" alignItems="center" height="100%">
                             {imageUrl ? (
