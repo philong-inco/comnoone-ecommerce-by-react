@@ -64,7 +64,6 @@ const validationSchema = Yup.object().shape({
     .nullable(),
 });
 
-
 const addressValidationSchema = Yup.object().shape({
   ten_nguoi_nhan: Yup.string()
     .required('Tên người nhận không được để trống')
@@ -360,14 +359,13 @@ function KhachHangAddress() {
   }
 
   const handleOpenDialog = (data) => {
-    setFormData(data); // Lưu dữ liệu form để xác nhận sau khi nhấn submit
-    setOpenDialog(true); // Mở hộp thoại
+    setFormData(data); 
+    setOpenDialog(true); 
   };
   
-  // Hàm xác nhận và cập nhật dữ liệu sau khi người dùng chọn "Xác nhận"
   const handleConfirmUpdateCustomer = async () => {
-    setOpenDialog(false); // Đóng dialog
-    await onSubmit(formData); // Thực hiện submit với dữ liệu đã lưu
+    setOpenDialog(false);
+    await onSubmit(formData); 
   };
 
   const onSubmit = async (data) => {

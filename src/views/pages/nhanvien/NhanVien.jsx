@@ -28,7 +28,9 @@ import {
     Select,
     MenuItem,
     Avatar,
-    Chip, Fab
+    Chip,
+    Fab,
+    Grid
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -36,7 +38,6 @@ import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBac
 import { IconEdit } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
-import Divider from '@mui/material/Divider';
 
 const DanhSachNhanVien = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -100,7 +101,7 @@ const DanhSachNhanVien = () => {
             case 0:
                 return (
                     <Chip
-                    
+
                         label="Đã Nghỉ Việc"
                         color="default"
                         style={{ backgroundColor: '#f44336', color: '#fff' }}
@@ -231,21 +232,18 @@ const DanhSachNhanVien = () => {
     return (
         <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
             <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                width="100%"
-                mb={2}
-                p={2}
                 sx={{
                     backgroundColor: 'white',
                     boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.2, 0.3)',
                     borderRadius: '8px',
+                    p: 3,
+                    mb: 3,
+                    width: '100%',
                 }}
             >
-                <Box display="flex" justifyContent="center" alignItems="center" width="80%">
-                    <Box flex={1.2} display="flex" alignItems="center" mr={2}>
-                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6} md={4}>
+                        <FormLabel component="legend" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Tìm Kiếm
                         </FormLabel>
                         <TextField
@@ -253,24 +251,20 @@ const DanhSachNhanVien = () => {
                             value={searchKeyWord}
                             onChange={handleSearchKeyWord}
                             variant="outlined"
-                            margin="normal"
                             fullWidth
                         />
-                    </Box>
+                    </Grid>
 
-                    <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-
-                    <Box flex={0.8} display="flex" alignItems="center" mr={2}>
-                        <FormLabel component="legend" sx={{ mr: 1.3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
+                    <Grid item xs={12} sm={6} md={4}>
+                        <FormLabel component="legend" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Giới Tính
                         </FormLabel>
-                        <FormControl fullWidth margin="dense">
+                        <FormControl fullWidth>
                             <InputLabel id="gender-select-label">-- Chọn giới tính --</InputLabel>
                             <Select
                                 labelId="gender-select-label"
                                 id="gender-select"
                                 value={selectGioiTinh}
-                                label="Giới tính"
                                 onChange={handleSelectChange}
                             >
                                 <MenuItem value=""><em>-- Chọn giới tính --</em></MenuItem>
@@ -278,13 +272,11 @@ const DanhSachNhanVien = () => {
                                 <MenuItem value={0}>Nữ</MenuItem>
                             </Select>
                         </FormControl>
-                    </Box>
+                    </Grid>
 
-                    <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-
-                    <Box flex={1.7} display="flex" alignItems="center" mr={2}>
-                        <FormLabel component="legend" sx={{ mr: 3, whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                            Trạng thái
+                    <Grid item xs={12} sm={12} md={4}>
+                        <FormLabel component="legend" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            Trạng Thái
                         </FormLabel>
                         <FormControl component="fieldset" fullWidth>
                             <RadioGroup
@@ -302,13 +294,13 @@ const DanhSachNhanVien = () => {
                                 ))}
                             </RadioGroup>
                         </FormControl>
-                    </Box>
-                </Box>
+                    </Grid>
+                </Grid>
                 <Box
                     sx={{
                         position: 'fixed',
-                        bottom: 16, 
-                        right: 16,  
+                        bottom: 16,
+                        right: 16,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -325,7 +317,7 @@ const DanhSachNhanVien = () => {
                             color: '#fff',
                             boxShadow: '0px 8px 15px rgba(0, 123, 255, 0.3)',
                             transition: 'all 0.3s ease',
-                            marginBottom: '10px', 
+                            marginBottom: '10px',
                             '&:hover': {
                                 backgroundColor: '#0056b3',
                                 boxShadow: '0px 15px 20px rgba(0, 86, 179, 0.4)',
@@ -341,19 +333,7 @@ const DanhSachNhanVien = () => {
                     >
                         <AddIcon sx={{ fontSize: '30px' }} />
                     </Fab>
-                </Box>
 
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        bottom: 100,
-                        right: 16,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        zIndex: 1300, 
-                    }}
-                >
                     <Fab
                         color="primary"
                         aria-label="export"
@@ -380,8 +360,8 @@ const DanhSachNhanVien = () => {
                         <InsertDriveFileIcon sx={{ fontSize: '30px' }} />
                     </Fab>
                 </Box>
-
             </Box>
+
 
 
             <TableContainer component={Paper}>

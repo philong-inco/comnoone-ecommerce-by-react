@@ -351,7 +351,6 @@ function DotGiamGiaConfiguration() {
                                 ),
                             }}
                         />
-
                         <TextField
                             label="Từ ngày"
                             name="tuNgay"

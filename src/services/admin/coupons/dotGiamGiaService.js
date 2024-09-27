@@ -3,7 +3,7 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:8080/api';
 
 export const listDotGiamGia = (filters) => {
-    const { page = 0, size = 5, ...restFilters } = filters;
+    const { page = 0, size = 6, ...restFilters } = filters;
     const queryParams = new URLSearchParams({
         ...restFilters,
         page,
@@ -11,6 +11,8 @@ export const listDotGiamGia = (filters) => {
     }).toString();
     return axios.get(`http://localhost:8080/api/v1/discounts/all?${queryParams}`);
 };
+
+
 
 export const themDotGiamGia = async (data) => {
     await axios.post(`${BASE_URL}/discounts/add`, data);
@@ -25,12 +27,21 @@ export const getDataProducts = async (page, pageSize) => {
         }
         return await response.json();
     } catch (error) {
-        // Xử lý lỗi chung
         console.error('Error fetching product data:', error);
         throw error;
     }
 };
 
+export const getDGGPage = async (page, size) => {
+    try {
+        size = 6;
+        const result = await get(`http://localhost:8080/api/v1/discounts?page=${page - 1}&size=${size}`);
+        return result;
+    } catch (error) {
+        console.log('Error get :');
+        throw error;
+    }
+};
 
 export const getDataProductsDetail = async (idSanPham) => {
     try {
@@ -45,4 +56,26 @@ export const getDataProductsDetail = async (idSanPham) => {
         throw new Error('Không thể tải chi tiết sản phẩm.');
     }
 };
+
+export const stopDPGG = async (id) => {
+    debugger;
+    try {
+      const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStop/${id}`);
+      return result;
+    } catch (error) {
+      console.log('Error put :', error);
+      throw error;
+    }
+  };
+  
+  export const startDGG = async (id) => {
+    debugger;
+    try {
+      const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStart/${id}`);
+      return result;
+    } catch (error) {
+      console.log('Error put :', error);
+      throw error;
+    }
+  };
 

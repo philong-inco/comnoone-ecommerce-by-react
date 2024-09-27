@@ -85,6 +85,26 @@ export const deleteKhPGG = async (id, status) => {
   }
 };
 
+export const stopKhPGG = async (id) => {
+  try {
+    const result = await put(`coupons/updateStatusPause/${id}`);
+    return result;
+  } catch (error) {
+    console.log('Error put :', error);
+    throw error;
+  }
+};
+
+export const startKhPGG = async (id) => {
+  try {
+    const result = await put(`coupons/updateStatusStart/${id}`);
+    return result;
+  } catch (error) {
+    console.log('Error put :', error);
+    throw error;
+  }
+};
+
 export const getAllCouponsToBill = async (billCode) => {
   try {
     const result = await get(`coupons/to-bill/${billCode}`);
@@ -94,3 +114,4 @@ export const getAllCouponsToBill = async (billCode) => {
     throw error;
   }
 };
+

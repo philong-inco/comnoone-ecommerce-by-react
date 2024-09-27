@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-     FormControl,
+    Switch,
+    FormControl, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
     TextField, Grid, IconButton, Tooltip, Box, Table, TableBody, Fab, InputAdornment, InputLabel,
     TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Snackbar, Alert, MenuItem, Select
 } from '@mui/material';
@@ -10,8 +11,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import { listDotGiamGia } from 'services/admin/coupons/dotGiamGiaService';
+import { listDotGiamGia, startDGG, stopDPGG } from 'services/admin/coupons/dotGiamGiaService';
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
 function DotGiamGia() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,10 +31,11 @@ function DotGiamGia() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [openConfirmDialogOne, setOpenConfirmDialogOne] = useState(false);
     const [selectedCouponId, setSelectedCouponId] = useState(null);
+    const [selectedCouponStatus, setSelectedCouponStatus] = useState(null);
     const navigate = useNavigate();
 
-    // Hàm gọi API để lấy danh sách phiếu giảm giá
     const fetchCoupons = async () => {
         const response = await listDotGiamGia(filters);
         setDotGiamGia(response.data.content);
@@ -40,14 +43,16 @@ function DotGiamGia() {
     };
 
     useEffect(() => {
-        fetchCoupons(currentPage);
-        const intervalId = setInterval(() => {
+        if (!filters) {
             fetchCoupons(currentPage);
-        }, 2000);
-    
-        return () => clearInterval(intervalId); 
-    }, [currentPage]);
-    
+            const intervalId = setInterval(() => {
+                fetchCoupons(currentPage);
+            }, 2000);
+            return () => clearInterval(intervalId);
+        }
+    }, [currentPage, filters]);
+
+
     useEffect(() => {
         fetchCoupons();
     }, [filters, currentPage]);
@@ -88,10 +93,50 @@ function DotGiamGia() {
         await deletedCoupons(selectedCouponId);
         setOpenConfirmDialog(false);
         fetchCoupons();
-        setSnackbarMessage('Xóa phiếu giảm giá thành công');
+        setSnackbarMessage('Hủy đợt giảm giá thành công');
         setSnackbarSeverity('success');
         setOpenSnackbar(true);
     };
+    const handleCloseConfirmDialogOne = () => {
+        setOpenConfirmDialogOne(false);
+        setSelectedCouponId(null);
+    };
+    const handleConfirmSwitchChange = (id, trangThai) => {
+        setSelectedCouponId(id);
+        setSelectedCouponStatus(trangThai);
+        setOpenConfirmDialogOne(true);
+    };
+
+    const handleSwitchChange = async () => {
+        const newStatus = selectedCouponStatus === 1 ? 1 : 4;
+        try {
+            if (newStatus === 4) {
+                const response = await startDGG(selectedCouponId);
+                if (response.status === 200) {
+                    setSnackbarMessage('Phiếu giảm giá đã được bắt đầu áp dụng.');
+                } else {
+                    throw new Error('Có lỗi xảy ra khi bắt đầu áp dụng phiếu giảm giá.');
+                }
+            } else if (newStatus === 1) {
+                const response = await stopDPGG(selectedCouponId);
+                if (response.status === 200) {
+                    setSnackbarMessage('Phiếu giảm giá đã được ngừng áp dụng.');
+                } else {
+                    throw new Error('Có lỗi xảy ra khi ngừng áp dụng phiếu giảm giá.');
+                }
+            }
+            setSnackbarSeverity('success');
+            fetchCoupons();
+        } catch (error) {
+            console.error(error);
+            setSnackbarMessage(error.message || 'Cập nhật trạng thái thất bại.');
+            setSnackbarSeverity('error');
+        } finally {
+            setOpenSnackbar(true);
+            setOpenConfirmDialogOne(false);  // Đóng đúng hộp thoại xác nhận
+        }
+    };
+
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
@@ -103,6 +148,7 @@ function DotGiamGia() {
             case 1: return 'green';
             case 2: return 'red';
             case 3: return '#FFA500';
+            case 4: return 'black';
             default: return 'blue';
         }
     };
@@ -113,15 +159,25 @@ function DotGiamGia() {
             case 1: return 'Đang Diễn Ra';
             case 2: return 'Đã Diễn Ra';
             case 3: return 'Đã Hủy';
+            case 4: return 'Đang tạm dừng';
             default: return 'Không xác định';
         }
+    };
+
+    const handleClearFilters = () => {
+        setFilters({
+            tenOrMa: '',
+            ngayBatDau: '',
+            ngayKetThuc: '',
+            trangThai: '',
+        });
     };
 
     return (
         <div>
             <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 2, marginBottom: 2 }}>
                 <Box sx={{ backgroundColor: 'white', p: 2, borderRadius: 2 }}>
-                    <Grid container spacing={3} p={2}>
+                    <Grid container spacing={3} alignItems="center" p={2}>
                         <Grid item xs={12} sm={3}>
                             <FormControl fullWidth variant="outlined">
                                 <TextField
@@ -134,26 +190,6 @@ function DotGiamGia() {
                                         startAdornment: (
                                             <InputAdornment position="start">
                                                 <SearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                    fullWidth
-                                />
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12} sm={3}>
-                            <FormControl fullWidth variant="outlined">
-                                <TextField
-                                    name="giaTri"
-                                    label="Giá Trị"
-                                    value={filters.giaTri}
-                                    onChange={handleFilterChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <AttachMoneyIcon />
                                             </InputAdornment>
                                         ),
                                     }}
@@ -207,6 +243,33 @@ function DotGiamGia() {
                                 </Select>
                             </FormControl>
                         </Grid>
+
+                        <Grid item xs={12} sm={2}>
+                            <IconButton
+                                onClick={handleClearFilters}
+                                color="secondary"
+                                sx={{
+                                    border: '1px solid',
+                                    borderRadius: 2,
+                                    padding: 1,
+                                    backgroundColor: '#f5f5f5',
+                                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                    '&:hover': {
+                                        backgroundColor: '#e0e0e0',
+                                        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
+                                    },
+                                    '& .MuiSvgIcon-root': {
+                                        transition: 'transform 0.3s ease',
+                                    },
+                                    '&:hover .MuiSvgIcon-root': {
+                                        transform: 'rotate(360deg)',
+                                    },
+                                }}
+                            >
+                                <DeleteSweepIcon />
+                            </IconButton>
+                        </Grid>
                     </Grid>
 
                     <Fab
@@ -236,6 +299,7 @@ function DotGiamGia() {
                             <TableCell>Ngày bắt đầu</TableCell>
                             <TableCell>Ngày kết thúc</TableCell>
                             <TableCell>Trạng thái</TableCell>
+                            <TableCell>Chi tiết</TableCell>
                             <TableCell>Hành động</TableCell>
                         </TableRow>
                     </TableHead>
@@ -267,18 +331,37 @@ function DotGiamGia() {
                                                 <VisibilityIcon />
                                             </IconButton>
                                         </Tooltip>
-                                        {phieu.trangThai === 0 && (
+                                    </TableCell>
+                                    <TableCell>
+                                        {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                                             <>
-                                                <Tooltip title="Chỉnh sửa">
-                                                    <IconButton color="secondary" onClick={() => handleEdit(phieu.id)}>
+                                                <IconButton
+                                                    color="secondary"
+                                                    onClick={() => handleEdit(phieu.id)}
+                                                >
+                                                    <Tooltip title="Chỉnh sửa">
                                                         <EditIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title="Hủy phiếu">
+                                                    </Tooltip>
+                                                </IconButton>
+                                            </>
+                                        )}
+
+                                        {(phieu.trangThai === 0 || phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                                            <>
+                                                <Tooltip title="Hủy đợt giảm giá">
                                                     <IconButton color="error" onClick={() => handleOpenConfirmDialog(phieu.id)}>
                                                         <DeleteIcon />
                                                     </IconButton>
                                                 </Tooltip>
+                                            </>
+                                        )}
+
+                                        {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                                            <>
+                                                <Switch
+                                                    checked={phieu.trangThai === 1}
+                                                    onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}
+                                                />
                                             </>
                                         )}
                                     </TableCell>
@@ -302,8 +385,53 @@ function DotGiamGia() {
                 />
             </Box>
 
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            <Dialog
+                open={openConfirmDialog}
+                onClose={handleCloseConfirmDialog}
+            >
+                <DialogTitle>Xác nhận hủy phiếu</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn có chắc chắn muốn hủy phiếu này? Hành động này không thể hoàn tác.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirmDialog} color="primary">
+                        Hủy bỏ
+                    </Button>
+                    <Button onClick={handleDelete} color="secondary" autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={openConfirmDialogOne}
+                onClose={handleCloseConfirmDialogOne}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Xác nhận thay đổi trạng thái?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn có chắc chắn muốn thay đổi trạng thái của đợt giảm giá này không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirmDialogOne}>Hủy</Button>
+                    <Button onClick={handleSwitchChange} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} variant="filled">
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Radio, FormControlLabel, RadioGroup, FormLabel, FormControl,
+  Switch, Radio, FormControlLabel, RadioGroup, FormLabel, FormControl,
   TextField, Grid, IconButton, Tooltip, Box, Table, TableBody,
   TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Fab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert
 } from '@mui/material';
@@ -10,9 +10,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { filterCoupons, deletedCoupons } from 'services/admin/coupons/couponsService';
+import { filterCoupons, deletedCoupons, stopKhPGG, startKhPGG } from 'services/admin/coupons/couponsService';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
 function PhieuGiamGia() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,17 +24,16 @@ function PhieuGiamGia() {
   const [size, setSize] = useState(5);
   const [ma, setMa] = useState('');
   const [trangThai, setTrangThai] = useState('');
-  const [loaiPhieu, setLoaiPhieu] = useState('');
   const [ngayBatDau, setNgayBatDau] = useState(null);
   const [ngayHetHan, setNgayHetHan] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // Trạng thái mở hộp thoại xác nhận
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedCouponId, setSelectedCouponId] = useState(null);
   const navigate = useNavigate();
+  const [selectedCouponStatus, setSelectedCouponStatus] = useState(null);
 
-  
   const fetchApi = async (currentPage, size) => {
     try {
       let filterString = `(ma ~~ '${ma}')`;
@@ -50,18 +49,18 @@ function PhieuGiamGia() {
       if (ngayBatDau && ngayHetHan) {
         filterString += ` and ngayBatDau >= '${ngayBatDau.format('YYYY-MM-DD')}' and ngayHetHan <= '${ngayHetHan.format('YYYY-MM-DD')}'`;
       }
-  
+
       const response = await filterCoupons(currentPage, 6, filterString);
-      console.log(response.data.meta);  // Debug response
+      console.log(response.data.meta);
       if (response.status_code === 200) {
         setDanhSachPhieuGiamGia(response.data.result);
-        setTotalPages(response.data.meta.pages);  // Cập nhật đúng số trang
+        setTotalPages(response.data.meta.pages);
       }
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   useEffect(() => {
     fetchApi(currentPage, size);
     const intervalId = setInterval(() => {
@@ -78,7 +77,9 @@ function PhieuGiamGia() {
     { id: 0, name: 'Chưa áp dụng', color: 'gray' },
     { id: 1, name: 'Đang áp dụng', color: 'green' },
     { id: 2, name: 'Đã hết hạn', color: 'red' },
-    { id: 3, name: 'Đã hủy', color: '#FFA500'  },
+    { id: 3, name: 'Đã hủy', color: '#FFA500' },
+    { id: 4, name: 'Đang tạm dừng', color: 'black' },
+
   ];
 
   const resetFilters = () => {
@@ -88,6 +89,14 @@ function PhieuGiamGia() {
     setTrangThai('');
     setNgayBatDau(null);
     setNgayHetHan(null);
+  };
+
+  const handleClearFilters = () => {
+    setMa('');
+    handleDateChange('ngayBatDau', null);
+    handleDateChange('ngayHetHan', null);
+    setPhamViApDung('');
+    setLoaiGiamGia('');
   };
 
   const handleDateChange = (name, value) => {
@@ -111,7 +120,7 @@ function PhieuGiamGia() {
     const status = statuses.find((s) => s.id === statusId);
     return status ? status.name : 'Không xác định';
   };
-  
+
   const handleNavigate = () => {
     navigate('/phieugiamgia/cauhinhphieugiamgia');
   };
@@ -125,23 +134,23 @@ function PhieuGiamGia() {
   };
 
   const handleOpenConfirmDialog = (id) => {
-    setSelectedCouponId(id); 
+    setSelectedCouponId(id);
     setOpenConfirmDialog(true);
   };
 
   const handleCloseConfirmDialog = () => {
-    setOpenConfirmDialog(false); 
-    setSelectedCouponId(null); 
+    setOpenConfirmDialog(false);
+    setSelectedCouponId(null);
   };
 
   const handleDelete = async () => {
     try {
       debugger;
-      const response = await deletedCoupons(selectedCouponId); 
+      const response = await deletedCoupons(selectedCouponId);
       if (response.trangThai === 3) {
         setSnackbarMessage('Phiếu đã được hủy thành công!');
         setSnackbarSeverity('success');
-        fetchApi(currentPage, 5); 
+        fetchApi(currentPage, 5);
       } else {
         setSnackbarMessage('Hủy phiếu thất bại.');
         setSnackbarSeverity('error');
@@ -152,30 +161,71 @@ function PhieuGiamGia() {
       setSnackbarSeverity('error');
     }
     setOpenSnackbar(true);
-    handleCloseConfirmDialog(); 
+    handleCloseConfirmDialog();
   };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
+  const handleConfirmSwitchChange = (id, trangThai) => {
+    setSelectedCouponId(id);
+    setSelectedCouponStatus(trangThai);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleSwitchChange = async () => {
+    const newStatus = selectedCouponStatus === 1 ? 1 : 4;
+    try {
+      if (newStatus === 4) {
+        const response = await startKhPGG(selectedCouponId);
+        if (response.status_code === 200) {
+          setSnackbarMessage('Phiếu giảm giá đã được bắt đầu áp dụng.');
+        } else {
+          throw new Error('Có lỗi xảy ra khi bắt đầu áp dụng phiếu giảm giá.');
+        }
+      } else if (newStatus === 1) {
+        const response = await stopKhPGG(selectedCouponId);
+        if (response.status_code === 200) {
+          setSnackbarMessage('Phiếu giảm giá đã được ngừng áp dụng.');
+        } else {
+          throw new Error('Có lỗi xảy ra khi ngừng áp dụng phiếu giảm giá.');
+        }
+      }
+      setSnackbarSeverity('success');
+      fetchApi(currentPage);
+    } catch (error) {
+      console.error(error);
+      setSnackbarMessage(error.message || 'Cập nhật trạng thái thất bại.');
+      setSnackbarSeverity('error');
+    } finally {
+      setOpenSnackbar(true);
+      setOpenConfirmDialog(false);
+    }
+  };
+
+
+
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterMoment}>
-        {/* Bộ lọc */}
-        <Box sx={{ backgroundColor: '#f0f0f0', p: 2, borderRadius: 2, marginBottom: 2 }}>
-          <Box sx={{ backgroundColor: 'white', p: 2, borderRadius: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+        <Box sx={{ backgroundColor: '#f0f0f0', p: 3, borderRadius: 2, marginBottom: 2 }}>
+          <Box sx={{ backgroundColor: 'white', p: 3, borderRadius: 2 }}>
+            <Grid container spacing={3}>
+
+              {/* Tìm kiếm theo mã */}
+              <Grid item xs={12} sm={6} md={4}>
                 <TextField
                   label="Tìm kiếm theo mã"
                   placeholder="Tìm kiếm theo mã"
                   fullWidth
-                  value={ma}  // Sửa lại giá trị thành 'ma'
+                  value={ma}
                   onChange={(e) => setMa(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={3}>
+
+              {/* Ngày bắt đầu */}
+              <Grid item xs={12} sm={6} md={4}>
                 <DatePicker
                   label="Ngày bắt đầu"
                   value={ngayBatDau}
@@ -184,7 +234,8 @@ function PhieuGiamGia() {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={3}>
+              {/* Ngày kết thúc */}
+              <Grid item xs={12} sm={6} md={4}>
                 <DatePicker
                   label="Ngày kết thúc"
                   value={ngayHetHan}
@@ -192,9 +243,11 @@ function PhieuGiamGia() {
                   renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Phạm vi áp dụng */}
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Phạm vi áp dụng</FormLabel>
+                  <FormLabel component="legend">Phạm vi áp dụng</FormLabel>
                   <RadioGroup row value={phamViApDung} onChange={(e) => setPhamViApDung(e.target.value)}>
                     <FormControlLabel value="" control={<Radio />} label="Tất cả" />
                     <FormControlLabel value="1" control={<Radio />} label="Công khai" />
@@ -202,29 +255,60 @@ function PhieuGiamGia() {
                   </RadioGroup>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+
+              {/* Loại phiếu */}
+              <Grid item xs={12} sm={6} md={4}>
                 <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Loại phiếu</FormLabel>
+                  <FormLabel component="legend">Loại phiếu</FormLabel>
                   <RadioGroup row value={loaiGiamGia} onChange={(e) => setLoaiGiamGia(e.target.value)}>
                     <FormControlLabel value="" control={<Radio />} label="Tất cả" />
                     <FormControlLabel value="1" control={<Radio />} label="%" />
                     <FormControlLabel value="2" control={<Radio />} label="VND" />
                   </RadioGroup>
                 </FormControl>
-                </Grid>
-                <Fab
-                  color="primary"
-                  aria-label="add"
+              </Grid>
+
+              <Grid item xs={12} sm={2}>
+                <IconButton
+                  onClick={handleClearFilters}
+                  color="secondary"
                   sx={{
-                    position: 'fixed',
-                    bottom: 16,
-                    right: 16,
+                    border: '1px solid',
+                    borderRadius: 2,
+                    padding: 1,
+                    backgroundColor: '#f5f5f5',
+                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    '&:hover': {
+                      backgroundColor: '#e0e0e0',
+                      boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      transition: 'transform 0.3s ease',
+                    },
+                    '&:hover .MuiSvgIcon-root': {
+                      transform: 'rotate(360deg)',
+                    },
                   }}
-                  onClick={handleNavigate}
                 >
-                  <AddIcon />
-                </Fab>           
+                  <DeleteSweepIcon /> {/* Icon mới */}
+                </IconButton>
+              </Grid>
+
+
             </Grid>
+            <Fab
+              color="primary"
+              aria-label="add"
+              sx={{
+                position: 'fixed',
+                bottom: 16,
+                right: 16,
+              }}
+              onClick={handleNavigate}
+            >
+              <AddIcon />
+            </Fab>
           </Box>
         </Box>
       </LocalizationProvider>
@@ -239,6 +323,7 @@ function PhieuGiamGia() {
               <TableCell>Ngày kết thúc</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell>Hành động</TableCell>
+              <TableCell>Xem phiếu</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -264,13 +349,7 @@ function PhieuGiamGia() {
                   </TableCell>
 
                   <TableCell>
-                    <Tooltip title="Xem chi tiết">
-                      <IconButton onClick={() => handleViewCoupon(phieu.id)}>
-                        <VisibilityIcon />
-                      </IconButton>
-                    </Tooltip>
-                    {/* Hiển thị nút chỉnh sửa và hủy chỉ khi trạng thái là 0 */}
-                    {phieu.trangThai === 0 && (
+                    {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                       <>
                         <IconButton
                           color="secondary"
@@ -280,6 +359,11 @@ function PhieuGiamGia() {
                             <EditIcon />
                           </Tooltip>
                         </IconButton>
+                      </>
+                    )}
+                    {(phieu.trangThai === 0 || phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                      <>
+
                         <IconButton
                           color="error"
                           onClick={() => handleOpenConfirmDialog(phieu.id)}
@@ -288,10 +372,33 @@ function PhieuGiamGia() {
                             <DeleteIcon />
                           </Tooltip>
                         </IconButton>
+                        <Switch
+                          checked={phieu.trangThai === 1}
+                          onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
+                        />
+
+                      </>
+                    )}
+
+                    {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
+                      <>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => handleEdit(phieu.id)}
+                        >
+                          <Tooltip title="Chỉnh sửa">
+                            <EditIcon />
+                          </Tooltip>
+                        </IconButton>
                       </>
                     )}
                   </TableCell>
-
+                  <TableCell><Tooltip title="Xem chi tiết">
+                    <IconButton onClick={() => handleViewCoupon(phieu.id)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -332,10 +439,29 @@ function PhieuGiamGia() {
         </DialogActions>
       </Dialog>
 
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Xác nhận thay đổi trạng thái?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Bạn có chắc chắn muốn thay đổi trạng thái của phiếu giảm giá này không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog}>Hủy</Button>
+          <Button onClick={handleSwitchChange} autoFocus>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Snackbar component */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
@@ -344,7 +470,7 @@ function PhieuGiamGia() {
         </Alert>
       </Snackbar>
 
-    </div>    
+    </div>
   );
 }
 

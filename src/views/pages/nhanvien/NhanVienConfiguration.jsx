@@ -371,12 +371,11 @@ function NhanVienConfiguration() {
             const errorMessage = error.response?.data?.error
                 ? translateErrorMessage(error.response.data.message)
                 : 'Đã xảy ra lỗi khi xử lý yêu cầu!';
-
-                setSnackbar({
-                    open: true,
-                    message: `Lỗi: ${errorMessage}`,
-                    severity: 'error',
-                  });
+            setSnackbar({
+                open: true,
+                message: `Lỗi: ${errorMessage}`,
+                severity: 'error',
+            });
         } finally {
             setLoading(false);
         }
