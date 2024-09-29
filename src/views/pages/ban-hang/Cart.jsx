@@ -1,4 +1,4 @@
-import { Update } from '@mui/icons-material';
+import { AddCircleOutline, RemoveCircleOutline, Update } from '@mui/icons-material';
 import {
   Button,
   Dialog,
@@ -22,7 +22,13 @@ import {
   Chip,
   Radio,
   Snackbar,
-  Alert
+  Alert,
+  FormControlLabel,
+  Switch,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextareaAutosize
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, display } from '@mui/system';
@@ -38,7 +44,7 @@ import {
   updateStatusByCode
 } from 'services/admin/bill/billService';
 import { getAllCouponsToBill } from 'services/admin/coupons/couponsService';
-import { getAll } from 'services/admin/customer/customerService';
+import { fetchSearchCustomer, findCustomerByPhone, getAll } from 'services/admin/customer/customerService';
 import { getAllProduct } from 'services/admin/product/productService';
 import { getAllSerialNumberByProductId, getAllSerialNumberByProductId2 } from 'services/admin/serial-number/serialNumber';
 import {
@@ -48,6 +54,8 @@ import {
 } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 import PdfForm from 'utils/pdf/pdf';
+import { FormControl } from 'react-bootstrap';
+import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 
 function Cart(props) {
   const { bill, onReload } = props;
@@ -82,43 +90,101 @@ function Cart(props) {
   const [showDiaLogCustomer, setShowDiaLogCustomer] = useState(false);
   const [pageCustomer, setPageCustomer] = useState(1);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  const [searchCustomer, setSearchCustomer] = useState('');
   // phiếu giảm giá
   const [showDiaLogCoupon, setShowDiaLogCoupon] = useState(false);
   const [coupons, setCoupons] = useState([]);
 
   // tiến hành thanh toán
-  const [amount, setAmount] = useState('0');
-  const [error, setError] = useState('');
+  // const [amount, setAmount] = useState('0');
+  // const [error, setError] = useState('');
   const [showDiaLogPayment, setShowDiaLogPayment] = useState(false);
-  const [payment, setPayment] = useState({
-    maGiaoDich: '',
-    phuongThuc: '',
-    soTien: ''
-  });
-  const [payments, setPayments] = useState([]);
+  // const [payment, setPayment] = useState({
+  //   maGiaoDich: '',
+  //   phuongThuc: '',
+  //   soTien: ''
+  // });
+  // const [payments, setPayments] = useState([]);
+
+  const [isCashChecked, setIsCashChecked] = useState(true); // Mặc định chọn Tiền mặt
+  const [isTransferChecked, setIsTransferChecked] = useState(false);
+  const [cashAmount, setCashAmount] = useState('0');
+  const [transferAmount, setTransferAmount] = useState('0');
+  const [cashError, setCashError] = useState('');
+  const [transferError, setTransferError] = useState('');
+  const [errorAmount, setErrorAmount] = useState('');
+
+  const handleCashChange = (event) => {
+    setIsCashChecked(event.target.checked);
+    if (!event.target.checked) {
+      setCashAmount(''); // Xoá dữ liệu khi bỏ chọn
+    }
+  };
+
+  const handleTransferChange = (event) => {
+    setIsTransferChecked(event.target.checked);
+    if (!event.target.checked) {
+      setTransferAmount(''); // Xoá dữ liệu khi bỏ chọn
+    }
+  };
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
+  // address
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedWard, setSelectedWard] = useState(null);
+
+  const [isDelivery, setIsDelivery] = useState(true);
+  const [orderInfo, setOrderInfo] = useState({
+    ten: '',
+    sdt: '',
+    email: '',
+    diaChi: '',
+    province: '',
+    district: '',
+    ward: '',
+    ghiChu: ''
+  });
+
+  const handleOrderChange = (e) => {
+    const { name, value } = e.target;
+    setOrderInfo({
+      ...orderInfo,
+      [name]: value
+    });
+  };
+
+  // hiển thi form address
+  const handleSwitchChange = (event) => {
+    setIsDelivery(event.target.checked);
+    if (!event.target.checked) {
+      alert('Ko chọn');
+    }
+  };
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
-  const handleAmountChange = (e) => {
-    const value = e.target.value.trim();
-    setAmount(value);
-    if (value === '' || isNaN(value) || Number(value) < 0) {
-      setError('Số tiền phải là số ');
-    } else if (value < billInFo.tongTienPhaiTra) {
-      setError('Số tiền chưa đủ');
-    } else {
-      setPayments({
-        phuongThuc: '0'
-      });
-      setError('');
-    }
-  };
+  // const handleAmountChange = (e) => {
+  //   const value = e.target.value.trim();
+  //   setAmount(value);
+  //   if (value === '' || isNaN(value) || Number(value) < 0) {
+  //     setError('Số tiền phải là số ');
+  //   } else if (value < billInFo.tongTienPhaiTra) {
+  //     setError('Số tiền chưa đủ');
+  //   } else {
+  //     setPayments({
+  //       phuongThuc: '0'
+  //     });
+  //     setError('');
+  //   }
+  // };
 
   const handleOpenPaymentDialog = (id) => {
     setShowDiaLogPayment(true);
@@ -130,45 +196,77 @@ function Cart(props) {
     // setError('');
   };
 
-  const handleBtnTienMat = () => {
-    if (amount === '' || isNaN(amount) || Number(amount) < 0) {
-      setSnackbarMessage('Số tiền phải là số');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+  const handleAmountChange = (e, type) => {
+    const value = e.target.value;
 
+    // Kiểm tra số tiền phải là số dương
+    if (isNaN(value) || parseFloat(value) < 0) {
+      if (type === 'cash') {
+        setCashError('Số tiền không hợp lệ');
+        setCashAmount(value);
+      } else if (type === 'transfer') {
+        setTransferError('Số tiền không hợp lệ');
+        setTransferAmount(value);
+      }
       return;
     }
-    if (amount < billInFo.tongTienPhaiTra) {
-      setSnackbarMessage('Số tiền khách trả chưa đủ');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
+
+    // Xóa lỗi nếu hợp lệ
+    if (type === 'cash') {
+      setCashAmount(value);
+      setCashError('');
+    } else if (type === 'transfer') {
+      setTransferAmount(value);
+      setTransferError('');
     }
-    if (confirm('Bạn chắc chắn muôn thanh toán bằng tiền mặt')) {
-      // setPayments([..., payment])
-      // call api
-      return;
+
+    // Kiểm tra tổng số tiền
+    const total = parseFloat(cashAmount || 0) + parseFloat(transferAmount || 0);
+    if (total >= parseFloat(billInFo?.tongTienPhaiTra || 0)) {
+      setErrorAmount('');
+    } else {
+      setErrorAmount('Tổng số tiền phải lớn hơn hoặc bằng tổng tiền phải trả');
     }
   };
 
-  const handleBtnXacNhanThanhToan = () => {
-    if (amount === '' || isNaN(amount) || Number(amount) < 0) {
-      setSnackbarMessage('Số tiền phải là số');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
-    if (amount < billInFo.tongTienPhaiTra) {
-      setSnackbarMessage('Số tiền khách trả chưa đủ');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
+  // const handleBtnTienMat = () => {
+  //   if (amount === '' || isNaN(amount) || Number(amount) < 0) {
+  //     setSnackbarMessage('Số tiền phải là số');
+  //     setSnackbarSeverity('error');
+  //     setSnackbarOpen(true);
 
-    if (confirm(`Xác nhận số tiền bạn nhập là ${parseInt(amount || 0).toLocaleString() || '0'} VNĐ`)) {
-      ApiUpdateStatusByCode();
-      return;
-    }
+  //     return;
+  //   }
+  //   if (amount < billInFo.tongTienPhaiTra) {
+  //     setSnackbarMessage('Số tiền khách trả chưa đủ');
+  //     setSnackbarSeverity('error');
+  //     setSnackbarOpen(true);
+  //     return;
+  //   }
+  //   if (confirm('Bạn chắc chắn muôn thanh toán bằng tiền mặt')) {
+  //     // setPayments([..., payment])
+  //     // call api
+  //     return;
+  //   }
+  // };
+
+  const handleBtnXacNhanThanhToan = () => {
+    // if (amount === '' || isNaN(amount) || Number(amount) < 0) {
+    //   setSnackbarMessage('Số tiền phải là số');
+    //   setSnackbarSeverity('error');
+    //   setSnackbarOpen(true);
+    //   return;
+    // }
+    // if (amount < billInFo.tongTienPhaiTra) {
+    //   setSnackbarMessage('Số tiền khách trả chưa đủ');
+    //   setSnackbarSeverity('error');
+    //   setSnackbarOpen(true);
+    //   return;
+    // }
+    // if (confirm(`Xác nhận số tiền bạn nhập là ${parseInt(amount || 0).toLocaleString() || '0'} VNĐ`)) {
+    //   ApiUpdateStatusByCode();
+    //   return;
+    // }
   };
 
   const ApiUpdateStatusByCode = async () => {
@@ -235,8 +333,6 @@ function Cart(props) {
 
   const fetchBillInFo = async () => {
     const response = await getBillByCode(id);
-    console.log('DATA KH : ', response);
-
     if (response.status_code === 200) {
       setBillInFo(response.data);
       setCustomer({
@@ -245,8 +341,19 @@ function Cart(props) {
         email: response.data.email,
         diaChi: response.data.diaChi
       });
+      setOrderInfo({
+        ten: response.data.tenKhachHang,
+        sdt: response.data.sdt,
+        email: response.data.email,
+        diaChi: '',
+        province: '',
+        district: '',
+        ward: '',
+        ghiChu: ''
+      });
     }
   };
+  console.log('Orde : ', orderInfo);
 
   useEffect(() => {
     fetchSerialNumberSold();
@@ -360,13 +467,21 @@ function Cart(props) {
   // api khách hàng
   const fetchApiAllCustomer = async (page) => {
     try {
-      const response = await getAll(page - 1);
+      // searchCustomer
+      // const response = await getAll(page - 1);
+      const response = await fetchSearchCustomer(searchCustomer, page - 1);
       if (response) {
         setCustomers(response.content);
         setTotalCustomers(response.totalPages);
       } else {
       }
     } catch (error) {}
+  };
+
+  const handleChangeSearchCustomer = (e) => {
+    const { value } = e.target;
+    setSearchCustomer(value.trim());
+    fetchApiAllCustomer(pageCustomer);
   };
 
   const handleAddCustomerToBill = async (customerId) => {
@@ -381,6 +496,16 @@ function Cart(props) {
           sdt: response.data.sdt,
           email: response.data.email
         });
+        setOrderInfo({
+          ten: response.data.tenKhachHang,
+          sdt: response.data.sdt,
+          email: response.data.email,
+          diaChi: '',
+          province: '',
+          district: '',
+          ward: '',
+          ghiChu: ''
+        });
         handleCloseShowDiaLogCustomer();
       } else {
       }
@@ -391,6 +516,36 @@ function Cart(props) {
     }
   };
 
+  const findCustomerByPhoneNumber = async (phoneNumber) => {
+    try {
+      const response = await findCustomerByPhone(phoneNumber);
+      if (response.status_code === 200) {
+        setSnackbarMessage('Thêm khách hàng thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        handleAddCustomerToBill(response.data.id, id);
+        setCustomer({
+          ten: response.data.ten,
+          sdt: response.data.sdt,
+          email: response.data.email
+        });
+      } else {
+        setSnackbarMessage('Không tìm thấy khách hàng với số điện thoại này !');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      setSnackbarMessage('Không tìm thấy khách hàng với số điện thoại này !');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+  const handleSubmitFormFindCumster = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const sdt = formData.get('sdt');
+    findCustomerByPhoneNumber(sdt.trim());
+  };
   const handleChangePageCustomer = (newPage) => {
     setPageCustomer(newPage);
     fetchApiAllCustomer(newPage);
@@ -478,9 +633,56 @@ function Cart(props) {
     setCoupons([]);
   };
 
-  // Kiểm tra hàm onReload
-  console.log('onReload prop:', onReload);
+  // address
+  useEffect(() => {
+    const loadProvinces = async () => {
+      const data = await fetchAllProvince();
+      setProvinces(data.data);
+    };
+    loadProvinces();
+  }, []);
+  const handleProvinceChange = async (event) => {
+    handleOrderChange(event);
+    const provinceId = event.target.value;
+    setSelectedProvince(provinceId);
+    const data = await fetchAllProvinceDistricts(provinceId);
+    setDistricts(data.data);
+    console.log('setDistricts : ', data);
+    setSelectedDistrict('');
+    setSelectedWard('');
+    setWards([]);
+  };
 
+  const handleDistrictChange = async (event) => {
+    handleOrderChange(event);
+    const districtId = event.target.value;
+    setSelectedDistrict(districtId);
+    const data = await fetchAllProvinceWard(districtId);
+    setWards(data.data);
+    console.log('setWards : ', data);
+    setSelectedWard('');
+  };
+
+  const handleWardChange = (event) => {
+    handleOrderChange(event);
+    setSelectedWard(event.target.value);
+    // if (selectedDistrict) {
+    getDeliveryDate(selectedDistrict, event.target.value);
+    // }
+  };
+
+  const getDeliveryDate = async (to_district_id, to_ward_code) => {
+    const data = await fetchAllDayShip(to_district_id, to_ward_code);
+    const data2 = await getMoneyShip(to_district_id, to_ward_code);
+    console.log('DATA 2 : ', data);
+    console.log('DATA 3 : ', data2);
+  };
+
+  console.log('1 P : ', selectedProvince);
+  console.log('2 D : ', selectedDistrict);
+  console.log('1 W : ', selectedWard);
+
+  // Kiểm tra hàm onReload
   const handleSomeAction = () => {
     if (typeof onReload === 'function') {
       onReload(); // Gọi hàm reload
@@ -494,7 +696,7 @@ function Cart(props) {
         <Grid container spacing={2}>
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">Giỏ hàng</Typography>
-            {/* <PdfForm serials={serialNumberSold} hiden={true} /> */}
+            <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} />
             <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
               Thêm sản phẩm
             </Button>
@@ -528,9 +730,30 @@ function Cart(props) {
                     {product.productName} <br />
                     <strong style={{ color: 'red' }}>{parseInt(product.price).toLocaleString()} VNĐ</strong>
                   </TableCell>
-
                   <TableCell>
-                    <strong>{product.quantity} </strong>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                        <RemoveCircleOutline />
+                      </IconButton>
+
+                      <TextField
+                        type="number"
+                        value={product.quantity}
+                        onChange={(e) => handleOpenDialog(product.productDetailId)}
+                        inputProps={{ min: 0 }}
+                        sx={{
+                          width: 50,
+                          height: 30, // Điều chỉnh chiều cao
+                          '& .MuiInputBase-input': {
+                            padding: '5px 10px' // Điều chỉnh padding để phù hợp với chiều cao
+                          }
+                        }}
+                      />
+
+                      <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                        <AddCircleOutline />
+                      </IconButton>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <strong style={{ color: 'red' }}>{parseInt(product.quantity * product.price).toLocaleString()} VNĐ</strong>
@@ -546,12 +769,12 @@ function Cart(props) {
                     </strong>
                   </TableCell>
                   <TableCell>
-                    <Button
+                    {/* <Button
                       sx={{ color: 'white', marginRight: '5px', backgroundColor: '#4CAF50', '&:hover': { backgroundColor: '#388E3C' } }}
                       onClick={() => handleOpenDialog(product.productDetailId)}
                     >
                       Cập nhập
-                    </Button>
+                    </Button> */}
                     <Button
                       sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
                       onClick={() => handleDelete(product)}
@@ -595,7 +818,19 @@ function Cart(props) {
           </Grid>
           <Grid container spacing={2} paddingY={2}>
             <Grid item xs={6}>
-              <Typography variant="subtitle1">Số điện thoại : {customer.sdt}</Typography>
+              <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center' }}>
+                Số điện thoại :{/* {customer.sdt} */}
+                <form onSubmit={handleSubmitFormFindCumster} style={{ width: '70%', marginLeft: '5px' }}>
+                  <input
+                    type="text"
+                    placeholder="Số điện thoại"
+                    // value={customer.sdt}
+                    name="sdt"
+                    defaultValue={customer.sdt}
+                    style={{ width: '50%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  />
+                </form>
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="subtitle1">Địa chỉ : {customer.diaChi}</Typography>
@@ -610,9 +845,9 @@ function Cart(props) {
         </Grid>
         <Grid item xs={4}>
           <Box display="flex" justifyContent="end">
-            <Button variant="outlined" disabled={id ? false : true}>
+            {/* <Button variant="outlined" disabled={id ? false : true}>
               Bán Giao Hàng
-            </Button>
+            </Button> */}
             <Button
               variant="contained"
               color="primary"
@@ -628,25 +863,160 @@ function Cart(props) {
         </Grid>
         <Grid mt={2} item xs={12} sx={{ borderTop: 1 }} />
 
-        <Grid item xs={9}>
-          GHN{' '}
+        <Grid item xs={8}>
+          {isDelivery ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
+              <div style={{ flex: '0 0 32%' }}>
+                <input
+                  type="text"
+                  name="ten"
+                  value={orderInfo.ten}
+                  placeholder="Họ và Tên"
+                  onChange={handleOrderChange}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
+
+              <div style={{ flex: '0 0 32%' }}>
+                <input
+                  type="text"
+                  name="sdt"
+                  value={orderInfo.sdt}
+                  placeholder="Số điện thoại"
+                  onChange={handleOrderChange}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
+
+              <div style={{ flex: '0 0 32%' }}>
+                <input
+                  type="text"
+                  name="email"
+                  value={orderInfo.email}
+                  placeholder="Email"
+                  onChange={handleOrderChange}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
+
+              <div style={{ flex: '0 0 100%' }}>
+                <input
+                  type="text"
+                  name="diaChi"
+                  value={orderInfo.diaChi}
+                  placeholder="Địa chỉ"
+                  onChange={handleOrderChange}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', width: '100%' }}>
+                <div style={{ width: '32%' }}>
+                  <select
+                    id="province"
+                    name="province"
+                    value={orderInfo.province}
+                    // value={selectedProvince}
+                    onChange={handleProvinceChange}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  >
+                    <option value="" disabled selected>
+                      Chọn Tỉnh/Thành Phố
+                    </option>
+                    {provinces.map((province) => (
+                      <option key={province.ProvinceID} value={province.ProvinceID}>
+                        {province.ProvinceName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ width: '32%' }}>
+                  <select
+                    id="district"
+                    name="district"
+                    value={orderInfo.district}
+                    // value={selectedDistrict}
+                    onChange={handleDistrictChange}
+                    // disabled={!selectedProvince}
+                    disabled={!orderInfo.province}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  >
+                    <option value="" disabled selected>
+                      Chọn Quận/Huyện
+                    </option>
+                    {districts.map((district) => (
+                      <option key={district.DistrictID} value={district.DistrictID}>
+                        {district.DistrictName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ width: '32%' }}>
+                  <select
+                    id="ward"
+                    // value={selectedWard}
+                    name="ward"
+                    value={orderInfo.ward}
+                    disabled={!orderInfo.district}
+                    onChange={handleWardChange}
+                    // disabled={!selectedDistrict}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  >
+                    <option value="" disabled selected>
+                      Chọn Phường/Xã
+                    </option>
+                    {wards.map((ward) => (
+                      <option key={ward.WardCode} value={ward.WardCode}>
+                        {ward.WardName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ flex: '0 0 100%' }}>
+                <textarea
+                  name="ghiChu"
+                  value={orderInfo.ghiChu}
+                  placeholder="Ghi chú"
+                  onChange={handleOrderChange}
+                  style={{ width: '100%', border: '1px solid grey', minHeight: '80px', padding: '10px', borderRadius: '4px' }}
+                ></textarea>
+              </div>
+
+              <div style={{ flex: '0 0 100%', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
+                <img src="https://ghn.vn/img/logo_ghn.png" alt="GHN Logo" style={{ width: '100px', marginRight: '10px' }} />
+                <span>Thời gian nhận hàng dự kiến:</span>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
         </Grid>
-        <Grid item xs={3}>
-          <form onSubmit={handleSubmitFormCoupon}>
-            <TextField label="Mã Giảm Giá" name="maPGG" variant="outlined" size="small" inputRef={inputRef} fullWidth />
-          </form>
-          <Button
-            variant="contained"
-            color="warning"
-            size="small"
-            sx={{ padding: 1, borderRadius: 3, marginLeft: 2 }}
-            onClick={() => {
-              handleShowDiaLogCoupon();
-            }}
-            disabled={id ? false : true}
-          >
-            Chọn Mã Giảm Giá :
-          </Button>
+        <Grid item xs={4}>
+          <Box display="flex" alignItems="center" sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Button
+              variant="contained"
+              color="warning"
+              size="small"
+              sx={{ padding: 1, borderRadius: 3, mr: 2 }}
+              onClick={() => {
+                handleShowDiaLogCoupon();
+              }}
+              disabled={id ? false : true}
+            >
+              Chọn Mã Giảm Giá :
+            </Button>
+            <form onSubmit={handleSubmitFormCoupon}>
+              <TextField label="Mã Giảm Giá" name="maPGG" variant="outlined" size="small" inputRef={inputRef} fullWidth />
+            </form>{' '}
+          </Box>
+          <FormControlLabel
+            control={<Switch checked={isDelivery} onChange={handleSwitchChange} color="primary" />}
+            label={isDelivery ? 'Giao hàng' : 'Tại quầy'}
+          />
           <Typography mt={1} variant="h4">
             Tổng tiền hàng: {parseInt(billInFo.tongTienBanDau || 0).toLocaleString() || '0'} VNĐ
           </Typography>
@@ -661,10 +1031,10 @@ function Cart(props) {
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold">
             Tiền thừa:{' '}
-            {`${Math.max(0, parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', {
+            {/* {`${Math.max(0, parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', {
               style: 'currency',
               currency: 'VND'
-            })}`}
+            })}`} */}
           </Typography>
           {/* <Typography mt={1} variant="h4">
             {' '}
@@ -785,7 +1155,8 @@ function Cart(props) {
                     <Checkbox
                       checked={selectedRows.includes(row.id)}
                       onChange={() => handleSelectRow(row.id)}
-                      disabled={row.trangThai == 1}
+                      // disabled={row.trangThai == 1}
+                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id)}
                     />
                     <TableCell>{row.ma}</TableCell>
                     <TableCell>
@@ -825,6 +1196,13 @@ function Cart(props) {
         <DialogTitle>Danh sách khách hàng</DialogTitle>
         <DialogContent>
           {/* Thêm bảng vào Dialog */}
+          <input
+            type="text"
+            name="search"
+            placeholder="Tìm theo mã , tên , sđt , email"
+            onChange={handleChangeSearchCustomer}
+            style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+          />
           <TableContainer component={Paper} style={{ maxHeight: '500px' }}>
             <Table stickyHeader>
               <TableHead>
@@ -937,7 +1315,7 @@ function Cart(props) {
         fullWidth
       >
         <DialogTitle>Thanh toán</DialogTitle>
-        <DialogContent>
+        {/* <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -952,7 +1330,6 @@ function Cart(props) {
               />
             </Grid>
 
-            {/* Tiền mặt và Chuyển khoản buttons */}
             <Grid item xs={6}>
               <Button fullWidth variant="outlined" onClick={handleBtnTienMat}>
                 Tiền mặt
@@ -964,48 +1341,12 @@ function Cart(props) {
               </Button>
             </Grid>
 
-            {/* Tổng tiền */}
             <Grid item xs={12}>
               <Typography variant="h6" align="right" color="error">
                 {`${parseInt(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN')} VNĐ`}
               </Typography>
             </Grid>
 
-            {/* Table */}
-            {/* <Grid item xs={12}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>STT</TableCell>
-                      <TableCell>Mã giao dịch</TableCell>
-                      <TableCell>Số tiền</TableCell>
-                      <TableCell>Phương thức</TableCell>
-                      <TableCell>Hành động</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>1</TableCell>
-                      <TableCell>-</TableCell>
-                      <TableCell>99.999.999 VND</TableCell>
-                      <TableCell>
-                        <Button size="small" variant="contained" color="success">
-                          Tiền mặt
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <IconButton color="error">
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid> */}
-
-            {/* Số tiền khách thanh toán */}
             <Grid item xs={12}>
               <Typography variant="h6">
                 Khách thanh toán:
@@ -1017,6 +1358,76 @@ function Cart(props) {
                 Tiền thừa:
                 <span style={{ color: 'blue', float: 'right' }}>
                   {`${(parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
+                  VND
+                </span>
+              </Typography>
+            </Grid>
+          </Grid>
+        </DialogContent> */}
+        <DialogContent>
+          <Grid container spacing={2} sx={{ paddingTop: 2 }}>
+            {isCashChecked && (
+              <Grid item xs={12}>
+                <TextField
+                  label="Số tiền mặt"
+                  fullWidth
+                  variant="outlined"
+                  type="number"
+                  value={cashAmount}
+                  onChange={(e) => handleAmountChange(e, 'cash')}
+                  error={!!cashError}
+                  helperText={cashError}
+                />
+              </Grid>
+            )}
+
+            {isTransferChecked && (
+              <Grid item xs={12}>
+                <TextField
+                  label="Số tiền chuyển khoản"
+                  fullWidth
+                  variant="outlined"
+                  type="number"
+                  value={transferAmount}
+                  onChange={(e) => handleAmountChange(e, 'transfer')}
+                  error={!!transferError}
+                  helperText={transferError}
+                />
+              </Grid>
+            )}
+            {errorAmount && (
+              <Grid item xs={12}>
+                <Typography color="error">{errorAmount}</Typography>
+              </Grid>
+            )}
+            <Grid item xs={6}>
+              <Checkbox checked={isCashChecked} onChange={handleCashChange} color="primary" />
+              <Typography>Tiền mặt</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Checkbox checked={isTransferChecked} onChange={handleTransferChange} color="primary" />
+              <Typography>Chuyển khoản</Typography>
+            </Grid>
+
+            {/* Tổng tiền */}
+            <Grid item xs={12}>
+              <Typography variant="h6" align="right" color="error">
+                {`${parseInt(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN')} VNĐ`}
+              </Typography>
+            </Grid>
+
+            {/* Khách thanh toán và tiền thừa */}
+            <Grid item xs={12}>
+              <Typography variant="h6">
+                Khách thanh toán:
+                <span style={{ color: 'red', float: 'right' }}>
+                  {`${parseFloat(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
+                </span>
+              </Typography>
+              <Typography variant="h6">
+                Tiền thừa:
+                <span style={{ color: 'blue', float: 'right' }}>
+                  {`${(parseFloat(cashAmount || '0') + parseFloat(transferAmount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
                   VND
                 </span>
               </Typography>
