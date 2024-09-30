@@ -11,7 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import { listDotGiamGia, startDGG, stopDPGG } from 'services/admin/coupons/dotGiamGiaService';
+import { listDotGiamGia, startDGG, stopDPGG, deleteDGG } from 'services/admin/coupons/dotGiamGiaService';
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
@@ -37,20 +37,20 @@ function DotGiamGia() {
     const navigate = useNavigate();
 
     const fetchCoupons = async () => {
+        debugger;
         const response = await listDotGiamGia(filters);
         setDotGiamGia(response.data.content);
         setTotalPages(response.data.totalPages);
     };
 
     useEffect(() => {
-        if (!filters) {
+        
             fetchCoupons(currentPage);
             const intervalId = setInterval(() => {
                 fetchCoupons(currentPage);
             }, 2000);
             return () => clearInterval(intervalId);
-        }
-    }, [currentPage, filters]);
+            }, [currentPage, filters]);
 
 
     useEffect(() => {
@@ -90,7 +90,7 @@ function DotGiamGia() {
     };
 
     const handleDelete = async () => {
-        await deletedCoupons(selectedCouponId);
+        await deleteDGG(selectedCouponId);
         setOpenConfirmDialog(false);
         fetchCoupons();
         setSnackbarMessage('Hủy đợt giảm giá thành công');

@@ -15,16 +15,10 @@ const thongKe = {
             children: [
                 {
                     id: 'doanhthu',
-                    title: 'Doanh thu',
+                    title: 'Thống Kê Chi Tiết',
                     type: 'item',
                     url: '/thongke/doanhthu'
-                  },
-                  {
-                    id: 'sanpham',
-                    title: 'Sản phẩm bán chạy',
-                    type: 'item',
-                    url: '/thongke/sanpham'
-                  }          
+                  }       
                 ]
         }
     ]

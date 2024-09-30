@@ -18,7 +18,7 @@ export const themDotGiamGia = async (data) => {
     await axios.post(`${BASE_URL}/discounts/add`, data);
 };
 export const getDataProducts = async (page, pageSize) => {
-    const url = `http://localhost:8080/api/san-pham/all?page=${page}&pageSize=${pageSize}`;
+    const url = `http://localhost:8080/api/san-pham/find-status-page?status=1&page=${page}&size=${pageSize}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -60,22 +60,32 @@ export const getDataProductsDetail = async (idSanPham) => {
 export const stopDPGG = async (id) => {
     debugger;
     try {
-      const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStop/${id}`);
-      return result;
+        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStop/${id}`);
+        return result;
     } catch (error) {
-      console.log('Error put :', error);
-      throw error;
+        console.log('Error put :', error);
+        throw error;
     }
-  };
-  
-  export const startDGG = async (id) => {
+};
+
+export const startDGG = async (id) => {
     debugger;
     try {
-      const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStart/${id}`);
-      return result;
+        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStart/${id}`);
+        return result;
     } catch (error) {
-      console.log('Error put :', error);
-      throw error;
+        console.log('Error put :', error);
+        throw error;
     }
-  };
+};
 
+export const deleteDGG = async (id) => {
+    debugger;
+    try {
+        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusdelete/${id}`);
+        return result;
+    } catch (error) {
+        console.log('Error put :', error);
+        throw error;
+    }
+};
