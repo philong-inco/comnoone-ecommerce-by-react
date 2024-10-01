@@ -96,18 +96,11 @@ function Cart(props) {
   const [coupons, setCoupons] = useState([]);
 
   // tiến hành thanh toán
-  // const [amount, setAmount] = useState('0');
-  // const [error, setError] = useState('');
-  const [showDiaLogPayment, setShowDiaLogPayment] = useState(false);
-  // const [payment, setPayment] = useState({
-  //   maGiaoDich: '',
-  //   phuongThuc: '',
-  //   soTien: ''
-  // });
-  // const [payments, setPayments] = useState([]);
 
-  const [isCashChecked, setIsCashChecked] = useState(true); // Mặc định chọn Tiền mặt
-  const [isTransferChecked, setIsTransferChecked] = useState(false);
+  const [showDiaLogPayment, setShowDiaLogPayment] = useState(false);
+
+  const [isCashChecked, setIsCashChecked] = useState(true);
+  const [isTransferChecked, setIsTransferChecked] = useState(true);
   const [cashAmount, setCashAmount] = useState('0');
   const [transferAmount, setTransferAmount] = useState('0');
   const [cashError, setCashError] = useState('');
@@ -115,16 +108,26 @@ function Cart(props) {
   const [errorAmount, setErrorAmount] = useState('');
 
   const handleCashChange = (event) => {
-    setIsCashChecked(event.target.checked);
-    if (!event.target.checked) {
-      setCashAmount(''); // Xoá dữ liệu khi bỏ chọn
+    const checked = event.target.checked;
+    setIsCashChecked(checked);
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      tienMat: checked ? 1 : null
+    }));
+    if (!checked) {
+      setCashAmount('');
     }
   };
 
   const handleTransferChange = (event) => {
-    setIsTransferChecked(event.target.checked);
+    const checked = event.target.checked;
+    setIsTransferChecked(checked);
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      chuyenKhoan: checked ? 2 : null
+    }));
     if (!event.target.checked) {
-      setTransferAmount(''); // Xoá dữ liệu khi bỏ chọn
+      setTransferAmount('');
     }
   };
 
@@ -140,16 +143,21 @@ function Cart(props) {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
 
-  const [isDelivery, setIsDelivery] = useState(true);
+  const [isDelivery, setIsDelivery] = useState(false);
   const [orderInfo, setOrderInfo] = useState({
+    chuyenKhoan: 2,
+    tienMat: 1,
+    loaiHoaDon: 0,
     ten: '',
     sdt: '',
     email: '',
     diaChi: '',
-    province: '',
-    district: '',
-    ward: '',
-    ghiChu: ''
+    tinh: '',
+    huyen: '',
+    phuong: '',
+    ghiChu: '',
+    ngayNhanHang: '',
+    tienShip: '0'
   });
 
   const handleOrderChange = (e) => {
@@ -162,11 +170,15 @@ function Cart(props) {
 
   // hiển thi form address
   const handleSwitchChange = (event) => {
+    const { name, value } = event.target;
     setIsDelivery(event.target.checked);
-    if (!event.target.checked) {
-      alert('Ko chọn');
-    }
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      loaiHoaDon: isDelivery ? 0 : 1
+    }));
   };
+  console.log('Loại hóa đơn : ', orderInfo);
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
@@ -192,15 +204,16 @@ function Cart(props) {
 
   const handleClosePaymentDialog = () => {
     setShowDiaLogPayment(false);
-    // setAmount('');
-    // setError('');
+    setCashAmount('0');
+    setTransferAmount('0');
+    setError('');
   };
 
   const handleAmountChange = (e, type) => {
     const value = e.target.value;
 
     // Kiểm tra số tiền phải là số dương
-    if (isNaN(value) || parseFloat(value) < 0) {
+    if (isNaN(value)) {
       if (type === 'cash') {
         setCashError('Số tiền không hợp lệ');
         setCashAmount(value);
@@ -211,18 +224,36 @@ function Cart(props) {
       return;
     }
 
+    if (parseFloat(value) < 0) {
+      if (type === 'cash') {
+        setCashError('Số tiền không được âm');
+        setCashAmount(value);
+      } else if (type === 'transfer') {
+        setTransferError('Số tiền không được âm');
+        setTransferAmount(value);
+      }
+      return;
+    }
+    let newCashAmount = cashAmount;
+    let newTransferAmount = transferAmount;
+
     // Xóa lỗi nếu hợp lệ
     if (type === 'cash') {
+      newCashAmount = value;
       setCashAmount(value);
       setCashError('');
     } else if (type === 'transfer') {
+      newTransferAmount = value;
       setTransferAmount(value);
       setTransferError('');
     }
+    const tongTienPhaiTra = Math.round(parseFloat(billInFo?.tongTienPhaiTra || 0));
+    console.log('TTT : ', tongTienPhaiTra);
 
     // Kiểm tra tổng số tiền
-    const total = parseFloat(cashAmount || 0) + parseFloat(transferAmount || 0);
-    if (total >= parseFloat(billInFo?.tongTienPhaiTra || 0)) {
+    const total = parseFloat(newCashAmount || 0) + parseFloat(newTransferAmount || 0);
+
+    if (total >= tongTienPhaiTra) {
       setErrorAmount('');
     } else {
       setErrorAmount('Tổng số tiền phải lớn hơn hoặc bằng tổng tiền phải trả');
@@ -251,6 +282,11 @@ function Cart(props) {
   // };
 
   const handleBtnXacNhanThanhToan = () => {
+    if (orderInfo.chuyenKhoan == null && orderInfo.tienMat == null) {
+      setSnackbarMessage('Bạn chưa chọn phương thức thanh toán');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
     // if (amount === '' || isNaN(amount) || Number(amount) < 0) {
     //   setSnackbarMessage('Số tiền phải là số');
     //   setSnackbarSeverity('error');
@@ -293,7 +329,7 @@ function Cart(props) {
 
   const apiPayCounter = async () => {
     try {
-      const response = await payCounter(id);
+      const response = await payCounter(id, orderInfo);
       if (response.status_code === 201) {
         setSnackbarMessage('Xác nhận thanh toán thành công thành công');
         setSnackbarSeverity('success');
@@ -342,14 +378,19 @@ function Cart(props) {
         diaChi: response.data.diaChi
       });
       setOrderInfo({
+        chuyenKhoan: 2,
+        tienMat: 1,
+        loaiHoaDon: isDelivery ? 1 : 0,
         ten: response.data.tenKhachHang,
         sdt: response.data.sdt,
         email: response.data.email,
         diaChi: '',
-        province: '',
-        district: '',
-        ward: '',
-        ghiChu: ''
+        tinh: '',
+        huyen: '',
+        phuong: '',
+        ghiChu: '',
+        ngayNhanHang: '',
+        tienShip: '0'
       });
     }
   };
@@ -386,7 +427,6 @@ function Cart(props) {
       billCode: id,
       serialNumberIds: serialNumberIds
     };
-    console.log('data : ', data);
     fetchDelete(id, serialNumberIds);
     fetchBillInFo();
   };
@@ -496,16 +536,14 @@ function Cart(props) {
           sdt: response.data.sdt,
           email: response.data.email
         });
-        setOrderInfo({
+
+        setOrderInfo((prevOrderInfo) => ({
+          ...prevOrderInfo,
           ten: response.data.tenKhachHang,
           sdt: response.data.sdt,
-          email: response.data.email,
-          diaChi: '',
-          province: '',
-          district: '',
-          ward: '',
-          ghiChu: ''
-        });
+          email: response.data.email
+        }));
+
         handleCloseShowDiaLogCustomer();
       } else {
       }
@@ -641,13 +679,20 @@ function Cart(props) {
     };
     loadProvinces();
   }, []);
+  console.log('TP : ', provinces);
+  console.log('Quận Huyện  : ', districts);
+  console.log('Xã huyện  : ', wards);
+
   const handleProvinceChange = async (event) => {
     handleOrderChange(event);
     const provinceId = event.target.value;
     setSelectedProvince(provinceId);
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      tinh: provinceId
+    }));
     const data = await fetchAllProvinceDistricts(provinceId);
     setDistricts(data.data);
-    console.log('setDistricts : ', data);
     setSelectedDistrict('');
     setSelectedWard('');
     setWards([]);
@@ -657,6 +702,10 @@ function Cart(props) {
     handleOrderChange(event);
     const districtId = event.target.value;
     setSelectedDistrict(districtId);
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      huyen: districtId
+    }));
     const data = await fetchAllProvinceWard(districtId);
     setWards(data.data);
     console.log('setWards : ', data);
@@ -666,16 +715,29 @@ function Cart(props) {
   const handleWardChange = (event) => {
     handleOrderChange(event);
     setSelectedWard(event.target.value);
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      phuong: event.target.value
+    }));
     // if (selectedDistrict) {
     getDeliveryDate(selectedDistrict, event.target.value);
     // }
   };
 
   const getDeliveryDate = async (to_district_id, to_ward_code) => {
-    const data = await fetchAllDayShip(to_district_id, to_ward_code);
-    const data2 = await getMoneyShip(to_district_id, to_ward_code);
-    console.log('DATA 2 : ', data);
-    console.log('DATA 3 : ', data2);
+    const dayShip = await fetchAllDayShip(to_district_id, to_ward_code);
+    const moneyShip = await getMoneyShip(to_district_id, to_ward_code);
+    const date = new Date(dayShip.data.leadtime * 1000);
+    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    setOrderInfo((prevOrderInfo) => ({
+      ...prevOrderInfo,
+      ngayNhanHang: formattedDate,
+      tienShip: moneyShip.data.total
+    }));
+    console.log('DATA 2 : ', dayShip);
+    console.log('Ngày nhận hàng : ', formattedDate);
+    console.log('DATA 3 : ', moneyShip);
+    console.log('Giá ship : ', moneyShip.data.total);
   };
 
   console.log('1 P : ', selectedProvince);
@@ -769,12 +831,6 @@ function Cart(props) {
                     </strong>
                   </TableCell>
                   <TableCell>
-                    {/* <Button
-                      sx={{ color: 'white', marginRight: '5px', backgroundColor: '#4CAF50', '&:hover': { backgroundColor: '#388E3C' } }}
-                      onClick={() => handleOpenDialog(product.productDetailId)}
-                    >
-                      Cập nhập
-                    </Button> */}
                     <Button
                       sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
                       onClick={() => handleDelete(product)}
@@ -845,9 +901,6 @@ function Cart(props) {
         </Grid>
         <Grid item xs={4}>
           <Box display="flex" justifyContent="end">
-            {/* <Button variant="outlined" disabled={id ? false : true}>
-              Bán Giao Hàng
-            </Button> */}
             <Button
               variant="contained"
               color="primary"
@@ -864,7 +917,7 @@ function Cart(props) {
         <Grid mt={2} item xs={12} sx={{ borderTop: 1 }} />
 
         <Grid item xs={8}>
-          {isDelivery ? (
+          {isDelivery && id ? (
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
               <div style={{ flex: '0 0 32%' }}>
                 <input
@@ -915,7 +968,7 @@ function Cart(props) {
                   <select
                     id="province"
                     name="province"
-                    value={orderInfo.province}
+                    value={orderInfo.tinh}
                     // value={selectedProvince}
                     onChange={handleProvinceChange}
                     style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -935,11 +988,11 @@ function Cart(props) {
                   <select
                     id="district"
                     name="district"
-                    value={orderInfo.district}
+                    value={orderInfo.huyen}
                     // value={selectedDistrict}
                     onChange={handleDistrictChange}
                     // disabled={!selectedProvince}
-                    disabled={!orderInfo.province}
+                    disabled={!orderInfo.tinh}
                     style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                   >
                     <option value="" disabled selected>
@@ -958,8 +1011,8 @@ function Cart(props) {
                     id="ward"
                     // value={selectedWard}
                     name="ward"
-                    value={orderInfo.ward}
-                    disabled={!orderInfo.district}
+                    value={orderInfo.phuong}
+                    disabled={!orderInfo.huyen}
                     onChange={handleWardChange}
                     // disabled={!selectedDistrict}
                     style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
@@ -988,7 +1041,10 @@ function Cart(props) {
 
               <div style={{ flex: '0 0 100%', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
                 <img src="https://ghn.vn/img/logo_ghn.png" alt="GHN Logo" style={{ width: '100px', marginRight: '10px' }} />
-                <span>Thời gian nhận hàng dự kiến:</span>
+                <span>
+                  Thời gian nhận hàng dự kiến: <strong>{orderInfo.ngayNhanHang}</strong>{' '}
+                </span>
+                <br />
               </div>
             </div>
           ) : (
@@ -1014,20 +1070,26 @@ function Cart(props) {
             </form>{' '}
           </Box>
           <FormControlLabel
+            disabled={id ? false : true}
             control={<Switch checked={isDelivery} onChange={handleSwitchChange} color="primary" />}
             label={isDelivery ? 'Giao hàng' : 'Tại quầy'}
           />
           <Typography mt={1} variant="h4">
-            Tổng tiền hàng: {parseInt(billInFo.tongTienBanDau || 0).toLocaleString() || '0'} VNĐ
+            Tổng tiền hàng: {parseFloat(billInFo.tongTienBanDau || 0).toLocaleString() || '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4">
             Phiếu giảm giá : {billInFo.maPGG || ''}
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm giá: {parseInt(billInFo.giaTriPhieuGiamGia || 0).toLocaleString() || '0'} {billInFo.loaiPGG === 1 ? '%' : 'VNĐ' || ''}
+            Giảm giá: {parseFloat(billInFo.giaTriPhieuGiamGia || 0).toLocaleString() || '0'} {billInFo.loaiPGG === 1 ? '%' : 'VNĐ' || ''}
           </Typography>
+          {isDelivery && (
+            <Typography mt={1} variant="h4">
+              Tiền ship: {parseFloat(orderInfo.tienShip || 0).toLocaleString() || '0'} VNĐ
+            </Typography>
+          )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Khách cần trả: {parseInt(billInFo.tongTienPhaiTra || 0).toLocaleString() || '0'} VNĐ
+            Khách cần trả: {parseFloat(billInFo.tongTienPhaiTra || 0).toLocaleString() || '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold">
             Tiền thừa:{' '}
@@ -1045,6 +1107,7 @@ function Cart(props) {
             color="primary"
             onClick={() => {
               apiPayCounter();
+              handleOpenPaymentDialog();
             }}
             disabled={id ? false : true}
           >
@@ -1304,66 +1367,8 @@ function Cart(props) {
         </DialogActions>
       </Dialog>
       {/* DiaLog Tiến Hành Thanh Toán */}
-      <Dialog
-        open={showDiaLogPayment}
-        onClose={() => {
-          setShowDiaLogPayment(false);
-          setAmount('');
-          setError('');
-        }}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={showDiaLogPayment} onClose={handleClosePaymentDialog} maxWidth="sm" fullWidth>
         <DialogTitle>Thanh toán</DialogTitle>
-        {/* <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Số tiền"
-                fullWidth
-                variant="outlined"
-                value={amount}
-                // value={parseInt(amount || 0).toLocaleString() || '0'}
-                error={!!error}
-                helperText={error}
-                onChange={handleAmountChange}
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <Button fullWidth variant="outlined" onClick={handleBtnTienMat}>
-                Tiền mặt
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Button fullWidth variant="contained" color="primary">
-                Chuyển khoản
-              </Button>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="h6" align="right" color="error">
-                {`${parseInt(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN')} VNĐ`}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="h6">
-                Khách thanh toán:
-                <span style={{ color: 'red', float: 'right' }}>
-                  {`${parseFloat(billInFo?.tongTienPhaiTra || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
-                </span>
-              </Typography>
-              <Typography variant="h6">
-                Tiền thừa:
-                <span style={{ color: 'blue', float: 'right' }}>
-                  {`${(parseFloat(amount || '0') - parseFloat(billInFo?.tongTienPhaiTra || '0')).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`}
-                  VND
-                </span>
-              </Typography>
-            </Grid>
-          </Grid>
-        </DialogContent> */}
         <DialogContent>
           <Grid container spacing={2} sx={{ paddingTop: 2 }}>
             {isCashChecked && (
@@ -1436,14 +1441,7 @@ function Cart(props) {
         </DialogContent>
 
         <DialogActions>
-          <Button
-            onClick={() => {
-              setShowDiaLogPayment(false);
-              setAmount('');
-              setError('');
-            }}
-            color="error"
-          >
+          <Button onClick={handleClosePaymentDialog} color="error">
             Huỷ
           </Button>
           <Button variant="contained" color="primary" onClick={handleBtnXacNhanThanhToan}>
