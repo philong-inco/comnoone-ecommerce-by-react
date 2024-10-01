@@ -12,10 +12,13 @@ import {
   Paper,
   Pagination,
   Chip,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import { getStatusColor, getStatusDisplayName } from 'utils/billUtil/billStatus';
 import { Edit } from '@mui/icons-material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 import { useNavigate } from 'react-router-dom';
 
 function BillTable(props) {
@@ -25,7 +28,7 @@ function BillTable(props) {
   const tabList = [
     { key: '', label: 'TẤT CẢ' },
     { key: 'DON_MOI', label: 'Đơn mới' },
-    { key: 'CHO_THANH_TOAN', label: 'Chờ thanh toán' },
+    // { key: 'CHO_THANH_TOAN', label: 'Chờ thanh toán' },
     { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
     { key: 'CHO_GIAO', label: 'Chờ giao' },
     { key: 'DANG_GIAO', label: 'Đang giao' },
@@ -72,9 +75,13 @@ function BillTable(props) {
       title: 'Hành động',
       key: 'action',
       render: (text, record) => (
-        <IconButton onClick={() => handleNavigate(record.ma)}>
-          <Edit />
-        </IconButton>
+        <>
+          <Tooltip title="Xem chi tiết">
+            <IconButton onClick={() => handleNavigate(record.ma)}>
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
+        </>
       )
     }
   ];

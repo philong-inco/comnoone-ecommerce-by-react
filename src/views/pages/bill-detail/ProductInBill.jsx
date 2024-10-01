@@ -23,7 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ProductList from './ProductList';
 import { deletedById, getAllSerialNumberSoldByBillId } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getBillByCode } from 'services/admin/bill/billService';
-import { Update } from '@mui/icons-material';
+import { Remove, RemoveCircle, Update } from '@mui/icons-material';
 
 function ProductInBill(props) {
   const { handleLoading, bill, fetchBill } = props;
@@ -167,7 +167,7 @@ function ProductInBill(props) {
                     </TableCell>
                     <TableCell>
                       <IconButton color="error" onClick={() => handleDelete(product)}>
-                        <Update color="warning" />
+                        <DeleteIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
