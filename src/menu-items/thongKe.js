@@ -17,7 +17,7 @@ const thongKe = {
                     id: 'doanhthu',
                     title: 'Thống Kê Chi Tiết',
                     type: 'item',
-                    url: '/thongke/doanhthu'
+                    url: '/dashboard/default'
                   }       
                 ]
         }

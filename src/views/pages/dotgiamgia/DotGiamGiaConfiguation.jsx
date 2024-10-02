@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import {
-    Fab, Select, Divider, FormControl, Chip, Snackbar, Alert, Dialog, DialogActions, DialogContent,
+    RadioGroup, FormControlLabel, Radio, Fab, Select, Divider, FormControl, Chip, Snackbar, Alert, Dialog, DialogActions, DialogContent,
     DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead,
     Table, TableContainer, Typography, TextField, Grid, Paper, Button, InputAdornment, IconButton, Tabs, Tab
 } from '@mui/material';
@@ -62,7 +62,7 @@ function DotGiamGiaConfiguration() {
                     return updatedState;
                 });
             } catch (error) {
-                setSnackbar({ open: true, message: 'Lỗi khi tải sản phẩm chi tiết', severity: 'error' });
+                setSnackbar({ open: true, message: 'không thể tìm được sản phẩm chi tiết', severity: 'error' });
             }
         };
 
@@ -295,6 +295,82 @@ function DotGiamGiaConfiguration() {
             console.error('Error fetching DGG detail:', error);
         }
     };
+    // Search
+
+    // 0: tìm theo tên, 1: tìm theo mã
+    const [typeOfFilter, setTypeOfFilter] = useState('0');
+    const handleTextFieldSearch = (event) => {
+        const keyword = event.target.value.toString().trim();
+        if (typeOfFilter === '0') {
+            setFilter(prev => (
+                {
+                    ...prev,
+                    tenSanPham: keyword,
+                    ma: ''
+                }))
+        } else if (typeOfFilter === '1') {
+            setFilter(prev => (
+                {
+                    ...prev,
+                    ma: keyword,
+                    tenSanPham: ''
+                }))
+        }
+    }
+
+    const changeTypeOfFilter = (e) => {
+        const type = e.target.value;
+        setTypeOfFilter(type);
+        if (type === '0') {
+            setFilter(prev => ({
+                ...prev,
+                tenSanPham: filter.ma,
+                ma: ''
+            }))
+        } else if (type === '1') {
+            setFilter(prev => ({
+                ...prev,
+                ma: filter.tenSanPham,
+                tenSanPham: ''
+            }))
+        }
+
+    }
+
+    const [resetFilter, setResetFilter] = useState(0);
+
+    const cleanFilter = () => {
+        setTypeOfFilter('0');
+        setFilter(prev => ({
+            ...prev,
+            tenSanPham: '',
+            ma: ''
+        }))
+        setResetFilter(prev => prev + 1);
+    }
+
+    const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
+    const [filter, setFilter] = useState({
+        page: 0,
+        size: '5',
+        tenSanPham: '',
+        ma: '',
+        trangThai: 1,
+    });
+
+    useEffect(() => {
+        loadProducts();
+    }, [filter]);
+    const loadProducts = async () => {
+        const queryString = Object.entries(filter)
+            .filter(([key, value]) => value !== '')
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
+        const urlQuery = urlFindFilter + queryString;
+        const result = await axios.get(urlQuery);
+        setSanPhamList(result.data.data);
+        setTotalElement(parseInt(result.data.totalElement));
+    };
 
     return (
         <Grid container spacing={2}>
@@ -404,6 +480,27 @@ function DotGiamGiaConfiguration() {
                 <Paper style={{ padding: '16px', height: '100%' }}>
                     <Typography variant="h6">Danh sách sản phẩm</Typography>
                     <Divider />
+
+                    <div style={{ display: 'flex', padding: 10, paddingTop: 20 }}>
+                        <TextField sx={{ maxHeight: '10px' }} color='secondary' onChange={handleTextFieldSearch} id="outlined-basic" label="Nhập từ khóa" variant="outlined" />
+
+                        <div style={{ marginLeft: 10, display: 'flex', alignItems: 'center' }}>
+
+                            <FormControl>
+                                {/* <FormLabel id="demo-controlled-radio-buttons-group">Tìm theo:</FormLabel> */}
+                                <RadioGroup
+                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                    name="controlled-radio-buttons-group"
+                                    value={typeOfFilter}
+                                    row
+                                    onChange={changeTypeOfFilter}
+                                >
+                                    <FormControlLabel value="0" control={<Radio color='secondary' size="small" />} label="Tên" />
+                                    <FormControlLabel value="1" control={<Radio color='secondary' size="small" />} label="Mã" />
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
+                    </div>
                     {loading ? (
                         <Typography>Đang tải dữ liệu...</Typography>
                     ) : (
