@@ -41,28 +41,31 @@ function TimeLine(props) {
         <Grid item xs={12}>
           <Typography variant="h5">Lịch sử đơn hàng</Typography>
         </Grid>
-        {billHistory.map((item) => (
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={3}
-            key={item.id}
-            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 2 }}
-          >
-            <Card sx={{ width: '100%', textAlign: 'center' }}>
-              <CardContent sx={{ padding: 2 }}>
-                <img src="https://via.placeholder.com/50" alt="Hình ảnh" style={{ width: '20%', height: 'auto' }} />
-                <Typography variant="h6" sx={{ mt: 1 }}>
-                  {getStatusBillHistory(item.trangThai)}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1, fontSize: '0.875rem' }}>
-                  {item.ngayTao}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        <div style={{ display: 'flex' }}>
+          {billHistory.map((item) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={3}
+              key={item.id}
+              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: 2 }}
+            >
+              <Card sx={{ width: '100%', textAlign: 'center' }}>
+                <CardContent sx={{ padding: 2 }}>
+                  <img src="https://via.placeholder.com/50" alt="Hình ảnh" style={{ width: '20%', height: 'auto' }} />
+                  <Typography variant="h6" sx={{ mt: 1 }}>
+                    {getStatusBillHistory(item.trangThai)}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mt: 1, fontSize: '0.875rem' }}>
+                    {item.ngayTao}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </div>
+
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-start', marginTop: 0 }}>
           <Button variant="contained" color="primary" onClick={handleRevertBillStatus}>
             Quay lại trước đó

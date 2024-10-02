@@ -27,7 +27,7 @@ import {
 import { getAllProduct } from 'services/admin/product/productService';
 import { createSerialNumberSold } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { Box } from '@mui/system';
-import { getAllSerialNumberByProductId } from 'services/admin/serial-number/serialNumber';
+import { getAllSerialNumberByProductId, getAllSerialNumberByProductId2 } from 'services/admin/serial-number/serialNumber';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
 function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, selectedSerialIds = [] }) {
@@ -70,7 +70,7 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, 
     }
   };
   const fetchSerialNumberByProduct = async (productId, page, size) => {
-    const response = await getAllSerialNumberByProductId(productId, page - 1, size);
+    const response = await getAllSerialNumberByProductId2(productId, page - 1, size);
     if (response.status_code === 200) {
       setSerials(response.data.result);
       setTotalSerial(response.data.meta.total);
@@ -216,11 +216,15 @@ function ProductList({ onProductSelected, handleLoading, handleLoadingTimeLine, 
               <TableBody>
                 {serials.map((row) => (
                   <TableRow key={row.id}>
-                    <Checkbox checked={selectedRows.includes(row.id)} onChange={() => handleSelectRow(row.id)} />
+                    <Checkbox
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => handleSelectRow(row.id)}
+                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id)}
+                    />
                     <TableCell>{row.ma}</TableCell>
                     <TableCell>
                       <Chip
-                        label={row.trangThai == 0 ? 'Còn hàng' : row.trangThai == 2 ? 'Đã bán' : 'Hủy'}
+                        label={row.trangThai == 0 ? 'Còn hàng' : row.trangThai == 1 ? 'Đã bán' : 'Hủy'}
                         style={{ backgroundColor: getStatusSerialColor(row.trangThai), color: '#fff' }}
                         size="small"
                       />

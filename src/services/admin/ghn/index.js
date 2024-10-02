@@ -81,7 +81,7 @@ export const fetchAllDayShip = async (to_district_id, to_ward_code) => {
   try {
     const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime', {
       headers: {
-        token: '0292ba75-34b6-11ef-89ca-1aad91406dac',
+        token: 'd73043b1-2777-11ee-b394-8ac29577e80e',
         shop_id: '4374133'
       },
       params: {
@@ -95,6 +95,34 @@ export const fetchAllDayShip = async (to_district_id, to_ward_code) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching shipping lead time:', error);
+    throw error;
+  }
+};
+
+export const getMoneyShip = async (to_district_id, to_ward_code) => {
+  try {
+    const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
+      headers: {
+        token: 'd73043b1-2777-11ee-b394-8ac29577e80e',
+        shop_id: '4374133'
+      },
+      params: {
+        service_type_id: 2,
+        insurance_value: '',
+        coupon: '',
+        from_district_id: 1485,
+        to_district_id: to_district_id,
+        to_ward_code: to_ward_code,
+        height: 15,
+        length: 15,
+        weight: 1000,
+        width: 15
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching shipping fee:', error);
     throw error;
   }
 };

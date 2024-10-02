@@ -82,9 +82,11 @@ export const updateStatusByCode = async (code, status) => {
   }
 };
 
-export const payCounter = async (billCode) => {
+export const payCounter = async (billCode, data) => {
+  console.log('Data request : ', data);
+
   try {
-    const result = await post(`bills/pay-counter/${billCode}`);
+    const result = await post(`bills/pay-counter/${billCode}`, data);
     return result;
   } catch (error) {
     console.error('Error pay counter by code :', error);
