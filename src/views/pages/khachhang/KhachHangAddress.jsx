@@ -130,7 +130,7 @@ function KhachHangAddress() {
   const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
   const [defaultAddressId, setDefaultAddressId] = useState(selectedAddress?.isDefault ? selectedAddress.id : null);
   const [formData, setFormData] = useState({});
-  
+
   useEffect(() => {
     if (isProvincesLoaded && id) {
       fetchKhachHangInfo(id);
@@ -181,8 +181,13 @@ function KhachHangAddress() {
   }, [errors]);
 
   const fetchProvinces = async () => {
+    debugger;
     try {
-      const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
+      const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+        headers: {
+          token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+        }
+      });
       if (response.data.data && Array.isArray(response.data.data)) {
         setProvinces(response.data.data);
         setIsProvincesLoaded(true);
@@ -195,15 +200,44 @@ function KhachHangAddress() {
   };
 
   const fetchDistricts = async (provinceId) => {
+    debugger;
     try {
-      const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${provinceId}.htm`);
+      const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+        headers: {
+          token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+        },
+        params: {
+          province_id: provinceId
+        }
+      });
       const formattedData = response.data.data.map(district => ({
-        id: district.id,
-        name: district.name
+        id: district.DistrictID,
+        name: district.DistrictName
       }));
       setDistricts(formattedData);
     } catch (error) {
       setError('Failed to fetch districts');
+    }
+  };
+
+  const fetchWards = async (districtId) => {
+    debugger;
+    try {
+      const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+        headers: {
+          token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+        },
+        params: {
+          district_id: districtId
+        }
+      });
+      const formattedData = response.data.data.map(ward => ({
+        id: ward.WardCode,
+        name: ward.WardName
+      }));
+      setWards(formattedData);
+    } catch (error) {
+      setError('Failed to fetch wards');
     }
   };
 
@@ -265,19 +299,6 @@ function KhachHangAddress() {
     setOpenDialog(true);
   };
 
-  const fetchWards = async (districtId) => {
-    try {
-      const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
-      const formattedData = response.data.data.map(ward => ({
-        id: ward.id,
-        name: ward.name
-      }));
-      setWards(formattedData);
-    } catch (error) {
-      setError('Failed to fetch wards');
-    }
-  };
-
   const fetchKhachHangInfo = async (id) => {
     try {
       const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
@@ -289,10 +310,10 @@ function KhachHangAddress() {
       setValue('gioi_tinh', khachHangData.gioiTinh.toString());
       if (khachHangData.hinhAnh) {
         setImageUrl(khachHangData.hinhAnh);
-    } else {
+      } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
-    }
-
+      }
+      debugger;
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;
       setAddresses(diaChiList);
@@ -306,12 +327,20 @@ function KhachHangAddress() {
 
       const fetchDistrictsAndWards = async () => {
         const districtPromises = Array.from(provinces).map(async (districtId) => {
-          const formattedTinhThanhPhoId = districtId.toString().padStart(2, '0');
+
           try {
-            const responseDistrict = await axios.get(`https://esgoo.net/api-tinhthanh/2/${formattedTinhThanhPhoId}.htm`);
+            debugger
+            const responseDistrict = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+              headers: {
+                token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+              },
+              params: {
+                province_id: districtId
+              }
+            });
             return responseDistrict.data.data.map(district => ({
-              id: district.id,
-              name: district.name
+              id: district.DistrictID,
+              name: district.DistrictName
             }));
           } catch (error) {
             setError('Failed to fetch districts');
@@ -323,10 +352,18 @@ function KhachHangAddress() {
         const wardPromises = Array.from(districts).map(async (districtId) => {
           const formattedQuanHuyenId = districtId.toString().padStart(3, '0');
           try {
-            const responseWard = await axios.get(`https://esgoo.net/api-tinhthanh/3/${formattedQuanHuyenId}.htm`);
+            debugger;
+            const responseWard = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+              headers: {
+                token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+              },
+              params: {
+                district_id: districtId
+              }
+            });
             return responseWard.data.data.map(ward => ({
-              id: ward.id,
-              name: ward.name
+              id: ward.WardCode,
+              name: ward.WardName
             }));
           } catch (error) {
             setError('Failed to fetch wards');
@@ -359,13 +396,13 @@ function KhachHangAddress() {
   }
 
   const handleOpenDialog = (data) => {
-    setFormData(data); 
-    setOpenDialog(true); 
+    setFormData(data);
+    setOpenDialog(true);
   };
-  
+
   const handleConfirmUpdateCustomer = async () => {
     setOpenDialog(false);
-    await onSubmit(formData); 
+    await onSubmit(formData);
   };
 
   const onSubmit = async (data) => {
@@ -742,7 +779,7 @@ function KhachHangAddress() {
                           Tỉnh/Thành phố:
                         </Typography>
                         <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
-                          {provinces.find(p => p.id == address.idTinhThanhPho)?.name}
+                          {provinces.find(p => p.ProvinceID == address.idTinhThanhPho)?.ProvinceName}
                         </Typography>
                       </Box>
                       <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
@@ -831,8 +868,8 @@ function KhachHangAddress() {
                   label="Tỉnh/Thành phố"
                 >
                   {provinces.map((province) => (
-                    <MenuItem key={province.id} value={province.id}>
-                      {province.name}
+                    <MenuItem key={province.ProvinceID} value={province.ProvinceID}>
+                      {province.ProvinceName}
                     </MenuItem>
                   ))}
                 </Select>

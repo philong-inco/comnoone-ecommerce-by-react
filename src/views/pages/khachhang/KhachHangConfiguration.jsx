@@ -38,20 +38,21 @@ const validationSchema = Yup.object().shape({
     sdt: Yup.string()
         .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
         .required('Số điện thoại không được để trống'),
-    ngay_sinh: Yup.date()
+        ngay_sinh: Yup.date()
         .required('Ngày sinh không được để trống')
         .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
         .test('age', 'Khách hàng phải từ 10 tuổi trở lên', value => {
-            if (!value) return false;
-            const today = new Date();
-            const birthDate = new Date(value);
-            const age = today.getFullYear() - birthDate.getFullYear();
-            const monthDifference = today.getMonth() - birthDate.getMonth();
-            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-            return age >= 10;
+          if (!value) return false;
+          const today = new Date();
+          const birthDate = new Date(value);
+          let age = today.getFullYear() - birthDate.getFullYear(); // Changed from const to let
+          const monthDifference = today.getMonth() - birthDate.getMonth();
+          if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--; // Now the reassignment is valid because "age" is a let
+          }
+          return age >= 10;
         }),
+      
     gioi_tinh: Yup.number().required('Giới tính không được để trống'),
     hinhAnh: Yup.string(),
 });
@@ -115,43 +116,55 @@ function KhachHangConfiguration() {
     const fetchProvinces = async () => {
         debugger;
         try {
-            const response = await axios.get(`https://esgoo.net/api-tinhthanh/1/0.htm`);
-            if (response.data.data && Array.isArray(response.data.data)) {
-                setProvinces(response.data.data);
-                setIsProvincesLoaded(true);
-            } else {
-                setError('Invalid or empty data received from provinces API');
+          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+            headers: {
+              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
             }
+          });
+          setProvinces(response.data.data); // Set the response data to provinces state
         } catch (error) {
-            setError('Failed to fetch provinces');
+          console.error('Error fetching provinces:', error);
+          throw error;
         }
-    };
-
-    const fetchDistricts = async (provinceId) => {
+      };
+    
+      const fetchDistricts = async (provinceId) => {
+        debugger;
         try {
-            const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${provinceId}.htm`);
-            const formattedData = response.data.data.map(district => ({
-                id: district.id,
-                ten: district.name
-            }));
-            setDistricts(formattedData);
+          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+            headers: {
+              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+            },
+            params: {
+              province_id: provinceId
+            }
+          });
+          setDistricts(response.data.data); // Set the response data to districts state
         } catch (error) {
-            setError('Failed to fetch districts');
+          console.error('Error fetching districts:', error);
+          throw error;
         }
-    };
-
-    const fetchWards = async (districtId) => {
+      };
+    
+      const fetchWards = async (districtId) => {
+        debugger;
         try {
-            const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
-            const formattedData = response.data.data.map(ward => ({
-                id: ward.id,
-                ten: ward.name
-            }));
-            setWards(formattedData);
+          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+            headers: {
+              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+            },
+            params: {
+              district_id: districtId
+            }
+          });
+          setWards(response.data.data); // Set the response data to wards state
         } catch (error) {
-            setError('Failed to fetch wards');
+          console.error('Error fetching wards:', error);
+          throw error;
         }
-    };
+      };
+    
+
 
     const openCloudinaryWidget = () => {
         window.cloudinary.openUploadWidget({
@@ -411,8 +424,8 @@ function KhachHangConfiguration() {
                                                 onChange={(e) => setSelectedProvince(e.target.value)}
                                             >
                                                 {provinces.map((province) => (
-                                                    <MenuItem key={province.id} value={province.id}>
-                                                        {province.name}
+                                                    <MenuItem key={province.ProvinceID} value={province.ProvinceID}>
+                                                        {province.ProvinceName}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -435,8 +448,8 @@ function KhachHangConfiguration() {
                                             >
                                                 <MenuItem value="">Chọn quận/huyện</MenuItem>
                                                 {districts.map((district) => (
-                                                    <MenuItem key={district.id} value={district.id}>
-                                                        {district.ten}
+                                                    <MenuItem key={district.DistrictID} value={district.DistrictID}>
+                                                        {district.DistrictName}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
@@ -459,8 +472,8 @@ function KhachHangConfiguration() {
                                             >
                                                 <MenuItem value="">Chọn phường/xã</MenuItem>
                                                 {wards.map((ward) => (
-                                                    <MenuItem key={ward.id} value={ward.id}>
-                                                        {ward.ten}
+                                                    <MenuItem key={ward.WardCode} value={ward.WardCode}>
+                                                        {ward.WardName}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
