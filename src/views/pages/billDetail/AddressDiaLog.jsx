@@ -164,10 +164,10 @@ function AddressDiaLog(props) {
     // console.log('Giá ship : ', moneyShip.data.total);
   };
 
-  //   console.log('TP : ', provinces);
-  //   console.log('Quận : ', districts);
-  //   console.log('Huyện : ', wards);
-  //   console.log('Form Data : ', formData);
+  console.log('TP : ', provinces);
+  console.log('Quận : ', districts);
+  console.log('Huyện : ', wards);
+  console.log('Form Data : ', formData);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -292,13 +292,13 @@ function AddressDiaLog(props) {
     }));
   };
 
-  // Hàm xử lý submit form
-  const handleSubmit2 = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    // Thực hiện các bước tiếp theo, ví dụ: gửi dữ liệu đến API
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0
+    }).format(value);
   };
-
   return (
     <>
       <Button variant="contained" color="primary" onClick={handleOpen}>
@@ -402,30 +402,19 @@ function AddressDiaLog(props) {
             <div className="form-group">
               <textarea id="ghiChu" placeholder="Ghi chú" value={formData.ghiChu} onChange={handleInputChange}></textarea>
             </div>
-            <h1> {formData.tienShip}</h1>
-            {/* Trường nhập tiền ship */}
-            {/* <div className="form-group">
-              <input
-                type="number"
-                id="tienShip"
-                placeholder="Nhập tiền ship"
-                value={formData.tienShip}
-                onChange={handleInputChange}
-                required
-              />
-            </div> */}
-
-            <button type="submit">Gửi thông tin</button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <strong style={{ fontSize: '24px' }}>{formatCurrency(formData.tienShip)}</strong> {/* Tăng kích thước chữ ở đây */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'flex-end', width: '100%' }}>
+                <Button onClick={handleClose} color="secondary">
+                  Hủy
+                </Button>
+                <Button variant="contained" color="primary" type="submit">
+                  Gửi thông tin
+                </Button>
+              </div>
+            </div>
           </form>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Hủy
-          </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Xác Nhận
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );

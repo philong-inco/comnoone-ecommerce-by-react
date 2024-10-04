@@ -211,6 +211,76 @@ function NewTimeLine(props) {
   const openConfirmOkeDialog = () => {
     setOpenConfirmOk(true);
   };
+
+  const renderButtons = (bill) => {
+    const buttons = [];
+
+    // Nút Hủy
+    if (
+      bill.trangThai === 'CHO_THANH_TOAN' ||
+      bill.trangThai === 'CHO_XAC_NHAN' ||
+      bill.trangThai === 'CHO_GIAO' ||
+      bill.trangThai === 'DANG_GIAO' ||
+      bill.trangThai === 'XAC_NHAN' ||
+      bill.trangThai === 'DON_MOI'
+    ) {
+      buttons.push(
+        <Grid item xs={3} key="huy-button">
+          <Button variant="contained" color="error" onClick={() => handleClickBtnStatus('HUY')} fullWidth>
+            HỦY
+          </Button>
+        </Grid>
+      );
+    }
+
+    // Nút Chờ Giao
+    if (bill.trangThai === 'DON_MOI' && bill.loaiHoaDon === 1) {
+      buttons.push(
+        <Grid item xs={3} key="xac-nhan-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('XAC_NHAN')} fullWidth>
+            Xác nhận
+          </Button>
+        </Grid>
+      );
+    } else if (bill.trangThai === 'DON_MOI' && bill.loaiHoaDon === 0) {
+      buttons.push(
+        <Grid item xs={3} key="hoan-thanh-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('HOAN_THANH')} fullWidth>
+            HOÀN THÀNH
+          </Button>
+        </Grid>
+      );
+    }
+
+    // Nút Đang Giao
+    if (bill.trangThai === 'CHO_GIAO' && bill.loaiHoaDon === 1) {
+      buttons.push(
+        <Grid item xs={3} key="dang-giao-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('DANG_GIAO')} fullWidth>
+            ĐANG GIAO
+          </Button>
+        </Grid>
+      );
+    }
+
+    // Nút Trả Hàng Hoàn Tiền
+    if (bill.trangThai === 'HOAN_THANH') {
+      buttons.push(
+        <Grid item xs={3} key="tra-hang-hoan-tien-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('TRA_HANG_HOAN_TIEN')} fullWidth>
+            TRẢ HÀNG HOÀN TIỀN
+          </Button>
+        </Grid>
+      );
+    }
+
+    return (
+      <Grid container spacing={2}>
+        {buttons}
+      </Grid>
+    );
+  };
+
   console.log(bill);
 
   return (
@@ -256,10 +326,7 @@ function NewTimeLine(props) {
               </Grid>
             ))}
           </div>
-
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-start', marginTop: 0 }}>
-            <Grid container spacing={2} sx={{ marginTop: 0 }}>
-              <Grid item xs={9} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+          {/* <Grid item xs={9} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <Grid item xs={3}>
                   <Button
                     variant="contained"
@@ -295,11 +362,17 @@ function NewTimeLine(props) {
                     Quay lại trước đó
                   </Button>
                 </Grid>
-                <Grid item xs={5}>
-                  <Button variant="contained" color="warning" fullWidth onClick={handleOpenDialog}>
-                    Chi tiết
-                  </Button>
-                </Grid>
+                
+              </Grid> */}
+          <Grid item xs={12} sx={{ marginTop: 0 }}>
+            <Grid container spacing={2} sx={{ justifyContent: 'space-between' }}>
+              <Grid item xs={10} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                {renderButtons(bill)}
+              </Grid>
+              <Grid item xs={2}>
+                <Button variant="contained" color="warning" fullWidth onClick={handleOpenDialog}>
+                  Chi tiết
+                </Button>
               </Grid>
             </Grid>
           </Grid>
