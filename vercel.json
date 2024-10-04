@@ -2,11 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.html",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "package.json",
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
@@ -14,5 +11,19 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "framework": "vite",
+  "static": {
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "s-maxage=1, stale-while-revalidate"
+          }
+        ]
+      }
+    ]
+  }
 }

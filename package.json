@@ -1,8 +1,9 @@
 {
     "name": "comnoone-admin",
     "version": "3.5.0",
-    "private": false,
+    "private": true,
     "homepage": "https://comnoone-ecommerce-by-react.vercel.app",
+
     "scripts": {
         "start": "env-cmd -f .env vite",
         "build": "vite build",
