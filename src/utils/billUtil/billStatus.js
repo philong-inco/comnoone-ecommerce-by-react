@@ -86,7 +86,7 @@ export const getStatusBillHistory = (status) => {
     case 0:
       return 'Tạo đơn hàng';
     case 1:
-      return 'Chờ thanh toán';
+      return 'Cập nhập đơn hàng';
     case 2:
       return 'Chờ xác nhận';
     case 3:
@@ -96,7 +96,7 @@ export const getStatusBillHistory = (status) => {
     case 5:
       return 'Trả hàng hoàn tiền';
     case 6:
-      return 'Hoàn thành';
+      return 'Chơ giao';
     case 7:
       return 'Hủy';
     case 8:

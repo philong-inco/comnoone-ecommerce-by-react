@@ -38,14 +38,14 @@ function BillTable(props) {
   ];
   const handleNavigate = (ma) => {
     console.log('Code', ma);
-    navigate(`/hoa-don/chi-tiet/${ma}`);
+    navigate(`/hoa-don/chi-tiet-2/${ma}`);
   };
 
   const columns = [
     { title: '#', dataIndex: 'key', key: 'key' },
     { title: 'Mã', dataIndex: 'ma', key: 'ma' },
     { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
-    { title: 'Tổng số tiền', dataIndex: 'tongTien', key: 'tongTien' },
+    { title: 'Tổng số tiền', dataIndex: 'tongTienPhaiTra', key: 'tongTien' },
     {
       title: 'Tên khách hàng',
       dataIndex: 'tenKhachHang',

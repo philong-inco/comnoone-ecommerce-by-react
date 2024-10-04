@@ -72,9 +72,9 @@ export const addCouponToBillByCode = async (couponCode, codeBill) => {
   }
 };
 
-export const updateStatusByCode = async (code, status) => {
+export const updateStatusByCode = async (code, status, data) => {
   try {
-    const result = await post(`bills/update-status/${code}?status=${status}`);
+    const result = await post(`bills/update-status/${code}?status=${status}`, data);
     return result;
   } catch (error) {
     console.error('Error update bill by code :', error);
@@ -93,6 +93,17 @@ export const payCounter = async (billCode, data) => {
     throw error;
   }
 };
+
+export const updateAddressInBill = async (billCode, data) => {
+  try {
+    const result = await post(`bills/update-address-in-bill/${billCode}`, data);
+    return result;
+  } catch (error) {
+    console.error('Error pay counter by code :', error);
+    throw error;
+  }
+};
+
 // lịch sử hóa đơn
 export const getBillHistoryByBillId = async (id) => {
   try {

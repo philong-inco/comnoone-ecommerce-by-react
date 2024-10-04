@@ -58,6 +58,7 @@ const DotGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/dotgiamg
 // hóa đơn
 const Bill = Loadable(lazy(() => import('views/pages/bill/index.jsx')));
 const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetail.jsx')));
+const BillDetail2 = Loadable(lazy(() => import('views/pages/billDetail/BillDetail.jsx')));
 
 // Bán hàng
 
@@ -78,6 +79,10 @@ const MainRoutes = {
         {
           path: 'chi-tiet/:id',
           element: <BillDetail />
+        },
+        {
+          path: 'chi-tiet-2/:id',
+          element: <BillDetail2 />
         }
 
         // Thêm các route add update detail ở đây
