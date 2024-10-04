@@ -439,7 +439,6 @@ const ProductList = (props) => {
       label: 'Giá bán',
       minWidth: 100,
       align: 'left',
-      align: 'left',
       format: (value) => formatNumber(value)
     },
     {

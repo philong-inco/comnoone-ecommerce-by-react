@@ -112,6 +112,7 @@ const SuaSanPham = () => {
   const loadData = async () => {
     const dataSanPham = await axios.get(`http://localhost:8080/api/san-pham/detail/${id}`)
     const dataSpct = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+    debugger;
     setSanPham(dataSanPham.data.data);
     setspct(dataSpct.data.data);
     setTenSanPham(dataSanPham.data.data.ten)
@@ -318,7 +319,7 @@ const SuaSanPham = () => {
               <TableCell align="left">{row.ocung}</TableCell>
               <TableCell align="left">{row.mauSac}</TableCell>
               <TableCell align="left">{row.giaBan} đ</TableCell>
-              <TableCell align="left"><IconEye onClick={() => handleViewSerial(row.id)} stroke={2} /><p sx={{color: '#85EA2D'}}>{row.listSerialNumber !== '' ? row.listSerialNumber.split(',').length : 0}</p>  </TableCell>
+              <TableCell align="left"><IconEye onClick={() => handleViewSerial(row.id)} stroke={2} /><p sx={{color: '#85EA2D'}}>{(row.listSerialNumber !== '' && row.listSerialNumber !== null) ? row.listSerialNumber.split(',').length : 0}</p>  </TableCell>
             </TableRow>
           ))}
         </TableBody>
