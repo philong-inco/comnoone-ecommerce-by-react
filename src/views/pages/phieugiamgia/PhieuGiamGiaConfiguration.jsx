@@ -69,17 +69,8 @@ function PhieuGiamGiaConfiguration() {
         const bigNumberGiaTriToiDa = new BigNumber(value.replace(/\./g, ''));
         const bigNumberDieuKien = new BigNumber(dieuKien.replace(/\./g, ''));
         return bigNumberGiaTriToiDa.isLessThanOrEqualTo(bigNumberDieuKien);
-      })
-      .test('is-giamToiDa-equal-giaTri', 'Giá trị tối đa phải bằng giá trị khi loại giảm giá là $', function (value) {
-        const { giaTri } = this.parent;
-        if (currencyType === '$') {
-          const bigNumberGiaTriToiDa = new BigNumber(value.replace(/\./g, ''));
-          const bigNumberGiaTri = new BigNumber(giaTri.replace(/\./g, ''));
-          return bigNumberGiaTriToiDa.isEqualTo(bigNumberGiaTri);
-        }
-        return true;
       }),
-      
+
     soLuong: yup
       .number('Chỉ được nhập số')
       .required('Số lượng là bắt buộc')
@@ -278,7 +269,7 @@ function PhieuGiamGiaConfiguration() {
           return;
         }
 
-        if (values.kieu === '2' && selectedKhachHang.length < 1) {
+        if(values.kieu === '2' && selectedKhachHang.length < 1){
           setSnackbar({
             open: true,
             message: `Vui lòng chọn khách hàng cho phiếu giảm giá.`,
@@ -324,7 +315,7 @@ function PhieuGiamGiaConfiguration() {
     },
   });
 
-
+  
 
   const handleCurrencyChange = (type) => {
     setCurrencyType(type);

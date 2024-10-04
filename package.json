@@ -2,6 +2,12 @@
     "name": "berry-free-material-react",
     "version": "3.5.0",
     "private": true,
+    "author": {
+        "name": "CodedThemes",
+        "email": "CodedThemes@gmail.com",
+        "url": "https://codedthemes.com/"
+    },
+    "homepage": "https://berrydashboard.io/free",
     "scripts": {
         "start": "env-cmd -f .env vite",
         "build": "vite build",
@@ -43,7 +49,6 @@
         "env-cmd": "^10.1.0",
         "formik": "^2.4.5",
         "framer-motion": "^11.0.6",
-        "gh-pages": "^6.1.1",
         "material-ui-popup-state": "^5.0.10",
         "moment": "^2.30.1",
         "next-cloudinary": "^6.11.0",
