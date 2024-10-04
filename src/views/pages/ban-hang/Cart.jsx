@@ -20,21 +20,14 @@ import {
   DialogActions,
   Checkbox,
   Chip,
-  Radio,
   Snackbar,
   Alert,
   FormControlLabel,
-  Switch,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextareaAutosize
+  Switch
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, display } from '@mui/system';
+import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import {
   addCouponToBill,
   addCouponToBillByCode,
@@ -46,7 +39,7 @@ import {
 import { getAllCouponsToBill } from 'services/admin/coupons/couponsService';
 import { fetchSearchCustomer, findCustomerByPhone, getAll } from 'services/admin/customer/customerService';
 import { getAllProduct } from 'services/admin/product/productService';
-import { getAllSerialNumberByProductId, getAllSerialNumberByProductId2 } from 'services/admin/serial-number/serialNumber';
+import { findSerialNumberByProductIdAndCodeSerial, getAllSerialNumberByProductId2 } from 'services/admin/serial-number/serialNumber';
 import {
   createSerialNumberSold,
   deletedById,
@@ -54,8 +47,9 @@ import {
 } from 'services/admin/serialNumberSold/serialNumberSoldService';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 import PdfForm from 'utils/pdf/pdf';
-import { FormControl } from 'react-bootstrap';
 import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
+import { getDefaultAddressByIdCustomer } from 'services/admin/address';
+import ProductList from './dialog-san-pham/ProductList';
 
 function Cart(props) {
   const { bill, onReload } = props;
@@ -75,11 +69,14 @@ function Cart(props) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   // selectedSerialIds
   const [selectedRows, setSelectedRows] = useState([]);
+  const [defaultSelectRows, setDefaultSelectRows] = useState([]);
   const [serials, setSerials] = useState([]);
   const [productId, setProductId] = useState(null);
   const [pageSerial, setPageSerial] = useState(1);
   const [sizeSerial, setSizeSerial] = useState(5);
   const [totalSerial, setTotalSerial] = useState(0);
+  const [searchSerial, setSearchSerial] = useState('');
+
   // customer
   const [customer, setCustomer] = useState({
     ten: '',
@@ -153,8 +150,11 @@ function Cart(props) {
     email: '',
     diaChi: '',
     tinh: '',
+    tenTinh: '',
     huyen: '',
+    tenHuyen: '',
     phuong: '',
+    tenPhuong: '',
     ghiChu: '',
     ngayNhanHang: '',
     tienShip: '0'
@@ -206,14 +206,16 @@ function Cart(props) {
     setShowDiaLogPayment(false);
     setCashAmount('0');
     setTransferAmount('0');
-    setError('');
+    setCashError('');
+    setTransferError('');
+    setErrorAmount('');
   };
 
   const handleAmountChange = (e, type) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/\./g, '');
 
     // Kiểm tra số tiền phải là số dương
-    if (isNaN(value)) {
+    if (isNaN(value) || Number(value) <= 0) {
       if (type === 'cash') {
         setCashError('Số tiền không hợp lệ');
         setCashAmount(value);
@@ -280,7 +282,10 @@ function Cart(props) {
   //     return;
   //   }
   // };
-
+  function formatNumber(value) {
+    const cleanedValue = String(value || '').replace(/\D/g, '');
+    return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
   const handleBtnXacNhanThanhToan = () => {
     if (orderInfo.chuyenKhoan == null && orderInfo.tienMat == null) {
       setSnackbarMessage('Bạn chưa chọn phương thức thanh toán');
@@ -305,7 +310,7 @@ function Cart(props) {
     // }
   };
 
-  const ApiUpdateStatusByCode = async () => {
+  const apiUpdateStatusByCode = async () => {
     try {
       const response = await updateStatusByCode(id, 'XAC_NHAN');
       console.log(response); // Kiểm tra phản hồi
@@ -336,11 +341,11 @@ function Cart(props) {
         setSnackbarOpen(true);
         setBillInFo({});
         setCustomer({});
-        setAmount(0);
+        // setAmount(0);
         handleSomeAction();
       }
     } catch (error) {
-      setSnackbarMessage('Hóa đơn chưa được xác nhận');
+      setSnackbarMessage(error.response.data.message);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
@@ -352,6 +357,7 @@ function Cart(props) {
       setSerialNumberSold(response.data);
       const allSerialNumberIds = response.data.flatMap((product) => product.serialNumbers.map((serial) => serial.serialNumberId));
       // setSerialNumberInBill(allSerialNumberIds);
+      setDefaultSelectRows(allSerialNumberIds);
       setSelectedRows(allSerialNumberIds);
     }
   };
@@ -377,6 +383,9 @@ function Cart(props) {
         email: response.data.email,
         diaChi: response.data.diaChi
       });
+      // if (response.data?.idKhachHang) {
+      //   const responseAddress = await getDefaultAddressByIdCustomer(response.data.idKhachHang);
+      // }
       setOrderInfo({
         chuyenKhoan: 2,
         tienMat: 1,
@@ -384,10 +393,13 @@ function Cart(props) {
         ten: response.data.tenKhachHang,
         sdt: response.data.sdt,
         email: response.data.email,
-        diaChi: '',
-        tinh: '',
-        huyen: '',
-        phuong: '',
+        diaChi: response.data.diaChi,
+        tinh: response.data?.tinh || '',
+        tenTinh: '',
+        huyen: response.data?.huyen || '',
+        tenHuyen: '',
+        phuong: response.data?.phuong || '',
+        tenPhuong: '',
         ghiChu: '',
         ngayNhanHang: '',
         tienShip: '0'
@@ -407,18 +419,9 @@ function Cart(props) {
     setShowModal(false);
   };
 
-  const handleLoadingProductInBill = () => {
-    setLoading(!loading);
-  };
-
   const handleShowModal = () => {
     setShowModal(!showModal);
   };
-
-  const handleProductSelected = () => {
-    setShowModal(false);
-  };
-  console.log('Customer : ', customer);
 
   // xóa toàn bộ sản phẩm
   const handleDelete = (value) => {
@@ -442,8 +445,8 @@ function Cart(props) {
     fetchProduct();
   }, [id]);
   // fetch Serial Number
-  const fetchSerialNumberByProduct = async (productId, page, size) => {
-    const response = await getAllSerialNumberByProductId2(productId, page - 1, size);
+  const fetchSerialNumberByProduct = async (productId, codeSerial, page, size) => {
+    const response = await findSerialNumberByProductIdAndCodeSerial(productId, codeSerial || '', page - 1, size);
     if (response.status_code === 200) {
       setSerials(response.data.result);
       setTotalSerial(response.data.meta.total);
@@ -454,7 +457,13 @@ function Cart(props) {
   const handleChangePageSerial = (newPage) => {
     setSelectedRows(selectedRows);
     setPageSerial(newPage);
-    fetchSerialNumberByProduct(productId, newPage, sizeSerial);
+    fetchSerialNumberByProduct(productId, searchSerial, newPage, sizeSerial);
+  };
+
+  const handleSearchChange = (event) => {
+    const newSearchSerial = event.target.value;
+    setSearchSerial(newSearchSerial.trim());
+    fetchSerialNumberByProduct(productId, newSearchSerial, pageSerial, sizeSerial);
   };
   // thêm serial
   const handleSubmitSerials = async () => {
@@ -465,11 +474,12 @@ function Cart(props) {
 
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {
-      setSnackbarMessage('Thêm sản phẩm thành công');
+      setSnackbarMessage('Cập nhập số lượng sản phẩm thành công');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
       setOpenDialog(false);
       setSelectedRows([]);
+      setSearchSerial('');
       setPageSerial(1);
       setProductId(null);
       setSelectedProduct(null);
@@ -491,14 +501,16 @@ function Cart(props) {
   const handleOpenDialog = (id) => {
     setProductId(id);
     fetchSerialNumberSold();
-    fetchSerialNumberByProduct(id, pageSerial, 5);
+    fetchSerialNumberByProduct(id, searchSerial, pageSerial, 5);
     setOpenDialog(true);
   };
 
   // đóng chọn serial
   const handleCloseDialog = () => {
+    setSearchSerial('');
     setOpenDialog(false);
     setSelectedRows([]);
+    setDefaultSelectRows([]);
     setPageSerial(1);
     setProductId(null);
     setSelectedProduct(null);
@@ -515,7 +527,11 @@ function Cart(props) {
         setTotalCustomers(response.totalPages);
       } else {
       }
-    } catch (error) {}
+    } catch (error) {
+      setSnackbarMessage('Api khách hàng lỗi');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
   };
 
   const handleChangeSearchCustomer = (e) => {
@@ -543,7 +559,8 @@ function Cart(props) {
           sdt: response.data.sdt,
           email: response.data.email
         }));
-
+        fetchBillInFo();
+        loadProvinces();
         handleCloseShowDiaLogCustomer();
       } else {
       }
@@ -608,7 +625,11 @@ function Cart(props) {
         setCoupons(response.data);
       } else {
       }
-    } catch (error) {}
+    } catch (error) {
+      setSnackbarMessage('Api phiếu giảm giá lỗi');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
   };
 
   const handleAddCouponToBill = async (couponId) => {
@@ -672,24 +693,40 @@ function Cart(props) {
   };
 
   // address
+  const loadProvinces = async () => {
+    const data = await fetchAllProvince();
+    setProvinces(data.data);
+    if (orderInfo?.huyen) {
+      const data = await fetchAllProvinceDistricts(orderInfo.tinh);
+      setDistricts(data.data);
+      setSelectedDistrict('');
+      setSelectedWard('');
+      setWards([]);
+    }
+    if (orderInfo?.huyen) {
+      const data = await fetchAllProvinceWard(orderInfo.huyen);
+      setWards(data.data);
+      setSelectedWard('');
+    }
+  };
   useEffect(() => {
-    const loadProvinces = async () => {
-      const data = await fetchAllProvince();
-      setProvinces(data.data);
-    };
     loadProvinces();
-  }, []);
-  console.log('TP : ', provinces);
+  }, [orderInfo.tinh]);
+  console.log('TP Tỉnh : ', provinces);
   console.log('Quận Huyện  : ', districts);
-  console.log('Xã huyện  : ', wards);
+  console.log('Xã phường  : ', wards);
 
   const handleProvinceChange = async (event) => {
     handleOrderChange(event);
     const provinceId = event.target.value;
     setSelectedProvince(provinceId);
+    const selectedProvince = provinces.find((province) => province.ProvinceID === parseInt(provinceId));
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
-      tinh: provinceId
+      tinh: provinceId,
+      tenTinh: selectedProvince ? selectedProvince.ProvinceName : '',
+      phuong: '',
+      huyen: ''
     }));
     const data = await fetchAllProvinceDistricts(provinceId);
     setDistricts(data.data);
@@ -702,26 +739,28 @@ function Cart(props) {
     handleOrderChange(event);
     const districtId = event.target.value;
     setSelectedDistrict(districtId);
+    const selectedDistrict = districts.find((district) => district.DistrictID === parseInt(districtId));
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
-      huyen: districtId
+      huyen: districtId,
+      tenHuyen: selectedDistrict ? selectedDistrict.DistrictName : ''
     }));
     const data = await fetchAllProvinceWard(districtId);
     setWards(data.data);
-    console.log('setWards : ', data);
     setSelectedWard('');
   };
 
   const handleWardChange = (event) => {
     handleOrderChange(event);
-    setSelectedWard(event.target.value);
+    const wardCode = event.target.value;
+    setSelectedWard(wardCode);
+    const selectedWard = wards.find((ward) => ward.WardCode === wardCode);
     setOrderInfo((prevOrderInfo) => ({
       ...prevOrderInfo,
-      phuong: event.target.value
+      phuong: wardCode,
+      tenPhuong: selectedWard ? selectedWard.WardName : ''
     }));
-    // if (selectedDistrict) {
     getDeliveryDate(selectedDistrict, event.target.value);
-    // }
   };
 
   const getDeliveryDate = async (to_district_id, to_ward_code) => {
@@ -752,13 +791,18 @@ function Cart(props) {
       console.error('onReload is not a function');
     }
   };
+
+  const handleLoadProductInBill = () => {
+    fetchSerialNumberSold();
+    fetchBillInFo();
+  };
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">Giỏ hàng</Typography>
-            <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} />
+            {/* <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} /> */}
             <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
               Thêm sản phẩm
             </Button>
@@ -1066,7 +1110,14 @@ function Cart(props) {
               Chọn Mã Giảm Giá :
             </Button>
             <form onSubmit={handleSubmitFormCoupon}>
-              <TextField label="Mã Giảm Giá" name="maPGG" variant="outlined" size="small" inputRef={inputRef} fullWidth />
+              {/* <TextField label="Mã Giảm Giá" name="maPGG" variant="outlined" size="small" inputRef={inputRef} fullWidth /> */}
+              <input
+                type="text"
+                placeholder="Mã Giảm Giá"
+                name="maPGG"
+                style={{ width: '80%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                ref={inputRef}
+              />
             </form>{' '}
           </Box>
           <FormControlLabel
@@ -1126,64 +1177,7 @@ function Cart(props) {
           <Button onClick={handleCancel}>Đóng</Button>
         </DialogTitle>
         {/* Danh sách sản phẩm */}
-        <DialogContent>
-          <Paper sx={{ padding: 2 }}>
-            <Grid container spacing={2} marginBottom={2}>
-              <Grid item xs={12}>
-                <Typography variant="h6">Tìm kiếm</Typography>
-              </Grid>
-            </Grid>
-
-            <TableContainer sx={{ maxHeight: '70vh' }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Ảnh</TableCell>
-                    <TableCell>Tên</TableCell>
-                    <TableCell>Mã</TableCell>
-                    <TableCell>Bàn phím</TableCell>
-                    <TableCell>CPU</TableCell>
-                    <TableCell>Màn hình</TableCell>
-                    <TableCell>Màu sắc</TableCell>
-                    <TableCell>RAM</TableCell>
-                    <TableCell>VGA</TableCell>
-                    <TableCell>Webcam</TableCell>
-                    <TableCell>Ổ cứng</TableCell>
-                    <TableCell>Giá</TableCell>
-                    <TableCell>Thao tác</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>
-                        <img src="https://via.placeholder.com/50" alt="Product" width="50" />
-                      </TableCell>
-                      <TableCell>{product.sanPham}</TableCell>
-                      <TableCell>{product.ma}</TableCell>
-                      <TableCell>{product.banPhim}</TableCell>
-                      <TableCell>{product.cpu}</TableCell>
-                      <TableCell>{product.manHinh}</TableCell>
-                      <TableCell>{product.mauSac}</TableCell>
-                      <TableCell>{product.ram}</TableCell>
-                      <TableCell>{product.vga}</TableCell>
-                      <TableCell>{product.webcam}</TableCell>
-                      <TableCell>{product.ocung}</TableCell>
-                      <TableCell>
-                        <Typography color="error">{parseInt(product.giaBan).toLocaleString()} VNĐ</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="contained" color="primary" onClick={() => handleOpenDialog(product.id)}>
-                          Chọn
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </DialogContent>
+        <ProductList onLoading={handleLoadProductInBill} selectedRowsInBill={selectedRows} />
       </Dialog>
 
       {/* Dialog Chọn serial */}
@@ -1199,7 +1193,7 @@ function Cart(props) {
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial</span>
-            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} />
+            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchChange} />
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -1219,7 +1213,7 @@ function Cart(props) {
                       checked={selectedRows.includes(row.id)}
                       onChange={() => handleSelectRow(row.id)}
                       // disabled={row.trangThai == 1}
-                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id)}
+                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id) && !defaultSelectRows.includes(row.id)}
                     />
                     <TableCell>{row.ma}</TableCell>
                     <TableCell>
@@ -1292,6 +1286,7 @@ function Cart(props) {
                         }}
                         variant="contained"
                         color="primary"
+                        disabled={billInFo?.idKhachHang === false || billInFo.idKhachHang === customer.id}
                       >
                         Chọn
                       </Button>
@@ -1377,8 +1372,8 @@ function Cart(props) {
                   label="Số tiền mặt"
                   fullWidth
                   variant="outlined"
-                  type="number"
-                  value={cashAmount}
+                  // value={cashAmount}
+                  value={formatNumber(cashAmount)}
                   onChange={(e) => handleAmountChange(e, 'cash')}
                   error={!!cashError}
                   helperText={cashError}
@@ -1392,8 +1387,8 @@ function Cart(props) {
                   label="Số tiền chuyển khoản"
                   fullWidth
                   variant="outlined"
-                  type="number"
-                  value={transferAmount}
+                  // value={transferAmount}
+                  value={formatNumber(transferAmount)}
                   onChange={(e) => handleAmountChange(e, 'transfer')}
                   error={!!transferError}
                   helperText={transferError}

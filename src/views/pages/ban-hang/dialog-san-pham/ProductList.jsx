@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 // import { FloatButton} from 'antd';
 // import { PlusOutlined } from '@ant-design/icons';
@@ -24,26 +24,39 @@ import {
   Chip,
   Switch,
   Fab,
-  IconButton
+  IconButton,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Checkbox,
+  Pagination,
+  DialogActions
 } from '@mui/material';
 // My component
-import SelectDropDown from '../sanpham/ui-component/SelectDropDown.jsx';
-import ButtonAdd from './ui-component/ButtonAdd.jsx';
+import ButtonAdd from 'views/pages/sanpham//ui-component/ButtonAdd.jsx';
 
 import Loader from 'ui-component/Loader';
 import { Box, maxHeight } from '@mui/system';
 import { Download, Upload } from '@mui/icons-material';
 import { MenuButton } from '@mui/base';
-import MenuDownload from './ui-component/Menu.jsx';
-import ImportProduct from './ui-component/ImportProduct.jsx';
+import MenuDownload from 'views/pages/sanpham//ui-component/Menu.jsx';
+import ImportProduct from 'views/pages/sanpham//ui-component/ImportProduct.jsx';
+import SelectDropdown from 'views/pages/sanpham/ui-component/SelectDropDown.jsx';
+import { createSerialNumberSold, getAllSerialNumberSoldByBillId } from 'services/admin/serialNumberSold/serialNumberSoldService';
+import { findSerialNumberByProductIdAndCodeSerial } from 'services/admin/serial-number/serialNumber';
+import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 
-const DanhSachSanPham = () => {
+const ProductList = (props) => {
+  const { id } = useParams();
+  const { onLoading } = props;
+
   const navigate = useNavigate();
   const handleUpdate = (id) => {
-    navigate(`/sanpham/sua/${id}`);
+    // navigate(`/sanpham/sua/${id}`);
   };
   const handleAdd = () => {
-    navigate(`/sanpham/add`);
+    // navigate(`/sanpham/add`);
   };
 
   // 0: tìm theo tên, 1: tìm theo mã
@@ -55,14 +68,14 @@ const DanhSachSanPham = () => {
     if (type === '0') {
       setFilter((prev) => ({
         ...prev,
-        tenSanPham: filter.ma,
+        tenSP: filter.ma,
         ma: ''
       }));
     } else if (type === '1') {
       setFilter((prev) => ({
         ...prev,
-        ma: filter.tenSanPham,
-        tenSanPham: ''
+        ma: filter.tenSP,
+        tenSP: ''
       }));
     }
   };
@@ -85,35 +98,38 @@ const DanhSachSanPham = () => {
     setTypeOfFilter('0');
     setFilter((prev) => ({
       ...prev,
-      tenSanPham: '',
+      tenSP: '',
       ma: ''
     }));
     setResetFilter((prev) => prev + 1);
   };
 
-  const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
+  const urlFindFilter = 'http://localhost:8080/api/san-pham-chi-tiet/find/filter?';
   const [sanPham, setsanPham] = useState([]);
   const [filter, setFilter] = useState({
-    page: 0,
-    size: '5',
-    tenSanPham: '',
-    ma: '',
+    // page: 0,
+    // size: '5',
+    tenSP: '',
+    maSP: '',
+    maSPCT: '',
     ngayTaoTruoc: '',
     ngayTaoSau: '',
     ngaySuaTruoc: '',
     ngaySuaSau: '',
     trangThai: '',
-    idNhuCau: '',
-    idThuongHieu: '',
-    idRam: '',
-    idMauSac: '',
-    idCPU: '',
-    idVGA: '',
-    idWebcam: '',
-    idOCung: '',
-    idManHinh: '',
-    idHeDieuHanh: '',
-    idBanPhim: ''
+    nhuCau: '',
+    thuongHieu: '',
+    ram: '',
+    mauSac: '',
+    cpu: '',
+    vga: '',
+    webcam: '',
+    oCung: '',
+    manHinh: '',
+    heDieuHanh: '',
+    banPhim: ''
+    // giaNhoHon: '',
+    // giaLonHon: ''
   });
 
   // Data for filters
@@ -147,6 +163,100 @@ const DanhSachSanPham = () => {
   const [banPhimChecked, setBanPhimChecked] = useState([]);
   const [trangThaiChecked, setTrangThaiChecked] = useState([]);
 
+  // serial
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [defaultSelectRows, setDefaultSelectRows] = useState([]);
+  const [serials, setSerials] = useState([]);
+  const [productId, setProductId] = useState(null);
+  const [pageSerial, setPageSerial] = useState(1);
+  const [sizeSerial, setSizeSerial] = useState(5);
+  const [totalSerial, setTotalSerial] = useState(0);
+  const [searchSerial, setSearchSerial] = useState('');
+
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleCloseDialog = () => {
+    setSearchSerial('');
+    setOpenDialog(false);
+    setSelectedRows([]);
+    setDefaultSelectRows([]);
+    setPageSerial(1);
+    setProductId(null);
+  };
+  // serial đã có
+  const fetchSerialNumberSold = async () => {
+    const response = await getAllSerialNumberSoldByBillId(id);
+    if (response.status_code === 200) {
+      const allSerialNumberIds = response.data.flatMap((product) => product.serialNumbers.map((serial) => serial.serialNumberId));
+      setDefaultSelectRows(allSerialNumberIds);
+      setSelectedRows(allSerialNumberIds);
+    }
+  };
+  // mở chọn serial
+  const handleOpenDialog = (id) => {
+    setProductId(id);
+    fetchSerialNumberSold();
+    fetchSerialNumberByProduct(id, searchSerial, pageSerial, 5);
+    setOpenDialog(true);
+  };
+
+  const fetchSerialNumberByProduct = async (productId, codeSerial, page, size) => {
+    const response = await findSerialNumberByProductIdAndCodeSerial(productId, codeSerial || '', page - 1, size);
+    if (response.status_code === 200) {
+      setSerials(response.data.result);
+      setTotalSerial(response.data.meta.total);
+      setPageSerial(response.data.meta.page + 1);
+    }
+  };
+
+  const handleChangePageSerial = (newPage) => {
+    setSelectedRows(selectedRows);
+    setPageSerial(newPage);
+    fetchSerialNumberByProduct(productId, searchSerial, newPage, sizeSerial);
+  };
+
+  const handleSearchChange = (event) => {
+    const newSearchSerial = event.target.value;
+    setSearchSerial(newSearchSerial.trim());
+    fetchSerialNumberByProduct(productId, newSearchSerial, pageSerial, sizeSerial);
+  };
+  // thêm serial
+  const handleSubmitSerials = async () => {
+    const data = {
+      billCode: id,
+      listSerialNumberId: selectedRows
+    };
+
+    const response = await createSerialNumberSold(data);
+    if (response.status_code === 201) {
+      setSnackbarMessage('Cập nhập số lượng thành công');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+      setOpenDialog(false);
+      setSelectedRows([]);
+      setSearchSerial('');
+      setPageSerial(1);
+      setProductId(null);
+      // setSelectedProduct(null);
+      onLoading();
+      // fetchSerialNumberSold();
+      // fetchBillInFo();
+    }
+  };
+  // tích chọn serial
+  const handleSelectRow = (id) => {
+    setSelectedRows((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter((rowId) => rowId !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
+  };
+  // ---------------------------------------
   useEffect(() => {
     loadProducts();
     // Load filter options
@@ -167,7 +277,7 @@ const DanhSachSanPham = () => {
     const idString = nhuCauChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idNhuCau: idString
+      nhuCau: idString
     }));
   }, [nhuCauChecked]);
 
@@ -175,7 +285,7 @@ const DanhSachSanPham = () => {
     const idString = thuongHieuChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idThuongHieu: idString
+      thuongHieu: idString
     }));
   }, [thuongHieuChecked]);
 
@@ -183,7 +293,7 @@ const DanhSachSanPham = () => {
     const idString = ramChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idRam: idString
+      ram: idString
     }));
   }, [ramChecked]);
 
@@ -191,7 +301,7 @@ const DanhSachSanPham = () => {
     const idString = CPUChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idCPU: idString
+      cpu: idString
     }));
   }, [CPUChecked]);
 
@@ -199,7 +309,7 @@ const DanhSachSanPham = () => {
     const idString = VGAChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idVGA: idString
+      vga: idString
     }));
   }, [VGAChecked]);
 
@@ -207,7 +317,7 @@ const DanhSachSanPham = () => {
     const idString = banPhimChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idBanPhim: idString
+      banPhim: idString
     }));
   }, [banPhimChecked]);
 
@@ -215,7 +325,7 @@ const DanhSachSanPham = () => {
     const idString = manHinhChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idManHinh: idString
+      manHinh: idString
     }));
   }, [manHinhChecked]);
 
@@ -223,7 +333,7 @@ const DanhSachSanPham = () => {
     const idString = webcamChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idWebcam: idString
+      webcam: idString
     }));
   }, [webcamChecked]);
 
@@ -231,7 +341,7 @@ const DanhSachSanPham = () => {
     const idString = heDieuHanhChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idHeDieuHanh: idString
+      heDieuHanh: idString
     }));
   }, [heDieuHanhChecked]);
 
@@ -239,7 +349,7 @@ const DanhSachSanPham = () => {
     const idString = mauSacChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idMauSac: idString
+      mauSac: idString
     }));
   }, [mauSacChecked]);
 
@@ -247,7 +357,7 @@ const DanhSachSanPham = () => {
     const idString = oCungChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      idOCung: idString
+      oCung: idString
     }));
   }, [oCungChecked]);
 
@@ -258,14 +368,16 @@ const DanhSachSanPham = () => {
     if (typeOfFilter === '0') {
       setFilter((prev) => ({
         ...prev,
-        tenSanPham: keyword,
-        ma: ''
+        tenSP: keyword,
+        maSP: ''
+        // maSPCT: ''
       }));
     } else if (typeOfFilter === '1') {
       setFilter((prev) => ({
         ...prev,
-        ma: keyword,
-        tenSanPham: ''
+        maSP: keyword,
+        // maSPCT: keyword,
+        tenSP: ''
       }));
     }
   };
@@ -314,33 +426,21 @@ const DanhSachSanPham = () => {
     setBanPhim(banPhimResult.data.data);
   };
 
+  function formatNumber(value) {
+    const cleanedValue = String(value || '').replace(/\D/g, '');
+    return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
   // MUI UI
   const columns = [
     { id: 'ma', label: 'Mã', minWidth: 70 },
-    { id: 'ten', label: 'Tên', minWidth: 350 },
+    { id: 'sanPham', label: 'Tên', minWidth: 150 },
     {
-      id: 'thuongHieu',
-      label: 'Thương hiệu',
+      id: 'giaBan',
+      label: 'Giá bán',
       minWidth: 100,
-      align: 'left'
-    },
-    {
-      id: 'nhuCau',
-      label: 'Nhu cầu',
-      minWidth: 100,
-      align: 'left'
-    },
-    {
-      id: 'trangThai',
-      label: 'Trạng thái',
-      minWidth: 30,
-      align: 'center',
-      format: (value) =>
-        value === 1 ? (
-          <Chip label="Hoạt động" size="small" color="secondary" />
-        ) : (
-          <Chip label="Đã tắt" size="small" sx={{ backgroundColor: '#EDE7F6' }} />
-        )
+      align: 'left',
+      align: 'left',
+      format: (value) => formatNumber(value)
     },
     {
       id: 'hanhDong',
@@ -382,6 +482,10 @@ const DanhSachSanPham = () => {
 
   // SELECT DROPDOWN
 
+  const loadProductInBill = () => {
+    onLoading();
+  };
+
   return (
     <>
       <MainCard label="Danh sách sản phẩm">
@@ -416,33 +520,21 @@ const DanhSachSanPham = () => {
               <div onClick={cleanFilter} style={{ marginLeft: 20, marginTop: 10, marginRight: 20 }}>
                 <FilterAltOffOutlinedIcon color="secondary" fontSize="large" />
               </div>
-              <div style={{ flexGrow: '1', display: 'flex', justifyContent: 'end' }}>
-                <Box style={{ marginRight: '10px' }} onClick={() => navigate('/sanpham/themnhieusanpham')}>
-                  <Fab size="medium" color="secondary">
-                    <Upload />
-                  </Fab>
-                </Box>
-                <Box style={{ marginRight: '10px' }}>
-                  <MenuDownload data={sanPham} />
-                </Box>
-
-                <ButtonAdd size={'medium'} color={'secondary'} title={'Thêm sản phẩm'} targetUrl={'them'} />
-              </div>
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              <SelectDropDown list={nhuCau} setListChecked={setNhuCauChecked} nameDropDown={'Nhu cầu'} />
-              <SelectDropDown list={thuongHieu} setListChecked={setThuongHieuChecked} nameDropDown={'Thương hiệu'} />
-              <SelectDropDown list={trangThai} setListChecked={setTrangThaiChecked} nameDropDown={'Trạng thái'} />
-              <SelectDropDown list={ram} setListChecked={setRamChecked} nameDropDown={'RAM'} />
-              <SelectDropDown list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
-              <SelectDropDown list={VGA} setListChecked={setVGAChecked} nameDropDown={'VGA'} />
-              <SelectDropDown list={manHinh} setListChecked={setManHinhChecked} nameDropDown={'Màn hình'} />
-              <SelectDropDown list={banPhim} setListChecked={setBanPhimChecked} nameDropDown={'Bàn phím'} />
-              <SelectDropDown list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
-              <SelectDropDown list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
-              <SelectDropDown list={heDieuHanh} setListChecked={setHeDieuHanhChecked} nameDropDown={'Hệ điều hành'} />
-              <SelectDropDown list={webcam} setListChecked={setWebcamChecked} nameDropDown={'Webcam'} />
+              <SelectDropdown list={nhuCau} setListChecked={setNhuCauChecked} nameDropDown={'Nhu cầu'} />
+              <SelectDropdown list={thuongHieu} setListChecked={setThuongHieuChecked} nameDropDown={'Thương hiệu'} />
+              {/* <SelectDropdown list={trangThai} setListChecked={setTrangThaiChecked} nameDropDown={'Trạng thái'} /> */}
+              <SelectDropdown list={ram} setListChecked={setRamChecked} nameDropDown={'RAM'} />
+              <SelectDropdown list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
+              <SelectDropdown list={VGA} setListChecked={setVGAChecked} nameDropDown={'VGA'} />
+              <SelectDropdown list={manHinh} setListChecked={setManHinhChecked} nameDropDown={'Màn hình'} />
+              <SelectDropdown list={banPhim} setListChecked={setBanPhimChecked} nameDropDown={'Bàn phím'} />
+              <SelectDropdown list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
+              <SelectDropdown list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
+              <SelectDropdown list={heDieuHanh} setListChecked={setHeDieuHanhChecked} nameDropDown={'Hệ điều hành'} />
+              <SelectDropdown list={webcam} setListChecked={setWebcamChecked} nameDropDown={'Webcam'} />
             </div>
           </Paper>
         </div>
@@ -464,7 +556,7 @@ const DanhSachSanPham = () => {
                 {sanPham
                   // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const rowIndex = filter.page * filter.size + index + 1;
+                    const rowIndex = index + 1;
                     return (
                       // lặp từng row
                       <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -476,20 +568,30 @@ const DanhSachSanPham = () => {
                             const valueTrangThai = row['trangThai'];
                             return (
                               <TableCell key={column.id} align={column.align}>
-                                <IconButton onClick={() => handleUpdate(row.id)}>
-                                  <EditOutlinedIcon />
-                                </IconButton>
-                                {valueTrangThai === 1 ? (
-                                  <Switch defaultChecked color="secondary" onChange={handleSwitchChange(row.id)} />
-                                ) : (
-                                  <Switch onChange={handleSwitchChange(row.id)} />
-                                )}
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  //  onClick={loadProductInBill}
+                                  onClick={() => handleOpenDialog(row.id)}
+                                >
+                                  Chọn serial
+                                </Button>
                               </TableCell>
                             );
                           }
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === 'number' ? column.format(value) : value}
+                              {column.id === 'sanPham' ? (
+                                <>{`${row.sanPham} [ ${row.ram} - ${row.cpu} - ${row.ocung} -  ${row.mauSac} ]`}</>
+                              ) : column.format ? (
+                                <>
+                                  <strong>
+                                    <span style={{ color: 'red' }}>{column.format(value)}&nbsp;</span> VNĐ
+                                  </strong>
+                                </>
+                              ) : (
+                                value
+                              )}
                             </TableCell>
                           );
                         })}
@@ -499,7 +601,7 @@ const DanhSachSanPham = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
+          {/* <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
             count={totalElement}
@@ -507,11 +609,78 @@ const DanhSachSanPham = () => {
             page={filter.page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          /> */}
         </Paper>
       </MainCard>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        PaperProps={{
+          style: {
+            width: '700px'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial</span>
+            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchChange} />
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Chọn</TableCell>
+                  <TableCell>Mã</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {serials.map((row) => (
+                  <TableRow key={row.id}>
+                    <Checkbox
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => handleSelectRow(row.id)}
+                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id) && !defaultSelectRows.includes(row.id)}
+                    />
+                    <TableCell>{row.ma}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={row.trangThai == 0 ? 'Chưa bán' : row.trangThai == 1 ? 'Đã bán' : 'Hủy'}
+                        style={{ backgroundColor: getStatusSerialColor(row.trangThai), color: '#fff' }}
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Pagination
+            sx={{ marginTop: '10px', textAlign: 'center' }}
+            count={Math.ceil(totalSerial / sizeSerial)}
+            page={pageSerial}
+            onChange={(event, value) => handleChangePageSerial(value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button
+            onClick={() => {
+              handleSubmitSerials();
+            }}
+            variant="contained"
+            color="primary"
+          >
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
 
-export default DanhSachSanPham;
+export default ProductList;

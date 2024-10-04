@@ -36,6 +36,7 @@ function BillDetail() {
 
   const handleLoading = () => {
     setLoading((prevLoading) => !prevLoading);
+    fetchBill();
   };
 
   return (
