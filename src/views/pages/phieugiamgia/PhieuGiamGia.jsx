@@ -379,19 +379,6 @@ function PhieuGiamGia() {
 
                       </>
                     )}
-
-                    {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
-                      <>
-                        <IconButton
-                          color="secondary"
-                          onClick={() => handleEdit(phieu.id)}
-                        >
-                          <Tooltip title="Chỉnh sửa">
-                            <EditIcon />
-                          </Tooltip>
-                        </IconButton>
-                      </>
-                    )}
                   </TableCell>
                   <TableCell><Tooltip title="Xem chi tiết">
                     <IconButton onClick={() => handleViewCoupon(phieu.id)}>
