@@ -327,6 +327,12 @@ const DanhSachSanPham = () => {
             align: 'left'
         },
         {
+            id: 'amount',
+            label: 'Số lượng',
+            minWidth: 100,
+            align: 'left'
+        },
+        {
             id: 'trangThai',
             label: 'Trạng thái',
             minWidth: 30,
