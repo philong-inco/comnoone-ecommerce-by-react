@@ -1,27 +1,15 @@
 import React from 'react'
 import axios from 'axios';
 import MainCard from 'ui-component/cards/MainCard';
-import { IconEye } from '@tabler/icons-react';
-import { Autocomplete , TextField, Button } from '@mui/material';
-import { IconCheck } from '@tabler/icons-react';
+import { Autocomplete , TextField } from '@mui/material';
 import SelectDropOneValueForUpdate from './ui-component/SelectDropOneValueForUpdate.jsx';
 import AlertDialogSlide from '../sanpham/ui-component/AlertDialogSlide.jsx';
-import SerialNumberViewFromSPCT from '../sanpham/ui-component/SerialNumberViewFromSPCT.jsx';
 import { useParams } from 'react-router-dom';  
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { color } from 'framer-motion';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 const SuaSanPham = () => {
   const { id } = useParams();  
-  const [openSeri, setOpenSeri] = useState(false); // openViewSeri
 
   ///////////////////
   // Data cho các combobox thuộc tính
@@ -42,23 +30,6 @@ const SuaSanPham = () => {
   const [nhuCauChecked, setNhuCauChecked] = useState('');
   const [thuongHieuChecked, setThuongHieuChecked] = useState('');
 
-  const [nhuCauEntityChecked, setNhuCauEntityChecked] = useState({});
-  const [thuongHieuEntityChecked, setThuongHieuEntityChecked] = useState({});
-  const [VGAEntityChecked, setVGAEntityChecked] = useState({});
-  const [webcamEntityChecked, setWebcamEntityChecked] = useState({});
-  const [manHinhEntityChecked, setManHinhEntityChecked] = useState({});
-  const [banPhimEntityChecked, setBanPhimEntityChecked] = useState({});
-  const [heDieuHanhEntityChecked, setHeDieuHanhEntityChecked] = useState({});
-  
-
-  // useEffect(() => {
-  //     console.log('nhuCauEntityChecked: ', nhuCauEntityChecked); 
-  // },[nhuCauEntityChecked])
-  // useEffect(() => {
-  //   console.log('thuongHieuEntityChecked: ', thuongHieuEntityChecked); 
-  // },[thuongHieuEntityChecked])
-
-
   // Bảng chỉ chọn 1 giá trị
   const [VGAChecked, setVGAChecked] = useState('');
   const [webcamChecked, setWebcamChecked] = useState('');
@@ -73,7 +44,6 @@ const SuaSanPham = () => {
   // Data thông tin sản phẩm và list spct
   const [sanPham, setSanPham] = useState();
   const [spct, setspct] = useState([]);
-  const [idSPCT, setIdSPCT] = useState();
 
   useEffect(() => {
     console.log('sanPham: ', sanPham)
@@ -148,87 +118,12 @@ const SuaSanPham = () => {
     console.log('nhuCauResult.data.data: ', nhuCauResult.data.data); 
     const nhuCauTemp = nhuCauResult.data.data.filter(x => x.ten == dataSanPham.data.data.nhuCau);
     const thuongHieuTemp = thuongHieuResult.data.data.filter(x => x.ten == dataSanPham.data.data.thuongHieu);
-    const VGATemp = vgaResult.data.data.filter(x => x.ten == dataSpct.data.data[0].vga);
-
-    const manHinhTemp = manHinhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].manHinh);
-    const webCamTemp = webcamResult.data.data.filter(x => x.ten == dataSpct.data.data[0].webcam);
-    const heDieuHanhTemp = heDieuHanhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].heDieuHanh);
-    const banPhimTemp = banPhimResult.data.data.filter(x => x.ten == dataSpct.data.data[0].banPhim);
-    console.log('VGATemp: ', VGATemp[0]); 
-    console.log('manHinhTemp: ', manHinhTemp); 
-
-    setNhuCauEntityChecked(nhuCauTemp[0]);
-    setThuongHieuEntityChecked(thuongHieuTemp[0]);
-    setVGAEntityChecked(VGATemp[0]);
-    setManHinhEntityChecked(manHinhTemp[0]);
-    setBanPhimEntityChecked(banPhimTemp[0]);
-    setHeDieuHanhEntityChecked(heDieuHanhTemp[0]);
-    setWebcamEntityChecked(webCamTemp[0]);
+    console.log('nhuCauTemp: ', nhuCauTemp); 
+    console.log('thuongHieuTemp: ', thuongHieuTemp); 
+    setNhuCauChecked(nhuCauTemp[0]);
+    setThuongHieuChecked(thuongHieuTemp[0]);
   }
 
-  const updateHandle = async () => {
-    let spUpdate = {
-      tenSP: tenSanPham,
-      moTa: moTaSanPham,
-      idThuongHieu: thuongHieuChecked, 
-      idNhuCau: nhuCauChecked,
-      idVGA: VGAChecked,
-      idWebcam: webcamChecked,
-      idManHinh: manHinhChecked,
-      idBanPhim: banPhimChecked,
-      idHeDieuHanh: heDieuHanhChecked
-    }
-    if (spUpdate.tenSP.trim() === '' || spUpdate.moTa.trim() === ''){
-      alert("Vui lòng điền đủ thông tin")
-      return;
-    }
-    console.log('spUpdate: ', spUpdate);
-
-    try {
-      const check = await axios.get(`http://localhost:8080/api/san-pham/exist-name-for-update?ten=${spUpdate.tenSP}&id=${id}`);
-      if (check.data.data){
-        alert("Tên sản phẩm đã tồn tại");
-        return;
-      }
-    } catch (error) {  
-      // Xử lý lỗi  
-      console.error('Có lỗi xảy ra khi check tên:', error);  
-      return;
-    }  
-
-    try {
-      await axios.put(`http://localhost:8080/api/san-pham/updateSanPhamAndSPCT/${id}`, spUpdate);
-      alert('Cập nhật thành công');
-    } catch (error) {  
-      // Xử lý lỗi  
-      console.error('Có lỗi xảy ra:', error);  
-      alert('Cập nhật không thành công. Vui lòng thử lại.');  
-    }  
-  }
-
-
-  //////// SERI VIEW /////////////////
-  const [listSeri, setListSeri] = useState([]);
-  useEffect(() => {
-    console.log('listSeri: ', listSeri);
-  }, [listSeri])
-
-    const handleViewSerial = async (id) => {
-      // view serial ở đây
-      console.log('spctId: ', id); 
-      const seriGet = await axios.get(`http://localhost:8080/api/serial-number/find-by-spct-id/${id}`);
-      setListSeri(seriGet.data.data);
-      
-      setIdSPCT(id);
-      setOpenSeri(true);
-    }
-
-
-  ///// Bảng biến thể ///////////
-
- 
-
-  ///// Bảng biến thể ///////////
   
 
   return (
@@ -245,7 +140,7 @@ const SuaSanPham = () => {
                 fullWidth 
                 color="secondary"
                 value={tenSanPham}
-                onChange={(e) => setTenSanPham(e.target.value)}
+                onChange={(e) => setMota(e.target.value)}
                 />
 
               <TextField
@@ -254,9 +149,8 @@ const SuaSanPham = () => {
                 variant="outlined"
                 color="secondary"
                 value={maSanPham}
-                sx={{ width: '30%', color: '#FF5555', marginLeft: '20px' }}
+                sx={{ width: '30%' }}
                 placeholder="Nhập mã hoặc mã tự sinh"
-                disabled
               />
             </div>
             <div>
@@ -268,21 +162,18 @@ const SuaSanPham = () => {
                 fullWidth 
                 value={moTaSanPham}
                 color="secondary"
-                onChange={(e) => setMotaSanPham(e.target.value)}
+                onChange={(e) => setMota(e.target.value)}
                 />
             </div>
           </div>
           <div>
-            <SelectDropOneValueForUpdate valueOld={thuongHieuEntityChecked} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
-            <SelectDropOneValueForUpdate valueOld={nhuCauEntityChecked} list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
-            <SelectDropOneValueForUpdate valueOld={VGAEntityChecked} list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
-            <SelectDropOneValueForUpdate valueOld={webcamEntityChecked} list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
-            <SelectDropOneValueForUpdate valueOld={manHinhEntityChecked} list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
-            <SelectDropOneValueForUpdate valueOld={banPhimEntityChecked} list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
-            <SelectDropOneValueForUpdate valueOld={heDieuHanhEntityChecked} list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
-          <Button variant="contained" onClick={updateHandle} color="secondary" sx={{ height: '60px', borderRadius: '7px', marginTop: '10px' }}>
-              <IconCheck /> Sửa
-            </Button>
+            <SelectDropOneValueForUpdate valueOld={thuongHieuChecked} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
+            <SelectDropOneValueForUpdate valueOld={nhuCauChecked} list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
+            <SelectDropOneValueForUpdate list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
+            <SelectDropOneValueForUpdate list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
+            <SelectDropOneValueForUpdate list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
+            <SelectDropOneValueForUpdate list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
+            <SelectDropOneValueForUpdate list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
           </div>
         </div>
 
@@ -290,6 +181,7 @@ const SuaSanPham = () => {
           {/* <AlertDialogSlide title={title} message={message} open={open} setOpen={setOpen} /> */}
         </div>
       </MainCard>
+
 
       <MainCard>
       <TableContainer component={Paper}>
@@ -335,10 +227,9 @@ const SuaSanPham = () => {
         idSPCT={idSPCT}
         setListSPCT={setspct}
       />
+
     </>
   )
 }
-
-
 
 export default SuaSanPham

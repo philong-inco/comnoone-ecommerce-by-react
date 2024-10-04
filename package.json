@@ -41,7 +41,6 @@
         "bootstrap": "^5.3.3",
         "cloudinary": "^2.3.0",
         "cloudinary-react": "^1.8.1",
-        "date-fns": "^3.6.0",
         "dayjs": "^1.11.12",
         "env-cmd": "^10.1.0",
         "formik": "^2.4.5",

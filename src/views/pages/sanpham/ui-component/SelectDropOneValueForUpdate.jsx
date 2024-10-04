@@ -11,13 +11,11 @@ const SelectDropOneValueForUpdate = ({ list, setValueSelect, name, valueOld }) =
   const [value, setValue] = useState({});
 
   useEffect(() => {
-    console.log('valueOld: ', valueOld);
     setValue(valueOld)
-  }, [valueOld])
+  }, [])
 
   useEffect(() => {
     setValueSelect(value.id);
-    console.log('value: ', value);
   }, [value]);
 
   const handleChange = (event) => {

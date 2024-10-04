@@ -512,14 +512,14 @@ const ThemSanPham = () => {
                 )}
               />
 
-              {/* <TextField
+              <TextField
                 id="codeProduct"
                 label="Mã sản phẩm"
                 variant="outlined"
                 color="secondary"
                 sx={{ width: '30%' }}
                 placeholder="Nhập mã hoặc mã tự sinh"
-              /> */}
+              />
             </div>
             <div>
               <TextField 
