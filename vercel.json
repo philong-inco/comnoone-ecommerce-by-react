@@ -1,5 +1,5 @@
 {
   "routes": [
-    { "src": "/free/(.*)", "dest": "/free/index.html" }
+    { "src": "/free/(.*)", "dest": "./index.html" }
   ]
 }
