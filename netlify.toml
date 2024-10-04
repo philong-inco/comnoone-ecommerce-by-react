@@ -1,6 +1,6 @@
 [build]
-  publish = "dist"  # Thư mục chứa các file build (thường là dist với Vite)
-  command = "npm run build"  # Lệnh build ứng dụng
+  publish = "dist"  
+  command = "npm run build" 
 
 [[redirects]]
   from = "/*"
