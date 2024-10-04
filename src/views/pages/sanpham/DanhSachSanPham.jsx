@@ -425,10 +425,49 @@ const DanhSachSanPham = () => {
                 <Box style={{ marginRight: '10px' }}>
                   <MenuDownload data={sanPham} />
                 </Box>
-
                 <ButtonAdd size={'medium'} color={'secondary'} title={'Thêm sản phẩm'} targetUrl={'them'} />
               </div>
             </div>
+
+    // MUI UI
+    const columns = [
+        { id: 'ma', label: 'Mã', minWidth: 70 },
+        { id: 'ten', label: 'Tên', minWidth: 350 },
+        {
+            id: 'thuongHieu',
+            label: 'Thương hiệu',
+            minWidth: 100,
+            align: 'left'
+        },
+        {
+            id: 'nhuCau',
+            label: 'Nhu cầu',
+            minWidth: 100,
+            align: 'left'
+        },
+        {
+            id: 'amount',
+            label: 'Số lượng',
+            minWidth: 100,
+            align: 'left'
+        },
+        {
+            id: 'trangThai',
+            label: 'Trạng thái',
+            minWidth: 30,
+            align: 'center',
+            format: (value) => value === 1 ? <Chip label="Hoạt động" size='small' color="secondary" />
+                :
+                <Chip label="Đã tắt" size='small' sx={{ backgroundColor: '#EDE7F6' }} />
+        },
+        {
+            id: 'hanhDong',
+            label: 'Hành động',
+            minWidth: 30,
+            align: 'center'
+        }
+    ];
+
 
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
               <SelectDropDown list={nhuCau} setListChecked={setNhuCauChecked} nameDropDown={'Nhu cầu'} />
