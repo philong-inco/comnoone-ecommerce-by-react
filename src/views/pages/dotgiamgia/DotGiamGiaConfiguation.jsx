@@ -147,6 +147,11 @@ function DotGiamGiaConfiguration() {
         setTabIndex(newValue);
     };
 
+    function formatNumber(value) {
+        const cleanedValue = String(value || "").replace(/\D/g, "");
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
     function addSeconds(dateTimeStr) {
         if (!dateTimeStr) return "";
         if (dateTimeStr.length === 16) {
@@ -192,6 +197,24 @@ function DotGiamGiaConfiguration() {
                     }
                     return true;
                 }),
+            giaTriToiDa: yup
+                .string()
+                .required('Giá trị tối đa là bắt buộc')
+                .test('is-big-decimal', 'Giá trị phải lớn hơn 0', (value) => {
+                    if (!value) return false;
+                    const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
+                    return bigNumberValue.isGreaterThan(0);
+                })
+                .test('is-giamToiDa-equal-giaTri', 'Giá trị tối đa phải bằng giá trị khi loại giảm giá là $', function (value) {
+                    const { giaTri } = this.parent;
+                    if (currencyType === '$') {
+                        const bigNumberGiaTriToiDa = new BigNumber(value.replace(/\./g, ''));
+                        const bigNumberGiaTri = new BigNumber(giaTri.replace(/\./g, ''));
+                        return bigNumberGiaTriToiDa.isEqualTo(bigNumberGiaTri);
+                    }
+                    return true;
+                }),
+
             tuNgay: yup.date()
                 .required('Ngày bắt đầu là bắt buộc')
                 .min(new Date(), 'Ngày bắt đầu phải từ hiện tại trở đi'),
@@ -203,13 +226,13 @@ function DotGiamGiaConfiguration() {
         }),
         onSubmit: async (values) => {
             try {
-                debugger;
                 setIsSubmitting(true);
                 const listSanPhamChiTiet = Object.values(selectedSanPhamChiTiet).flat();
                 const data = {
                     ten: values.tenPhieu,
                     moTa: values.moTa,
                     giaTriGiam: values.giaTri,
+                    giamToiDa: values.giaTriToiDa,
                     loaiChietKhau: currencyType === '%' ? 1 : 2,
                     thoiGianBatDau: addSeconds(values.tuNgay),
                     thoiGianKetThuc: addSeconds(values.denNgay),
@@ -254,7 +277,6 @@ function DotGiamGiaConfiguration() {
             debugger
             const response = await axios.get(`http://localhost:8080/api/v1/discounts/${id}`);
             const data = response.data;
-
             formik.setValues({
                 stat: data.trangThai,
                 maPhieu: data.ma,
@@ -262,7 +284,8 @@ function DotGiamGiaConfiguration() {
                 moTa: data.moTa,
                 giaTri: data.giaTriGiam,
                 tuNgay: data.thoiGianBatDau,
-                denNgay: data.thoiGianKetthuc
+                denNgay: data.thoiGianKetthuc,
+                giaTriToiDa: data.giamToiDa
             });
 
             setCurrencyType(data.loaiChietKhau === 1 ? '%' : "$");
@@ -276,7 +299,7 @@ function DotGiamGiaConfiguration() {
             );
 
             const sanPhamIds = sanPhamChiTietData
-                .map(item => parseInt(item.sanPhamId))  // Chuyển chuỗi thành số nguyên
+                .map(item => parseInt(item.sanPhamId))
                 .filter((value, index, self) =>
                     !isNaN(value) && self.indexOf(value) === index
                 );
@@ -427,6 +450,25 @@ function DotGiamGiaConfiguration() {
                                 ),
                             }}
                         />
+                        <TextField
+                            label=" Giá trị giảm giá tối đa"
+                            name="giaTriToiDa"
+                            fullWidth
+                            margin="normal"
+                            value={formatNumber(formik.values.giaTriToiDa)}
+                            onChange={formik.handleChange}
+                            error={formik.touched.giaTriToiDa && Boolean(formik.errors.giaTriToiDa)}
+                            helperText={formik.touched.giaTriToiDa && formik.errors.giaTriToiDa}
+                            InputProps={{
+                                readOnly: isChiTietPage,
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+
                         <TextField
                             label="Từ ngày"
                             name="tuNgay"
