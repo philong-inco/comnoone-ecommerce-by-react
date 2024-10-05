@@ -281,7 +281,7 @@ function NewTimeLine(props) {
     );
   };
 
-  console.log(bill);
+  console.log('BILL IN TIME LINE : ', bill);
 
   return (
     <>

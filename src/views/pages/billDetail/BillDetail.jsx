@@ -1,12 +1,16 @@
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, Fab, IconButton, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getBillByCode, getBillHistoryByBillId } from 'services/admin/bill/billService';
 import NewTimeLine from './TimeLine';
 import BillInFo from './BillInFo';
+import SerialNumberSold from './SerialNumberSold';
+import OrderInformation from './OrderInformation';
 
 function BillDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // hóa đơn
   const [bill, setBill] = useState({});
@@ -57,14 +61,31 @@ function BillDetail() {
 
   // lịch sử
 
-  console.log('ID : ', id);
-  console.log('Hoa đơn : ', bill);
-  console.log('Lịch sử : ', billHistory);
+  const handleNavigate = () => {
+    navigate('/hoa-don/danh-sach');
+  };
+  console.log('BILL DETAIL => ID : ', id);
+  console.log('BILL DETAIL => BILL : ', bill);
+  console.log('BILL DETAIL => HISTORY : ', billHistory);
 
   return (
     <>
+      <Fab
+        color="primary"
+        aria-label="back"
+        sx={{
+          position: 'fixed',
+          top: 170,
+          right: 15
+        }}
+        onClick={handleNavigate}
+      >
+        <ArrowBackIcon />
+      </Fab>
       <NewTimeLine data={billHistory} onLoading={onLoading} bill={bill} />
       <BillInFo bill={bill} onLoading={onLoading} />
+      <SerialNumberSold onLoading={onLoading} bill={bill} />
+      <OrderInformation />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}

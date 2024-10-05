@@ -43,6 +43,7 @@ function BillTable(props) {
 
   const columns = [
     { title: '#', dataIndex: 'key', key: 'key' },
+    { title: 'Chọn', key: 'selected' },
     { title: 'Mã', dataIndex: 'ma', key: 'ma' },
     { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
     { title: 'Tổng số tiền', dataIndex: 'tongTienPhaiTra', key: 'tongTien' },
@@ -60,7 +61,18 @@ function BillTable(props) {
       dataIndex: 'loaiHoaDon',
       key: 'loaiHoaDon',
       render: (loaiHoaDon) => (
-        <Chip label={loaiHoaDon == 0 ? 'Tại quầy' : 'Online'} color={loaiHoaDon == 0 ? 'primary' : 'success'} size="small" />
+        <Chip
+          size="small"
+          sx={{
+            width: 100,
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '0.8rem',
+            padding: '15px 4px'
+          }}
+          label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
+          color={loaiHoaDon == 0 ? 'primary' : 'success'}
+        />
       )
     },
     {
@@ -68,7 +80,19 @@ function BillTable(props) {
       dataIndex: 'trangThai',
       key: 'trangThai',
       render: (trangThai) => (
-        <Chip label={getStatusDisplayName(trangThai)} style={{ backgroundColor: getStatusColor(trangThai), color: '#fff' }} size="small" />
+        <Chip
+          label={getStatusDisplayName(trangThai)}
+          style={{ backgroundColor: getStatusColor(trangThai), color: '#fff' }}
+          size="small"
+          Chip
+          sx={{
+            width: 100,
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '0.8rem',
+            padding: '15px 4px'
+          }}
+        />
       )
     },
     {
@@ -97,7 +121,7 @@ function BillTable(props) {
       <Tabs
         value={activeKey}
         onChange={(event, newValue) => handleTabChange(newValue)}
-        variant="scrollable"
+        variant="fullWidth"
         scrollButtons="auto"
         allowScrollButtonsMobile
       >

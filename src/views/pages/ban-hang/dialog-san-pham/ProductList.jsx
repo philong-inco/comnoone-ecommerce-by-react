@@ -31,7 +31,9 @@ import {
   DialogContent,
   Checkbox,
   Pagination,
-  DialogActions
+  DialogActions,
+  Snackbar,
+  Alert
 } from '@mui/material';
 // My component
 import ButtonAdd from 'views/pages/sanpham//ui-component/ButtonAdd.jsx';
@@ -221,7 +223,8 @@ const ProductList = (props) => {
   const handleSearchChange = (event) => {
     const newSearchSerial = event.target.value;
     setSearchSerial(newSearchSerial.trim());
-    fetchSerialNumberByProduct(productId, newSearchSerial, pageSerial, sizeSerial);
+    setPageSerial(1);
+    fetchSerialNumberByProduct(productId, newSearchSerial, 1, sizeSerial);
   };
   // thêm serial
   const handleSubmitSerials = async () => {
@@ -436,10 +439,24 @@ const ProductList = (props) => {
     { id: 'sanPham', label: 'Tên', minWidth: 150 },
     {
       id: 'giaBan',
+      label: 'Giá sản phẩm',
+      minWidth: 100,
+      align: 'left',
+      format: (value) => formatNumber(value)
+    },
+    {
+      id: 'giaSauKhuyenMai',
       label: 'Giá bán',
       minWidth: 100,
       align: 'left',
       format: (value) => formatNumber(value)
+    },
+    {
+      id: 'soTienDuocGiam',
+      label: 'Số tiền được giảm',
+      minWidth: 100,
+      align: 'left'
+      // format: (value) => formatNumber(value)
     },
     {
       id: 'hanhDong',
@@ -484,11 +501,13 @@ const ProductList = (props) => {
   const loadProductInBill = () => {
     onLoading();
   };
-
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
   return (
     <>
       <MainCard label="Danh sách sản phẩm">
-        <div key={resetFilter} style={{ marginBottom: 30 }}>
+        <div key={resetFilter}>
           <Paper>
             <div style={{ display: 'flex', padding: 10, paddingTop: 20 }}>
               <TextField
@@ -581,7 +600,7 @@ const ProductList = (props) => {
                           return (
                             <TableCell key={column.id} align={column.align}>
                               {column.id === 'sanPham' ? (
-                                <>{`${row.sanPham} [ ${row.ram} - ${row.cpu} - ${row.ocung} -  ${row.mauSac} ]`}</>
+                                <>{`${row.tenSanPham} [ ${row.ram} - ${row.cpu} - ${row.ocung} -  ${row.mauSac} ]`}</>
                               ) : column.format ? (
                                 <>
                                   <strong>
@@ -678,6 +697,18 @@ const ProductList = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/*  */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

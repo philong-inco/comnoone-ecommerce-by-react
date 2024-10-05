@@ -81,8 +81,8 @@ function BillInFo(props) {
               Loại hóa đơn:
             </Typography>
             <Chip
-              label={bill.loaiHoaDon === '0' ? 'Tại quầy' : 'Online'}
-              color={bill.loaiHoaDon === '0' ? 'primary' : 'success'}
+              label={bill.loaiHoaDon == '0' ? 'Tại quầy' : 'SHIP'}
+              color={bill.loaiHoaDon == '0' ? 'primary' : 'success'}
               sx={{ ml: 1 }}
             />
           </Box>
