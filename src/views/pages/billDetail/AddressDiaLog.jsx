@@ -50,6 +50,18 @@ function AddressDiaLog(props) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
+    setFormData((prevData) => ({
+      ...prevData,
+      ten: formData?.tenKhachHang,
+      tinh: formData?.tinh,
+      huyen: formData?.huyen,
+      phuong: formData?.phuong,
+      tienShip: formData?.tienShip,
+      sdt: formData?.sdt,
+      email: formData?.email,
+      diaChi: formData?.diaChi,
+      ghiChu: formData?.ghiChu
+    }));
     setFormDataError({
       ten: '',
       sdt: '',
@@ -64,6 +76,7 @@ function AddressDiaLog(props) {
     if (open) {
       fetchBill();
       loadProvinces();
+      console.log('Load 1');
     }
   }, [open]);
 
@@ -94,6 +107,7 @@ function AddressDiaLog(props) {
 
   useEffect(() => {
     loadProvinces();
+    console.log('Load 2');
   }, [formData.tinh]);
 
   console.log('BILL IN ADDRESS DIALOG : ', bill);
@@ -101,7 +115,7 @@ function AddressDiaLog(props) {
   const loadProvinces = async () => {
     const data = await fetchAllProvince();
     setProvinces(data.data);
-    if (formData?.huyen) {
+    if (formData?.tinh) {
       const data = await fetchAllProvinceDistricts(formData.tinh);
       setDistricts(data.data);
       setSelectedDistrict('');
@@ -206,13 +220,15 @@ function AddressDiaLog(props) {
     // console.log('Giá ship : ', moneyShip.data.total);
   };
 
-  // console.log('TP : ', provinces);
-  // console.log('Quận : ', districts);
-  // console.log('Huyện : ', wards);
-  // console.log('Form Data : ', formData);
+  console.log('TP : ', provinces);
+  console.log('Quận : ', districts);
+  console.log('Huyện : ', wards);
+  console.log('Form Data : ', formData);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('Form Data Guiwr  ĐI : ', formData);
+
     const trimmedFormData = {
       ...formData,
       ten: formData.ten?.trim(),
@@ -243,6 +259,12 @@ function AddressDiaLog(props) {
           tienShip: ''
         });
         setFormDataError({
+          tinh: '',
+          huyen: '',
+          phuong: '',
+          email: '',
+          ten: '',
+          sdt: '',
           ten: '',
           sdt: '',
           email: ''

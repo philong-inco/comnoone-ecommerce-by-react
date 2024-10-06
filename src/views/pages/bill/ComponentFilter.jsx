@@ -26,9 +26,7 @@ function ComponentFilter(props) {
           />
         </Grid>
         <Grid item xs={12} sm={6} container justifyContent="flex-end">
-          <Button variant="outlined" color="primary" startIcon={<FileDownload />}>
-            Quét mã
-          </Button>
+          <Button variant="outlined" color="primary" startIcon={<FileDownload />}></Button>
           <Button
             variant="contained"
             color="primary"

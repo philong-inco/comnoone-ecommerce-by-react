@@ -469,7 +469,8 @@ function Cart(props) {
   const handleSubmitSerials = async () => {
     const data = {
       billCode: id,
-      listSerialNumberId: selectedRows
+      listSerialNumberId: selectedRows,
+      productId: productId
     };
 
     const response = await createSerialNumberSold(data);

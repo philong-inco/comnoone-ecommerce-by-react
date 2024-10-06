@@ -156,7 +156,6 @@ function BillTable(props) {
                   </TableBody>
                 </Table>
               </TableContainer>
-
               <Pagination
                 sx={{ marginTop: '10px', textAlign: 'center' }}
                 count={Math.ceil(total / pageSize)}

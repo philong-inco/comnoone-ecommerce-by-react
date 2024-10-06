@@ -39,11 +39,11 @@ function BillInFo(props) {
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
               Tên khách hàng:
             </Typography>
-            {bill.tenKhachHang === null ? (
+            {bill.idKhachHang == null ? (
               <Chip label="Khách lẻ" color="info" sx={{ ml: 1 }} />
             ) : (
               <Typography variant="body1" sx={{ ml: 1 }}>
-                {bill.tenKhachHang}
+                {bill.tenKhachHang || bill.idKhachHang}
               </Typography>
             )}
           </Box>

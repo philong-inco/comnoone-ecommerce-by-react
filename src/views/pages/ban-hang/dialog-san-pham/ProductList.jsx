@@ -230,8 +230,10 @@ const ProductList = (props) => {
   const handleSubmitSerials = async () => {
     const data = {
       billCode: id,
-      listSerialNumberId: selectedRows
+      listSerialNumberId: selectedRows,
+      productId: productId
     };
+    console.log('DATA REQUEST : ', data);
 
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {

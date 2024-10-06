@@ -20,10 +20,10 @@ import {
   Pagination,
   DialogActions,
   Checkbox,
-  Chip
+  Chip,
+  Button
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { findSerialNumberByProductIdAndCodeSerial } from 'services/admin/serial-number/serialNumber';
 import {
@@ -106,8 +106,11 @@ function SerialNumberSold(props) {
   const handleSubmitSerials = async () => {
     const data = {
       billCode: id,
-      listSerialNumberId: selectedRows
+      listSerialNumberId: selectedRows,
+      productId: productId
     };
+
+    console.log('DATA REQUEST : ', data);
 
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {
@@ -139,7 +142,7 @@ function SerialNumberSold(props) {
   const handleOpenDialog = (id) => {
     setProductId(id);
     // xem lại
-    // fetchSerialNumberSold();
+    fetchSerialNumberSold();
     fetchSerialNumberByProduct(id, searchSerial, pageSerial, 5);
     setOpenDialog(true);
   };
@@ -184,6 +187,9 @@ function SerialNumberSold(props) {
     setProductId(null);
   };
 
+  console.log('Select ROW ', selectedRows);
+  console.log('Select Dèauk ', selectedRows);
+
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
@@ -204,6 +210,7 @@ function SerialNumberSold(props) {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell>STT</TableCell>
                 <TableCell>Ảnh</TableCell>
                 <TableCell>Mã SP</TableCell>
                 <TableCell>Tên sản phẩm</TableCell>
@@ -216,13 +223,14 @@ function SerialNumberSold(props) {
             <TableBody>
               {serialNumberSold.map((product, index) => (
                 <TableRow key={product.id}>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>
                     <img src="https://via.placeholder.com/50" alt="Product" width="50" />
                   </TableCell>
                   <TableCell>{product.productDetailCode}</TableCell>
                   <TableCell>
                     {product.productName} <br />
-                    <strong style={{ color: 'red' }}>{parseInt(product.price).toLocaleString()} VNĐ</strong>
+                    <strong style={{ color: 'red' }}>{parseFloat(product.price).toLocaleString()} VNĐ</strong>
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -250,7 +258,7 @@ function SerialNumberSold(props) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <strong style={{ color: 'red' }}>{parseInt(product.quantity * product.price).toLocaleString()} VNĐ</strong>
+                    <strong style={{ color: 'red' }}>{parseFloat(product.quantity * product.price).toLocaleString()} VNĐ</strong>
                   </TableCell>
                   <TableCell>
                     <strong>
@@ -277,7 +285,7 @@ function SerialNumberSold(props) {
         </TableContainer>
         <Grid container justifyContent="end" alignItems="center" mt={2}>
           <Typography variant="h4">
-            Tổng tiền : <strong style={{ color: 'red' }}> {parseInt(bill.tongTienBanDau || 0).toLocaleString() || '0'} </strong> VNĐ
+            Tổng tiền : <strong style={{ color: 'red' }}> {parseFloat(bill.tongTienBanDau || 0).toLocaleString() || '0'} </strong> VNĐ
           </Typography>
         </Grid>
       </Grid>

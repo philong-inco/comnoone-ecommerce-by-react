@@ -85,7 +85,7 @@ function BillDetail() {
       <NewTimeLine data={billHistory} onLoading={onLoading} bill={bill} />
       <BillInFo bill={bill} onLoading={onLoading} />
       <SerialNumberSold onLoading={onLoading} bill={bill} />
-      <OrderInformation />
+      <OrderInformation onLoading={onLoading} bill={bill} />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
