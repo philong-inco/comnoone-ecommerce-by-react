@@ -21,9 +21,9 @@ const App = () => {
       <ThemeProvider theme={themes(customization)}>
         <CssBaseline />
         <NavigationScroll>
-          <BrowserRouter> 
+         
             <RouterProvider router={router} />
-          </BrowserRouter>
+          
         </NavigationScroll>
       </ThemeProvider>
     </StyledEngineProvider>
