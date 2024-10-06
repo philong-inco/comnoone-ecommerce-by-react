@@ -169,13 +169,12 @@ function DotGiamGiaConfiguration() {
         },
         validationSchema: yup.object({
             tenPhieu: yup.string().required('Tên đợt giảm giá là bắt buộc'),
-            giaTri: yup
-                .string()
-                .required('Giá trị là bắt buộc')
-                .test('is-valid-value', (value, context) => {
 
+            giaTri: yup.string().required('Giá trị là bắt buộc')
+                .test('is-valid-value', (value, context) => {
                     if (!value) return context.createError({ message: 'Giá trị là bắt buộc' });
                     const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
+
                     if (currencyType === '%') {
                         if (!bigNumberValue.isGreaterThan(0)) {
                             return context.createError({ message: 'Giá trị phải lớn hơn 0%' });
@@ -192,29 +191,69 @@ function DotGiamGiaConfiguration() {
                     }
                     return true;
                 }),
-            tuNgay: yup.date()
-                .required('Ngày bắt đầu là bắt buộc')
+
+            giaTriToiDa: yup.string().nullable()
+                .test('is-correct-value', 'Giá trị tối đa không hợp lệ', function (value) {
+                    const { giaTri } = this.parent;
+                    const bigNumberGiaTri = new BigNumber(giaTri.replace(/\./g, ''));
+                    const bigNumberGiaTriToiDa = value ? new BigNumber(value.replace(/\./g, '')) : null;
+
+                    if (currencyType === '$') {
+                        if (!bigNumberGiaTriToiDa || !bigNumberGiaTriToiDa.isEqualTo(bigNumberGiaTri)) {
+                            return this.createError({ message: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
+                        }
+                    } else if (currencyType === '%') {
+                        if (value !== "" && value != null) {
+                            return this.createError({ message: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
+                        }
+                    }
+                    return true;
+                }),
+
+            tuNgay: yup.date().required('Ngày bắt đầu là bắt buộc')
                 .min(new Date(), 'Ngày bắt đầu phải từ hiện tại trở đi'),
-            denNgay: yup.date()
-                .required('Ngày kết thúc là bắt buộc')
+
+            denNgay: yup.date().required('Ngày kết thúc là bắt buộc')
                 .when('tuNgay', (tuNgay, schema) => {
                     return schema.min(tuNgay, 'Ngày kết thúc phải sau ngày bắt đầu');
-                }),
+                })
         }),
-        onSubmit: async (values) => {
+
+        onSubmit: async (values, { setErrors, validateForm }) => {
+            const errors = await validateForm();
+            if (Object.keys(errors).length > 0) {
+                setErrors(errors);
+                return;
+            }
+
             try {
-                debugger;
                 setIsSubmitting(true);
                 const listSanPhamChiTiet = Object.values(selectedSanPhamChiTiet).flat();
+                const giaTriGiam = new BigNumber(String(values.giaTri).replace(/\./g, ''));
+                const giamToiDa = values.giaTriToiDa === "" ? new BigNumber(0) : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
+
+                if (currencyType === '$') {
+                    if (!giamToiDa.isEqualTo(giaTriGiam)) {
+                        setErrors({ giaTriToiDa: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
+                        return;
+                    }
+                } else if (currencyType === '%') {
+                    // Nếu là phần trăm (%), kiểm tra giamToiDa phải là chuỗi rỗng
+                    if (values.giaTriToiDa !== "") {
+                        setErrors({ giaTriToiDa: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
+                        return; // Dừng submit nếu có lỗi
+                    }
+                }
                 const data = {
                     ten: values.tenPhieu,
                     moTa: values.moTa,
                     giaTriGiam: values.giaTri,
+                    giamToiDa: values.giaTriToiDa === "" ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
                     loaiChietKhau: currencyType === '%' ? 1 : 2,
                     thoiGianBatDau: addSeconds(values.tuNgay),
                     thoiGianKetThuc: addSeconds(values.denNgay),
                     listSanPhamChiTiet: listSanPhamChiTiet
-                }
+                };
 
                 let response;
                 if (id) {
@@ -224,15 +263,24 @@ function DotGiamGiaConfiguration() {
                     response = await axios.post('http://localhost:8080/api/v1/discounts/add', data);
                     setSnackbar({ open: true, message: 'Đợt giảm giá đã được tạo thành công!', severity: 'success' });
                 }
+
                 setTimeout(() => {
                     navigate('/dotgiamgia/danhsachdotgiamgia');
                 }, 3000);
             } catch (error) {
-                console.log(error);
-                setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+                if (error.response && error.response.data && error.response.data.errors) {
+                    // Hiển thị lỗi server
+                    setErrors(error.response.data.errors);
+                } else {
+                    console.log(error);
+                    setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+                }
+            } finally {
+                setIsSubmitting(false);
             }
         }
     });
+
 
     const handleConfirmClose = (isConfirmed) => {
         setConfirmOpen(false);
@@ -249,6 +297,11 @@ function DotGiamGiaConfiguration() {
         setConfirmOpen(true);
     };
 
+    function formatNumber(value) {
+        const cleanedValue = String(value || "").replace(/\D/g, "");
+        return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
     const fetchDggDetail = async () => {
         try {
             debugger
@@ -262,7 +315,8 @@ function DotGiamGiaConfiguration() {
                 moTa: data.moTa,
                 giaTri: data.giaTriGiam,
                 tuNgay: data.thoiGianBatDau,
-                denNgay: data.thoiGianKetthuc
+                denNgay: data.thoiGianKetthuc,
+                giaTriToiDa: data.giamToiDa
             });
 
             setCurrencyType(data.loaiChietKhau === 1 ? '%' : "$");
@@ -295,10 +349,9 @@ function DotGiamGiaConfiguration() {
             console.error('Error fetching DGG detail:', error);
         }
     };
-    // Search
 
-    // 0: tìm theo tên, 1: tìm theo mã
     const [typeOfFilter, setTypeOfFilter] = useState('0');
+
     const handleTextFieldSearch = (event) => {
         const keyword = event.target.value.toString().trim();
         if (typeOfFilter === '0') {
@@ -423,6 +476,24 @@ function DotGiamGiaConfiguration() {
                                         >
                                             <AttachMoneyIcon />
                                         </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        <TextField
+                            label=" Giá trị giảm giá tối đa"
+                            name="giaTriToiDa"
+                            fullWidth
+                            margin="normal"
+                            value={formatNumber(formik.values.giaTriToiDa)}
+                            onChange={formik.handleChange}
+                            error={formik.touched.giaTriToiDa && Boolean(formik.errors.giaTriToiDa)}
+                            helperText={formik.touched.giaTriToiDa && formik.errors.giaTriToiDa}
+                            InputProps={{
+                                readOnly: isChiTietPage,
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
                                     </InputAdornment>
                                 ),
                             }}

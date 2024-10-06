@@ -54,23 +54,6 @@ function PhieuGiamGiaConfiguration() {
         }
         return true;
       }),
-
-    giaTriToiDa: yup
-      .string()
-      .required('Giá trị tối đa là bắt buộc')
-      .test('is-big-decimal', 'Giá trị phải lớn hơn 0', (value) => {
-        if (!value) return false;
-        const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
-        return bigNumberValue.isGreaterThan(0);
-      })
-      .test('is-less-than-or-equal-to-dieuKien', 'Giá trị tối đa phải nhỏ hơn hoặc bằng điều kiện', function (value) {
-        const { dieuKien } = this.parent;
-        if (!value || !dieuKien) return false;
-        const bigNumberGiaTriToiDa = new BigNumber(value.replace(/\./g, ''));
-        const bigNumberDieuKien = new BigNumber(dieuKien.replace(/\./g, ''));
-        return bigNumberGiaTriToiDa.isLessThanOrEqualTo(bigNumberDieuKien);
-      }),
-
     soLuong: yup
       .number('Chỉ được nhập số')
       .required('Số lượng là bắt buộc')
@@ -257,7 +240,13 @@ function PhieuGiamGiaConfiguration() {
       kieu: '1',
     },
     validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { setErrors, validateForm }) => {
+      const errors = await validateForm();
+      if (Object.keys(errors).length > 0) {
+        setErrors(errors);
+        return;
+      }
+
       try {
         setIsSubmitting(true);
         if (values.kieu === '2' && selectedKhachHang.length > values.soLuong) {
@@ -269,7 +258,7 @@ function PhieuGiamGiaConfiguration() {
           return;
         }
 
-        if(values.kieu === '2' && selectedKhachHang.length < 1){
+        if (values.kieu === '2' && selectedKhachHang.length < 1) {
           setSnackbar({
             open: true,
             message: `Vui lòng chọn khách hàng cho phiếu giảm giá.`,
@@ -277,7 +266,23 @@ function PhieuGiamGiaConfiguration() {
           });
           return;
         }
-        debugger;
+
+        const giaTriGiam = new BigNumber(String(values.giaTri).replace(/\./g, ''));
+        const giamToiDa = values.giaTriToiDa === "" ? new BigNumber(0) : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
+
+        if (currencyType === '$') {
+          if (!giamToiDa.isEqualTo(giaTriGiam)) {
+            setErrors({ giaTriToiDa: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
+            return;
+          }
+        } else if (currencyType === '%') {
+          // Nếu là phần trăm (%), kiểm tra giamToiDa phải là chuỗi rỗng
+          if (values.giaTriToiDa !== "") {
+            setErrors({ giaTriToiDa: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
+            return; // Dừng submit nếu có lỗi
+          }
+        }
+
         const data = {
           ten: values.tenPhieu,
           giaTriDonToiThieu: new BigNumber(String(values.dieuKien).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
@@ -285,7 +290,7 @@ function PhieuGiamGiaConfiguration() {
           ngayHetHan: addSeconds(values.denNgay),
           loaiGiamGia: currencyType === '%' ? 1 : 2,
           giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
-          giamToiDa: new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
+          giamToiDa: values.giaTriToiDa === "" ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
           phamViApDung: values.kieu,
           soLuong: values.soLuong,
           listKhachHang: selectedKhachHang
@@ -315,7 +320,7 @@ function PhieuGiamGiaConfiguration() {
     },
   });
 
-  
+
 
   const handleCurrencyChange = (type) => {
     setCurrencyType(type);
