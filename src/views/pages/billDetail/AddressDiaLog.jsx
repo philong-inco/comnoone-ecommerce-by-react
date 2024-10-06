@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Input, TextField } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Input, Snackbar, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 import './Address.css';
@@ -39,24 +39,46 @@ function AddressDiaLog(props) {
   const [formDataError, setFormDataError] = useState({
     ten: '',
     sdt: '',
-    email: ''
+    email: '',
+    tinh: '',
+    huyen: '',
+    phuong: ''
   });
 
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setFormData((prevData) => ({
+      ...prevData,
+      ten: formData?.tenKhachHang,
+      tinh: formData?.tinh,
+      huyen: formData?.huyen,
+      phuong: formData?.phuong,
+      tienShip: formData?.tienShip,
+      sdt: formData?.sdt,
+      email: formData?.email,
+      diaChi: formData?.diaChi,
+      ghiChu: formData?.ghiChu
+    }));
+    setFormDataError({
+      ten: '',
+      sdt: '',
+      email: '',
+      tinh: '',
+      huyen: '',
+      phuong: ''
+    });
+  };
 
   useEffect(() => {
     if (open) {
       fetchBill();
       loadProvinces();
+      console.log('Load 1');
     }
   }, [open]);
-
-  useEffect(() => {
-    loadProvinces();
-  }, [formData.tinh]);
 
   const fetchBill = async () => {
     try {
@@ -70,12 +92,10 @@ function AddressDiaLog(props) {
           huyen: response.data.huyen,
           phuong: response.data.phuong,
           tienShip: response.data.tienShip,
-          ten: response.data.ten,
           sdt: response.data.sdt,
           email: response.data.email,
           diaChi: response.data.diaChi,
-          ghiChu: response.data.ghiChu,
-          tienShip: response.data.tienShip
+          ghiChu: response.data.ghiChu
         }));
       }
     } catch (error) {
@@ -85,10 +105,17 @@ function AddressDiaLog(props) {
     }
   };
 
+  useEffect(() => {
+    loadProvinces();
+    console.log('Load 2');
+  }, [formData.tinh]);
+
+  console.log('BILL IN ADDRESS DIALOG : ', bill);
+
   const loadProvinces = async () => {
     const data = await fetchAllProvince();
     setProvinces(data.data);
-    if (formData?.huyen) {
+    if (formData?.tinh) {
       const data = await fetchAllProvinceDistricts(formData.tinh);
       setDistricts(data.data);
       setSelectedDistrict('');
@@ -99,6 +126,35 @@ function AddressDiaLog(props) {
       const data = await fetchAllProvinceWard(formData.huyen);
       setWards(data.data);
       setSelectedWard('');
+    }
+    if (formData?.tinh != null) {
+      setSelectedProvince(formData.tinh);
+      const selectedProvince = provinces.find((province) => province.ProvinceID === parseInt(formData.tinh));
+      setFormData((prevData) => ({
+        ...prevData,
+        tinh: formData.tinh,
+        tenTinh: selectedProvince ? selectedProvince.ProvinceName : ''
+      }));
+    }
+
+    if (formData?.huyen != null) {
+      setSelectedDistrict(formData.huyen);
+      const selectedDistrict = districts.find((district) => district.DistrictID === parseInt(formData.huyen));
+      setFormData((prevData) => ({
+        ...prevData,
+        huyen: formData.huyen,
+        tenHuyen: selectedDistrict ? selectedDistrict.DistrictName : ''
+      }));
+    }
+
+    if (formData?.phuong != null) {
+      setSelectedWard(formData.phuong);
+      const selectedWard = wards.find((ward) => ward.WardCode === formData.phuong);
+      setFormData((prevData) => ({
+        ...prevData,
+        phuong: formData.phuong,
+        tenPhuong: selectedWard ? selectedWard.WardName : ''
+      }));
     }
   };
 
@@ -171,6 +227,8 @@ function AddressDiaLog(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('Form Data Guiwr  ĐI : ', formData);
+
     const trimmedFormData = {
       ...formData,
       ten: formData.ten?.trim(),
@@ -185,12 +243,7 @@ function AddressDiaLog(props) {
     };
     try {
       const response = await updateAddressInBill(id, trimmedFormData);
-      console.log(response);
-
       if (response.status_code == 201) {
-        setSnackbarMessage('Cập nhập địa chỉ thành công');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
         setFormData({
           ten: '',
           sdt: '',
@@ -206,36 +259,39 @@ function AddressDiaLog(props) {
           tienShip: ''
         });
         setFormDataError({
+          tinh: '',
+          huyen: '',
+          phuong: '',
+          email: '',
+          ten: '',
+          sdt: '',
           ten: '',
           sdt: '',
           email: ''
         });
         onLoading();
         handleClose();
+        setSnackbarMessage('Cập nhập địa chỉ thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
       }
     } catch (error) {
-      console.log('Looxi : ', error);
+      console.log('Error Address : ', error);
       if (error.response && error.response.data) {
         const errorMessages = error.response.data.message;
-
-        // Cập nhật thông báo lỗi cho các trường tương ứng
         const newFormDataError = {
           ten: '',
           sdt: '',
-          email: ''
-          // Khởi tạo cho các trường khác nếu cần
+          email: '',
+          tinh: '',
+          huyen: '',
+          phuong: ''
         };
-
-        // Lưu các lỗi không được phép để trống
-        const requiredFieldErrors = errorMessages.filter((error) => [6002, 6004, 6006].includes(error.error_code));
-
-        // Nếu có lỗi không được để trống, cập nhật trước
+        const requiredFieldErrors = errorMessages.filter((error) => [6002, 6004, 6006, 6008, 6009, 6010, 6011].includes(error.error_code));
         if (requiredFieldErrors.length > 0) {
           requiredFieldErrors.forEach((error) => {
-            const field = error.field; // Tên trường
-            const message = error.messages; // Thông điệp lỗi
-
-            // Cập nhật thông báo lỗi vào formDataError
+            const field = error.field;
+            const message = error.messages;
             switch (field) {
               case 'email':
                 newFormDataError.email = message;
@@ -245,6 +301,15 @@ function AddressDiaLog(props) {
                 break;
               case 'ten':
                 newFormDataError.ten = message;
+                break;
+              case 'tinh':
+                newFormDataError.tinh = message;
+                break;
+              case 'huyen':
+                newFormDataError.huyen = message;
+                break;
+              case 'phuong':
+                newFormDataError.phuong = message;
                 break;
               default:
                 break;
@@ -283,7 +348,9 @@ function AddressDiaLog(props) {
       }
     }
   };
-
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData((prevData) => ({
@@ -360,6 +427,7 @@ function AddressDiaLog(props) {
                   </option>
                 ))}
               </select>
+              {formDataError.tinh && <span className="error-message">{formDataError.tinh}</span>}
             </div>
 
             {/* Dropdown chọn Quận/Huyện */}
@@ -377,6 +445,7 @@ function AddressDiaLog(props) {
                   </option>
                 ))}
               </select>
+              {formDataError.huyen && <span className="error-message">{formDataError.huyen}</span>}
             </div>
 
             {/* Dropdown chọn Phường/Xã */}
@@ -396,6 +465,7 @@ function AddressDiaLog(props) {
                   </option>
                 ))}
               </select>
+              {formDataError.phuong && <span className="error-message">{formDataError.phuong}</span>}
             </div>
 
             {/* Textarea nhập ghi chú */}
@@ -416,6 +486,17 @@ function AddressDiaLog(props) {
           </form>
         </DialogContent>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

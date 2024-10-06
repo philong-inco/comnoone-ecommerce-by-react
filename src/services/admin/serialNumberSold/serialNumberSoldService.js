@@ -21,8 +21,6 @@ export const getAllSerialNumberSoldByBillId = async (codeBill) => {
 };
 
 export const deletedById = async (billCodeRequest, serialNumberIdsRequest) => {
-  console.log('DATA : ', billCodeRequest + ' , ', serialNumberIdsRequest);
-
   try {
     const result = await post(`serial-number-sold/delete`, {
       billCode: billCodeRequest,
