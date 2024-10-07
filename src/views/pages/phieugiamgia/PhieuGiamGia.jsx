@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Switch, Radio, FormControlLabel, RadioGroup, FormLabel, FormControl,
   TextField, Grid, IconButton, Tooltip, Box, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Fab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert
+  TableCell, TableContainer, TableHead, TableRow, Paper, Button, TablePagination, Fab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -13,12 +13,11 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { filterCoupons, deletedCoupons, stopKhPGG, startKhPGG } from 'services/admin/coupons/couponsService';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-
+import moment from 'moment';
 function PhieuGiamGia() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [danhSachPhieuGiamGia, setDanhSachPhieuGiamGia] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
   const [phamViApDung, setPhamViApDung] = useState('');
   const [loaiGiamGia, setLoaiGiamGia] = useState('');
   const [size, setSize] = useState(5);
@@ -59,6 +58,15 @@ function PhieuGiamGia() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage + 1); // Điều chỉnh vì TablePagination bắt đầu từ 0
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setSize(parseInt(event.target.value, 10));
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi số hàng mỗi trang
   };
 
   useEffect(() => {
@@ -105,10 +113,6 @@ function PhieuGiamGia() {
     } else if (name === 'ngayHetHan') {
       setNgayHetHan(value);
     }
-  };
-
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
   };
 
   const getStatusColor = (statusId) => {
@@ -224,15 +228,17 @@ function PhieuGiamGia() {
                 />
               </Grid>
 
-              {/* Ngày bắt đầu */}
               <Grid item xs={12} sm={6} md={4}>
-                <DatePicker
-                  label="Ngày bắt đầu"
-                  value={ngayBatDau}
-                  onChange={(date) => handleDateChange('ngayBatDau', date)}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
+                <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                  <DatePicker
+                    label="Ngày bắt đầu"
+                    value={ngayBatDau}
+                    onChange={(date) => handleDateChange('ngayBatDau', date)}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </Box>
               </Grid>
+
 
               {/* Ngày kết thúc */}
               <Grid item xs={12} sm={6} md={4}>
@@ -244,55 +250,70 @@ function PhieuGiamGia() {
                 />
               </Grid>
 
-              {/* Phạm vi áp dụng */}
               <Grid item xs={12} sm={6} md={4}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Phạm vi áp dụng</FormLabel>
-                  <RadioGroup row value={phamViApDung} onChange={(e) => setPhamViApDung(e.target.value)}>
-                    <FormControlLabel value="" control={<Radio />} label="Tất cả" />
-                    <FormControlLabel value="1" control={<Radio />} label="Công khai" />
-                    <FormControlLabel value="2" control={<Radio />} label="Riêng tư" />
-                  </RadioGroup>
-                </FormControl>
+                <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend" sx={{ textAlign: 'center' }}>Phạm vi áp dụng</FormLabel>
+                    <RadioGroup
+                      row
+                      value={phamViApDung}
+                      onChange={(e) => setPhamViApDung(e.target.value)}
+                      sx={{ justifyContent: 'center' }}  // Căn giữa các Radio button
+                    >
+                      <FormControlLabel value="" control={<Radio />} label="Tất cả" />
+                      <FormControlLabel value="1" control={<Radio />} label="Công khai" />
+                      <FormControlLabel value="2" control={<Radio />} label="Riêng tư" />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
               </Grid>
 
-              {/* Loại phiếu */}
+
               <Grid item xs={12} sm={6} md={4}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel component="legend">Loại phiếu</FormLabel>
-                  <RadioGroup row value={loaiGiamGia} onChange={(e) => setLoaiGiamGia(e.target.value)}>
-                    <FormControlLabel value="" control={<Radio />} label="Tất cả" />
-                    <FormControlLabel value="1" control={<Radio />} label="%" />
-                    <FormControlLabel value="2" control={<Radio />} label="VND" />
-                  </RadioGroup>
-                </FormControl>
+                <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend" sx={{ textAlign: 'center' }}>Loại phiếu</FormLabel>
+                    <RadioGroup
+                      row
+                      value={loaiGiamGia}
+                      onChange={(e) => setLoaiGiamGia(e.target.value)}
+                      sx={{ justifyContent: 'center' }}  // Căn giữa các Radio button
+                    >
+                      <FormControlLabel value="" control={<Radio />} label="Tất cả" />
+                      <FormControlLabel value="1" control={<Radio />} label="%" />
+                      <FormControlLabel value="2" control={<Radio />} label="VND" />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
               </Grid>
 
               <Grid item xs={12} sm={2}>
-                <IconButton
-                  onClick={handleClearFilters}
-                  color="secondary"
-                  sx={{
-                    border: '1px solid',
-                    borderRadius: 2,
-                    padding: 1,
-                    backgroundColor: '#f5f5f5',
-                    transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    '&:hover': {
-                      backgroundColor: '#e0e0e0',
-                      boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
-                    },
-                    '& .MuiSvgIcon-root': {
-                      transition: 'transform 0.3s ease',
-                    },
-                    '&:hover .MuiSvgIcon-root': {
-                      transform: 'rotate(360deg)',
-                    },
-                  }}
-                >
-                  <DeleteSweepIcon /> {/* Icon mới */}
-                </IconButton>
+                <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                  <IconButton
+                    onClick={handleClearFilters}
+                    color="secondary"
+                    sx={{
+                      border: '1px solid',
+                      borderRadius: 2,
+                      padding: 1,
+                      backgroundColor: '#f5f5f5',
+                      transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                      '&:hover': {
+                        backgroundColor: '#e0e0e0',
+                        boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        transition: 'transform 0.3s ease',
+                      },
+                      '&:hover .MuiSvgIcon-root': {
+                        transform: 'rotate(360deg)',
+                      },
+                    }}
+                  >
+                    <DeleteSweepIcon /> {/* Icon mới */}
+                  </IconButton>
+                </Box>
               </Grid>
 
 
@@ -300,9 +321,10 @@ function PhieuGiamGia() {
             <Fab
               color="primary"
               aria-label="add"
+              title='Thêm phiếu giảm giá'
               sx={{
                 position: 'fixed',
-                bottom: 16,
+                top: 340,
                 right: 16,
               }}
               onClick={handleNavigate}
@@ -332,8 +354,8 @@ function PhieuGiamGia() {
                 <TableRow key={index}>
                   <TableCell>{phieu.ma}</TableCell>
                   <TableCell>{phieu.ten}</TableCell>
-                  <TableCell>{phieu.ngayBatDau}</TableCell>
-                  <TableCell>{phieu.ngayHetHan}</TableCell>
+                  <TableCell>{moment(phieu.ngayBatDau).format('DD/MM/YYYY HH:mm')}</TableCell>
+                  <TableCell>{moment(phieu.ngayHetHan).format('DD/MM/YYYY HH:mm')}</TableCell>
                   <TableCell>
                     <Box sx={{
                       backgroundColor: getStatusColor(phieu.trangThai),
@@ -372,15 +394,21 @@ function PhieuGiamGia() {
                             <DeleteIcon />
                           </Tooltip>
                         </IconButton>
+                      </>
+                    )}
+                    {(phieu.trangThai === 1|| phieu.trangThai === 4) && (
+                      <>
+                      <Tooltip title="Thay đổi trạng thái">
                         <Switch
                           checked={phieu.trangThai === 1}
                           onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
                         />
-
+                        </Tooltip>
                       </>
                     )}
                   </TableCell>
-                  <TableCell><Tooltip title="Xem chi tiết">
+                  <TableCell>
+                    <Tooltip title="Xem chi tiết">
                     <IconButton onClick={() => handleViewCoupon(phieu.id)}>
                       <VisibilityIcon />
                     </IconButton>
@@ -397,14 +425,15 @@ function PhieuGiamGia() {
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="center" mt={2}>
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={handlePageChange}
-          color="primary"
-        />
-      </Box>
+      <TablePagination
+        rowsPerPageOptions={[5]}
+        component="div"
+        count={totalPages * size}
+        page={currentPage - 1}
+        onPageChange={handlePageChange}
+        rowsPerPage={size}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
 
       <Dialog
         open={openConfirmDialog}

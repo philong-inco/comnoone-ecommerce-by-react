@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Switch,
+    Switch, TablePagination, 
     FormControl, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
     TextField, Grid, IconButton, Tooltip, Box, Table, TableBody, Fab, InputAdornment, InputLabel,
     TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Snackbar, Alert, MenuItem, Select
@@ -25,8 +25,10 @@ function DotGiamGia() {
         trangThai: '',
         ngayBatDau: '',
         ngayKetThuc: '',
-        size: 6
+        size: 5
     });
+
+    const [size, setSize] = useState(6);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -37,20 +39,30 @@ function DotGiamGia() {
     const navigate = useNavigate();
 
     const fetchCoupons = async () => {
-        debugger;
-        const response = await listDotGiamGia(filters);
-        setDotGiamGia(response.data.content);
-        setTotalPages(response.data.totalPages);
+        try {
+            const response = await listDotGiamGia({
+                ...filters,
+                size,
+                page: currentPage,
+            });
+            setDotGiamGia(response.data.content);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error("Error fetching coupons:", error);
+        }
     };
 
     useEffect(() => {
-        
+        fetchCoupons();
+    }, [currentPage, size, filters]);
+    useEffect(() => {
+
+        fetchCoupons(currentPage);
+        const intervalId = setInterval(() => {
             fetchCoupons(currentPage);
-            const intervalId = setInterval(() => {
-                fetchCoupons(currentPage);
-            }, 2000);
-            return () => clearInterval(intervalId);
-            }, [currentPage, filters]);
+        }, 2000);
+        return () => clearInterval(intervalId);
+    }, [currentPage, filters]);
 
 
     useEffect(() => {
@@ -64,10 +76,14 @@ function DotGiamGia() {
         });
     };
 
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-        setFilters({ ...filters, page: value - 1 });
-    };
+    const handlePageChange = (event, newPage) => {
+        setCurrentPage(newPage + 1); 
+      };
+    
+      const handleRowsPerPageChange = (event) => {
+        setSize(parseInt(event.target.value, 5));
+        setCurrentPage(1);
+      };
 
     const handleViewCoupon = (id) => {
         navigate(`/dotgiamgia/cauhinhdotgiamgia/view/${id}`);
@@ -277,7 +293,7 @@ function DotGiamGia() {
                         aria-label="add"
                         sx={{
                             position: 'fixed',
-                            bottom: 16,
+                            top: 340,
                             right: 16,
                             boxShadow: 3,
                         }}
@@ -376,14 +392,15 @@ function DotGiamGia() {
                 </Table>
             </TableContainer>
 
-            <Box display="flex" justifyContent="center" my={2}>
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="primary"
-                />
-            </Box>
+            <TablePagination
+            rowsPerPageOptions={[5]}
+                component="div"
+                count={totalPages * size}
+                page={currentPage - 1}
+                onPageChange={handlePageChange}
+                rowsPerPage={size}
+                onRowsPerPageChange={handleRowsPerPageChange}
+            />
 
             <Dialog
                 open={openConfirmDialog}

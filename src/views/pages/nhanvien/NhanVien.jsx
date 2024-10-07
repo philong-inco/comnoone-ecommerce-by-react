@@ -30,7 +30,8 @@ import {
     Avatar,
     Chip,
     Fab,
-    Grid
+    Grid,
+    TablePagination 
 } from '@mui/material';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -59,23 +60,45 @@ const DanhSachNhanVien = () => {
 
     const navigate = useNavigate();
 
+    const [filter, setFilter] = useState({
+        page: 0, 
+        size: 5, 
+    });
+
+    const [totalElement, setTotalElement] = useState(0);
     const fetchNhanVien = async () => {
         try {
+            debugger;
             let result;
             if (searchKeyWord) {
-                result = await searchNhanVienKeyWord(currentPage - 1, searchKeyWord);
+                result = await searchNhanVienKeyWord(filter.page, filter.size, searchKeyWord);
             } else if (searchRadio) {
-                result = await searchTrangThai(currentPage - 1, searchRadio);
+                result = await searchTrangThai(filter.page, filter.size, searchRadio);
             } else if (selectGioiTinh !== '') {
-                result = await searchGioiTinh(currentPage - 1, selectGioiTinh);
+                result = await searchGioiTinh(filter.page, filter.size, selectGioiTinh);
             } else {
-                result = await getAll(currentPage - 1);
+                result = await getAll(filter.page, filter.size);
             }
             setNhanVien(result.content);
-            setTotalPages(result.totalPages);
+            setTotalElement(result.totalElements);
         } catch (error) {
             console.log(error);
         }
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setFilter((prev) => ({
+            ...prev,
+            page: newPage,
+        }));
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setFilter({
+            ...filter,
+            size: parseInt(event.target.value, 10),
+            page: 0,
+        });
     };
 
     const getAllNhanVien = async () => {
@@ -90,7 +113,7 @@ const DanhSachNhanVien = () => {
 
     useEffect(() => {
         fetchNhanVien();
-    }, [currentPage, searchKeyWord, searchRadio, selectGioiTinh]);
+    }, [filter.page, filter.size, searchKeyWord, searchRadio, selectGioiTinh]);
 
     useEffect(() => {
         getAllNhanVien();
@@ -143,6 +166,7 @@ const DanhSachNhanVien = () => {
     }
 
     const handleRadioChange = (event) => {
+        debugger;
         setSearchRadio(event.target.value);
         setCurrentPage(1);
         setSearchKeyWord('');
@@ -230,7 +254,7 @@ const DanhSachNhanVien = () => {
         XLSX.writeFile(wb, "danh_sach_nhan_vien.xlsx");
     };
     return (
-        <MainCard style={{ textAlign: "center" }} title="Danh Sách Nhân Viên">
+        <MainCard style={{ textAlign: "center" }}>
             <Box
                 sx={{
                     backgroundColor: 'white',
@@ -299,17 +323,18 @@ const DanhSachNhanVien = () => {
                 <Box
                     sx={{
                         position: 'fixed',
-                        bottom: 16,
+                        top: 350,
                         right: 16,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        zIndex: 1300,
+                        zIndex: 1300,                 
                     }}
                 >
                     <Fab
                         color="primary"
                         aria-label="add"
+                        title="Thêm Nhân Viên"
                         sx={{
                             height: '60px',
                             width: '60px',
@@ -337,6 +362,7 @@ const DanhSachNhanVien = () => {
                     <Fab
                         color="primary"
                         aria-label="export"
+                        title="Xuất danh sách nhân viên"
                         sx={{
                             height: '60px',
                             width: '60px',
@@ -402,13 +428,14 @@ const DanhSachNhanVien = () => {
 
                                     <TableCell>{getStatusNhanVien(nv.trangThai)}</TableCell>
                                     <TableCell>
-                                        <Button className="btn btn-link">
+                                        <Button className="btn btn-link" title="Sửa Nhân Viên">
                                             <IconEdit stroke={2} onClick={() => handleEdit(nv.id)} />
                                         </Button>
                                         <Switch
                                             checked={nv.trangThai === 1}
                                             onChange={() => handleSwitchChange(nv.id, nv.trangThai)}
                                             color="primary"
+                                            title="Trạng thái nhân viên"
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -417,14 +444,15 @@ const DanhSachNhanVien = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Box display="flex" justifyContent="center" mt={2}>
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="primary"
-                />
-            </Box>
+            <TablePagination
+                rowsPerPageOptions={[5]}
+                component="div"
+                count={totalElement}
+                rowsPerPage={filter.size}
+                page={filter.page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
             <Dialog
                 open={confirmOpen}
                 onClose={handleCancelDelete}

@@ -38,21 +38,21 @@ const validationSchema = Yup.object().shape({
     sdt: Yup.string()
         .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')
         .required('Số điện thoại không được để trống'),
-        ngay_sinh: Yup.date()
+    ngay_sinh: Yup.date()
         .required('Ngày sinh không được để trống')
         .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
         .test('age', 'Khách hàng phải từ 10 tuổi trở lên', value => {
-          if (!value) return false;
-          const today = new Date();
-          const birthDate = new Date(value);
-          let age = today.getFullYear() - birthDate.getFullYear(); // Changed from const to let
-          const monthDifference = today.getMonth() - birthDate.getMonth();
-          if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-            age--; // Now the reassignment is valid because "age" is a let
-          }
-          return age >= 10;
+            if (!value) return false;
+            const today = new Date();
+            const birthDate = new Date(value);
+            let age = today.getFullYear() - birthDate.getFullYear(); // Changed from const to let
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                age--; // Now the reassignment is valid because "age" is a let
+            }
+            return age >= 10;
         }),
-      
+
     gioi_tinh: Yup.number().required('Giới tính không được để trống'),
     hinhAnh: Yup.string(),
 });
@@ -114,56 +114,53 @@ function KhachHangConfiguration() {
     }, [errors]);
 
     const fetchProvinces = async () => {
-        debugger;
         try {
-          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
-            headers: {
-              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
-            }
-          });
-          setProvinces(response.data.data); // Set the response data to provinces state
+            const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+                headers: {
+                    token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+                }
+            });
+            setProvinces(response.data.data); // Set the response data to provinces state
         } catch (error) {
-          console.error('Error fetching provinces:', error);
-          throw error;
+            console.error('Error fetching provinces:', error);
+            throw error;
         }
-      };
-    
-      const fetchDistricts = async (provinceId) => {
-        debugger;
+    };
+
+    const fetchDistricts = async (provinceId) => {
         try {
-          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
-            headers: {
-              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
-            },
-            params: {
-              province_id: provinceId
-            }
-          });
-          setDistricts(response.data.data); // Set the response data to districts state
+            const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+                headers: {
+                    token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+                },
+                params: {
+                    province_id: provinceId
+                }
+            });
+            setDistricts(response.data.data); // Set the response data to districts state
         } catch (error) {
-          console.error('Error fetching districts:', error);
-          throw error;
+            console.error('Error fetching districts:', error);
+            throw error;
         }
-      };
-    
-      const fetchWards = async (districtId) => {
-        debugger;
+    };
+
+    const fetchWards = async (districtId) => {
         try {
-          const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
-            headers: {
-              token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
-            },
-            params: {
-              district_id: districtId
-            }
-          });
-          setWards(response.data.data); // Set the response data to wards state
+            const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+                headers: {
+                    token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
+                },
+                params: {
+                    district_id: districtId
+                }
+            });
+            setWards(response.data.data); // Set the response data to wards state
         } catch (error) {
-          console.error('Error fetching wards:', error);
-          throw error;
+            console.error('Error fetching wards:', error);
+            throw error;
         }
-      };
-    
+    };
+
 
 
     const openCloudinaryWidget = () => {
@@ -191,75 +188,71 @@ function KhachHangConfiguration() {
         navigate('/khachhang/danhsachkhachhang');
     }
 
-    const onSubmit = async (data) => {
-        setConfirmDialogOpen(true);
-        setLoading(true);
-        try {
-            debugger;
-            let formData = {}
-            formData.ten = data.ten;
-            formData.email = data.email;
-            formData.sdt = data.sdt;
-            formData.ngay_sinh = new Date(data.ngay_sinh).toISOString();
-            formData.gioi_tinh = data.gioi_tinh;
-            formData.hinhAnh = imageUrl;
-            formData.idPhuongXa = selectedWard;
-            formData.idQuanHuyen = selectedDistrict;
-            formData.idTinhThanhPho = selectedProvince;
-            formData.diaChiNhanHang = data.dia_chi;
-
-            await validationSchema.validate(formData);
-
-            const url = `http://localhost:8080/api/khachhang/create`
-            const method = 'post'
-
-            const response = await axios({
-                method: method,
-                url: url,
-                data: formData,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-
-            if (response.status === 200) {
-                setSnackbarMessage('Dữ liệu khách hàng được thêm thành công!');
-                setSnackbarSeverity('success');
-                setSnackbarOpen(true);
-                setTimeout(() => {
-                    handleNavigate();
-                }, 3000);
-            } else {
-                throw new Error('Unexpected response status');
-            }
-        } catch (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                const errorMessage = error.response.data.error;
-                const errorDetails = errorMessage.split(':').pop().trim();
-
-                setSnackbarMessage(errorDetails);
-            } else if (error.response && error.response.data && error.response.data.error) {
-                setSnackbarMessage(error.response.data.error); 
-            } else if (error.message) {
-                setSnackbarMessage(error.message);
-            } else {
-                setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
-            }
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [formData, setFormData] = useState(null);
+    const onSubmit = (data) => {
+        setFormData(data);
+        setConfirmDialogOpen(true);
+    };
 
-    const handleConfirmClose = (isConfirmed) => {
+
+    const handleConfirmClose = async (isConfirmed) => {
         setConfirmDialogOpen(false);
-        if (isConfirmed) {
-            onSubmit(); 
+
+        if (isConfirmed && formData) {
+            setLoading(true);
+            try {
+                let finalData = {
+                    ten: formData.ten,
+                    email: formData.email,
+                    sdt: formData.sdt,
+                    ngay_sinh: new Date(formData.ngay_sinh).toISOString(),
+                    gioi_tinh: formData.gioi_tinh,
+                    hinhAnh: imageUrl,
+                    idPhuongXa: selectedWard,
+                    idQuanHuyen: selectedDistrict,
+                    idTinhThanhPho: selectedProvince,
+                    diaChiNhanHang: formData.dia_chi
+                };
+
+                await validationSchema.validate(finalData);
+
+                const response = await axios.post(`http://localhost:8080/api/khachhang/create`, finalData, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.status === 200) {
+                    setSnackbarMessage('Dữ liệu khách hàng được thêm thành công!');
+                    setSnackbarSeverity('success');
+                    setSnackbarOpen(true);
+                    setTimeout(handleNavigate, 3000);
+                } else {
+                    throw new Error('Unexpected response status');
+                }
+            } catch (error) {
+                handleApiError(error);
+            } finally {
+                setLoading(false);
+            }
         }
     };
+
+    const handleApiError = (error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+            const errorMessage = error.response.data.error;
+            const errorDetails = errorMessage.split(':').pop().trim();
+            setSnackbarMessage(errorDetails);
+        } else if (error.response && error.response.data && error.response.data.error) {
+            setSnackbarMessage(error.response.data.error);
+        } else if (error.message) {
+            setSnackbarMessage(error.message);
+        } else {
+            setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+        }
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
@@ -267,7 +260,6 @@ function KhachHangConfiguration() {
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={3}>
-                    {/* Avatar Section */}
                     <Grid item xs={12} md={4}>
                         <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                             {imageUrl ? (
@@ -503,7 +495,7 @@ function KhachHangConfiguration() {
                                 />
                             </Grid>
 
-                          
+
                             <Grid item xs={12}>
                                 <Box display="flex" justifyContent="center">
                                     <Button
@@ -525,7 +517,7 @@ function KhachHangConfiguration() {
                 open={snackbarOpen}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}

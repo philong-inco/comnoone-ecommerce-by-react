@@ -181,7 +181,6 @@ function KhachHangAddress() {
   }, [errors]);
 
   const fetchProvinces = async () => {
-    debugger;
     try {
       const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
         headers: {
@@ -200,7 +199,6 @@ function KhachHangAddress() {
   };
 
   const fetchDistricts = async (provinceId) => {
-    debugger;
     try {
       const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
         headers: {
@@ -221,7 +219,6 @@ function KhachHangAddress() {
   };
 
   const fetchWards = async (districtId) => {
-    debugger;
     try {
       const response = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
         headers: {
@@ -313,7 +310,6 @@ function KhachHangAddress() {
       } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
       }
-      debugger;
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;
       setAddresses(diaChiList);
@@ -329,7 +325,6 @@ function KhachHangAddress() {
         const districtPromises = Array.from(provinces).map(async (districtId) => {
 
           try {
-            debugger
             const responseDistrict = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
               headers: {
                 token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
@@ -352,7 +347,6 @@ function KhachHangAddress() {
         const wardPromises = Array.from(districts).map(async (districtId) => {
           const formattedQuanHuyenId = districtId.toString().padStart(3, '0');
           try {
-            debugger;
             const responseWard = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
               headers: {
                 token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
@@ -443,7 +437,6 @@ function KhachHangAddress() {
           'Content-Type': 'application/json'
         }
       });
-
       if (response.status === 200) {
         setSnackbarMessage('Cập nhật thành công khách hàng!');
         setSnackbarSeverity('success');
@@ -1032,12 +1025,18 @@ function KhachHangAddress() {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          variant="filled"
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
     </Box>
   );
 }

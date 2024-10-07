@@ -20,7 +20,7 @@ export const getDanhSachNhanVien = async () => {
     }
 };
 
-export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
+export const searchNhanVienKeyWord = async (page, size,searchKeyWord) => {
     try {
         const result = await get(`/nhan_vien/search?pageNo=${page}&search=${searchKeyWord}`
         );
@@ -31,8 +31,9 @@ export const searchNhanVienKeyWord = async (page, searchKeyWord) => {
     }
 };
 
-export const searchTrangThai = async (page, searchRadio) => {
+export const searchTrangThai = async (page,size, searchRadio) => {
     try {
+        debugger;
         const result = await get(`/nhan_vien/searchtrangthai?pageNo=${page}&trangThai=${searchRadio}`);
         return result;
     } catch (error) {
@@ -41,8 +42,9 @@ export const searchTrangThai = async (page, searchRadio) => {
     }
 };
 
-export const searchGioiTinh = async (page, selectGioiTinh) => {
+export const searchGioiTinh = async (page,size, selectGioiTinh) => {
     try {
+        debugger;
         const result = await get(`/nhan_vien/searchgioitinh?pageNo=${page}&gioiTinh=${selectGioiTinh}`);
         return result;
     } catch (error) {
