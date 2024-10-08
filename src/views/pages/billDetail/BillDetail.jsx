@@ -7,6 +7,8 @@ import NewTimeLine from './TimeLine';
 import BillInFo from './BillInFo';
 import SerialNumberSold from './SerialNumberSold';
 import OrderInformation from './OrderInformation';
+import HistoryPayment from './HistoryPayment';
+import Test from '../ban-hang/Test';
 
 function BillDetail() {
   const { id } = useParams();
@@ -84,8 +86,10 @@ function BillDetail() {
       </Fab>
       <NewTimeLine data={billHistory} onLoading={onLoading} bill={bill} />
       <BillInFo bill={bill} onLoading={onLoading} />
+      <HistoryPayment />
       <SerialNumberSold onLoading={onLoading} bill={bill} />
-      <OrderInformation onLoading={onLoading} bill={bill} />
+      {/* <OrderInformation onLoading={onLoading} billInfo={bill} /> */}
+      {/* <Test onLoading={onLoading} billInfo={bill} onReload={onLoading} /> */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}

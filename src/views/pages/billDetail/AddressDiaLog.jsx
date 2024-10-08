@@ -155,6 +155,7 @@ function AddressDiaLog(props) {
         phuong: formData.phuong,
         tenPhuong: selectedWard ? selectedWard.WardName : ''
       }));
+      getDeliveryDate(selectedDistrict, formData.phuong);
     }
   };
 
@@ -263,11 +264,8 @@ function AddressDiaLog(props) {
           huyen: '',
           phuong: '',
           email: '',
-          ten: '',
           sdt: '',
-          ten: '',
-          sdt: '',
-          email: ''
+          ten: ''
         });
         onLoading();
         handleClose();

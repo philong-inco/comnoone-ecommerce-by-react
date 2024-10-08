@@ -84,26 +84,26 @@ export const getStatusBillHistoryColor = (status) => {
 export const getStatusBillHistory = (status) => {
   switch (status) {
     case 0:
-      return 'Tạo đơn hàng';
+      return 'Tạo đơn hàng 0';
     case 1:
-      return 'Cập nhập đơn hàng';
+      return 'Cập nhập đơn hàng 1';
     case 2:
-      return 'Chờ xác nhận';
+      return 'Chờ xác nhận 2';
     case 3:
-      return 'Chờ giao';
+      return 'Chờ giao 3';
     case 4:
-      return 'Đang giao';
+      return 'Đang giao 4';
     case 5:
-      return 'Trả hàng hoàn tiền';
+      return 'Trả hàng hoàn tiền 5';
     case 6:
-      return 'Chơ giao';
+      return 'Hoàn thành 6';
     case 7:
-      return 'Hủy';
+      return 'Hủy 7';
     case 8:
-      return 'Xoá';
+      return 'Xoá 8';
     case 9:
-      return 'Xác nhận';
+      return 'Xác nhận 9';
     default:
-      return 'Không xác định';
+      return 'Không xác định 10';
   }
 };
