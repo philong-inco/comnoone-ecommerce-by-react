@@ -80,7 +80,8 @@ function SerialNumberSold(props) {
   };
   useEffect(() => {
     fetchSerialNumberSold();
-  }, []);
+    console.log('Vòa Load  ffff');
+  }, [bill]);
   // serial in product
   const fetchSerialNumberByProduct = async (productId, codeSerial, page, size) => {
     const response = await findSerialNumberByProductIdAndCodeSerial(productId, codeSerial || '', page - 1, size);
@@ -285,7 +286,8 @@ function SerialNumberSold(props) {
         </TableContainer>
         <Grid container justifyContent="end" alignItems="center" mt={2}>
           <Typography variant="h4">
-            Tổng tiền : <strong style={{ color: 'red' }}> {parseFloat(bill.tongTienBanDau || 0).toLocaleString() || '0'} </strong> VNĐ
+            Tổng tiền : <strong style={{ color: 'red' }}> {parseFloat(id ? bill.tongTienBanDau : 0 || 0).toLocaleString() || '0'} </strong>{' '}
+            VNĐ
           </Typography>
         </Grid>
       </Grid>

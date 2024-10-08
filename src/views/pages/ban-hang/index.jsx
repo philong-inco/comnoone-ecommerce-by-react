@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 
 import Cart from './Cart';
+import SellManager from './SellManager';
 
 function Sell() {
   // const { id } = useParams();
@@ -21,8 +22,19 @@ function Sell() {
 
   const fetchBillCodes = async () => {
     const response = await getBillCodes();
+    // if (response.status_code === 200) {
+    //   setTabs(response.data);
+    // }
     if (response.status_code === 200) {
-      setTabs(response.data);
+      if (response.data.length > 0) {
+        setTabs(response.data);
+        setValue(0); // Chọn hóa đơn đầu tiên
+        navigate(`/ban-hang/hoa-don/${response.data[0]}`);
+      } else {
+        setTabs([]); // Nếu không còn hóa đơn nào thì set về mảng rỗng
+        setValue(null);
+        navigate('/ban-hang');
+      }
     }
   };
   useEffect(() => {
@@ -31,10 +43,14 @@ function Sell() {
   }, []);
 
   const fetchBill = async (billCode) => {
-    const response = await getBillByCode(billCode);
-    if (response.status_code === 200) {
-      setBill(response.data);
-      console.log('CAlll APi');
+    try {
+      const response = await getBillByCode(billCode);
+      if (response.status_code === 200) {
+        setBill(response.data);
+        console.log('CAlll APi');
+      }
+    } catch (error) {
+      setBill({});
     }
   };
 
@@ -136,8 +152,9 @@ function Sell() {
               }
             />
           </Tabs>
-        </Box>
-        <Cart bill={bill} onReload={handleReload} />
+        </Box>{' '}
+        <SellManager bill={bill} onReload={handleReload} />
+        {/* <Cart bill={bill} onReload={handleReload} /> */}
       </Box>
     </>
   );

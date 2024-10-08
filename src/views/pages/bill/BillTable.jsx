@@ -40,13 +40,26 @@ function BillTable(props) {
     console.log('Code', ma);
     navigate(`/hoa-don/chi-tiet-2/${ma}`);
   };
-
+  const calculateTotalAmount = (record) => {
+    const totalProductAmount = record.tongTienPhaiTra;
+    const shippingCost = record.tienShip || 0;
+    const giamRank = record.tienGiamHangKhachHang;
+    return totalProductAmount + shippingCost;
+  };
   const columns = [
     { title: '#', dataIndex: 'key', key: 'key' },
     { title: 'Chọn', key: 'selected' },
     { title: 'Mã', dataIndex: 'ma', key: 'ma' },
     { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
-    { title: 'Tổng số tiền', dataIndex: 'tongTienPhaiTra', key: 'tongTien' },
+    {
+      title: 'Tổng số tiền',
+      dataIndex: 'tongTienPhaiTra',
+      key: 'tongTien',
+      render: (text, record) => {
+        const totalAmount = calculateTotalAmount(record);
+        return totalAmount.toLocaleString();
+      }
+    },
     {
       title: 'Tên khách hàng',
       dataIndex: 'tenKhachHang',
