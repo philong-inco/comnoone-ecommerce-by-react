@@ -12,7 +12,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { listDotGiamGia, startDGG, stopDPGG, deleteDGG } from 'services/admin/coupons/dotGiamGiaService';
-import ClearIcon from '@mui/icons-material/Clear';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
 function DotGiamGia() {
@@ -149,7 +148,7 @@ function DotGiamGia() {
             setSnackbarSeverity('error');
         } finally {
             setOpenSnackbar(true);
-            setOpenConfirmDialogOne(false);  // Đóng đúng hộp thoại xác nhận
+            setOpenConfirmDialogOne(false);
         }
     };
 
