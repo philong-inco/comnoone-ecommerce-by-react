@@ -444,14 +444,14 @@ const ProductList = (props) => {
       label: 'Giá sản phẩm',
       minWidth: 100,
       align: 'left',
-      format: (value) => formatNumber(value)
+      format: (value) => parseFloat(value || 0).toLocaleString()
     },
     {
       id: 'giaSauKhuyenMai',
       label: 'Giá bán',
       minWidth: 100,
       align: 'left',
-      format: (value) => formatNumber(value)
+      format: (value) => parseFloat(value || 0).toLocaleString()
     },
     {
       id: 'soTienDuocGiam',

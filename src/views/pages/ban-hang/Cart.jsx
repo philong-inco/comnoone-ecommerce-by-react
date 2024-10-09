@@ -575,7 +575,7 @@ function Cart(props) {
   const findCustomerByPhoneNumber = async (phoneNumber) => {
     try {
       const response = await findCustomerByPhone(phoneNumber);
-      if (response.status_code === 200) {
+      if (response) {
         setSnackbarMessage('Thêm khách hàng thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
@@ -586,12 +586,14 @@ function Cart(props) {
           email: response.data.email
         });
       } else {
-        setSnackbarMessage('Không tìm thấy khách hàng với số điện thoại này !');
+        setSnackbarMessage('Khoong thể thêm');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
     } catch (error) {
-      setSnackbarMessage('Không tìm thấy khách hàng với số điện thoại này !');
+      console.log(error);
+
+      setSnackbarMessage(error.response.data.message);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }

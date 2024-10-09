@@ -88,7 +88,7 @@ function KhachHangAddress() {
     },
   });
 
-  const { register: registerAddress, handleSubmit: handleSubmitAddress, control: controlAddress, formState: { errors: addressErrors }, setValue: setValueAddress, reset: resetAddress } = useForm({
+  const { register: registerAddress, handleSubmit: handleSubmitAddress, control: controlAddress, formState: { errors: addressErrors }, setValue:  setValueAddress, reset: resetAddress } = useForm({
     resolver: yupResolver(addressValidationSchema),
     defaultValues: {
       ten_nguoi_nhan: '',
