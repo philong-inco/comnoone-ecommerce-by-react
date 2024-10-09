@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'https://weblaptop-by-springboot-and-reactjs.onrender.com/api';
 
 export const listDotGiamGia = (filters) => {
     const { page = 0, size = 6, ...restFilters } = filters;
@@ -9,7 +9,7 @@ export const listDotGiamGia = (filters) => {
         page,
         size,
     }).toString();
-    return axios.get(`http://localhost:8080/api/v1/discounts/all?${queryParams}`);
+    return axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/v1/discounts/all?${queryParams}`);
 };
 
 
@@ -18,7 +18,7 @@ export const themDotGiamGia = async (data) => {
     await axios.post(`${BASE_URL}/discounts/add`, data);
 };
 export const getDataProducts = async (page, pageSize) => {
-    const url = `http://localhost:8080/api/san-pham/find-status-page?status=1&page=${page}&size=${pageSize}`;
+    const url = `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/san-pham/find-status-page?status=1&page=${page}&size=${pageSize}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -35,7 +35,7 @@ export const getDataProducts = async (page, pageSize) => {
 export const getDGGPage = async (page, size) => {
     try {
         size = 6;
-        const result = await get(`http://localhost:8080/api/v1/discounts?page=${page - 1}&size=${size}`);
+        const result = await get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/v1/discounts?page=${page - 1}&size=${size}`);
         return result;
     } catch (error) {
         console.log('Error get :');
@@ -45,7 +45,7 @@ export const getDGGPage = async (page, size) => {
 
 export const getDataProductsDetail = async (idSanPham) => {
     try {
-        const response = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id`, {
+        const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/san-pham-chi-tiet/get-by-product-id`, {
             params: {
                 idProduct: idSanPham
             }
@@ -60,7 +60,7 @@ export const getDataProductsDetail = async (idSanPham) => {
 export const stopDPGG = async (id) => {
     debugger;
     try {
-        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStop/${id}`);
+        const result = await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/v1/discounts/changestatusStop/${id}`);
         return result;
     } catch (error) {
         console.log('Error put :', error);
@@ -71,7 +71,7 @@ export const stopDPGG = async (id) => {
 export const startDGG = async (id) => {
     debugger;
     try {
-        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStart/${id}`);
+        const result = await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/v1/discounts/changestatusStart/${id}`);
         return result;
     } catch (error) {
         console.log('Error put :', error);
@@ -82,7 +82,7 @@ export const startDGG = async (id) => {
 export const deleteDGG = async (id) => {
     debugger;
     try {
-        const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusdelete/${id}`);
+        const result = await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/v1/discounts/changestatusdelete/${id}`);
         return result;
     } catch (error) {
         console.log('Error put :', error);

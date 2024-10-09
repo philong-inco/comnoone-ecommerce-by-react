@@ -67,6 +67,7 @@ function NhanVienConfiguration() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [formData, setFormData] = useState({});
+    
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
     const handleOpenDialog = (data) => {
@@ -88,7 +89,6 @@ function NhanVienConfiguration() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await fetchRoles();
                 await fetchProvinces();
             } catch (error) {
                 setError('Failed to fetch initial data');
@@ -116,17 +116,6 @@ function NhanVienConfiguration() {
             fetchWards(selectedDistrict);
         }
     }, [selectedDistrict]);
-
-    const fetchRoles = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/api/vaitro');
-            const filteredRoles = response.data.filter(role => role.ten !== 'Admin');
-            setRoles(filteredRoles);
-        } catch (error) {
-            setError('Failed to fetch roles');
-        }
-    };
-
 
     useEffect(() => {
         const errorKeys = Object.keys(errors);
@@ -203,9 +192,8 @@ function NhanVienConfiguration() {
     const fetchNhanVien = async (id) => {
         try {
             debugger;
-            const response = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
+            const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/${id}`);
             const nhanVienData = response.data;
-            const responseVaiTro = await axios.get(`http://localhost:8080/api/vaitro/findbynhanvien/${response.data.id}`)
             const gioiTinhString = nhanVienData.gioiTinh !== undefined ? nhanVienData.gioiTinh.toString() : "1";
             console.log("Giới tính sau khi convert: ", gioiTinhString);
             setValue('gioi_tinh', gioiTinhString);
@@ -220,8 +208,6 @@ function NhanVienConfiguration() {
             } else {
                 setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
             }
-            const selectedRoles = responseVaiTro.data.map(role => role.ten);
-            setSelectedRoles(selectedRoles);
             setValue('ngay_sinh', nhanVienData.ngaySinh.split('T')[0]);
 
             if (nhanVienData.diaChi) {
@@ -308,6 +294,7 @@ function NhanVienConfiguration() {
     const onSubmit = async (data) => {
         setLoading(true);
         try {
+            debugger;
             let formData = {};
             formData.ten = data.ten;
             formData.sdt = data.sdt;
@@ -332,11 +319,11 @@ function NhanVienConfiguration() {
             formData.hinh_anh = data.hinh_anh;
             const diaChi = `${data.dia_chi}, ${selectedWard ? wards.find(ward => ward.id === selectedWard).ten : ''}, ${selectedDistrict ? districts.find(district => district.id === selectedDistrict).ten : ''}, ${selectedProvince ? provinces.find(province => province.id === selectedProvince).name : ''}`;
             formData.dia_chi = diaChi;
-            formData.list_vai_tro = selectedRoles;
+            formData.list_vai_tro = ["Nhân Viên"];
 
             await schema.validate(formData);
             debugger;
-            const url = id ? `http://localhost:8080/api/nhan_vien/update/${id}` : 'http://localhost:8080/api/nhan_vien/create';
+            const url = id ? `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/update/${id}` : 'https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/create';
             const method = id ? 'put' : 'post';
 
             const response = await axios({
@@ -540,42 +527,6 @@ function NhanVienConfiguration() {
                                     {errors.gioi_tinh && <FormHelperText>{errors.gioi_tinh.message}</FormHelperText>}
                                 </FormControl>
                             </Grid>
-
-
-
-                            {/* Vai trò */}
-                            <Grid item xs={12} md={6}>
-                                <FormControl fullWidth sx={{ mb: 2 }}>
-                                    <InputLabel>Vai trò</InputLabel>
-                                    <Controller
-                                        name="list_vai_tro"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                {...field}
-                                                multiple
-                                                value={selectedRoles}
-                                                onChange={(e) => setSelectedRoles(e.target.value)}
-                                                renderValue={(selected) => (
-                                                    <div>
-                                                        {selected.map((value) => (
-                                                            <Chip key={value} label={roles.find((role) => role.ten === value)?.ten} />
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            >
-                                                {roles.map((role) => (
-                                                    <MenuItem key={role.ten} value={role.ten}>
-                                                        <Checkbox checked={selectedRoles.indexOf(role.ten) > -1} />
-                                                        <ListItemText primary={role.ten} />
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>
-
                             {/* Địa chỉ */}
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>

@@ -217,7 +217,7 @@ function KhachHangConfiguration() {
 
                 await validationSchema.validate(finalData);
 
-                const response = await axios.post(`http://localhost:8080/api/khachhang/create`, finalData, {
+                const response = await axios.post(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/khachhang/create`, finalData, {
                     headers: { 'Content-Type': 'application/json' }
                 });
 

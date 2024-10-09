@@ -34,10 +34,8 @@ import {
   DialogActions,
   DialogContentText
 } from '@mui/material';
-import { textAlign } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
-import CloseIcon from '@mui/icons-material/Close';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
@@ -125,6 +123,7 @@ function KhachHangAddress() {
   const [pendingChangeValue, setPendingChangeValue] = useState(false);
   const [addressId, setAddressId] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogDelete, setOpenDialogDelete] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
   const [openSetDefaultDialog, setOpenSetDefaultDialog] = useState(false);
   const [openUnsetDefaultDialog, setOpenUnsetDefaultDialog] = useState(false);
@@ -252,7 +251,8 @@ function KhachHangAddress() {
     setOpenSetDefaultDialog(false);
     if (selectedAddress) {
       try {
-        await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setLoading(true);
+        await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
@@ -265,7 +265,8 @@ function KhachHangAddress() {
     setOpenUnsetDefaultDialog(false);
     if (selectedAddress) {
       try {
-        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        setLoading(true);
+        await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(null); // Unset the default address
         handleCloseModal();
       } catch (error) {
@@ -281,24 +282,24 @@ function KhachHangAddress() {
 
   const handleDeleteAddress = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/diachi/${addressId}`);
-
+      setLoading(true);
+      await axios.delete(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/${addressId}`);
     } catch (error) {
       console.error('Lỗi khi xóa địa chỉ:', error);
     } finally {
-      setOpenDialog(false);
+      setOpenDialogDelete(false);
       handleCloseModal();
     }
   };
 
   const handleDeleteClick = () => {
     setIdToDelete(addressId);
-    setOpenDialog(true);
+    setOpenDialogDelete(true);
   };
 
   const fetchKhachHangInfo = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
+      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/khachhang/searchbyid/${id}`);
       const khachHangData = response.data;
       setValue('ten', khachHangData.ten);
       setValue('sdt', khachHangData.sdt);
@@ -310,7 +311,7 @@ function KhachHangAddress() {
       } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
       }
-      const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
+      const responseDiaChi = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;
       setAddresses(diaChiList);
       const provinces = new Set();
@@ -401,6 +402,7 @@ function KhachHangAddress() {
 
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
       let updatedData = {
         ten: data.ten,
         sdt: data.sdt,
@@ -431,7 +433,7 @@ function KhachHangAddress() {
       }
 
       await validationSchema.validate(updatedData);
-      const url = `http://localhost:8080/api/khachhang/update/${id}`;
+      const url = `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/khachhang/update/${id}`;
       const response = await axios.put(url, updatedData, {
         headers: {
           'Content-Type': 'application/json'
@@ -451,11 +453,14 @@ function KhachHangAddress() {
       setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
       setTimeout(() => {
         handleCloseSnackbar();
       }, 1000);
     }
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     resetAddress();
@@ -467,8 +472,8 @@ function KhachHangAddress() {
   };
 
   const onAddressSubmit = async (data) => {
-    debugger
     try {
+      setLoading(true);
       let formDataAddress = {};
       formDataAddress.tenNguoiNhan = data.ten_nguoi_nhan;
       formDataAddress.sdtNguoiNhan = data.sdt_nguoi_nhan;
@@ -479,7 +484,7 @@ function KhachHangAddress() {
       formDataAddress.idQuanHuyen = data.districts || selectedDistrict;
       formDataAddress.idPhuongXa = data.wards || selectedWard;
       try {
-        const url = data.id_dia_chi ? `http://localhost:8080/api/diachi/updatelocation/${data.id_dia_chi}` : 'http://localhost:8080/api/diachi/create';
+        const url = data.id_dia_chi ? `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/updatelocation/${data.id_dia_chi}` : 'https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/create';
         const method = data.id_dia_chi ? 'PUT' : 'POST';
         const responseAddress = await axios({
           method: method,
@@ -489,7 +494,6 @@ function KhachHangAddress() {
             'Content-Type': 'application/json'
           }
         });
-        console.log(responseAddress);
       } catch (error) {
         console.log(error);
       } if (data.id_dia_chi) {
@@ -513,7 +517,8 @@ function KhachHangAddress() {
       setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
-
+    } finally {
+      setLoading(false);
       setTimeout(() => {
         handleCloseSnackbar();
       }, 1000);
@@ -701,7 +706,7 @@ function KhachHangAddress() {
                 color: 'white',
               }}
             >
-              Cập nhật
+              {loading ? 'Đang xử lý...' : 'Cập nhật'}
             </Button>
 
 
@@ -942,7 +947,7 @@ function KhachHangAddress() {
                   },
                 }}
               >
-                Lưu
+                {loading ? 'Đang xử lý...' : 'Lưu'}
               </Button>
             </Box>
 
@@ -952,15 +957,15 @@ function KhachHangAddress() {
 
 
       <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        open={openDialogDelete}
+        onClose={() => setOpenDialogDelete(false)}
       >
         <DialogTitle>Xóa Địa Chỉ</DialogTitle>
         <DialogContent>
           Bạn có chắc chắn muốn xóa địa chỉ này?
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
+          <Button onClick={() => setOpenDialogDelete(false)} color="primary">
             Hủy
           </Button>
           <Button onClick={handleDeleteAddress} color="secondary">
