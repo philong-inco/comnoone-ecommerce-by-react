@@ -379,7 +379,7 @@ function PhieuGiamGiaConfiguration() {
 
   const fetchCouponDetail = async () => {
     try {
-      const response = await axios.get(`https://comnoone-ecommerce-by-react.vercel.app/api/coupons/detail/${id}`);
+      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender/api/coupons/detail/${id}`);
       const coupon = response.data;
       formik.setValues({
         stat: coupon.data.trangThai,
