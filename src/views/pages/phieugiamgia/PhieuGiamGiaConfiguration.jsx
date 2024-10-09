@@ -81,6 +81,7 @@ function PhieuGiamGiaConfiguration() {
 
 
   useEffect(() => {
+    debugger;
     fetchKhachHang();
   }, [currentPage, searchKeyWord, selectHangKhachHang, id]);
 
@@ -379,7 +380,8 @@ function PhieuGiamGiaConfiguration() {
 
   const fetchCouponDetail = async () => {
     try {
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender/api/coupons/detail/${id}`);
+      debugger;
+      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/coupons/detail/${id}`);
       const coupon = response.data;
       formik.setValues({
         stat: coupon.data.trangThai,
