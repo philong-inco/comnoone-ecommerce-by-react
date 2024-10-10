@@ -355,18 +355,28 @@ function NhanVienConfiguration() {
             }
             console.log(response);
         } catch (error) {
-            const errorMessage = error.response?.data?.error
-                ? translateErrorMessage(error.response.data.message)
-                : 'Đã xảy ra lỗi khi xử lý yêu cầu!';
-            setSnackbar({
-                open: true,
-                message: `Lỗi: ${errorMessage}`,
-                severity: 'error',
-            });
+            handleApiError(error);
         } finally {
             setLoading(false);
         }
     };
+
+    const handleApiError = (error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+            const errorMessage = error.response.data.error;
+            const errorDetails = errorMessage.split(':').pop().trim();
+            setSnackbarMessage(errorDetails);
+        } else if (error.response && error.response.data && error.response.data.error) {
+            setSnackbarMessage(error.response.data.error);
+        } else if (error.message) {
+            setSnackbarMessage(error.message);
+        } else {
+            setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+        }
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+    };
+
 
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
