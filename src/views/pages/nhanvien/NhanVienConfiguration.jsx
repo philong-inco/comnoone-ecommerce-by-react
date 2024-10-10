@@ -191,7 +191,6 @@ function NhanVienConfiguration() {
 
     const fetchNhanVien = async (id) => {
         try {
-            debugger;
             const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/${id}`);
             const nhanVienData = response.data;
             const gioiTinhString = nhanVienData.gioiTinh !== undefined ? nhanVienData.gioiTinh.toString() : "1";
@@ -294,7 +293,6 @@ function NhanVienConfiguration() {
     const onSubmit = async (data) => {
         setLoading(true);
         try {
-            debugger;
             let formData = {};
             formData.ten = data.ten;
             formData.sdt = data.sdt;
@@ -322,7 +320,6 @@ function NhanVienConfiguration() {
             formData.list_vai_tro = ["Nhân Viên"];
 
             await schema.validate(formData);
-            debugger;
             const url = id ? `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/update/${id}` : 'https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/create';
             const method = id ? 'put' : 'post';
 

@@ -238,20 +238,34 @@ function KhachHangConfiguration() {
     };
 
     const handleApiError = (error) => {
-        if (error.response && error.response.data && error.response.data.message) {
-            const errorMessage = error.response.data.error;
-            const errorDetails = errorMessage.split(':').pop().trim();
-            setSnackbarMessage(errorDetails);
-        } else if (error.response && error.response.data && error.response.data.error) {
-            setSnackbarMessage(error.response.data.error);
+        debugger;
+        let errorMessage = 'Có lỗi xảy ra khi xử lý yêu cầu!';
+
+        if (error.response && error.response.data) {
+            const errorData = error.response.data;
+
+            if (errorData.message) {
+                errorMessage = errorData.message;
+            }
+
+            if (errorData.error) {
+                const mainError = errorData.error.split(':').pop().trim();
+                errorMessage = `${errorMessage}: ${mainError}`;
+            }
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+                const additionalErrors = errorData.errors.map((err) => err.message || err).join('; ');
+                errorMessage = `${errorMessage}. Chi tiết: ${additionalErrors}`;
+            }
+
         } else if (error.message) {
-            setSnackbarMessage(error.message);
-        } else {
-            setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+            errorMessage = error.message;
         }
+
+        setSnackbarMessage(errorMessage);
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
     };
+
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
