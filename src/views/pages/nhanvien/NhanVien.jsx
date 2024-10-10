@@ -237,22 +237,39 @@ const DanhSachNhanVien = () => {
     const currentYear = new Date().getFullYear();
     const years = Array.from(new Array(101), (_, index) => currentYear - index);
 
-    const handleExportExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(allNhanVien.map((nv, index) => ({
-            STT: index + 1 + (currentPage - 1) * 10,
-            'Hình Ảnh': nv.hinhAnh,
-            Mã: nv.ma,
-            Tên: nv.ten,
-            'Ngày Sinh': formatDate(nv.ngaySinh),
-            'Số Điện Thoại': nv.sdt,
-            Email: nv.email,
-            'Địa Chỉ': nv.diaChi,
-            'Trạng Thái': nv.trangThai === 1 ? 'Đang Làm Việc' : 'Đã Nghỉ Việc'
-        })));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Nhân Viên");
-        XLSX.writeFile(wb, "danh_sach_nhan_vien.xlsx");
+    const handleExportExcel = async () => {
+        try {
+            let filteredData;
+            if (searchKeyWord) {
+                filteredData = await searchNhanVienKeyWord(filter.page, filter.size, searchKeyWord);
+            } else if (searchRadio) {
+                filteredData = await searchTrangThai(filter.page, filter.size, searchRadio);
+            } else if (selectGioiTinh !== '') {
+                filteredData = await searchGioiTinh(filter.page, filter.size, selectGioiTinh);
+            } else {
+                filteredData = await getAll(filter.page, filter.size);
+            }
+    
+            const ws = XLSX.utils.json_to_sheet(filteredData.content.map((nv, index) => ({
+                STT: index + 1 + (filter.page - 1) * filter.size,
+                'Hình Ảnh': nv.hinhAnh,
+                Mã: nv.ma,
+                Tên: nv.ten,
+                'Ngày Sinh': formatDate(nv.ngaySinh),
+                'Số Điện Thoại': nv.sdt,
+                Email: nv.email,
+                'Địa Chỉ': nv.diaChi,
+                'Trạng Thái': nv.trangThai === 1 ? 'Đang Làm Việc' : 'Đã Nghỉ Việc'
+            })));
+    
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Nhân Viên");
+            XLSX.writeFile(wb, "danh_sach_nhan_vien.xlsx");
+        } catch (error) {
+            console.log("Lỗi khi xuất file Excel:", error);
+        }
     };
+    
     return (
         <MainCard style={{ textAlign: "center" }}>
             <Box
