@@ -5,6 +5,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import {
     Box,
     Button,
@@ -21,6 +23,7 @@ import {
     Alert,
     RadioGroup,
     Radio,
+    Fab,
     CircularProgress,
     FormControlLabel,
     Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
@@ -269,9 +272,22 @@ function KhachHangConfiguration() {
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
+            <Fab
+                color="primary"
+                aria-label="back"
+                sx={{
+                    position: 'fixed',
+                    bottom: 16,
+                    right: 16,
+                }}
+                onClick={handleNavigate}
+            >
+                <ArrowBackIcon />
+            </Fab>
             <Typography variant="h1" gutterBottom style={{ textAlign: "center", marginBottom: '5%' }}>
                 Thêm Khách Hàng
             </Typography>
+
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={4}>
@@ -293,7 +309,7 @@ function KhachHangConfiguration() {
                                 />
                             ) : (
                                 <img
-                                    src='../src/assets/images/images.jpg'
+                                    src='https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg'
                                     alt="Ảnh đại diện"
                                     style={{
                                         width: '250px',
@@ -523,6 +539,7 @@ function KhachHangConfiguration() {
                                 </Box>
                                 {error && <FormHelperText error>{error}</FormHelperText>}
                             </Grid>
+
                         </Grid>
                     </Grid>
                 </Grid>

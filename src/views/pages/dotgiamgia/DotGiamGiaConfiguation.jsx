@@ -714,7 +714,7 @@ function DotGiamGiaConfiguration() {
             <Snackbar open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}
                 </Alert>

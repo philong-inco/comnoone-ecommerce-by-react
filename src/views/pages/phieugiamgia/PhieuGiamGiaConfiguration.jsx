@@ -447,7 +447,7 @@ function PhieuGiamGiaConfiguration() {
             <TextField
               label="Mã Phiếu Giảm Giá"
               name="maPhieu"
-              fullWidth
+              fullWidth={false}
               margin="normal"
               value={formik.values.maPhieu}
               onChange={formik.handleChange}
@@ -455,11 +455,18 @@ function PhieuGiamGiaConfiguration() {
               helperText={formik.touched.maPhieu && formik.errors.maPhieu}
               InputProps={{
                 readOnly: true,
+                inputProps: { tabIndex: -1 },
+                sx: {
+                  pointerEvents: 'none', // Ngăn hiệu ứng khi hover
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)', // Tạo nền mờ nhạt để giảm độ nổi bật
+                },
               }}
               InputLabelProps={{
                 shrink: true,
               }}
+              sx={{ width: '200px' }}
             />
+
 
             <TextField
               label="Tên Phiếu Giảm Giá"
@@ -788,10 +795,12 @@ function PhieuGiamGiaConfiguration() {
           </Box>
         </Paper>
       </Grid>
-      <Snackbar open={snackbar.open}
+      <Snackbar
+        open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>

@@ -32,8 +32,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
+  Fab 
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
 const validationSchema = Yup.object().shape({
@@ -593,7 +595,18 @@ function KhachHangAddress() {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
-      {/* Thông tin khách hàng */}
+      <Fab
+                color="primary"
+                aria-label="back"
+                sx={{
+                    position: 'fixed',
+                    bottom: 16,
+                    right: 16,
+                }}
+                onClick={handleNavigate}
+            >
+                <ArrowBackIcon />
+            </Fab>
       <Box sx={{ width: '33%', p: 2, borderRight: '1px solid #ddd' }}>
         <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center' }}>
           Thông tin khách hàng

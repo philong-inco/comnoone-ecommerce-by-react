@@ -8,6 +8,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { yupResolver } from '@hookform/resolvers/yup';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import {
     Select,
     MenuItem,
@@ -21,7 +23,7 @@ import {
     CircularProgress,
     Checkbox,
     ListItemText,
-    Chip,
+    Fab,
     FormHelperText,
     Snackbar,
     FormLabel,
@@ -297,7 +299,7 @@ function NhanVienConfiguration() {
             formData.ten = data.ten;
             formData.sdt = data.sdt;
             formData.email = data.email;
-            formData.tai_khoan_ngan_hang = data.tai_khoan_ngan_hang;
+            formData.tai_khoan_ngan_hang = data.tai_khoan_ngan_hang;``
             const today = new Date();
             const birthDate = new Date(data.ngay_sinh);
             let age = today.getFullYear() - birthDate.getFullYear();
@@ -417,8 +419,8 @@ function NhanVienConfiguration() {
                                 />
                             ) : (
                                 <img
-                                    src='../src/assets/images/images.jpg'
-                                    alt="Ảnh đại diện"
+                                    src='https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg'
+                                    alt=""
                                     style={{
                                         width: '250px',
                                         height: '250px',
@@ -647,6 +649,18 @@ function NhanVienConfiguration() {
                         {error && <FormHelperText error>{error}</FormHelperText>}
                     </Grid>
                 </Grid>
+                <Fab
+                    color="primary"
+                    aria-label="back"
+                    sx={{
+                        position: 'fixed',
+                        bottom: 16,
+                        right: 16,
+                    }}
+                    onClick={handleNavigate}
+                >
+                    <ArrowBackIcon />  
+                </Fab>
             </form>
             <Dialog
                 open={openDialog}
