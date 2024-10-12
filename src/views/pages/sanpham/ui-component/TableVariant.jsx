@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Switch, Button } from '@mui/material';
 import { IconUpload } from '@tabler/icons-react';
+import { IconCirclePlus, IconCheck } from '@tabler/icons-react';
 import { color } from 'framer-motion';
 import ImportSerialForm from './ImportSerialForm.jsx';
 import axios from 'axios';
 // import InputSetPriceAll from './InputSetPriceAll.jsx';
 import ListVariant from './ListVariant.jsx';
 
-const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResult }) => {
+const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResult, actionFather, listAnh }) => {
   const [variantList, setVariantList] = useState([]);
   const combinedKey = (index, variant) => {
     let result = '';
@@ -35,10 +36,43 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     });
   });
 
+  // set giá chung
+  const [priceAll, setPriceAll] = useState('');
+
+  const handlePriceAll = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setPriceAll(value);
+  }
+  const changePriceAll = () => {
+    console.log('priceAll: ', priceAll);
+    if(confirm("Xác nhận thay đổi toàn bộ giá bán thành: ", priceAll)){
+      const newVariantMap = variantList.map(varian => ({
+        ...varian, 
+        giaBan: priceAll
+      }));
+    setVariantList(newVariantMap);
+    }
+  }
+
+  // Ảnh san pham
+  const [imageList, setImageList] = useState([]);
+
+  // Ảnh san pham
+
+  useEffect(() => {
+    console.log('imageList: ', imageList); 
+  }, [imageList])
+
+  // set giá chung
+
   useEffect(() => {
     setVariantList([]);
     setVariantList([...variantListFromParent]);
   }, [variantListFromParent]);
+
+  useEffect(() => {
+    setImageList([...listAnh]);
+  }, [listAnh]);
 
   useEffect(() => {
     console.log('variantList:', variantList);
@@ -182,6 +216,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     console.log('check: ', check);
     if (check.check) {
       setResult(variantList);
+      actionFather();
     } else {
       let noti = '';
       if (check.message !== ''){
@@ -265,6 +300,19 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 
   return (
     <div>
+      <div style={{textAlign: "right"}}>
+      <TextField
+          label="Nhập giá chung"
+          id="outlined-start-adornment"
+          sx={{ m: 1, width: '25ch' }}
+          value={formatCurrency(priceAll)}
+          onChange={handlePriceAll}
+        />
+        <Button onClick={changePriceAll} variant="contained" color="secondary" sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}>
+          <IconCheck />
+        </Button>
+
+      </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -336,9 +384,11 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           </TableBody>
         </Table>
       </TableContainer>
-      <Button color="secondary" onClick={handleSetResult}>
+      <div style={{textAlign: "center", padding: "20px 0"}}>
+      <Button title='Xác nhận' variant="contained" color="secondary" sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}  onClick={handleSetResult}>
         Xác nhận
       </Button>
+      </div>
 
       <div>
         <ImportSerialForm

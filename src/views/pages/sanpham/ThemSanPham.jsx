@@ -55,6 +55,8 @@ const ThemSanPham = () => {
   const [tenSanPham, setTenSanPham] = useState('');
   const [moTa, setMota] = useState('');
 
+  // ảnh sản phâm
+  const [listAnh, setListAnh] = useState([]);
 
   // cho phép upload ảnh tiếp
   const [isValidToUpload, setIsValidToUpload] = useState(true);
@@ -77,6 +79,7 @@ const ThemSanPham = () => {
     const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
     const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
     const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
+    const anhSanPhamAll = await axios.get(`http://localhost:8080/api/anh-san-pham/list`);
 
     setSanPham(sanPhamResult.data.data);
     setNhuCau(nhuCauResult.data.data);
@@ -90,6 +93,7 @@ const ThemSanPham = () => {
     setManHinh(manHinhResult.data.data);
     setHeDieuHanh(heDieuHanhResult.data.data);
     setBanPhim(banPhimResult.data.data);
+    setListAnh(anhSanPhamAll.data.data);
   };
 
   const [productVarriant, setProductVarriant] = useState([]);
@@ -97,17 +101,33 @@ const ThemSanPham = () => {
   const [selectedKey, setSelectedKey] = useState([]); // các key được select
   const [resultVariant, setResultVariant] = useState([]); // thằng này nhận kết quả cuối cùng của TableVariant
 
-  useEffect(() => {
+  const checkTenSP = async (name) => {
+    const checkUniqueNameProduct = await axios.get(`http://localhost:8080/api/san-pham/exist-name?name=${name}`);
+    console.log('checkUniqueNameProduct: ', checkUniqueNameProduct); 
+    if (checkUniqueNameProduct.data.code === 999) {
+      return false;
+    }
+    return true;
+  }
+
+  const handleUpdateContinue = async () => {
     let check = true;
     if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' ||heDieuHanhChecked === '' || manHinhChecked === '' || webcamChecked === '' || nhuCauChecked === '' || thuongHieuChecked === '')
     {
       check = false;
       showAlertMessage('Hãy nhập thông tin sản phẩm')
     }
+    let isUnique = await checkTenSP(tenSanPham);
+    if (!isUnique) {
+      showAlertMessage("Tên sản phẩm đã tồn tại")
+    }
     //thực hiện kiểm tra lại các thuộc tính chung và sửa đổi vào result rồi sau đó tạo sản phẩm
-    if (check == true && resultVariant.length > 0) {
+    if (check == true && resultVariant.length > 0 && isUnique) {
       handleCreateProduct();
     }
+  }
+
+  useEffect(() => {
 
     console.log('resultVariant truyền lên cha: ', resultVariant)
   }, [resultVariant])
@@ -576,6 +596,8 @@ const ThemSanPham = () => {
               variantListFromParent={productVarriant}
               showMessage={showAlertMessage}
               setResult={setResultVariant}
+              actionFather={handleUpdateContinue}
+              listAnh={listAnh}
             />
           )}
         </div>
