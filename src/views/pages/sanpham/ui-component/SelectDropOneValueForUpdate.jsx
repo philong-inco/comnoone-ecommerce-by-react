@@ -12,16 +12,16 @@ const SelectDropOneValueForUpdate = ({ list, setValueSelect, name, valueOld }) =
 
   useEffect(() => {
     setValue(valueOld)
-  }, [])
+  }, [valueOld])
 
   useEffect(() => {
     setValueSelect(value.id);
+    console.log('value: ', value);
   }, [value]);
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
-
   return (
     <FormControl required sx={{ m: 1, width: '23.4%' }}>
       <InputLabel id="demo-simple-select-required-label" color='secondary'>{name}</InputLabel>
@@ -51,5 +51,4 @@ const SelectDropOneValueForUpdate = ({ list, setValueSelect, name, valueOld }) =
     </FormControl>
   );
 };
-
 export default SelectDropOneValueForUpdate;
