@@ -327,7 +327,7 @@ const DanhSachSanPham = () => {
             align: 'left'
         },
         {
-            id: 'amount',
+            id: 'soLuong',
             label: 'Số lượng',
             minWidth: 100,
             align: 'left'

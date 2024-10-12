@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { IconCirclePlus } from '@tabler/icons-react';
+import { IconCirclePlus, IconCheck } from '@tabler/icons-react';
 import Button from '@mui/material/Button';
 import { IconTrash } from '@tabler/icons-react';
 import Dialog from '@mui/material/Dialog';
@@ -21,7 +21,7 @@ import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
 import { format } from 'date-fns';  
 import { useState } from 'react';
-import { width } from '@mui/system';
+import { maxHeight, width } from '@mui/system';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -36,35 +36,65 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
         setListSeriTemp(list);
     }, [list])
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+    const handleClickOpen = () => {
+      setOpen(true);
+    };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+    const handleClose = () => {
+      setOpen(false);
+    };
 
   const removeSeri = async (id) => {
-    axios.delete(`http://localhost:8080/api/serial-number/delete/${id}`);
+    if (!confirm("Xác nhận xóa?")){
+      return;
+    }
+    await axios.delete(`http://localhost:8080/api/serial-number/delete/${id}`);
     let removeSeriListNew = listSeriTemp.filter(x => x.id != id);
     setListSeriTemp(removeSeriListNew);
+    loadDataSpceAfter();
+  }
+
+  const loadDataSpceAfter = async () => {
     const dataSpctAfter = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
     console.log('dataSpctAfter: ', dataSpctAfter);
     setListSPCT(dataSpctAfter.data.data);
   }
 
+  const loadSeriList = async () => {
+    const seriGetAgain = await axios.get(`http://localhost:8080/api/serial-number/find-by-spct-id/${idSPCT}`);
+    
+    setListSeriTemp(seriGetAgain.data.data);
+  }
+
   const handleWriteSerial = (e) => {
     console.log('e.target.value: ', e.target.value);
-    const val = e.target.value;
     setAddSeriStr(e.target.value);
   }
 
+  const validateSeriLength = (list) => {
+    for(let i = 0; i < list.length; i++){
+      if (list[i].length < 7 || list[i].length > 20){
+        return false;
+      }
+      const regex = /^[A-Za-z0-9]+$/;
+      if(!regex.test(list[i])){
+      return false;
+      }
+    return true;
+  }
+}
+
   const handleAddSeri = async () => {
-    console.log('addSeriStr: ', addSeriStr); 
-    const seriConverted = addSeriStr.split(',');
+    console.log('addSeriStr: ', addSeriStr);
+    const seriConverted = addSeriStr.split(',').filter(x => x.trim() !== '');
     console.log('seriConverted: ', seriConverted);
     let seriDuplicated = "";
     let isDulicate = false;
+    let checkValidate = validateSeriLength(seriConverted);
+    if (!checkValidate){
+      alert("Quy ước SerialNumber cho phép 7-20 ký tự liền nhau và không có ký tự đặc biệt");
+      return;
+    }
     for (let i = 0; i < seriConverted.length; i++){
         let seri = seriConverted[i];
         const check = await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${seri}`);
@@ -98,6 +128,8 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
             await axios.post(`http://localhost:8080/api/serial-number/add`, seriAdd);
         }
         alert("Thêm seri thành công");
+        loadSeriList();
+        loadDataSpceAfter();
     }
 
 
@@ -127,7 +159,8 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <MainCard>
-          <TableContainer component={Paper}>
+            <h2>Danh sách serial number:</h2>
+            <TableContainer component={Paper}>
             <Table sx={{ minWidth: 1000 }} aria-label="simple table">
                 <TableHead>
                 <TableRow>
@@ -138,7 +171,8 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
                     <TableCell align="left">Hành động</TableCell>
                 </TableRow>
                 </TableHead>
-                <TableBody>
+                
+                <TableBody >
                 {listSeriTemp.map((row, index) => (
                     <TableRow
                     key={row.id}
@@ -147,29 +181,38 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
                     <TableCell component="th" scope="row">
                         {index + 1}
                     </TableCell>
-                    <TableCell sx={{fontWeight: '800', color: '#673AB7'}} align="left">{row.ma}</TableCell>
+                    <TableCell sx={{fontWeight: '800', color: '#673AB7'}} align="left" title={`${row.ma.length} ký tự`}>{row.ma}</TableCell>
                     <TableCell align="left">{format(new Date(row.ngayNhap), 'dd-MM-yyyy HH:mm:ss')}</TableCell>
                     {row.trangThai == 0 && <TableCell align="left"><Chip label="Chưa bán" size='small' sx={{ backgroundColor: '#88C4F5' }} /></TableCell>}
                     {row.trangThai == 1 && <TableCell align="left"><Chip label="Đã bán" size='small' sx={{ backgroundColor: '#EDE7F6' }} /></TableCell>}
-                    {row.trangThai == 0 && <TableCell align="left"><IconTrash stroke={2} onClick={() => {removeSeri(row.id)}} /></TableCell>}
+                    {row.trangThai == 0 && <TableCell align="left" title={`Xóa`}>
+                      <Button variant="contained" color='error' onClick={() => {removeSeri(row.id)}}
+                          sx={{color: "#FFFFFF", backgroundColor: "#AA0000", marginTop: '10px'}}>
+                        <IconTrash stroke={2} />
+                      </Button>
+                      </TableCell>}
                     </TableRow>
                 ))}
                 </TableBody>
+                
             </Table>
             </TableContainer>
+          
 
             <div style={{ display: 'flex', justifyContent: 'space-between'}}>
-                <div style={{width: '70%'}}>
+                <div style={{width: '80%'}}>
                 <DialogContentText id="alert-dialog-slide-description">
-                <p>Thêm serial: </p>
                 <br /><br />
                 <TextField fullWidth rows={5} onChange={handleWriteSerial} id="serial" label="Thêm serial number cho biến thể này" multiline maxRows={5} />
                     </DialogContentText>
                 </div>
+                <div  style={{width: '25%', margin: "50px 0 0 20px", color: "#FFFFFF"}}>
+                <Button onClick={handleAddSeri} variant="contained" color="secondary" sx={{ height: '60px', borderRadius: '7px', marginTop: '10px' }}>
+                  <IconCheck /> Thêm
+                </Button>
+              </div>
             </div>
-            <div  style={{width: '25%'}}>
-                <IconCirclePlus stroke={2} onClick={handleAddSeri}/>
-            </div>
+            
           </MainCard>
 
         </DialogContent>
