@@ -148,7 +148,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 
     const serialValidate = [];
     console.log('ListValid before: ', serialValidate);
-
+    
     for (const serial of newSerial) {  
       const check = await isUniqueSerial(serial); // Đợi kết quả từ isUniqueSerial  
       console.log('Kết quả hàm: ', check); // Hiển thị kết quả trực tiếp  
