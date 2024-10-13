@@ -7,7 +7,6 @@ import NewTimeLine from './TimeLine';
 import BillInFo from './BillInFo';
 import SerialNumberSold from './SerialNumberSold';
 import HistoryPayment from './HistoryPayment';
-import Test from '../ban-hang/Test';
 import Test2 from '../ban-hang/Test2';
 import OrderInfo from './OrderInfo';
 

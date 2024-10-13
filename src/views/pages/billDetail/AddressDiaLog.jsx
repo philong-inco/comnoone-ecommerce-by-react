@@ -1,4 +1,16 @@
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Input, Snackbar, TextField } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Input,
+  Snackbar,
+  TextField,
+  Tooltip
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 import './Address.css';
@@ -366,9 +378,11 @@ function AddressDiaLog(props) {
   };
   return (
     <>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Cập nhật địa chỉ
-      </Button>
+      <Tooltip title="Chọn địa chỉ cho đơn hàng" placement="top">
+        <Button variant="contained" color="primary" onClick={handleOpen}>
+          Cập nhật địa chỉ
+        </Button>
+      </Tooltip>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>Chọn Địa Chỉ</DialogTitle>
@@ -477,7 +491,7 @@ function AddressDiaLog(props) {
                   Hủy
                 </Button>
                 <Button variant="contained" color="primary" type="submit">
-                  Gửi thông tin
+                  Lưu
                 </Button>
               </div>
             </div>
@@ -487,11 +501,11 @@ function AddressDiaLog(props) {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

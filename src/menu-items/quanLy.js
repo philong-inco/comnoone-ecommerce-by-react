@@ -10,29 +10,18 @@ const quanLy = {
     {
       id: 'hoadon',
       title: 'Quản lý hóa đơn',
-      type: 'collapse',
+      type: 'item',
+      url: '/hoa-don/danh-sach',
       icon: icons.IconReceipt2,
-      children: [
-        {
-          id: 'index',
-          title: 'Danh sách',
-          type: 'item',
-          url: '/hoa-don/danh-sach'
-        },
-
-        {
-          id: 'hoadoncho',
-          title: 'Chờ xác nhận',
-          type: 'item',
-          url: '/hoadon/choxacnhan'
-        },
-        {
-          id: 'danhsachhoadon',
-          title: 'Danh sách hóa đơn',
-          type: 'item',
-          url: '/hoadon/danhsach'
-        }
-      ]
+      breadcrumbs: false
+      // children: [
+      //   {
+      //     id: 'index',
+      //     title: 'Danh sách',
+      //     type: 'item',
+      //     url: '/hoa-don/danh-sach'
+      //   }
+      // ]
     },
     {
       id: 'sanpham',

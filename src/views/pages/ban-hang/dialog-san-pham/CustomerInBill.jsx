@@ -16,8 +16,11 @@ import {
   TableBody,
   Pagination,
   DialogActions,
-  TextField
+  TextField,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+import { GridCheckCircleIcon } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { addCustomerToBill } from 'services/admin/bill/billService';
@@ -260,17 +263,17 @@ function CustomerInBill(props) {
                     <TableCell>{customer.sdt}</TableCell>
                     <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
                     <TableCell>
-                      {' '}
-                      <Button
-                        onClick={() => {
-                          handleAddCustomerToBill(customer.id);
-                        }}
-                        variant="contained"
-                        color="primary"
-                        disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
-                      >
-                        Chọn
-                      </Button>
+                      <Tooltip title="Chọn khách hàng này" placement="top">
+                        <IconButton
+                          onClick={() => {
+                            handleAddCustomerToBill(customer.id);
+                          }}
+                          color="primary"
+                          disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
+                        >
+                          <GridCheckCircleIcon />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -292,11 +295,11 @@ function CustomerInBill(props) {
       </Dialog>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

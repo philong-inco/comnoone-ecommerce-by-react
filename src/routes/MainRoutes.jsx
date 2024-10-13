@@ -76,12 +76,9 @@ const MainRoutes = {
           path: 'danh-sach',
           element: <Bill />
         },
+
         {
           path: 'chi-tiet/:id',
-          element: <BillDetail />
-        },
-        {
-          path: 'chi-tiet-2/:id',
           element: <BillDetail2 />
         }
 

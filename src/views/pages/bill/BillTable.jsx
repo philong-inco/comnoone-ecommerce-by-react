@@ -39,7 +39,7 @@ function BillTable(props) {
   ];
   const handleNavigate = (ma) => {
     console.log('Code', ma);
-    navigate(`/hoa-don/chi-tiet-2/${ma}`);
+    navigate(`/hoa-don/chi-tiet/${ma}`);
   };
   const calculateTotalAmount = (record) => {
     const totalProductAmount = record.tongTienPhaiTra;

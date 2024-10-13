@@ -3,7 +3,6 @@ import SerialNumberSold from '../billDetail/SerialNumberSold';
 import { getBillByCode } from 'services/admin/bill/billService';
 import { useEffect, useState } from 'react';
 import CustomerInBill from './dialog-san-pham/CustomerInBill';
-import Test from './Test';
 import Test2 from './Test2';
 
 function SellManager(props) {
@@ -48,7 +47,6 @@ function SellManager(props) {
     <>
       <SerialNumberSold onLoading={onLoading} bill={bill} title="Giỏ hàng" />
       <CustomerInBill onLoading={onLoading} bill={bill} />
-      {/* <Test onLoading={onLoading} billInfo={bill} onReload={loadBillInTab} /> */}
       <Test2 onLoading={onLoading} bill={bill} onReload={loadBillInTab} />
     </>
   );

@@ -437,7 +437,7 @@ const ProductList = (props) => {
   }
   // MUI UI
   const columns = [
-    { id: 'ma', label: 'Mã', minWidth: 70 },
+    { id: 'maSPCT', label: 'Mã', minWidth: 70 },
     { id: 'sanPham', label: 'Tên', minWidth: 150 },
     {
       id: 'giaBan',

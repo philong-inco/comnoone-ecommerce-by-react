@@ -200,20 +200,19 @@ function SerialNumberSold(props) {
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">{title}</Typography>
             {/* <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} /> */}
-            <Button
-              hidden={
-                bill.trangThai == 'DANG_GIAO' || bill.trangThai == 'HOAN_THANH' || bill.trangThai == 'CHO_GIAO' || bill.trangThai == 'HUY'
-              }
-              variant="contained"
-              color="warning"
-              onClick={handleShowModal}
-              disabled={id ? false : true}
-            >
-              Thêm sản phẩm
-            </Button>
-            {/* <Button variant="contained" color="warning" onClick={handleSomeAction}>
-              Load
-            </Button> */}
+            <Tooltip title="Thêm sản phẩm" placement="top">
+              <Button
+                hidden={
+                  bill.trangThai == 'DANG_GIAO' || bill.trangThai == 'HOAN_THANH' || bill.trangThai == 'CHO_GIAO' || bill.trangThai == 'HUY'
+                }
+                variant="contained"
+                color="warning"
+                onClick={handleShowModal}
+                disabled={id ? false : true}
+              >
+                Thêm sản phẩm
+              </Button>
+            </Tooltip>
           </Grid>
         </Grid>
         <Divider sx={{ marginY: 2 }} />
@@ -245,18 +244,19 @@ function SerialNumberSold(props) {
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <IconButton
-                        disabled={
-                          bill.trangThai == 'DANG_GIAO' ||
-                          bill.trangThai == 'HOAN_THANH' ||
-                          bill.trangThai == 'CHO_GIAO' ||
-                          bill.trangThai == 'HUY'
-                        }
-                        onClick={() => handleOpenDialog(product.productDetailId)}
-                      >
-                        <RemoveCircleOutline />
-                      </IconButton>
-
+                      <Tooltip title="Cập nhập số lượng" placement="top">
+                        <IconButton
+                          disabled={
+                            bill.trangThai == 'DANG_GIAO' ||
+                            bill.trangThai == 'HOAN_THANH' ||
+                            bill.trangThai == 'CHO_GIAO' ||
+                            bill.trangThai == 'HUY'
+                          }
+                          onClick={() => handleOpenDialog(product.productDetailId)}
+                        >
+                          <RemoveCircleOutline />
+                        </IconButton>
+                      </Tooltip>
                       <TextField
                         disabled={
                           bill.trangThai == 'DANG_GIAO' ||
@@ -276,18 +276,19 @@ function SerialNumberSold(props) {
                           }
                         }}
                       />
-
-                      <IconButton
-                        disabled={
-                          bill.trangThai == 'DANG_GIAO' ||
-                          bill.trangThai == 'HOAN_THANH' ||
-                          bill.trangThai == 'CHO_GIAO' ||
-                          bill.trangThai == 'HUY'
-                        }
-                        onClick={() => handleOpenDialog(product.productDetailId)}
-                      >
-                        <AddCircleOutline />
-                      </IconButton>
+                      <Tooltip title="Cập nhập số lượng" placement="top">
+                        <IconButton
+                          disabled={
+                            bill.trangThai == 'DANG_GIAO' ||
+                            bill.trangThai == 'HOAN_THANH' ||
+                            bill.trangThai == 'CHO_GIAO' ||
+                            bill.trangThai == 'HUY'
+                          }
+                          onClick={() => handleOpenDialog(product.productDetailId)}
+                        >
+                          <AddCircleOutline />
+                        </IconButton>
+                      </Tooltip>
                     </div>
                   </TableCell>
                   <TableCell>
