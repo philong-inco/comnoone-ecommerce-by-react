@@ -18,7 +18,9 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Tooltip,
+  Typography,
+  CircularProgress
 } from '@mui/material';
 import { IconArticleFilledFilled } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -31,6 +33,7 @@ import { getStatusBillHistory, getStatusBillHistoryColor } from 'utils/billUtil/
 function NewTimeLine(props) {
   const { id } = useParams();
   const { data, onLoading, bill } = props;
+  const [loading, setLoading] = useState(false);
 
   const maxHeight = window.innerHeight * 0.5;
 
@@ -68,11 +71,11 @@ function NewTimeLine(props) {
         color = 'error'; // Màu đỏ
         break;
       case 'CHO_GIAO':
-        label = 'CHỜ GIAO';
+        label = 'CHỜ VẬN CHUYỂN';
         color = 'warning'; // Màu vàng
         break;
       case 'DANG_GIAO':
-        label = 'ĐANG GIAO';
+        label = 'ĐÃ VẬN CHUYỂN';
         color = 'info'; // Màu xanh dương
         break;
       case 'TRA_HANG_HOAN_TIEN':
@@ -84,8 +87,12 @@ function NewTimeLine(props) {
         color = 'success'; // Màu xanh lá
         break;
       case 'XAC_NHAN':
-        label = 'XÁC NHẬN';
+        label = 'ĐÃ XÁC NHẬN';
         color = 'primary'; // Màu chính
+        break;
+      case 'CHO_XAC_NHAN':
+        label = 'CHỜ XÁC NHẬN';
+        color = 'warning'; // Màu chính
         break;
       default:
         break;
@@ -97,9 +104,9 @@ function NewTimeLine(props) {
     { id: 'stt', label: 'STT' },
     { id: 'ngayTao', label: 'Thời gian', minWidth: 100, maxWidth: 250 },
     { id: 'nguoiSua', label: 'Người chỉnh sửa', minWidth: 100, maxWidth: 150 },
-    { id: 'trangThai', label: 'Trạng Thái', minWidth: 120, maxWidth: 150 },
     { id: 'ghiChuChoCuaHang', label: 'Ghi chú của hàng', minWidth: 150, maxWidth: 200 },
-    { id: 'ghiChuChoKhachHang', label: 'Ghi chú khách hàng', minWidth: 150, maxWidth: 200 }
+    { id: 'ghiChuChoKhachHang', label: 'Ghi chú khách hàng', minWidth: 150, maxWidth: 200 },
+    { id: 'trangThai', label: 'Trạng Thái', minWidth: 120, maxWidth: 150 }
   ];
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -234,11 +241,11 @@ function NewTimeLine(props) {
     }
 
     // Nút Chờ Giao
-    if (bill.trangThai === 'DON_MOI' && bill.loaiHoaDon === 1) {
+    if ((bill.trangThai === 'DON_MOI' || bill.trangThai === 'CHO_XAC_NHAN') && bill.loaiHoaDon === 1) {
       buttons.push(
         <Grid item xs={3} key="xac-nhan-button">
           <Button variant="contained" onClick={() => handleClickBtnStatus('XAC_NHAN')} fullWidth>
-            Xác nhận
+            XÁC NHẬN
           </Button>
         </Grid>
       );
@@ -250,6 +257,22 @@ function NewTimeLine(props) {
           </Button>
         </Grid>
       );
+    } else if (bill.trangThai === 'XAC_NHAN' && bill.loaiHoaDon === 1) {
+      buttons.push(
+        <Grid item xs={3} key="hoan-thanh-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('CHO_GIAO')} fullWidth>
+            CHỜ VẬN CHUYỂN
+          </Button>
+        </Grid>
+      );
+    } else if (bill.trangThai === 'DANG_GIAO' && bill.loaiHoaDon === 1) {
+      buttons.push(
+        <Grid item xs={3} key="hoan-thanh-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatus('HOAN_THANH')} fullWidth>
+            HOÀN THÀNH
+          </Button>
+        </Grid>
+      );
     }
 
     // Nút Đang Giao
@@ -257,22 +280,22 @@ function NewTimeLine(props) {
       buttons.push(
         <Grid item xs={3} key="dang-giao-button">
           <Button variant="contained" onClick={() => handleClickBtnStatus('DANG_GIAO')} fullWidth>
-            ĐANG GIAO
+            VẬN CHUYỂN
           </Button>
         </Grid>
       );
     }
 
     // Nút Trả Hàng Hoàn Tiền
-    if (bill.trangThai === 'HOAN_THANH') {
-      buttons.push(
-        <Grid item xs={3} key="tra-hang-hoan-tien-button">
-          <Button variant="contained" onClick={() => handleClickBtnStatus('TRA_HANG_HOAN_TIEN')} fullWidth>
-            TRẢ HÀNG HOÀN TIỀN
-          </Button>
-        </Grid>
-      );
-    }
+    // if (bill.trangThai === 'HOAN_THANH') {
+    //   buttons.push(
+    //     <Grid item xs={3} key="tra-hang-hoan-tien-button">
+    //       <Button variant="contained" onClick={() => handleClickBtnStatus('TRA_HANG_HOAN_TIEN')} fullWidth>
+    //         TRẢ HÀNG HOÀN TIỀN
+    //       </Button>
+    //     </Grid>
+    //   );
+    // }
 
     return (
       <Grid container spacing={2}>
@@ -326,53 +349,17 @@ function NewTimeLine(props) {
               </Grid>
             ))}
           </div>
-          {/* <Grid item xs={9} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <Grid item xs={3}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => {
-                      handleClickBtnStatus('HUY');
-                    }}
-                    fullWidth
-                  >
-                    HỦY
-                  </Button>
-                </Grid>{' '}
-                <Grid item xs={3}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      handleClickBtnStatus('XAC_NHAN');
-                    }}
-                    fullWidth
-                  >
-                    Xác nhận
-                  </Button>
-                </Grid>{' '}
-                <Grid item xs={4}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      onLoading();
-                    }}
-                    fullWidth
-                  >
-                    Quay lại trước đó
-                  </Button>
-                </Grid>
-                
-              </Grid> */}
           <Grid item xs={12} sx={{ marginTop: 0 }}>
             <Grid container spacing={2} sx={{ justifyContent: 'space-between' }}>
               <Grid item xs={10} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                 {renderButtons(bill)}
               </Grid>
               <Grid item xs={2}>
-                <Button variant="contained" color="warning" fullWidth onClick={handleOpenDialog}>
-                  Chi tiết
-                </Button>
+                <Tooltip title="Lịch sử hóa đơn" arrow placement="top">
+                  <Button variant="contained" color="warning" fullWidth onClick={handleOpenDialog}>
+                    Chi tiết
+                  </Button>
+                </Tooltip>
               </Grid>
             </Grid>
           </Grid>
@@ -405,12 +392,7 @@ function NewTimeLine(props) {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell style={{ minWidth: columns[0].minWidth, maxWidth: columns[0].maxWidth }}>{row.ngayTao}</TableCell>
                     <TableCell style={{ minWidth: columns[1].minWidth, maxWidth: columns[1].maxWidth }}>{row.nguoiSua}</TableCell>
-                    <TableCell style={{ minWidth: columns[2].minWidth, maxWidth: columns[2].maxWidth }}>
-                      <Chip
-                        label={getStatusBillHistory(row.trangThai)}
-                        sx={{ backgroundColor: getStatusBillHistoryColor(row.trangThai), color: '#fff' }}
-                      />
-                    </TableCell>
+
                     <TableCell
                       style={{
                         minWidth: columns[3].minWidth,
@@ -430,6 +412,20 @@ function NewTimeLine(props) {
                       }}
                     >
                       {row.ghiChuChoKhachHang}
+                    </TableCell>
+                    <TableCell style={{ minWidth: columns[2].minWidth, maxWidth: columns[2].maxWidth }}>
+                      <Chip
+                        label={getStatusBillHistory(row.trangThai)}
+                        sx={{
+                          backgroundColor: getStatusBillHistoryColor(row.trangThai),
+                          color: '#fff',
+                          width: '120px',
+                          borderRadius: '20px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

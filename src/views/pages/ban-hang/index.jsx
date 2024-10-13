@@ -9,7 +9,6 @@ import { deleteBillByCode, getBillCodes } from 'services/admin/sell/sellService'
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 
-import Cart from './Cart';
 import SellManager from './SellManager';
 
 function Sell() {
@@ -153,7 +152,7 @@ function Sell() {
             />
           </Tabs>
         </Box>{' '}
-        <SellManager bill={bill} onReload={handleReload} />
+        <SellManager exitingBill={bill} onReload={handleReload} />
         {/* <Cart bill={bill} onReload={handleReload} /> */}
       </Box>
     </>

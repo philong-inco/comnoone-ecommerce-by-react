@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Grid, Divider } from '@mui/material';
+import { Button, TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Grid, Divider, Tooltip } from '@mui/material';
 import { Search, Add, FileDownload } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 function ComponentFilter(props) {
-  const { handleSearch, handleCreateBill, onDateChange, fromDate, toDate, handleBillTypeChange } = props;
+  const { handleSearch, handleCreateBill, onDateChange, fromDate, toDate, handleBillTypeChange, handlePrint } = props;
   const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,18 +26,25 @@ function ComponentFilter(props) {
           />
         </Grid>
         <Grid item xs={12} sm={6} container justifyContent="flex-end">
-          <Button variant="outlined" color="primary" startIcon={<FileDownload />}></Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => {
-              navigate('/ban-hang');
-            }}
-            style={{ marginLeft: '10px' }}
-          >
-            Tạo hóa đơn
-          </Button>
+          {/* <Button variant="outlined" color="primary" startIcon={<FileDownload />}></Button> */}
+          <Tooltip title="Tải file excel" arrow placement="top">
+            <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }} onClick={handlePrint}>
+              <FileDownload />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Tạo hóa đơn" arrow placement="top">
+            <Button
+              variant="contained"
+              color="primary"
+              // startIcon={<Add />}
+              onClick={() => {
+                navigate('/ban-hang');
+              }}
+              style={{ marginLeft: '10px' }}
+            >
+              <Add />
+            </Button>
+          </Tooltip>
         </Grid>
       </Grid>
       <Divider style={{ margin: '10px 0' }} />
@@ -69,20 +76,17 @@ function ComponentFilter(props) {
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} container alignItems="center">
-          <FormControl component="fieldset">
-            <FormLabel component="legend" style={{ marginRight: '10px' }}>
+        <Grid item xs={12} sm={6} container alignItems="center" style={{ display: 'flex' }}>
+          <FormControl component="fieldset" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            {/* <FormLabel component="legend" style={{ marginRight: '10px' }}>
               Loại:
-            </FormLabel>
-            <RadioGroup row defaultValue={''} onChange={handleBillTypeChange}>
+            </FormLabel> */}
+            <RadioGroup row defaultValue={''} onChange={handleBillTypeChange} style={{ display: 'flex', flexDirection: 'row' }}>
               <FormControlLabel value={''} control={<Radio />} label="Tất cả" />
               <FormControlLabel value={'0'} control={<Radio />} label="Tại quầy" />
               <FormControlLabel value={'1'} control={<Radio />} label="Online" />
             </RadioGroup>
           </FormControl>
-          <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }}>
-            Export Excel
-          </Button>
         </Grid>
       </Grid>
     </div>

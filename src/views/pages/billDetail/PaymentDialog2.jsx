@@ -52,9 +52,26 @@ const PaymentDialog2 = (props) => {
     const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
     const newData = {
       idHTTT: idThanhToan,
-      soTien: parseFloat(soTien),
-      loaiThanhToan: '0'
+      soTien: data.tongTienPhaiTra + (data.loaiHoaDon == 1 ? data.tienShip : 0),
+      tienNhan: parseFloat(soTien),
+      loaiThanhToan: '0',
+      // tienShip: data.tienShip,
+      loaiHoaDon: data.loaiHoaDon,
+      //
+      ten: data.ten,
+      sdt: data.sdt,
+      email: data.email
+      // diaChi: data.diaChi,
+      // tinh: data.tinh,
+      // tenTinh: data.tenTinh,
+      // huyen: data.huyen,
+      // tenHuyen: data.tenHuyen,
+      // phuong: data.phuong,
+      // tenPhuong: data.tenPhuong,
+      // ghiChu: data.ghiChu
     };
+    console.log('Data veef HDHTT : ', newData);
+
     create(newData);
     setSoTien('');
     setXacNhanMo(false);
@@ -101,7 +118,7 @@ const PaymentDialog2 = (props) => {
         const totalPaid = response.data
           .filter((payment) => payment.loaiThanhToan === 0)
           .reduce((sum, payment) => {
-            return sum + (payment.soTien || 0);
+            return sum + (payment.tienNhan || 0);
           }, 0);
         setTienDaThanhToan(totalPaid);
       }
@@ -147,12 +164,13 @@ const PaymentDialog2 = (props) => {
     const tienDu = tienDaThanhToan - tongTienPhaiTra;
     setTienDu(tienDu > 0 ? tienDu : 0);
   }, [tienDaThanhToan, data]);
-
+  // 86.426.531,57
   const handleConfirmThanhToan = () => {
     console.log(data);
     const newData = {
       thanhToanSau: data.thanhToanSau,
       loaiHoaDon: data.loaiHoaDon,
+      tienShip: data.tienShip,
       ten: data.tenKhachHang,
       sdt: data.sdt,
       email: data.email,
@@ -161,7 +179,6 @@ const PaymentDialog2 = (props) => {
       tenTinh: data.tenTinh,
       huyen: data.huyen,
       tenHuyen: data.tenHuyen,
-      // lõi đọna nfya
       phuong: data.phuong,
       tenPhuong: data.tenPhuong,
       ghiChu: data.ghiChu
@@ -179,6 +196,7 @@ const PaymentDialog2 = (props) => {
         setSnackbarMessage('Xác nhận thanh toán thành công thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
+        setXacNhanMo(false);
         // setFormData({});
         // setBill({});
         // setFormDataAddress({});
@@ -259,7 +277,8 @@ const PaymentDialog2 = (props) => {
                       <TableRow>
                         <TableCell>STT</TableCell>
                         <TableCell>Ngày tạo</TableCell>
-                        <TableCell>Số tiền</TableCell>
+                        {/* <TableCell>Số tiền</TableCell> */}
+                        <TableCell>Tiền nhận</TableCell>
                         <TableCell>Phương thanh toán</TableCell>
                         <TableCell>Trạng thái</TableCell>
                         <TableCell>Người tạo</TableCell>
@@ -271,7 +290,8 @@ const PaymentDialog2 = (props) => {
                         <TableRow key={index}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{thanhToan.ngayTao}</TableCell>
-                          <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell>
+                          {/* <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell> */}
+                          <TableCell>{thanhToan.tienNhan ? thanhToan.tienNhan.toLocaleString() : ''}</TableCell>
                           <TableCell>{thanhToan.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>
                           <TableCell>{thanhToan.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
                           <TableCell>{thanhToan.nguoiTao ? thanhToan.nguoiTao : 'Chưa xác định'}</TableCell>
@@ -317,7 +337,7 @@ const PaymentDialog2 = (props) => {
       <Dialog open={xacNhanThanhToan} onClose={() => setXacNhanThanhToan(false)}>
         <DialogTitle>Xác nhận thanh toán</DialogTitle>
         <DialogContent>
-          Bạn có chắc chắn muốn thanh toán bằng {phuongThucThanhToan === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'} không?
+          Bạn có chắc chắn muốn thanh toán bằng hóa đơn <strong>{data.ma} </strong> không?
         </DialogContent>
         <Grid item xs={12} sx={{ textAlign: 'right' }}>
           <Button onClick={() => setXacNhanThanhToan(false)}>Hủy</Button>

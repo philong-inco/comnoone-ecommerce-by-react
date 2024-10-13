@@ -55,7 +55,7 @@ function CustomerInBill(props) {
     } else {
       setCustomer({
         ten: bill.tenKhachHang,
-        sdt: bill.sdt,
+        sdt: bill.sdt || '',
         email: bill.email,
         diaChi: bill.diaChi
       });
@@ -202,11 +202,18 @@ function CustomerInBill(props) {
                   type="text"
                   placeholder="Số điện thoại"
                   name="sdt"
-                  defaultValue={customer.sdt || ''}
+                  // defaultValue={customer.sdt || ''}
+                  value={customer.sdt}
                   variant="outlined" // Hoặc 'filled' hoặc 'standard' tùy theo kiểu bạn muốn
                   label="Số điện thoại" // Thêm label cho TextField
                   InputLabelProps={{
                     shrink: !!customer.sdt // Đưa label lên nếu có dữ liệu
+                  }}
+                  onChange={(e) => {
+                    setCustomer({
+                      ...customer, // Giữ lại các giá trị khác của customer
+                      sdt: e.target.value // Cập nhật giá trị sdt
+                    });
                   }}
                   fullWidth // Đảm bảo trường nhập chiếm toàn bộ chiều rộng của không gian cha
                   margin="normal" // Khoảng cách tiêu chuẩn xung quanh trường nhập

@@ -47,8 +47,8 @@ function BillTable(props) {
     return totalProductAmount + shippingCost;
   };
   const columns = [
-    { title: '#', dataIndex: 'key', key: 'key' },
-    { title: 'Chọn', key: 'selected' },
+    { title: 'STT', dataIndex: 'key', key: 'key' },
+    // { title: 'Chọn', key: 'selected' },
     { title: 'Mã', dataIndex: 'ma', key: 'ma' },
     { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
     {
@@ -74,18 +74,20 @@ function BillTable(props) {
       dataIndex: 'loaiHoaDon',
       key: 'loaiHoaDon',
       render: (loaiHoaDon) => (
-        <Chip
-          size="small"
-          sx={{
-            width: 100,
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '0.8rem',
-            padding: '15px 4px'
-          }}
-          label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
-          color={loaiHoaDon == 0 ? 'primary' : 'success'}
-        />
+        <Tooltip title={loaiHoaDon == 0 ? 'Bán tại quầy' : 'Hóa đơn bán giao hang'} arrow placement="top">
+          <Chip
+            size="small"
+            sx={{
+              width: 100,
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '0.8rem',
+              padding: '15px 4px'
+            }}
+            label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
+            color={loaiHoaDon == 0 ? 'primary' : 'success'}
+          />
+        </Tooltip>
       )
     },
     {
@@ -156,12 +158,28 @@ function BillTable(props) {
                       ))}
                     </TableRow>
                   </TableHead>
-                  <TableBody>
+                  {/* <TableBody>
                     {bills.map((bill) => (
                       <TableRow key={bill.id}>
                         {columns.map((column) => (
                           <TableCell key={column.key}>
                             {column.render ? column.render(bill[column.dataIndex], bill) : bill[column.dataIndex]}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody> */}
+                  <TableBody>
+                    {bills.map((bill, index) => (
+                      <TableRow key={bill.id}>
+                        {columns.map((column) => (
+                          <TableCell key={column.key}>
+                            {/* Kiểm tra nếu cột là "STT", hiển thị số thứ tự */}
+                            {column.key === 'key'
+                              ? index + 1
+                              : column.render
+                                ? column.render(bill[column.dataIndex], bill)
+                                : bill[column.dataIndex]}
                           </TableCell>
                         ))}
                       </TableRow>

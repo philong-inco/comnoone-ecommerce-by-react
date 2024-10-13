@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createBill, getBillFilter } from 'services/admin/bill/billService';
 import ComponentFilter from './ComponentFilter';
 import BillTable from './BillTable';
+import axios from 'axios';
 
 function Bill() {
   const navigate = useNavigate();
@@ -63,6 +64,39 @@ function Bill() {
       setLoading(false);
     }
   };
+
+  const handlePrint = async () => {
+    let filter = ` ( ma ~~ '${searchTerm.trim()}' or sdt ~~ '${searchTerm.trim()}' or email ~~ '${searchTerm.trim()}') `;
+    if (billType) {
+      filter += ` and loaiHoaDon:${billType}`;
+    }
+    if (status) {
+      filter += ` and trangThai:'${status}'`;
+    }
+    if (fromDate && toDate) {
+      filter += ` and ngayTao >: '${getCurrentTimeInMilliseconds(fromDate, true)}' and ngayTao <:'${getCurrentTimeInMilliseconds(toDate, false)}'   `;
+    }
+
+    try {
+      const response = await axios({
+        url: `http://localhost:8080/api/bills/export`,
+        method: 'GET',
+        params: { filter },
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'hoadon.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Lỗi in hóa đơn: ', error);
+    }
+  };
+
   const onPageChange = (page) => {
     console.log(`PAGE ${page}`);
     setPage(page);
@@ -134,6 +168,7 @@ function Bill() {
         fromDate={fromDate}
         toDate={toDate}
         handleBillTypeChange={handleBillTypeChange}
+        handlePrint={handlePrint}
       />
       <BillTable
         activeKey={activeKey}
