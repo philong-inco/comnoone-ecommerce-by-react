@@ -112,7 +112,12 @@ const ThemSanPham = () => {
 
   const handleUpdateContinue = async () => {
     let check = true;
-    if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' ||heDieuHanhChecked === '' || manHinhChecked === '' || webcamChecked === '' || nhuCauChecked === '' || thuongHieuChecked === '')
+    if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' 
+    ||heDieuHanhChecked === '' || manHinhChecked === '' || webcamChecked === '' 
+    || nhuCauChecked === '' || thuongHieuChecked === '' || VGAChecked === undefined 
+    || moTa === undefined || tenSanPham === undefined || banPhimChecked === undefined 
+    ||heDieuHanhChecked === undefined || manHinhChecked === undefined || webcamChecked === undefined 
+    || nhuCauChecked === undefined || thuongHieuChecked === undefined)
     {
       check = false;
       showAlertMessage('Hãy nhập thông tin sản phẩm')
@@ -121,6 +126,18 @@ const ThemSanPham = () => {
     if (!isUnique) {
       showAlertMessage("Tên sản phẩm đã tồn tại")
     }
+      console.log('--VGAChecked: ', VGAChecked);
+      console.log('--moTa: ', moTa);
+      console.log('--tenSanPham: ', tenSanPham);
+      console.log('--banPhimChecked: ', banPhimChecked);
+      console.log('--heDieuHanhChecked: ', heDieuHanhChecked);
+      console.log('--manHinhChecked: ', manHinhChecked);
+      console.log('--webcamChecked: ', webcamChecked);
+      console.log('--nhuCauChecked: ', nhuCauChecked);
+      console.log('--thuongHieuChecked: ', thuongHieuChecked);
+      console.log('--check: ', check);
+      console.log('--resultVariant.length > 0: ', resultVariant.length > 0);
+      console.log('--isUnique: ', isUnique);
     //thực hiện kiểm tra lại các thuộc tính chung và sửa đổi vào result rồi sau đó tạo sản phẩm
     if (check == true && resultVariant.length > 0 && isUnique) {
       handleCreateProduct();
@@ -128,7 +145,6 @@ const ThemSanPham = () => {
   }
 
   useEffect(() => {
-
     console.log('resultVariant truyền lên cha: ', resultVariant)
   }, [resultVariant])
 
@@ -201,6 +217,15 @@ const ThemSanPham = () => {
       ...prev,
       VGA: VGAChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          VGA: VGAChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [VGAChecked]);
 
   useEffect(() => {
@@ -208,6 +233,15 @@ const ThemSanPham = () => {
       ...prev,
       heDieuHanh: heDieuHanhChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          heDieuHanh: heDieuHanhChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [heDieuHanhChecked]);
 
   useEffect(() => {
@@ -215,30 +249,75 @@ const ThemSanPham = () => {
       ...prev,
       webcam: webcamChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          webcam: webcamChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [webcamChecked]);
   useEffect(() => {
     setDefaultVariant((prev) => ({
       ...prev,
       manHinh: manHinhChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          manHinh: manHinhChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [manHinhChecked]);
   useEffect(() => {
     setDefaultVariant((prev) => ({
       ...prev,
       banPhim: banPhimChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          banPhim: banPhimChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [banPhimChecked]);
   useEffect(() => {
     setDefaultVariant((prev) => ({
       ...prev,
       thuongHieu: thuongHieuChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          thuongHieu: thuongHieuChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [thuongHieuChecked]);
   useEffect(() => {
     setDefaultVariant((prev) => ({
       ...prev,
       nhuCau: nhuCauChecked
     }));
+    if (resultVariant.length > 0){
+      const temp = resultVariant.map(x => (
+        {
+          ...x,
+          nhuCau: nhuCauChecked
+        }
+      ))
+      setResultVariant(temp);
+    }
   }, [nhuCauChecked]);
 
   //   const defaultVariant = {
@@ -598,81 +677,11 @@ const ThemSanPham = () => {
               setResult={setResultVariant}
               actionFather={handleUpdateContinue}
               listAnh={listAnh}
+              mauSacChecked={mauSacChecked}
             />
           )}
         </div>
       </MainCard>
-      <div style={{
-        padding: '24px',
-        marginTop: "20px",
-        marginBottom: "40px",
-        width: '100%',
-        background: "#fff",
-        borderRadius: "10px",
-      }}>
-        <div style={{ width: "100%" }}>
-          <div style={{ fontWeight: "bolder", fontSize: "20px", textAlign: 'center', width: "100%", display: "flex", justifyContent: "center", }}>Ảnh</div>
-          <div style={{ margin: "10px 0", width: "100%", display: "flex", justifyContent: "center", }}>
-            { isValidToUpload && 
-              <UploadWidget 
-              setUrlImages={setUrlImages} 
-              countMauSac={mauSacChecked.length * 3}
-              showMessage={showAlertMessage}
-              />
-            }
-          </div>
-        </div>
-
-        <div style={{ width: "100%", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "40px" }}>
-          {
-            urlImages.map(url =>
-              <Card
-                sx={{
-                  width: 150,
-                  border: "1px solid rgba(0, 0, 0, 0.12)",
-                  borderRadius: "12px",
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                  overflow: "hidden",
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.2)",
-                  },
-                }}
-              >
-                <CardMedia
-                  sx={{
-                    height: 150,
-                    backgroundSize: "contain",
-                    backgroundPosition: "center",
-                    filter: "brightness(90%)",
-                    transition: "filter 0.3s",
-                    "&:hover": {
-                      filter: "brightness(100%)",
-                    },
-                  }}
-                  image={url}
-                />
-                <CardContent
-                  sx={{
-                    backgroundColor: "#f8f9fa",
-                    padding: "16px",
-                    textAlign: "center",
-                  }}
-                >
-                  <SelectBoxColor 
-                  title={'Màu sắc'} 
-                  options={mauSacChecked}
-                  />
-                </CardContent>
-              </Card>
-            )
-          }
-
-
-        </div>
-      </div>
-
     </>
   );
 };

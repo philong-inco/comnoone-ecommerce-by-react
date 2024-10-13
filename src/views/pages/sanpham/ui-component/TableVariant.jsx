@@ -4,11 +4,14 @@ import { IconUpload } from '@tabler/icons-react';
 import { IconCirclePlus, IconCheck } from '@tabler/icons-react';
 import { color } from 'framer-motion';
 import ImportSerialForm from './ImportSerialForm.jsx';
+import AlbumImage from './AlbumImage.jsx';
 import axios from 'axios';
 // import InputSetPriceAll from './InputSetPriceAll.jsx';
 import ListVariant from './ListVariant.jsx';
+import { margin } from '@mui/system';
+import { element } from 'prop-types';
 
-const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResult, actionFather, listAnh }) => {
+const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
   const [variantList, setVariantList] = useState([]);
   const combinedKey = (index, variant) => {
     let result = '';
@@ -56,12 +59,45 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 
   // Ảnh san pham
   const [imageList, setImageList] = useState([]);
-
+  const [openAlbum, setOpenAlbum] = useState(false);
+  const handleOpenAlbum = () => setOpenAlbum(true);
   // Ảnh san pham
 
   useEffect(() => {
     console.log('imageList: ', imageList); 
   }, [imageList])
+
+  // biến lưu id album ảnh được hiện
+  const [idAlbumImageVisiable, setAlbumImageVisiable] = useState(null);
+  const handleShowAlbumImage = (id) => {
+    setAlbumImageVisiable(id);
+  }
+
+  // mac sac checked
+  const [mauSacCheckedSelectAnh, setMauSacCheckedSelectAnh] = useState([]);
+  useEffect(()=>{
+    console.log('mauSacCheckedSelectAnhcha: ', mauSacCheckedSelectAnh); 
+  }, [mauSacCheckedSelectAnh])
+
+  const onUpdateImage = (id, arr) => {
+    let newMauSacSelect = mauSacCheckedSelectAnh.map((element) => {
+      if (element.id === id) {
+        return {...element, urls: arr}
+      }
+      return element;
+    });
+    setMauSacCheckedSelectAnh(newMauSacSelect);
+  }
+  useEffect(() => {
+    const elementConvert = mauSacChecked.map(x => ({
+      id: x.id,
+      ten: x.ten,
+      urls: []
+    }))
+    setMauSacCheckedSelectAnh(elementConvert);
+  }, [mauSacChecked])
+  // mac sac checked
+  
 
   // set giá chung
 
@@ -242,6 +278,13 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     };
     let seriVuaNhap = [];
     variantList.forEach((item, idx) => {
+      // set mảng ảnh theo màu
+      mauSacCheckedSelectAnh.forEach(color => {
+        if (item.mauSac.id === color.id){
+          item.anhSanPham = color.urls
+        }
+      })
+      // check giá
       if (item.giaBan === '' || isNaN(item.giaBan) || parseFloat(item.giaBan) <= 0) {
         check.check = false;
         check.message += idx + 1 + ', ';
@@ -297,6 +340,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
    *         }
    * }
    */
+
 
   return (
     <div>
@@ -384,6 +428,51 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           </TableBody>
         </Table>
       </TableContainer>
+      <div style={{padding: "20px", margin: "50px 0 20px 0", textAlign: "center"}}>
+      <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn ảnh theo màu sắc</h3>
+      </div>
+       {
+        mauSacCheckedSelectAnh.map(element => (
+          <div key={element.id} style={{display: "flex", margin: "10px 0", minHeight: "115px"}}>
+            <div style={{width: "30%"}}>
+            <Button color='secondary' variant="outlined" onClick={() => handleShowAlbumImage(element.id)}>
+              Màu {element.ten}
+            </Button>
+            {idAlbumImageVisiable === element.id && 
+              <AlbumImage 
+                key={element.id}
+                openAlbum={openAlbum}
+                setOpenAlbum={handleShowAlbumImage}
+                listAnh={imageList}
+                nameColor={element.ten}
+                idColor={element.id}
+                onUpdateImage={onUpdateImage}
+              />
+            }
+            
+            </div>
+            <div style={{width:"70%", display: "flex"}}>
+              {element.urls.map(url => (
+                <div style={{width: "100px", margin: "5px"}}>
+                  <img src={url} style={{width: "100%"}} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+       }                     
+
+      {/* Anh sp */}
+      {/* <div style={{margin: "10px 0", textAlign: "center"}}>
+      <Button variant="outlined" onClick={handleOpenAlbum}>
+        Chọn ảnh
+      </Button>
+        <AlbumImage 
+          openAlbum={openAlbum}
+          setOpenAlbum={setOpenAlbum}
+          listAnh={imageList} 
+          />
+      </div> */}
       <div style={{textAlign: "center", padding: "20px 0"}}>
       <Button title='Xác nhận' variant="contained" color="secondary" sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}  onClick={handleSetResult}>
         Xác nhận
@@ -407,6 +496,8 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           setPriceAll={setPriceAll}
         /> */}
       </div>
+      
+      
     </div>
     // <div>
 

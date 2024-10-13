@@ -205,7 +205,8 @@ const SuaSanPham = () => {
     }  
   }
 
-
+ // list anh
+ const [listImg, setListImg] = useState([]);
   //////// SERI VIEW /////////////////
   const [listSeri, setListSeri] = useState([]);
   useEffect(() => {
@@ -217,7 +218,8 @@ const SuaSanPham = () => {
       console.log('spctId: ', id); 
       const seriGet = await axios.get(`http://localhost:8080/api/serial-number/find-by-spct-id/${id}`);
       setListSeri(seriGet.data.data);
-      
+      const imgListGet = await axios.get(`http://localhost:8080/api/anh-san-pham/find-by-spct-id?idSPCT=${id}`);
+      setListImg(imgListGet.data.data);
       setIdSPCT(id);
       setOpenSeri(true);
     }
@@ -333,6 +335,7 @@ const SuaSanPham = () => {
         idSP={id}
         idSPCT={idSPCT}
         setListSPCT={setspct}
+        listImg={listImg}
       />
     </>
   )

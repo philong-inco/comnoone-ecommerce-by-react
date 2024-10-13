@@ -27,7 +27,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, idSP, idSPCT, setListSPCT}) {
+export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, idSP, idSPCT, setListSPCT, listImg}) {
   
     const [listSeriTemp, setListSeriTemp] = React.useState([]);
     const [addSeriStr, setAddSeriStr] = React.useState('');
@@ -211,6 +211,18 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
                   <IconCheck /> Thêm
                 </Button>
               </div>
+            </div>
+
+            <div style={{margin: "30px 0"}}>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Ảnh biến thể</h3>
+            <div style={{display: "flex"}}>
+              {listImg.map(url => (
+                  <div style={{width: "100px", margin: "5px"}}>
+                    <img src={url} style={{width: "100%"}} />
+                  </div>
+              ))}
+            </div>
+            
             </div>
             
           </MainCard>

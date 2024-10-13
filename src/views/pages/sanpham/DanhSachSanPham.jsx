@@ -416,7 +416,7 @@ const DanhSachSanPham = () => {
                                 </FormControl>
                             </div>
 
-                            <div onClick={cleanFilter} style={{ marginLeft: 20, marginTop: 10, marginRight: 20 }}>
+                            <div title="Xóa bộ lọc" onClick={cleanFilter} style={{ marginLeft: 20, marginTop: 10, marginRight: 20 }}>
                                 <FilterAltOffOutlinedIcon
                                     color='secondary'
                                     fontSize='large'
@@ -424,12 +424,12 @@ const DanhSachSanPham = () => {
                             </div>
                             <div style={{ flexGrow: '1', display: 'flex', justifyContent: 'end' }}>
 
-                                <Box style={{ marginRight: "10px" }} onClick={() => navigate('/sanpham/themnhieusanpham')}>
+                                <Box title="Tải lên Excel" style={{ marginRight: "10px" }} onClick={() => navigate('/sanpham/themnhieusanpham')}>
                                     <Fab size="medium" color="secondary">
                                         <Upload />
                                     </Fab>
                                 </Box>
-                                <Box style={{ marginRight: "10px" }}>
+                                <Box title="Xuất Excel" style={{ marginRight: "10px" }}>
                                     <MenuDownload data={sanPham} />
                                 </Box>
 
