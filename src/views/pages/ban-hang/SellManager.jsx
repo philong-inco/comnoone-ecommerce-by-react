@@ -4,9 +4,10 @@ import { getBillByCode } from 'services/admin/bill/billService';
 import { useEffect, useState } from 'react';
 import CustomerInBill from './dialog-san-pham/CustomerInBill';
 import Test from './Test';
+import Test2 from './Test2';
 
 function SellManager(props) {
-  const { onReload } = props;
+  const { onReload, exitingBill } = props;
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -19,9 +20,10 @@ function SellManager(props) {
         setBill(response.data);
       }
     } catch (error) {
-      setSnackbarMessage(error.response.data.message);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      // setSnackbarMessage(error.response.data.message);
+      // setSnackbarSeverity('error');
+      // setSnackbarOpen(true);
+      console.log('Lỗi : ', error);
     }
   };
 
@@ -41,11 +43,13 @@ function SellManager(props) {
   const loadAll = () => {
     onReload(); // gọi hàm onReload
   };
+
   return (
     <>
-      <SerialNumberSold onLoading={onLoading} bill={bill} />
+      <SerialNumberSold onLoading={onLoading} bill={bill} title="Giỏ hàng" />
       <CustomerInBill onLoading={onLoading} bill={bill} />
-      <Test onLoading={onLoading} billInfo={bill} onReload={loadBillInTab} />
+      {/* <Test onLoading={onLoading} billInfo={bill} onReload={loadBillInTab} /> */}
+      <Test2 onLoading={onLoading} bill={bill} onReload={loadBillInTab} />
     </>
   );
 }

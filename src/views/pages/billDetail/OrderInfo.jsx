@@ -28,21 +28,20 @@ import {
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import '../billDetail/Address.css';
-import { addCouponToBillByCode, getBillByCode, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
-import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
+import { addCouponToBillByCode, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
 import PaymentDialog2 from '../billDetail/PaymentDialog2';
 import CouponDiaLog from '../billDetail/CouponDiaLog';
-import PdfForm from 'utils/pdf/pdf';
+import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 
-function Test(props) {
+function OrderInfo(props) {
   const { id } = useParams();
   const {
     // bill,
-    billInfo,
+    bill,
     onLoading,
     onReload
   } = props;
+
   const inputRef = useRef(null);
   const [isDelivery, setIsDelivery] = useState(false);
   const [provinces, setProvinces] = useState([]);
@@ -51,17 +50,14 @@ function Test(props) {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
-  const [bill, setBill] = useState({});
 
-  const [showPDF, setShowPDF] = useState(false);
-
-  // pgg
   const [showDiaLogCoupon, setShowDiaLogCoupon] = useState(false);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  // pay
+
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     ten: '',
@@ -88,98 +84,58 @@ function Test(props) {
     huyen: '',
     phuong: ''
   });
-
-  // pay
-  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  // address
-  const [formDataAddress, setFormDataAddress] = useState({
-    ten: '',
-    sdt: '',
-    email: '',
-    diaChi: '',
-    tinh: '',
-    tenTinh: '',
-    huyen: '',
-    tenHuyen: '',
-    phuong: '',
-    tenPhuong: '',
-    ghiChu: '',
-    tienShip: ''
-  });
-
-  const fetchBill = async () => {
-    try {
-      const response = await getBillByCode(id);
-      if (response.status_code === 200) {
-        setBill(response.data);
-        setFormData({
-          ...response.data,
-          ten: response.data.tenKhachHang
-        });
-        setIsDelivery(response.data.loaiHoaDon);
-
-        if (response.data.phuong && response.data.huyen) {
-          getDeliveryDate(response.data.huyen, response.data.phuong);
-        }
-      }
-    } catch (error) {
-      setSnackbarMessage('error.response.data.message');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
-
   useEffect(() => {
-    fetchBill();
-  }, [billInfo]);
-  // }, [id]);
-
-  useEffect(() => {
+    setFormData({
+      ...bill,
+      ten: bill.tenKhachHang || '',
+      email: bill.email || '',
+      sdt: bill.sdt || '',
+      diaChi: bill.diaChi || ''
+    });
+    setFormDataError({});
+    setIsDelivery(bill.loaiHoaDon == 1);
     loadProvinces();
-  }, [formData.huyen]);
-
-  // tỉnh thành
+  }, [id, bill]);
+  // address
   const loadProvinces = async () => {
     const data = await fetchAllProvince();
     setProvinces(data.data);
-    if (formData?.tinh) {
-      setSelectedProvince(formData.tinh);
-      const selectedProvince = data.data.find((province) => province.ProvinceID === parseInt(formData.tinh));
-      setFormData((prevData) => ({
-        ...prevData,
-        tenTinh: selectedProvince ? selectedProvince.ProvinceName : ''
-      }));
-
-      // Tải quận huyện tương ứng
-      const districtsData = await fetchAllProvinceDistricts(formData.tinh);
-      setDistricts(districtsData.data);
+    if (bill?.tinh) {
+      const data = await fetchAllProvinceDistricts(bill.tinh);
+      setDistricts(data.data);
       setSelectedDistrict('');
       setSelectedWard('');
       setWards([]);
-
-      // Tải phường tương ứng nếu có
-      if (formData?.huyen) {
-        setSelectedDistrict(formData.huyen);
-        const selectedDistrict = districtsData.data.find((district) => district.DistrictID === parseInt(formData.huyen));
+    }
+    if (bill?.huyen) {
+      const data = await fetchAllProvinceWard(bill.huyen);
+      setWards(data.data);
+      setSelectedWard('');
+    }
+    if (bill?.tinh) {
+      const selectedProvince = provinces.find((province) => province.ProvinceID === parseInt(bill.tinh));
+      setFormData((prevData) => ({
+        ...prevData,
+        tinh: bill.tinh,
+        tenTinh: selectedProvince ? selectedProvince.ProvinceName : ''
+      }));
+      if (bill?.huyen) {
+        const selectedDistrict = districts.find((district) => district.DistrictID === parseInt(bill.huyen));
         setFormData((prevData) => ({
           ...prevData,
+          huyen: bill.huyen,
           tenHuyen: selectedDistrict ? selectedDistrict.DistrictName : ''
         }));
-
-        const wardsData = await fetchAllProvinceWard(formData.huyen);
-
-        setWards(wardsData.data);
-        const selectedWard = wardsData.data.find((ward) => ward.WardCode === formData.phuong);
-        // console.log('Đc chọn : ', selectedWard);
-        // console.log('Đc chọn tên: ', selectedWard.WardName);
-
-        setSelectedWard(selectedWard.WardCode);
-        setFormData((prevData) => ({
-          ...prevData,
-          phuong: selectedWard.WardCode,
-          tenPhuong: selectedWard ? selectedWard.WardName : ''
-        }));
-        getDeliveryDate(selectedDistrict, selectedWard);
+        if (bill?.phuong != null) {
+          setSelectedWard(bill.phuong);
+          const selectedWard = wards.find((ward) => ward.WardCode === bill.phuong);
+          setFormData((prevData) => ({
+            ...prevData,
+            phuong: bill.phuong,
+            tenPhuong: selectedWard ? selectedWard.WardName : ''
+          }));
+          getDeliveryDate(selectedDistrict, bill.phuong);
+        }
       }
     }
   };
@@ -209,7 +165,6 @@ function Test(props) {
     handleInputChange(event);
     const districtId = event.target.value;
     setSelectedDistrict(districtId);
-
     const selectedDistrict = districts.find((district) => district.DistrictID === parseInt(districtId));
     setFormData((prevData) => ({
       ...prevData,
@@ -298,30 +253,19 @@ function Test(props) {
     }
   };
 
-  // hiển thi form address
   const handleSwitchChange = (event) => {
     const { name, value } = event.target;
     setIsDelivery(event.target.checked);
-    setFormData((prevData) => ({
-      ...prevData,
-      ten: bill?.tenKhachHang,
-      tinh: bill?.tinh,
-      huyen: bill?.huyen,
-      phuong: bill?.phuong,
-      tienShip: event.target.checked ? 0 : bill?.tienShip,
-      sdt: bill?.sdt,
-      email: bill?.email,
-      diaChi: bill?.diaChi,
-      ghiChu: bill?.ghiChu,
-      loaiHoaDon: isDelivery ? 0 : 1,
-      // thanhToanSau: isDelivery ? bill?.thanhToanSau : 0
-      thanhToanSau: bill?.thanhToanSau
-    }));
-    // loadProvinces();
-    if (bill?.phuong && bill?.huyen) {
-      getDeliveryDate(bill.huyen, bill.phuong);
-    }
+    loadProvinces();
+    setFormData({
+      ...formData,
+      loaiHoaDon: event.target.checked ? 1 : 0
+    });
+    // if (bill?.phuong && bill?.huyen) {
+    //   getDeliveryDate(bill.huyen, bill.phuong);
+    // }
   };
+
   const handlePaymentSwitchChange = (event) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -337,193 +281,115 @@ function Test(props) {
   const handleCloseDiaLogCoupon = () => {
     setShowDiaLogCoupon(false);
   };
-
   const openPaymentDialog = () => {
-    const errors = {};
-    if (isDelivery) {
-      // Kiểm tra tên
-      if (!formData.ten) {
-        errors.ten = 'Vui lòng nhập tên của bạn';
-      } else if (formData.ten.length < 5) {
-        errors.ten = 'Tên phải có ít nhất 5 ký tự';
-      } else if (!/^[\p{L} ]+$/u.test(formData.ten)) {
-        errors.ten = 'Tên chỉ được nhập chữ và khoảng trắng';
-      }
-      if (!formData.sdt) {
-        errors.sdt = 'Vui lòng nhập số điện thoại';
-      } else if (!/^0\d{9}$/.test(formData.sdt)) {
-        errors.sdt = 'Số điện thoại không hợp lệ';
-      }
-
-      if (!formData.email) {
-        errors.email = 'Vui lòng nhập email';
-      } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
-        errors.email = 'Email không hợp lệ';
-      }
-      if (!formData.tinh) {
-        errors.tinh = 'Vui lòng chọn Tỉnh/Thành Phố';
-      }
-      if (!formData.huyen) {
-        errors.huyen = 'Vui lòng chọn Quận/Huyện';
-      }
-      if (!formData.phuong) {
-        errors.phuong = 'Vui lòng chọn Phường/Xã';
-      }
-    }
-    console.log('Form Data Oke : ', formData);
-    setFormDataError(errors);
-    if (Object.keys(errors).length > 0) {
-      setSnackbarMessage('Thông tin đơn hàng chưa cung cấp đủ');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    } else {
-      setFormDataError({});
-      if (isDelivery) {
-        if (
-          formData.tinh != bill.tinh ||
-          formData.huyen != bill.huyen ||
-          formData.phuong != bill.phuong ||
-          formData.ten != bill.ten ||
-          formData.sdt != bill.sdt ||
-          formData.diaChi != bill.diaChi ||
-          formData.ghiChu != bill.ghiChu
-        ) {
-          updateAddress({
-            ten: formData.ten,
-            sdt: formData.sdt,
-            email: formData.email,
-            diaChi: formData.diaChi,
-            tinh: formData.tinh,
-            tenTinh: provinces.find((province) => province.ProvinceID === parseInt(formData.tinh)).ProvinceName,
-            huyen: formData.huyen,
-            tenHuyen: districts.find((district) => district.DistrictID === parseInt(formData.huyen)).DistrictName,
-            phuong: formData.phuong,
-            tenPhuong: wards.find((ward) => ward.WardCode === formData.phuong).WardName,
-            ghiChu: formData.ghiChu,
-            tienShip: formData.tienShip
-          });
-        }
-      }
-    }
-    // // lưu lại địa chỉ
-    // setFormDataAddress({
-    //   ten: formData.ten,
-    //   sdt: formData.sdt,
-    //   email: formData.email,
-    //   diaChi: formData.diaChi,
-    //   tinh: formData.tinh,
-    //   tenTinh: provinces.find((province) => province.ProvinceID === parseInt(formData.tinh)).ProvinceName,
-    //   huyen: formData.huyen,
-    //   tenHuyen: districts.find((district) => district.DistrictID === parseInt(formData.huyen)).DistrictName,
-    //   phuong: formData.phuong,
-    //   tenPhuong: wards.find((ward) => ward.WardCode === formData.phuong).WardName,
-    //   ghiChu: formData.ghiChu,
-    //   tienShip: formData.tienShip
-    // });
-    // update adddress
-
-    // Kiểm tra tổng sản phẩm
-    if (bill.tongSanPham === 0) {
-      setSnackbarMessage('Hóa đơn chưa có sản phẩm nào');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
-    if (formData.thanhToanSau == 0) {
-      setIsPaymentDialogOpen(true);
-    } else {
-      const data = {
-        thanhToanSau: formData.thanhToanSau,
-        loaiHoaDon: formData.loaiHoaDon,
-        ten: formData.ten,
-        sdt: formData.sdt,
-        email: formData.email,
-        diaChi: formData.diaChi,
-        tinh: formData.tinh,
-        tenTinh: formData.tenTinh,
-        huyen: formData.huyen,
-        tenHuyen: formData.tenHuyen,
-        phuong: formData.phuong,
-        tenPhuong: formData.tenPhuong,
-        ghiChu: formData.ghiChu
-      };
-      apiPayCounter(data);
-      console.log('Trả sau : => ', data);
-      alert('ttt');
-    }
+    //   const errors = {};
+    //   if (isDelivery) {
+    //     // Kiểm tra tên
+    //     if (!formData.ten) {
+    //       errors.ten = 'Vui lòng nhập tên của bạn';
+    //     } else if (formData.ten.length < 5) {
+    //       errors.ten = 'Tên phải có ít nhất 5 ký tự';
+    //     }
+    //     //   } else if (!/^[\p{L} ]+$/u.test(formData.ten)) {
+    //     //     errors.ten = 'Tên chỉ được nhập chữ và khoảng trắng';
+    //     //   }
+    //     if (!formData.sdt) {
+    //       errors.sdt = 'Vui lòng nhập số điện thoại';
+    //     } else if (!/^0\d{9}$/.test(formData.sdt)) {
+    //       errors.sdt = 'Số điện thoại không hợp lệ';
+    //     }
+    //     if (!formData.email) {
+    //       errors.email = 'Vui lòng nhập email';
+    //     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
+    //       errors.email = 'Email không hợp lệ';
+    //     }
+    //     if (!formData.tinh) {
+    //       errors.tinh = 'Vui lòng chọn Tỉnh/Thành Phố';
+    //     }
+    //     if (!formData.huyen) {
+    //       errors.huyen = 'Vui lòng chọn Quận/Huyện';
+    //     }
+    //     if (!formData.phuong) {
+    //       errors.phuong = 'Vui lòng chọn Phường/Xã';
+    //     }
+    //   }
+    //   console.log('Form Data Oke : ', formData);
+    //   setFormDataError(errors);
+    //   if (Object.keys(errors).length > 0) {
+    //     setSnackbarMessage('Thông tin đơn hàng chưa cung cấp đủ');
+    //     setSnackbarSeverity('error');
+    //     setSnackbarOpen(true);
+    //     return;
+    //   } else {
+    //     setFormDataError({});
+    //     if (isDelivery) {
+    //     }
+    //   }
+    //   // Kiểm tra tổng sản phẩm
+    //   if (bill.tongSanPham === 0) {
+    //     setSnackbarMessage('Hóa đơn chưa có sản phẩm nào');
+    //     setSnackbarSeverity('error');
+    //     setSnackbarOpen(true);
+    //     return;
+    //   }
+    //   if (formData.thanhToanSau == 0) {
+    //     setIsPaymentDialogOpen(true);
+    //   } else {
+    //     console.log('ADD___________ : ', formData);
+    //     const data = {
+    //       thanhToanSau: formData.thanhToanSau,
+    //       loaiHoaDon: formData.loaiHoaDon,
+    //       ten: formData.ten,
+    //       sdt: formData.sdt,
+    //       email: formData.email,
+    //       diaChi: formData.diaChi,
+    //       tinh: formData.tinh,
+    //       tenTinh: formData.tenTinh,
+    //       huyen: formData.huyen,
+    //       tenHuyen: formData.tenHuyen,
+    //       phuong: formData.phuong,
+    //       tenPhuong: formData.tenPhuong,
+    //       ghiChu: formData.ghiChu,
+    //       tienShip: formData.tienShip
+    //     };
+    //     console.log('THANH TOÁN SAU : ', data);
+    //     apiPayCounter(data);
+    //     console.log('Trả sau : => ', data);
+    //     alert('ttt');
+    //   }
     // Mở hộp thoại thanh toán
   };
-  console.log('Addresss : ', formDataAddress);
 
   const onClosePaymentDialog = () => {
     setIsPaymentDialogOpen(false);
   };
 
   const apiPayCounter = async (data) => {
-    try {
-      const response = await payCounter(id, data);
-      if (response.status_code === 201) {
-        setSnackbarMessage('Xác nhận thanh toán thành công thành công');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-        setFormData({});
-        setBill({});
-        setFormDataAddress({});
-        setShowPDF(true);
-        onReload();
-
-        onLoading();
-        // onReload();
-      }
-    } catch (error) {
-      console.log(error);
-
-      setSnackbarMessage('Lỗi');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
+    //   try {
+    //     const response = await payCounter(id, data);
+    //     if (response.status_code === 201) {
+    //       setSnackbarMessage('Xác nhận thanh toán thành công thành công');
+    //       setSnackbarSeverity('success');
+    //       setSnackbarOpen(true);
+    //       setFormData({});
+    //       onReload();
+    //       onLoading();
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
+    //     setSnackbarMessage('Lỗi');
+    //     setSnackbarSeverity('error');
+    //     setSnackbarOpen(true);
+    //   }
   };
-
-  const updateAddress = async (newAddress) => {
-    try {
-      const response = await updateAddressInBill(id, newAddress);
-      if (response.status_code == 201) {
-        // setSnackbarMessage('Caapj nhaapj ddiaj cir');
-        // setSnackbarSeverity('success');
-        // setSnackbarOpen(true);
-        // onLoading();
-
-        fetchBill();
-      }
-    } catch (error) {
-      console.log(error);
-
-      setSnackbarMessage('Lỗi Adddress');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
-  console.log('setIsDelivery : ', isDelivery);
-
-  console.log('FOrm DATA : ', formData);
-
-  console.log('BILL IN ODER INFORMATION : ', bill);
-  const handlePrint = () => {
-    setShowPDF(true);
-  };
-
-  useEffect(() => {
-    // Gọi hàm in tại đây nếu cần
-    if (showPDF) {
-      handlePrint(); // Hoặc gọi hàm in của bạn
-      setShowPDF(false);
-    }
-  }, [showPDF]);
 
   const loadAll = () => {
     onReload();
   };
+
+  console.log('BILL : ', bill);
+  console.log('Form data  : ', formData);
+
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
@@ -538,10 +404,11 @@ function Test(props) {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  disabled={true}
                   label="Tên của bạn"
                   id="ten"
                   placeholder="Nhập tên của bạn"
-                  value={formData.ten}
+                  value={formData.ten || ''}
                   onChange={handleInputChange}
                   error={!!formDataError.ten}
                   helperText={formDataError.ten}
@@ -554,6 +421,7 @@ function Test(props) {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  disabled={true}
                   label="Số điện thoại"
                   id="sdt"
                   placeholder="Nhập số điện thoại"
@@ -571,6 +439,7 @@ function Test(props) {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  disabled={true}
                   label="Email"
                   id="email"
                   placeholder="Nhập email"
@@ -588,6 +457,7 @@ function Test(props) {
 
               <Grid item xs={12}>
                 <TextField
+                  disabled={true}
                   label="Địa chỉ giao hàng"
                   id="diaChi"
                   placeholder="Nhập địa chỉ giao hàng"
@@ -606,7 +476,14 @@ function Test(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="tinh-label">Tỉnh/Thành Phố</InputLabel>
-                  <Select labelId="tinh-label" id="tinh" value={formData.tinh} onChange={handleProvinceChange} error={!!formDataError.tinh}>
+                  <Select
+                    disabled={true}
+                    labelId="tinh-label"
+                    id="tinh"
+                    value={formData.tinh}
+                    onChange={handleProvinceChange}
+                    error={!!formDataError.tinh}
+                  >
                     <MenuItem value="" disabled>
                       Chọn Tỉnh/Thành Phố
                     </MenuItem>
@@ -623,7 +500,7 @@ function Test(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="huyen-label">Quận/Huyện</InputLabel>
-                  <Select labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
+                  <Select disabled={true} labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
                     <MenuItem value="">Chọn Quận/Huyện</MenuItem>
                     {districts.map((district) => (
                       <MenuItem key={district.DistrictID} value={district.DistrictID}>
@@ -638,7 +515,7 @@ function Test(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="phuong-label">Phường/Xã</InputLabel>
-                  <Select labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
+                  <Select disabled={true} labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
                     <MenuItem value="">Chọn Phường/Xã</MenuItem>
                     {wards.map((ward) => (
                       <MenuItem key={ward.WardCode} value={ward.WardCode}>
@@ -652,6 +529,7 @@ function Test(props) {
 
               <Grid item xs={12}>
                 <TextField
+                  disabled={true}
                   label="Ghi chú"
                   id="ghiChu"
                   placeholder="Ghi chú"
@@ -677,40 +555,19 @@ function Test(props) {
           )}
         </Grid>
         <Grid item xs={4}>
-          <Box display="flex" alignItems="center" sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
-            <Button
-              variant="contained"
-              color="warning"
-              size="small"
-              sx={{ padding: 1, borderRadius: 3, mr: 2 }}
-              onClick={() => {
-                handleShowDiaLogCoupon();
-              }}
-              disabled={id ? false : true}
-            >
-              Chọn Mã Giảm Giá :
-            </Button>
-            <form onSubmit={handleSubmitFormCoupon}>
-              <input
-                type="text"
-                placeholder="Mã Giảm Giá"
-                name="maPGG"
-                style={{ width: '150%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-                ref={inputRef}
-              />
-            </form>{' '}
-          </Box>
-          <FormControlLabel
-            disabled={id ? false : true}
+          {/* <FormControlLabel
+            disabled={true}
             control={<Switch checked={isDelivery} onChange={handleSwitchChange} color="primary" />}
             label={isDelivery ? 'Giao hàng' : 'Tại quầy'}
           />
           {isDelivery && (
             <FormControlLabel
-              control={<Switch checked={formData?.thanhToanSau === 1} onChange={handlePaymentSwitchChange} color="primary" />}
+              control={
+                <Switch disabled={true} checked={formData?.thanhToanSau === 1} onChange={handlePaymentSwitchChange} color="primary" />
+              }
               label={'Trả sau'}
             />
-          )}
+          )} */}
           <Typography mt={1} variant="h4">
             Tổng tiền hàng: {id ? parseFloat(formData?.tongTienBanDau || 0).toLocaleString() || '0' : 0} VNĐ
           </Typography>
@@ -718,33 +575,29 @@ function Test(props) {
             Phiếu giảm giá : {id ? formData?.maPGG || '' : ''}
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm giá: - {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} VNĐ
+            Giảm giá: {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm hạng: - {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} VNĐ
+            Giảm hạng: {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
             Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           {isDelivery && (
             <Typography mt={1} variant="h4">
-              Tiền ship: + {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} VNĐ
+              Tiền ship: {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} VNĐ
             </Typography>
           )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
             Khách cần trả:{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
-          <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
+          {/* <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
             Xác nhận thanh toán
-          </Button>
-          {/* {isPaymentDialogOpen && (
-              <PaymentDialog open={isPaymentDialogOpen} onClose={onClosePaymentDialog} onSubmit={handlePaymentSubmit} data={formData} />
-            )} */}
-          <PaymentDialog2 open={isPaymentDialogOpen} onClose={onClosePaymentDialog} data={formData} onReload={loadAll} />
+          </Button> */}
+          {/* <PaymentDialog2 open={isPaymentDialogOpen} onClose={onClosePaymentDialog} data={formData} onReload={loadAll} /> */}
         </Grid>
       </Grid>
-
       <CouponDiaLog
         showDiaLogCoupon={showDiaLogCoupon}
         handleCloseDiaLogCoupon={handleCloseDiaLogCoupon}
@@ -763,8 +616,8 @@ function Test(props) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      {showPDF && <PdfForm hiden={showPDF} code={bill.ma} />}
     </>
   );
 }
-export default Test;
+
+export default OrderInfo;

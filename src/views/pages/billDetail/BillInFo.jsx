@@ -5,6 +5,12 @@ import AddressDiaLog from './AddressDiaLog';
 
 function BillInFo(props) {
   const { bill, onLoading } = props;
+  const shouldShowAddressDialog = !(
+    bill.trangThai === 'DANG_GIAO' ||
+    bill.trangThai === 'HOAN_THANH' ||
+    bill.trangThai === 'CHO_GIAO' ||
+    bill.trangThai === 'HUY'
+  );
   return (
     <>
       <Grid container spacing={2} padding={3} sx={{ backgroundColor: 'white', borderRadius: 4, mt: 2, boxShadow: 3 }}>
@@ -14,11 +20,13 @@ function BillInFo(props) {
           </Typography>
         </Grid>
         <Grid item xs={2} container justifyContent="flex-end">
-          <AddressDiaLog
-            onLoading={() => {
-              onLoading();
-            }}
-          />
+          {shouldShowAddressDialog && (
+            <AddressDiaLog
+              onLoading={() => {
+                onLoading();
+              }}
+            />
+          )}
         </Grid>
 
         {/* Mã đơn hàng */}

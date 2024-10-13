@@ -6,9 +6,10 @@ import { getBillByCode, getBillHistoryByBillId } from 'services/admin/bill/billS
 import NewTimeLine from './TimeLine';
 import BillInFo from './BillInFo';
 import SerialNumberSold from './SerialNumberSold';
-import OrderInformation from './OrderInformation';
 import HistoryPayment from './HistoryPayment';
 import Test from '../ban-hang/Test';
+import Test2 from '../ban-hang/Test2';
+import OrderInfo from './OrderInfo';
 
 function BillDetail() {
   const { id } = useParams();
@@ -86,10 +87,9 @@ function BillDetail() {
       </Fab>
       <NewTimeLine data={billHistory} onLoading={onLoading} bill={bill} />
       <BillInFo bill={bill} onLoading={onLoading} />
-      <HistoryPayment />
-      <SerialNumberSold onLoading={onLoading} bill={bill} />
-      {/* <OrderInformation onLoading={onLoading} billInfo={bill} /> */}
-      {/* <Test onLoading={onLoading} billInfo={bill} onReload={onLoading} /> */}
+      <HistoryPayment bill={bill} />
+      <SerialNumberSold onLoading={onLoading} bill={bill} title="Hóa đơn chi tiết" />
+      <OrderInfo onLoading={onLoading} bill={bill} onReload={onLoading} />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}

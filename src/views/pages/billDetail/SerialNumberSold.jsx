@@ -21,7 +21,8 @@ import {
   DialogActions,
   Checkbox,
   Chip,
-  Button
+  Button,
+  Tooltip
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -34,10 +35,11 @@ import {
 import ProductList from '../ban-hang/dialog-san-pham/ProductList';
 import { Box } from '@mui/system';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
+import { GridDeleteIcon } from '@mui/x-data-grid';
 
 function SerialNumberSold(props) {
   const { id } = useParams();
-  const { onLoading, bill } = props;
+  const { onLoading, bill, title } = props;
   // show sp
   const [showModal, setShowModal] = useState(false);
   // show dialog seril
@@ -196,9 +198,17 @@ function SerialNumberSold(props) {
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
-            <Typography variant="h3">Giỏ hàng</Typography>
+            <Typography variant="h3">{title}</Typography>
             {/* <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} /> */}
-            <Button variant="contained" color="warning" onClick={handleShowModal} disabled={id ? false : true}>
+            <Button
+              hidden={
+                bill.trangThai == 'DANG_GIAO' || bill.trangThai == 'HOAN_THANH' || bill.trangThai == 'CHO_GIAO' || bill.trangThai == 'HUY'
+              }
+              variant="contained"
+              color="warning"
+              onClick={handleShowModal}
+              disabled={id ? false : true}
+            >
               Thêm sản phẩm
             </Button>
             {/* <Button variant="contained" color="warning" onClick={handleSomeAction}>
@@ -235,11 +245,25 @@ function SerialNumberSold(props) {
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                      <IconButton
+                        disabled={
+                          bill.trangThai == 'DANG_GIAO' ||
+                          bill.trangThai == 'HOAN_THANH' ||
+                          bill.trangThai == 'CHO_GIAO' ||
+                          bill.trangThai == 'HUY'
+                        }
+                        onClick={() => handleOpenDialog(product.productDetailId)}
+                      >
                         <RemoveCircleOutline />
                       </IconButton>
 
                       <TextField
+                        disabled={
+                          bill.trangThai == 'DANG_GIAO' ||
+                          bill.trangThai == 'HOAN_THANH' ||
+                          bill.trangThai == 'CHO_GIAO' ||
+                          bill.trangThai == 'HUY'
+                        }
                         type="number"
                         value={product.quantity}
                         onChange={(e) => handleOpenDialog(product.productDetailId)}
@@ -253,7 +277,15 @@ function SerialNumberSold(props) {
                         }}
                       />
 
-                      <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                      <IconButton
+                        disabled={
+                          bill.trangThai == 'DANG_GIAO' ||
+                          bill.trangThai == 'HOAN_THANH' ||
+                          bill.trangThai == 'CHO_GIAO' ||
+                          bill.trangThai == 'HUY'
+                        }
+                        onClick={() => handleOpenDialog(product.productDetailId)}
+                      >
                         <AddCircleOutline />
                       </IconButton>
                     </div>
@@ -272,12 +304,32 @@ function SerialNumberSold(props) {
                     </strong>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
+                    {/* <Button
+                      // disabled={
+                      //   bill.trangThai == 'DANG_GIAO' ||
+                      //   bill.trangThai == 'HOAN_THANH' ||
+                      //   bill.trangThai == 'CHO_GIAO' ||
+                      //   bill.trangThai == 'HUY'
+                      // }
+                      // sx={{ color: 'white', backgroundColor: 'red', '&:hover': { backgroundColor: 'darkred' } }}
                       onClick={() => handleDelete(product)}
                     >
-                      Hủy
-                    </Button>
+                      <GridDeleteIcon />
+                    </Button> */}
+                    <Tooltip title={'Hủy toàn bộ sản phẩm : ' + product.productName} placement="top">
+                      <IconButton
+                        disabled={
+                          bill.trangThai == 'DANG_GIAO' ||
+                          bill.trangThai == 'HOAN_THANH' ||
+                          bill.trangThai == 'CHO_GIAO' ||
+                          bill.trangThai == 'HUY'
+                        }
+                        onClick={() => handleDelete(product)}
+                        style={{ color: 'red' }}
+                      >
+                        <GridDeleteIcon />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

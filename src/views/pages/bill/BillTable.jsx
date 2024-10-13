@@ -74,18 +74,20 @@ function BillTable(props) {
       dataIndex: 'loaiHoaDon',
       key: 'loaiHoaDon',
       render: (loaiHoaDon) => (
-        <Chip
-          size="small"
-          sx={{
-            width: 100,
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '0.8rem',
-            padding: '15px 4px'
-          }}
-          label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
-          color={loaiHoaDon == 0 ? 'primary' : 'success'}
-        />
+        <Tooltip title={loaiHoaDon == 0 ? 'Bán tại quầy' : 'Hóa đơn bán giao hang'} arrow placement="top">
+          <Chip
+            size="small"
+            sx={{
+              width: 100,
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '0.8rem',
+              padding: '15px 4px'
+            }}
+            label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
+            color={loaiHoaDon == 0 ? 'primary' : 'success'}
+          />
+        </Tooltip>
       )
     },
     {

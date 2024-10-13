@@ -90,9 +90,9 @@ export const getStatusBillHistory = (status) => {
     case 2:
       return 'Chờ xác nhận 2';
     case 3:
-      return 'Chờ giao 3';
+      return 'Chờ  vận chuyển';
     case 4:
-      return 'Đang giao 4';
+      return 'Đang giao';
     case 5:
       return 'Trả hàng hoàn tiền 5';
     case 6:
@@ -102,7 +102,7 @@ export const getStatusBillHistory = (status) => {
     case 8:
       return 'Xoá 8';
     case 9:
-      return 'Xác nhận 9';
+      return 'Đã xác nhận 9';
     default:
       return 'Không xác định 10';
   }
