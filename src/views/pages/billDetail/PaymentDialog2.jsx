@@ -197,6 +197,7 @@ const PaymentDialog2 = (props) => {
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         setXacNhanMo(false);
+        setXacNhanThanhToan(false);
         // setFormData({});
         // setBill({});
         // setFormDataAddress({});

@@ -75,7 +75,7 @@ function SerialNumberSold(props) {
     if (response.status_code === 200) {
       fetchSerialNumberSold();
       onLoading();
-      setSnackbarMessage('Xóa sản phẩm khoải hóa đơn thành công');
+      setSnackbarMessage('Xóa sản phẩm khỏi hóa đơn thành công');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     }
@@ -436,11 +436,11 @@ function SerialNumberSold(props) {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2000}
+        autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

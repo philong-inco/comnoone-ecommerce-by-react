@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAllHistoryPaymentByBillCode } from 'services/admin/hdhttt';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Snackbar, Paper, Typography, Grid } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Snackbar, Paper, Typography, Grid, Chip } from '@mui/material';
 
 function HistoryPayment(props) {
   const { id } = useParams();
@@ -43,16 +43,15 @@ function HistoryPayment(props) {
                 <TableRow>
                   {' '}
                   <TableCell>STT</TableCell>
-                  <TableCell>Ngày tạo</TableCell>
                   <TableCell>Số tiền</TableCell>
                   {/* <TableCell>Phương thanh toán</TableCell> */}
-                  <TableCell>Trạng thái</TableCell>
+                  <TableCell>Trạng thái</TableCell> <TableCell>Ngày tạo</TableCell>
                   <TableCell>Người tạo</TableCell> {/* Cột mới */}
                 </TableRow>
               </TableHead>
-              {/* <TableBody> */}
-              {/* {historyPayments.map((payment, index) => ( */}
-              {/* <TableRow key={index}>
+              {/* <TableBody>
+                {historyPayments.map((payment, index) => (
+                  <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{payment.ngayTao}</TableCell>
                     <TableCell>{payment.soTien ? payment.soTien.toLocaleString() : 'Chưa có'}</TableCell>
@@ -60,17 +59,25 @@ function HistoryPayment(props) {
                       {payment.phuongThanhToan === null ? '' : payment.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}
                     </TableCell>
                     <TableCell>{payment.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
-                    <TableCell>{payment.nguoiTao ? payment.nguoiTao : 'Chưa xác định'}</TableCell> 
-                  </TableRow> */}
-              {/* ))} */}
-              {/* </TableBody> */}
+                    <TableCell>{payment.nguoiTao ? payment.nguoiTao : 'Chưa xác định'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody> */}
               <TableBody>
                 {Array.from(new Map(historyPayments.map((payment) => [payment.soTien, payment])).values()).map((payment, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <strong>{payment.soTien ? payment.soTien.toLocaleString() + ' VNĐ' : 'Chưa có'}</strong>{' '}
+                    </TableCell>
+                    <TableCell>
+                      {payment.loaiThanhToan === 0 ? (
+                        <Chip label="Thanh toán" color="success" size="small" /> // Chip màu xanh cho 'Thanh toán'
+                      ) : (
+                        <Chip label="Trả Sau" color="error" size="small" /> // Chip màu đỏ cho 'Trả Sau'
+                      )}
+                    </TableCell>
                     <TableCell>{payment.ngayTao}</TableCell>
-                    <TableCell>{payment.soTien ? payment.soTien.toLocaleString() : 'Chưa có'}</TableCell>
-                    <TableCell>{payment.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
                     <TableCell>{payment.nguoiTao ? payment.nguoiTao : 'Chưa xác định'}</TableCell>
                   </TableRow>
                 ))}

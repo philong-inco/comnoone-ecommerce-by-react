@@ -589,7 +589,7 @@ function OrderInfo(props) {
             </Typography>
           )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Khách cần trả:{' '}
+            Tổng tiền hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           {/* <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>

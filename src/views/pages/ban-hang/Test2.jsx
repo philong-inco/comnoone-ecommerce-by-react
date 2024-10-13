@@ -96,11 +96,50 @@ function Test2(props) {
     });
     setFormDataError({});
     setIsDelivery(bill.loaiHoaDon == 1);
+    loadProvinces();
   }, [id, bill]);
   // address
   const loadProvinces = async () => {
     const data = await fetchAllProvince();
     setProvinces(data.data);
+    if (bill?.tinh) {
+      const data = await fetchAllProvinceDistricts(bill.tinh);
+      setDistricts(data.data);
+      setSelectedDistrict('');
+      setSelectedWard('');
+      setWards([]);
+    }
+    if (bill?.huyen) {
+      const data = await fetchAllProvinceWard(bill.huyen);
+      setWards(data.data);
+      setSelectedWard('');
+    }
+    if (bill?.tinh) {
+      const selectedProvince = provinces.find((province) => province.ProvinceID === parseInt(bill.tinh));
+      setFormData((prevData) => ({
+        ...prevData,
+        tinh: bill.tinh,
+        tenTinh: selectedProvince ? selectedProvince.ProvinceName : ''
+      }));
+      if (bill?.huyen) {
+        const selectedDistrict = districts.find((district) => district.DistrictID === parseInt(bill.huyen));
+        setFormData((prevData) => ({
+          ...prevData,
+          huyen: bill.huyen,
+          tenHuyen: selectedDistrict ? selectedDistrict.DistrictName : ''
+        }));
+        if (bill?.phuong != null) {
+          setSelectedWard(bill.phuong);
+          const selectedWard = wards.find((ward) => ward.WardCode === bill.phuong);
+          setFormData((prevData) => ({
+            ...prevData,
+            phuong: bill.phuong,
+            tenPhuong: selectedWard ? selectedWard.WardName : ''
+          }));
+          getDeliveryDate(selectedDistrict, bill.phuong);
+        }
+      }
+    }
   };
 
   const handleProvinceChange = async (event) => {

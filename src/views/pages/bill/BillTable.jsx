@@ -13,7 +13,8 @@ import {
   Pagination,
   Chip,
   IconButton,
-  Tooltip
+  Tooltip,
+  TablePagination
 } from '@mui/material';
 import { getStatusColor, getStatusDisplayName } from 'utils/billUtil/billStatus';
 import { Edit } from '@mui/icons-material';
@@ -187,11 +188,21 @@ function BillTable(props) {
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Pagination
+              {/* <Pagination
                 sx={{ marginTop: '10px', textAlign: 'center' }}
                 count={Math.ceil(total / pageSize)}
                 page={page}
                 onChange={(event, value) => onPageChange(value)}
+              /> */}
+
+              <TablePagination
+                component="div"
+                count={total}
+                page={page - 1}
+                onPageChange={(event, newPage) => onPageChange(newPage + 1)}
+                rowsPerPage={pageSize}
+                // onRowsPerPageChange={(event) => onPageSizeChange(event.target.value)}
+                rowsPerPageOptions={[5]}
               />
             </>
           )}
