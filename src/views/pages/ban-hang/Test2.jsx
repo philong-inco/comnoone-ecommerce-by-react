@@ -566,7 +566,7 @@ function Test2(props) {
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
-            Xác nhận thanh toán
+            {isDelivery ? 'Xác nhận đặt hàng' : 'Tiến hành thanh toán'}
           </Button>
           <PaymentDialog2 open={isPaymentDialogOpen} onClose={onClosePaymentDialog} data={formData} onReload={loadAll} />
         </Grid>

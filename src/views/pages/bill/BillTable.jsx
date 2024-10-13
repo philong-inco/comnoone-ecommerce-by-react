@@ -47,8 +47,8 @@ function BillTable(props) {
     return totalProductAmount + shippingCost;
   };
   const columns = [
-    { title: '#', dataIndex: 'key', key: 'key' },
-    { title: 'Chọn', key: 'selected' },
+    { title: 'STT', dataIndex: 'key', key: 'key' },
+    // { title: 'Chọn', key: 'selected' },
     { title: 'Mã', dataIndex: 'ma', key: 'ma' },
     { title: 'Tổng SP', dataIndex: 'tongSanPham', key: 'tongSanPham' },
     {
@@ -158,12 +158,28 @@ function BillTable(props) {
                       ))}
                     </TableRow>
                   </TableHead>
-                  <TableBody>
+                  {/* <TableBody>
                     {bills.map((bill) => (
                       <TableRow key={bill.id}>
                         {columns.map((column) => (
                           <TableCell key={column.key}>
                             {column.render ? column.render(bill[column.dataIndex], bill) : bill[column.dataIndex]}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody> */}
+                  <TableBody>
+                    {bills.map((bill, index) => (
+                      <TableRow key={bill.id}>
+                        {columns.map((column) => (
+                          <TableCell key={column.key}>
+                            {/* Kiểm tra nếu cột là "STT", hiển thị số thứ tự */}
+                            {column.key === 'key'
+                              ? index + 1
+                              : column.render
+                                ? column.render(bill[column.dataIndex], bill)
+                                : bill[column.dataIndex]}
                           </TableCell>
                         ))}
                       </TableRow>

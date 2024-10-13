@@ -277,7 +277,7 @@ const PaymentDialog2 = (props) => {
                       <TableRow>
                         <TableCell>STT</TableCell>
                         <TableCell>Ngày tạo</TableCell>
-                        <TableCell>Số tiền</TableCell>
+                        {/* <TableCell>Số tiền</TableCell> */}
                         <TableCell>Tiền nhận</TableCell>
                         <TableCell>Phương thanh toán</TableCell>
                         <TableCell>Trạng thái</TableCell>
@@ -290,7 +290,7 @@ const PaymentDialog2 = (props) => {
                         <TableRow key={index}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{thanhToan.ngayTao}</TableCell>
-                          <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell>
+                          {/* <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell> */}
                           <TableCell>{thanhToan.tienNhan ? thanhToan.tienNhan.toLocaleString() : ''}</TableCell>
                           <TableCell>{thanhToan.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>
                           <TableCell>{thanhToan.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>

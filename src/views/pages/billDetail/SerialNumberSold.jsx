@@ -195,7 +195,7 @@ function SerialNumberSold(props) {
 
   return (
     <>
-      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
+      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 2, borderRadius: 4 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">{title}</Typography>

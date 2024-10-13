@@ -32,7 +32,7 @@ function HistoryPayment(props) {
   };
 
   return (
-    <Grid container style={{ marginTop: '20px' }}>
+    <Grid container spacing={2} padding={3} sx={{ backgroundColor: 'white', borderRadius: 4, mt: 2, boxShadow: 3 }}>
       <Grid item xs={12}>
         {loading ? (
           <Typography>Đang tải...</Typography>

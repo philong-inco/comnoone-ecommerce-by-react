@@ -392,7 +392,7 @@ function OrderInfo(props) {
 
   return (
     <>
-      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
+      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 2, borderRadius: 4 }}>
         <Grid item xs={8}>
           <Typography variant="h3">Thông tin đơn hàng </Typography>
         </Grid>
