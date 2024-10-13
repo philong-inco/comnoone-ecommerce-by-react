@@ -1,8 +1,9 @@
 import { Button } from "@mui/material";
 import { useState } from "react";
 import { useEffect, useRef } from "react";
+import { IconCirclePlus } from '@tabler/icons-react';
 
-const UploadWidget = ({ setUrlImages, showMessage }) => {
+const UploadWidget = ({ setUrlImages }) => {
     const cloudinaryRef = useRef();
     const widgetRef = useRef();
 
@@ -13,25 +14,20 @@ const UploadWidget = ({ setUrlImages, showMessage }) => {
             uploadPreset: "demo_shop"
         }, function (error, result) {
             if (!error && result && result.event === "success") {
-                let newImage = {
-                    colorId: 0,
-                    url: result.info.secure_url
-                }
-                setUrlImages(prevImages => [...prevImages, newImage]);
+                let url = result.info.secure_url
+                setUrlImages(prevImages => [url, ...prevImages]);
             }
         });
     }, [setUrlImages]);
 
 
     const handleUpload = () => {
-        
         widgetRef.current.open()
-        
     }
 
     return (
-        <Button onClick={handleUpload}>
-            Tải ảnh
+        <Button title='Tải ảnh lên' sx={{color: "#FFFFFF"}} onClick={handleUpload}>
+            <IconCirclePlus stroke={2}/>
         </Button>
     );
 };
