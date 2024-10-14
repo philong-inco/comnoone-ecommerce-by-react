@@ -2,7 +2,6 @@ import { get, post, patch, put, del, del2 } from 'utils/request';
 
 export const filterCoupons = async (page, size, path) => {
   try {
-    console.log('PATH : ', path);
     const result = await get(`coupons/all?page=${page - 1}&size=${size}&sort=id,DESC&filter=${path}`);
     console.log(result);
     return result;

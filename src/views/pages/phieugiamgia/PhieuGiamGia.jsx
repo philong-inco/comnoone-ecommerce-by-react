@@ -32,7 +32,7 @@ function PhieuGiamGia() {
   const [selectedCouponId, setSelectedCouponId] = useState(null);
   const navigate = useNavigate();
   const [selectedCouponStatus, setSelectedCouponStatus] = useState(null);
-
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const fetchApi = async (currentPage, size) => {
     try {
       let filterString = `(ma ~~ '${ma}')`;
@@ -147,25 +147,32 @@ function PhieuGiamGia() {
     setSelectedCouponId(null);
   };
 
+  const handleOpenDeleteDialog = (id) => {
+    setSelectedCouponId(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setSelectedCouponId(null);
+  };
   const handleDelete = async () => {
     try {
-      debugger;
       const response = await deletedCoupons(selectedCouponId);
       if (response.trangThai === 3) {
         setSnackbarMessage('Phiếu đã được hủy thành công!');
         setSnackbarSeverity('success');
-        fetchApi(currentPage, 5);
+        fetchApi(currentPage, size);
       } else {
         setSnackbarMessage('Hủy phiếu thất bại.');
         setSnackbarSeverity('error');
-        console.log(error);
       }
     } catch (error) {
       setSnackbarMessage('Đã xảy ra lỗi.');
       setSnackbarSeverity('error');
     }
     setOpenSnackbar(true);
-    handleCloseConfirmDialog();
+    handleCloseDeleteDialog();
   };
 
   const handleCloseSnackbar = () => {
@@ -388,7 +395,7 @@ function PhieuGiamGia() {
 
                         <IconButton
                           color="error"
-                          onClick={() => handleOpenConfirmDialog(phieu.id)}
+                          onClick={() => handleOpenDeleteDialog(phieu.id)}
                         >
                           <Tooltip title="Hủy phiếu">
                             <DeleteIcon />
@@ -396,23 +403,23 @@ function PhieuGiamGia() {
                         </IconButton>
                       </>
                     )}
-                    {(phieu.trangThai === 1|| phieu.trangThai === 4) && (
+                    {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
                       <>
-                      <Tooltip title="Thay đổi trạng thái">
-                        <Switch
-                          checked={phieu.trangThai === 1}
-                          onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
-                        />
+                        <Tooltip title="Thay đổi trạng thái">
+                          <Switch
+                            checked={phieu.trangThai === 1}
+                            onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
+                          />
                         </Tooltip>
                       </>
                     )}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Xem chi tiết">
-                    <IconButton onClick={() => handleViewCoupon(phieu.id)}>
-                      <VisibilityIcon />
-                    </IconButton>
-                  </Tooltip>
+                      <IconButton onClick={() => handleViewCoupon(phieu.id)}>
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))
@@ -436,8 +443,8 @@ function PhieuGiamGia() {
       />
 
       <Dialog
-        open={openConfirmDialog}
-        onClose={handleCloseConfirmDialog}
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
       >
         <DialogTitle>Xác nhận hủy phiếu</DialogTitle>
         <DialogContent>
@@ -446,10 +453,17 @@ function PhieuGiamGia() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseConfirmDialog} color="primary">
+          <Button onClick={handleCloseDeleteDialog} color="primary">
             Hủy bỏ
           </Button>
-          <Button onClick={handleDelete} color="secondary" autoFocus>
+          <Button
+            onClick={async () => {
+              await handleDelete();
+              handleCloseDeleteDialog();
+            }}
+            color="secondary"
+            autoFocus
+          >
             Xác nhận
           </Button>
         </DialogActions>
