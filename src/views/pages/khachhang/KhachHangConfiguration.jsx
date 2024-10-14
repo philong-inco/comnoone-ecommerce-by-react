@@ -326,10 +326,8 @@ function KhachHangConfiguration() {
                         </Box>
                     </Grid>
 
-                    {/* Form Fields Section */}
                     <Grid item xs={12} md={8}>
                         <Grid container spacing={3}>
-                            {/* Personal Information */}
                             <Grid item xs={12} md={6}>
                                 <Controller
                                     name="ten"
