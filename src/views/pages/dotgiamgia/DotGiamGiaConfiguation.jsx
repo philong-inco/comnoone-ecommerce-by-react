@@ -192,7 +192,7 @@ function DotGiamGiaConfiguration() {
                     return true;
                 }),
 
-            giaTriToiDa: yup.string().nullable()
+            giaTriToiDa: yup.string().required('Giá trị tối đa không được để trống')
                 .test('is-correct-value', 'Giá trị tối đa không hợp lệ', function (value) {
                     const { giaTri } = this.parent;
                     const bigNumberGiaTri = new BigNumber(giaTri.replace(/\./g, ''));
@@ -201,10 +201,6 @@ function DotGiamGiaConfiguration() {
                     if (currencyType === '$') {
                         if (!bigNumberGiaTriToiDa || !bigNumberGiaTriToiDa.isEqualTo(bigNumberGiaTri)) {
                             return this.createError({ message: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
-                        }
-                    } else if (currencyType === '%') {
-                        if (value !== "" && value != null) {
-                            return this.createError({ message: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
                         }
                     }
                     return true;

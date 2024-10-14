@@ -54,6 +54,7 @@ function PhieuGiamGiaConfiguration() {
         }
         return true;
       }),
+
     soLuong: yup
       .number('Chỉ được nhập số')
       .required('Số lượng là bắt buộc')
@@ -269,20 +270,22 @@ function PhieuGiamGiaConfiguration() {
         }
 
         const giaTriGiam = new BigNumber(String(values.giaTri).replace(/\./g, ''));
-        const giamToiDa = values.giaTriToiDa === "" ? new BigNumber(0) : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
+        const giamToiDa = values.giaTriToiDa === "" || values.giaTriToiDa == null
+          ? new BigNumber(0)
+          : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
+
+        if (values.giaTriToiDa == null || values.giaTriToiDa === "") {
+          setErrors({ giaTriToiDa: 'Giá trị tối đa không được để trống.' });
+          return;
+        }
 
         if (currencyType === '$') {
           if (!giamToiDa.isEqualTo(giaTriGiam)) {
             setErrors({ giaTriToiDa: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
             return;
           }
-        } else if (currencyType === '%') {
-          // Nếu là phần trăm (%), kiểm tra giamToiDa phải là chuỗi rỗng
-          if (values.giaTriToiDa !== "") {
-            setErrors({ giaTriToiDa: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
-            return; // Dừng submit nếu có lỗi
-          }
         }
+
 
         const data = {
           ten: values.tenPhieu,
