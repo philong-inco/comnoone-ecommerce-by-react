@@ -33,17 +33,24 @@ function PhieuGiamGia() {
   const navigate = useNavigate();
   const [selectedCouponStatus, setSelectedCouponStatus] = useState(null);
 
-  const fetchFilteredData = async (currentPage, size) => {
+  const fetchApi = async (currentPage, size) => {
     try {
       let filterString = `(ma ~~ '${ma}')`;
-      if (phamViApDung) filterString += ` and phamViApDung = ${phamViApDung}`;
-      if (trangThai) filterString += ` and trangThai = ${trangThai}`;
-      if (loaiGiamGia) filterString += ` and loaiGiamGia = ${loaiGiamGia}`;
+      if (phamViApDung) {
+        filterString += ` and phamViApDung = ${phamViApDung}`;
+      }
+      if (trangThai) {
+        filterString += ` and trangThai = ${trangThai}`;
+      }
+      if (loaiGiamGia) {
+        filterString += ` and loaiGiamGia = ${loaiGiamGia}`;
+      }
       if (ngayBatDau && ngayHetHan) {
         filterString += ` and ngayBatDau >= '${ngayBatDau.format('YYYY-MM-DD')}' and ngayHetHan <= '${ngayHetHan.format('YYYY-MM-DD')}'`;
       }
 
-      const response = await filterCoupons(currentPage, size, filterString);
+      const response = await filterCoupons(currentPage, 6, filterString);
+      console.log(response.data.meta);
       if (response.status_code === 200) {
         setDanhSachPhieuGiamGia(response.data.result);
         setTotalPages(response.data.meta.pages);
@@ -52,39 +59,27 @@ function PhieuGiamGia() {
       console.error(error);
     }
   };
-
-  const fetchAllData = async () => {
-    try {
-      const response = await filterCoupons(1, 6, ''); // API tổng không có filter string
-      if (response.status_code === 200) {
-        setDanhSachPhieuGiamGia(response.data.result);
-        setTotalPages(response.data.meta.pages);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchFilteredData(currentPage, size);
-  }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchAllData();
-    }, 2000); 
-
-    return () => clearInterval(intervalId);
-  }, []);
 
   const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage + 1);
+    setCurrentPage(newPage + 1); // Điều chỉnh vì TablePagination bắt đầu từ 0
   };
 
   const handleRowsPerPageChange = (event) => {
     setSize(parseInt(event.target.value, 10));
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi số hàng mỗi trang
   };
+
+  useEffect(() => {
+    fetchApi(currentPage, size);
+    const intervalId = setInterval(() => {
+      fetchApi(currentPage, size);
+    }, 2000); // 2 seconds
+    return () => clearInterval(intervalId);
+  }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
+
+  useEffect(() => {
+    fetchApi(currentPage, size);
+  }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
 
   const statuses = [
     { id: 0, name: 'Chưa áp dụng', color: 'gray' },
@@ -401,23 +396,23 @@ function PhieuGiamGia() {
                         </IconButton>
                       </>
                     )}
-                    {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                    {(phieu.trangThai === 1|| phieu.trangThai === 4) && (
                       <>
-                        <Tooltip title="Thay đổi trạng thái">
-                          <Switch
-                            checked={phieu.trangThai === 1}
-                            onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
-                          />
+                      <Tooltip title="Thay đổi trạng thái">
+                        <Switch
+                          checked={phieu.trangThai === 1}
+                          onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
+                        />
                         </Tooltip>
                       </>
                     )}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Xem chi tiết">
-                      <IconButton onClick={() => handleViewCoupon(phieu.id)}>
-                        <VisibilityIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton onClick={() => handleViewCoupon(phieu.id)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
                   </TableCell>
                 </TableRow>
               ))
