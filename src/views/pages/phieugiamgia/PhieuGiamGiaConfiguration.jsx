@@ -1,12 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';  // Để lấy id từ URL
-import { MenuItem, Select, Divider, FormControl, Chip, Snackbar, Fab, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormLabel, Checkbox, Box, Pagination, TableBody, TableCell, TableRow, TableHead, Table, TableContainer, Typography, TextField, Grid, Paper, RadioGroup, FormControlLabel, Radio, Button, InputAdornment, IconButton } from '@mui/material';
+import { useParams } from 'react-router-dom'; // Để lấy id từ URL
+import {
+  MenuItem,
+  Select,
+  Divider,
+  FormControl,
+  Chip,
+  Snackbar,
+  Fab,
+  Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormLabel,
+  Checkbox,
+  Box,
+  Pagination,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableHead,
+  Table,
+  TableContainer,
+  Typography,
+  TextField,
+  Grid,
+  Paper,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Button,
+  InputAdornment,
+  IconButton
+} from '@mui/material';
 import PercentIcon from '@mui/icons-material/Percent';
 import AddIcon from '@mui/icons-material/Add';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import axios from 'axios';  // Axios for API calls
+import axios from 'axios'; // Axios for API calls
 import { useNavigate } from 'react-router-dom';
 import { getAll, getSearchKeyWord, getSelectHangKhachHang, getDanhSachKhachHang } from 'services/admin/customer/customerService.js';
 import BigNumber from 'bignumber.js';
@@ -35,7 +69,6 @@ function PhieuGiamGiaConfiguration() {
       .string()
       .required('Giá trị là bắt buộc')
       .test('is-valid-value', (value, context) => {
-
         if (!value) return context.createError({ message: 'Giá trị là bắt buộc' });
         const bigNumberValue = new BigNumber(value.replace(/\./g, ''));
         if (currencyType === '%') {
@@ -69,17 +102,10 @@ function PhieuGiamGiaConfiguration() {
         return bigNumberValue.isGreaterThan(10);
       }),
 
-    tuNgay: yup
-      .date()
-      .min(new Date(), 'Từ ngày phải là ngày trong tương lai')
-      .required('Từ ngày là bắt buộc'),
+    tuNgay: yup.date().min(new Date(), 'Từ ngày phải là ngày trong tương lai').required('Từ ngày là bắt buộc'),
 
-    denNgay: yup
-      .date()
-      .min(yup.ref('tuNgay'), 'Đến ngày phải sau từ ngày')
-      .required('Đến ngày là bắt buộc'),
+    denNgay: yup.date().min(yup.ref('tuNgay'), 'Đến ngày phải sau từ ngày').required('Đến ngày là bắt buộc')
   });
-
 
   useEffect(() => {
     debugger;
@@ -92,9 +118,9 @@ function PhieuGiamGiaConfiguration() {
       let result;
       if (searchKeyWord && selectHangKhachHang == '') {
         result = await getSearchKeyWord(currentPage - 1, searchKeyWord);
-      } else if (selectHangKhachHang !== '' && searchKeyWord == "") {
+      } else if (selectHangKhachHang !== '' && searchKeyWord == '') {
         result = await getSelectHangKhachHang(currentPage - 1, selectHangKhachHang);
-      } else if (selectHangKhachHang == '' && searchKeyWord == "") {
+      } else if (selectHangKhachHang == '' && searchKeyWord == '') {
         result = await getAll(currentPage - 1);
       }
       setKhachHang(result.content);
@@ -131,7 +157,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Đồng"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#CD853F',
@@ -143,7 +169,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Bạc"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#C0C0C0',
@@ -155,7 +181,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Vàng"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#FFD700',
@@ -167,7 +193,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Bạch Kim"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#E5E4E2',
@@ -179,7 +205,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Kim Cương"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#363636',
@@ -191,7 +217,7 @@ function PhieuGiamGiaConfiguration() {
         return (
           <Chip
             label="Không xác định"
-            color='default'
+            color="default"
             sx={{
               ...chipStyles,
               backgroundColor: '#FFFFFF',
@@ -214,7 +240,7 @@ function PhieuGiamGiaConfiguration() {
   };
 
   useEffect(() => {
-    console.log("Danh sách khách hàng đã chọn:", selectedKhachHang);
+    console.log('Danh sách khách hàng đã chọn:', selectedKhachHang);
   }, []);
 
   useEffect(() => {
@@ -223,12 +249,10 @@ function PhieuGiamGiaConfiguration() {
       setSnackbar({
         open: true,
         message: `Số lượng khách hàng đã chọn (${selectedKhachHang.length}) nhiều hơn số lượng phiếu đã nhập, số lượng phiếu đã được tự động điều chỉnh.`,
-        severity: 'info',
+        severity: 'info'
       });
     }
   }, [selectedKhachHang]);
-
-
 
   const formik = useFormik({
     initialValues: {
@@ -239,7 +263,7 @@ function PhieuGiamGiaConfiguration() {
       dieuKien: '',
       tuNgay: '',
       denNgay: '',
-      kieu: '1',
+      kieu: '1'
     },
     validationSchema,
     onSubmit: async (values, { setErrors, validateForm }) => {
@@ -255,7 +279,7 @@ function PhieuGiamGiaConfiguration() {
           setSnackbar({
             open: true,
             message: `Số lượng khách hàng được chọn (${selectedKhachHang.length}) nhiều hơn số lượng phiếu (${values.soLuong}). Vui lòng tăng số lượng phiếu.`,
-            severity: 'error',
+            severity: 'error'
           });
           return;
         }
@@ -264,17 +288,18 @@ function PhieuGiamGiaConfiguration() {
           setSnackbar({
             open: true,
             message: `Vui lòng chọn khách hàng cho phiếu giảm giá.`,
-            severity: 'error',
+            severity: 'error'
           });
           return;
         }
 
         const giaTriGiam = new BigNumber(String(values.giaTri).replace(/\./g, ''));
-        const giamToiDa = values.giaTriToiDa === "" || values.giaTriToiDa == null
-          ? new BigNumber(0)
-          : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
+        const giamToiDa =
+          values.giaTriToiDa === '' || values.giaTriToiDa == null
+            ? new BigNumber(0)
+            : new BigNumber(String(values.giaTriToiDa).replace(/\./g, ''));
 
-        if (values.giaTriToiDa == null || values.giaTriToiDa === "") {
+        if (values.giaTriToiDa == null || values.giaTriToiDa === '') {
           setErrors({ giaTriToiDa: 'Giá trị tối đa không được để trống.' });
           return;
         }
@@ -286,7 +311,6 @@ function PhieuGiamGiaConfiguration() {
           }
         }
 
-
         const data = {
           ten: values.tenPhieu,
           giaTriDonToiThieu: new BigNumber(String(values.dieuKien).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
@@ -294,17 +318,17 @@ function PhieuGiamGiaConfiguration() {
           ngayHetHan: addSeconds(values.denNgay),
           loaiGiamGia: currencyType === '%' ? 1 : 2,
           giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
-          giamToiDa: values.giaTriToiDa === "" ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
+          giamToiDa: values.giaTriToiDa === '' ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
           phamViApDung: values.kieu,
           soLuong: values.soLuong,
           listKhachHang: selectedKhachHang
         };
         let response;
         if (id) {
-          response = await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/coupons/update/${id}`, data);
+          response = await axios.put(`http://localhost:8080/api/coupons/update/${id}`, data);
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
-          response = await axios.post('https://weblaptop-by-springboot-and-reactjs.onrender.com/api/coupons/add', data);
+          response = await axios.post('http://localhost:8080/api/coupons/add', data);
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được tạo thành công!', severity: 'success' });
         }
         setTimeout(() => {
@@ -316,15 +340,13 @@ function PhieuGiamGiaConfiguration() {
         setSnackbar({
           open: true,
           message: `Lỗi: ${extractedMessage}`,
-          severity: 'error',
+          severity: 'error'
         });
       } finally {
         setIsSubmitting(false);
       }
-    },
+    }
   });
-
-
 
   const handleCurrencyChange = (type) => {
     setCurrencyType(type);
@@ -332,11 +354,12 @@ function PhieuGiamGiaConfiguration() {
 
   const handleSelectKhachHang = (id) => {
     setSelectedKhachHang((prevSelected) => {
-      const newSelected = Array.isArray(prevSelected) && prevSelected.includes(id)
-        ? prevSelected.filter((selectedId) => selectedId !== id)
-        : [...(Array.isArray(prevSelected) ? prevSelected : []), id];
+      const newSelected =
+        Array.isArray(prevSelected) && prevSelected.includes(id)
+          ? prevSelected.filter((selectedId) => selectedId !== id)
+          : [...(Array.isArray(prevSelected) ? prevSelected : []), id];
 
-      console.log("Selected KhachHang within handler:", newSelected);  // Kiểm tra giá trị mới
+      console.log('Selected KhachHang within handler:', newSelected); // Kiểm tra giá trị mới
       return newSelected;
     });
   };
@@ -346,13 +369,11 @@ function PhieuGiamGiaConfiguration() {
       { id: 0, name: 'Chưa áp dụng', color: 'gray' },
       { id: 1, name: 'Đang áp dụng', color: 'green' },
       { id: 2, name: 'Đã hết hạn', color: 'red' },
-      { id: 3, name: 'Đã hủy', color: 'orange' },
+      { id: 3, name: 'Đã hủy', color: 'orange' }
     ];
 
-    return statuses.find(status => status.id === statusId) || { name: 'Không xác định', color: 'default' };
+    return statuses.find((status) => status.id === statusId) || { name: 'Không xác định', color: 'default' };
   };
-
-
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
@@ -364,7 +385,7 @@ function PhieuGiamGiaConfiguration() {
   };
 
   function addSeconds(dateTimeStr) {
-    if (!dateTimeStr) return "";
+    if (!dateTimeStr) return '';
     if (dateTimeStr.length === 16) {
       return `${dateTimeStr}:00`;
     }
@@ -378,13 +399,12 @@ function PhieuGiamGiaConfiguration() {
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
     setIsSubmitting(false);
-
   };
 
   const fetchCouponDetail = async () => {
     try {
       debugger;
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/coupons/detail/${id}`);
+      const response = await axios.get(`http://localhost:8080/api/coupons/detail/${id}`);
       const coupon = response.data;
       formik.setValues({
         stat: coupon.data.trangThai,
@@ -396,7 +416,7 @@ function PhieuGiamGiaConfiguration() {
         dieuKien: coupon.data.giaTriDonToiThieu,
         tuNgay: coupon.data.ngayBatDau,
         denNgay: coupon.data.ngayHetHan,
-        kieu: coupon.data.phamViApDung.toString(),
+        kieu: coupon.data.phamViApDung.toString()
       });
       setCurrencyType(coupon.data.loaiGiamGia === 1 ? '%' : '$');
       const khachHangIds = coupon.data.khachHangPhieuGiamGias || [];
@@ -419,8 +439,8 @@ function PhieuGiamGiaConfiguration() {
   };
 
   function formatNumber(value) {
-    const cleanedValue = String(value || "").replace(/\D/g, "");
-    return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const cleanedValue = String(value || '').replace(/\D/g, '');
+    return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   const handleSelectAll = () => {
@@ -445,8 +465,6 @@ function PhieuGiamGiaConfiguration() {
             </Grid>
           )}
           <form onSubmit={formik.handleSubmit}>
-
-
             <TextField
               label="Mã Phiếu Giảm Giá"
               name="maPhieu"
@@ -461,15 +479,14 @@ function PhieuGiamGiaConfiguration() {
                 inputProps: { tabIndex: -1 },
                 sx: {
                   pointerEvents: 'none', // Ngăn hiệu ứng khi hover
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)', // Tạo nền mờ nhạt để giảm độ nổi bật
-                },
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)' // Tạo nền mờ nhạt để giảm độ nổi bật
+                }
               }}
               InputLabelProps={{
-                shrink: true,
+                shrink: true
               }}
               sx={{ width: '200px' }}
             />
-
 
             <TextField
               label="Tên Phiếu Giảm Giá"
@@ -477,7 +494,7 @@ function PhieuGiamGiaConfiguration() {
               fullWidth
               margin="normal"
               InputProps={{
-                readOnly: isChiTietPage,
+                readOnly: isChiTietPage
               }}
               value={formik.values.tenPhieu}
               onChange={formik.handleChange}
@@ -521,7 +538,7 @@ function PhieuGiamGiaConfiguration() {
                           <AttachMoneyIcon />
                         </IconButton>
                       </InputAdornment>
-                    ),
+                    )
                   }}
                 />
               </Grid>
@@ -541,7 +558,7 @@ function PhieuGiamGiaConfiguration() {
                       <InputAdornment position="end">
                         <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
                       </InputAdornment>
-                    ),
+                    )
                   }}
                 />
               </Grid>
@@ -568,7 +585,7 @@ function PhieuGiamGiaConfiguration() {
                   fullWidth
                   margin="normal"
                   InputProps={{
-                    readOnly: isChiTietPage,
+                    readOnly: isChiTietPage
                   }}
                   value={formatNumber(formik.values.dieuKien)}
                   onChange={formik.handleChange}
@@ -586,11 +603,12 @@ function PhieuGiamGiaConfiguration() {
                   fullWidth
                   margin="normal"
                   InputProps={{
-                    readOnly: isChiTietPage,
-                  }} value={formik.values.tuNgay}
+                    readOnly: isChiTietPage
+                  }}
+                  value={formik.values.tuNgay}
                   onChange={formik.handleChange}
                   InputLabelProps={{
-                    shrink: true,
+                    shrink: true
                   }}
                   error={formik.touched.tuNgay && Boolean(formik.errors.tuNgay)}
                   helperText={formik.touched.tuNgay && formik.errors.tuNgay}
@@ -604,18 +622,17 @@ function PhieuGiamGiaConfiguration() {
                   fullWidth
                   margin="normal"
                   InputProps={{
-                    readOnly: isChiTietPage,
+                    readOnly: isChiTietPage
                   }}
                   value={formik.values.denNgay}
                   InputLabelProps={{
-                    shrink: true,
+                    shrink: true
                   }}
                   onChange={formik.handleChange}
                   error={formik.touched.denNgay && Boolean(formik.errors.denNgay)}
                   helperText={formik.touched.denNgay && formik.errors.denNgay}
                 />
               </Grid>
-
             </Grid>
             <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
               <Grid item>
@@ -633,20 +650,10 @@ function PhieuGiamGiaConfiguration() {
                     }
                   }}
                 >
-                  <FormControlLabel
-                    value="1"
-                    control={<Radio />}
-                    label="Công khai"
-                  />
-                  <FormControlLabel
-                    value="2"
-                    control={<Radio />}
-                    label="Cá nhân hóa"
-                  />
+                  <FormControlLabel value="1" control={<Radio />} label="Công khai" />
+                  <FormControlLabel value="2" control={<Radio />} label="Cá nhân hóa" />
                 </RadioGroup>
               </Grid>
-
-
             </Grid>
             {!isChiTietPage && (
               <Button fullWidth variant="contained" sx={{ mt: 2 }} onClick={handleSubmitWithConfirm} disabled={isSubmitting}>
@@ -659,7 +666,9 @@ function PhieuGiamGiaConfiguration() {
 
       <Grid item xs={6}>
         <Paper style={{ padding: '16px', height: '100%' }}>
-          <Typography variant="h6" gutterBottom>Chọn khách hàng</Typography>
+          <Typography variant="h6" gutterBottom>
+            Chọn khách hàng
+          </Typography>
           <Box
             display="flex"
             flexDirection="row"
@@ -671,7 +680,7 @@ function PhieuGiamGiaConfiguration() {
               backgroundColor: 'white',
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
               borderRadius: '8px',
-              width: '100%',
+              width: '100%'
             }}
           >
             <Grid container spacing={2} alignItems="center">
@@ -683,7 +692,7 @@ function PhieuGiamGiaConfiguration() {
                       mb: 1,
                       fontWeight: 'bold',
                       fontSize: '1rem',
-                      color: 'text.primary',
+                      color: 'text.primary'
                     }}
                   >
                     Tìm kiếm
@@ -696,8 +705,8 @@ function PhieuGiamGiaConfiguration() {
                     fullWidth
                     InputProps={{
                       style: {
-                        borderRadius: '8px',
-                      },
+                        borderRadius: '8px'
+                      }
                     }}
                   />
                 </FormControl>
@@ -711,7 +720,7 @@ function PhieuGiamGiaConfiguration() {
                       mb: 1,
                       fontWeight: 'bold',
                       fontSize: '1rem',
-                      color: 'text.primary',
+                      color: 'text.primary'
                     }}
                   >
                     Hạng khách hàng
@@ -725,7 +734,7 @@ function PhieuGiamGiaConfiguration() {
                     fullWidth
                     sx={{
                       borderRadius: '8px',
-                      backgroundColor: 'white',
+                      backgroundColor: 'white'
                     }}
                   >
                     <MenuItem value="">-- Tất cả khách hàng --</MenuItem>
@@ -743,7 +752,7 @@ function PhieuGiamGiaConfiguration() {
                 sx={{
                   position: 'fixed',
                   bottom: 16,
-                  right: 16,
+                  right: 16
                 }}
                 onClick={handleNavigate}
               >
@@ -760,7 +769,7 @@ function PhieuGiamGiaConfiguration() {
                       indeterminate={selectedKhachHang.length > 0 && selectedKhachHang.length < khachHang.length}
                       checked={selectAll}
                       onChange={handleSelectAll}
-                      disabled={isChiTietPage || formik.values.kieu === "1"}
+                      disabled={isChiTietPage || formik.values.kieu === '1'}
                     />
                   </TableCell>
                   <TableCell>Tên khách hàng</TableCell>
@@ -776,7 +785,7 @@ function PhieuGiamGiaConfiguration() {
                       <Checkbox
                         checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
                         onChange={() => handleSelectKhachHang(row.id)}
-                        disabled={isChiTietPage || formik.values.kieu === "1"}
+                        disabled={isChiTietPage || formik.values.kieu === '1'}
                       />
                     </TableCell>
                     <TableCell>{row.ten}</TableCell>
@@ -789,12 +798,7 @@ function PhieuGiamGiaConfiguration() {
             </Table>
           </TableContainer>
           <Box display="fixed" justifyContent="center" alignItems="center" marginTop={2}>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-            />
+            <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
           </Box>
         </Paper>
       </Grid>
@@ -802,22 +806,17 @@ function PhieuGiamGiaConfiguration() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
 
-      <Dialog
-        open={confirmOpen}
-        onClose={() => handleConfirmClose(false)}
-      >
+      <Dialog open={confirmOpen} onClose={() => handleConfirmClose(false)}>
         <DialogTitle>Xác nhận</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Bạn có chắc chắn muốn lưu thông tin phiếu giảm giá này?
-          </DialogContentText>
+          <DialogContentText>Bạn có chắc chắn muốn lưu thông tin phiếu giảm giá này?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleConfirmClose(false)} color="primary">
