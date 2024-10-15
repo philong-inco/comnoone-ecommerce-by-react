@@ -266,13 +266,8 @@ function DotGiamGiaConfiguration() {
             setErrors({ giaTriToiDa: 'Giá trị tối đa phải bằng với giá trị giảm giá khi loại chiết khấu là tiền.' });
             return;
           }
-        } else if (currencyType === '%') {
-          // Nếu là phần trăm (%), kiểm tra giamToiDa phải là chuỗi rỗng
-          if (values.giaTriToiDa !== '') {
-            setErrors({ giaTriToiDa: 'Giá trị tối đa phải là chuỗi rỗng khi loại chiết khấu là phần trăm.' });
-            return; // Dừng submit nếu có lỗi
-          }
         }
+        
         const data = {
           ten: values.tenPhieu,
           moTa: values.moTa,
@@ -286,7 +281,7 @@ function DotGiamGiaConfiguration() {
 
         let response;
         if (id) {
-          response = await axios.put(`http://localhost:8080/api/v1//discounts/update/${id}`, data);
+          response = await axios.put(`http://localhost:8080/api/v1/discounts/update/${id}`, data);
           setSnackbar({ open: true, message: 'Đợt giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
           response = await axios.post('http://localhost:8080/api/v1/discounts/add', data);
