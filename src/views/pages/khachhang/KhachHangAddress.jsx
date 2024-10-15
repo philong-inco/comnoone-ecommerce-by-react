@@ -33,7 +33,7 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  Fab 
+  Fab
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
@@ -52,16 +52,10 @@ const validationSchema = Yup.object().shape({
     .matches(/^[0-9]{10}$/, 'Số điện thoại phải có 10 chữ số')
     .required('Số điện thoại không được để trống'),
 
-  ngay_sinh: Yup.date()
-    .max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại')
-    .required('Ngày sinh không được để trống'),
-  gioi_tinh: Yup.number()
-    .oneOf([0, 1], 'Giới tính không hợp lệ')
-    .required('Giới tính không được để trống'),
+  ngay_sinh: Yup.date().max(new Date(), 'Ngày sinh phải là quá khứ hoặc hiện tại').required('Ngày sinh không được để trống'),
+  gioi_tinh: Yup.number().oneOf([0, 1], 'Giới tính không hợp lệ').required('Giới tính không được để trống'),
 
-  hinhAnh: Yup.string()
-    .url('Hình ảnh phải là một URL hợp lệ')
-    .nullable(),
+  hinhAnh: Yup.string().url('Hình ảnh phải là một URL hợp lệ').nullable()
 });
 
 const addressValidationSchema = Yup.object().shape({
@@ -75,22 +69,34 @@ const addressValidationSchema = Yup.object().shape({
     .required('Số điện thoại người nhận không được để trống')
     .matches(/^\d{10}$/, 'Số điện thoại người nhận phải bao gồm đúng 10 chữ số'),
 
-  dia_chi_nhan_hang: Yup.string()
-    .required('Địa chỉ nhận hàng không được để trống')
+  dia_chi_nhan_hang: Yup.string().required('Địa chỉ nhận hàng không được để trống')
 });
 
 function KhachHangAddress() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { register, handleSubmit, control, formState: { errors }, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    setValue
+  } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      addresses: [],
-    },
+      addresses: []
+    }
   });
 
-  const { register: registerAddress, handleSubmit: handleSubmitAddress, control: controlAddress, formState: { errors: addressErrors }, setValue:  setValueAddress, reset: resetAddress } = useForm({
+  const {
+    register: registerAddress,
+    handleSubmit: handleSubmitAddress,
+    control: controlAddress,
+    formState: { errors: addressErrors },
+    setValue: setValueAddress,
+    reset: resetAddress
+  } = useForm({
     resolver: yupResolver(addressValidationSchema),
     defaultValues: {
       ten_nguoi_nhan: '',
@@ -99,8 +105,8 @@ function KhachHangAddress() {
       dia_chi_nhan_hang: '',
       province: '',
       district: '',
-      ward: '',
-    },
+      ward: ''
+    }
   });
 
   const [imageUrl, setImageUrl] = useState('');
@@ -148,7 +154,6 @@ function KhachHangAddress() {
 
   useEffect(() => {
     if (selectedDistrict) {
-
       fetchWards(selectedDistrict);
     } else {
       setWards([]);
@@ -209,7 +214,7 @@ function KhachHangAddress() {
           province_id: provinceId
         }
       });
-      const formattedData = response.data.data.map(district => ({
+      const formattedData = response.data.data.map((district) => ({
         id: district.DistrictID,
         name: district.DistrictName
       }));
@@ -229,7 +234,7 @@ function KhachHangAddress() {
           district_id: districtId
         }
       });
-      const formattedData = response.data.data.map(ward => ({
+      const formattedData = response.data.data.map((ward) => ({
         id: ward.WardCode,
         name: ward.WardName
       }));
@@ -248,13 +253,12 @@ function KhachHangAddress() {
     }
   };
 
-
   const handleConfirmSetDefault = async () => {
     setOpenSetDefaultDialog(false);
     if (selectedAddress) {
       try {
         setLoading(true);
-        await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
@@ -268,7 +272,7 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         setLoading(true);
-        await axios.put(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(null); // Unset the default address
         handleCloseModal();
       } catch (error) {
@@ -285,7 +289,7 @@ function KhachHangAddress() {
   const handleDeleteAddress = async () => {
     try {
       setLoading(true);
-      await axios.delete(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/${addressId}`);
+      await axios.delete(`http://localhost:8080/api/diachi/${addressId}`);
     } catch (error) {
       console.error('Lỗi khi xóa địa chỉ:', error);
     } finally {
@@ -301,7 +305,7 @@ function KhachHangAddress() {
 
   const fetchKhachHangInfo = async (id) => {
     try {
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/khachhang/searchbyid/${id}`);
+      const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
       const khachHangData = response.data;
       setValue('ten', khachHangData.ten);
       setValue('sdt', khachHangData.sdt);
@@ -313,7 +317,7 @@ function KhachHangAddress() {
       } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
       }
-      const responseDiaChi = await axios.get(`https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
+      const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data;
       setAddresses(diaChiList);
       const provinces = new Set();
@@ -326,7 +330,6 @@ function KhachHangAddress() {
 
       const fetchDistrictsAndWards = async () => {
         const districtPromises = Array.from(provinces).map(async (districtId) => {
-
           try {
             const responseDistrict = await axios.get('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
               headers: {
@@ -336,7 +339,7 @@ function KhachHangAddress() {
                 province_id: districtId
               }
             });
-            return responseDistrict.data.data.map(district => ({
+            return responseDistrict.data.data.map((district) => ({
               id: district.DistrictID,
               name: district.DistrictName
             }));
@@ -358,7 +361,7 @@ function KhachHangAddress() {
                 district_id: districtId
               }
             });
-            return responseWard.data.data.map(ward => ({
+            return responseWard.data.data.map((ward) => ({
               id: ward.WardCode,
               name: ward.WardName
             }));
@@ -373,7 +376,7 @@ function KhachHangAddress() {
       await fetchDistrictsAndWards();
     } catch (error) {
       setError('Failed to fetch KhachHang Info');
-      setSnackbarOpen("Xảy ra lỗi khi hiển thị thông tin khách hàng!.");
+      setSnackbarOpen('Xảy ra lỗi khi hiển thị thông tin khách hàng!.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       setTimeout(() => {
@@ -386,11 +389,11 @@ function KhachHangAddress() {
     resetAddress();
     setIsEditing(false);
     setSnackbarOpen(false);
-  }
+  };
 
   const handleNavigate = () => {
     navigate('/khachhang/danhsachkhachhang');
-  }
+  };
 
   const handleOpenDialog = (data) => {
     setFormData(data);
@@ -435,7 +438,7 @@ function KhachHangAddress() {
       }
 
       await validationSchema.validate(updatedData);
-      const url = `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/khachhang/update/${id}`;
+      const url = `http://localhost:8080/api/khachhang/update/${id}`;
       const response = await axios.put(url, updatedData, {
         headers: {
           'Content-Type': 'application/json'
@@ -450,7 +453,6 @@ function KhachHangAddress() {
           handleCloseSnackbar();
         }, 1000);
       }
-
     } catch (error) {
       setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
       setSnackbarSeverity('error');
@@ -470,7 +472,6 @@ function KhachHangAddress() {
     setSelectedProvince('');
     setSelectedDistrict('');
     setSelectedWard('');
-
   };
 
   const onAddressSubmit = async (data) => {
@@ -486,7 +487,9 @@ function KhachHangAddress() {
       formDataAddress.idQuanHuyen = data.districts || selectedDistrict;
       formDataAddress.idPhuongXa = data.wards || selectedWard;
       try {
-        const url = data.id_dia_chi ? `https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/updatelocation/${data.id_dia_chi}` : 'https://weblaptop-by-springboot-and-reactjs.onrender.com/api/diachi/create';
+        const url = data.id_dia_chi
+          ? `http://localhost:8080/api/diachi/updatelocation/${data.id_dia_chi}`
+          : 'http://localhost:8080/api/diachi/create';
         const method = data.id_dia_chi ? 'PUT' : 'POST';
         const responseAddress = await axios({
           method: method,
@@ -498,7 +501,8 @@ function KhachHangAddress() {
         });
       } catch (error) {
         console.log(error);
-      } if (data.id_dia_chi) {
+      }
+      if (data.id_dia_chi) {
         setSnackbarMessage('Cập nhật thành công địa chỉ!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
@@ -528,16 +532,17 @@ function KhachHangAddress() {
   };
 
   const openCloudinaryWidget = () => {
-    window.cloudinary.openUploadWidget({
-      cloudName: 'daljc2ktr',
-      uploadPreset: 'ovuxjxsx',
-      sources: ['local', 'url', 'camera', 'google_photos', 'facebook', 'dropbox', 'instagram'],
-      multiple: false,
-      cropping: true,
-      folder: 'customers_images',
-    },
+    window.cloudinary.openUploadWidget(
+      {
+        cloudName: 'daljc2ktr',
+        uploadPreset: 'ovuxjxsx',
+        sources: ['local', 'url', 'camera', 'google_photos', 'facebook', 'dropbox', 'instagram'],
+        multiple: false,
+        cropping: true,
+        folder: 'customers_images'
+      },
       (error, result) => {
-        if (!error && result.event === "success") {
+        if (!error && result.event === 'success') {
           setImageUrl(result.info.secure_url);
         }
       }
@@ -555,12 +560,12 @@ function KhachHangAddress() {
       setValueAddress('id_dia_chi', address.id);
       setAddressId(address.id);
       if (address.loaiDiaChi === 1) {
-        setIsDefault(true)
+        setIsDefault(true);
       }
       try {
         const formattedTinhThanhPhoId = address.idTinhThanhPho.toString().padStart(2, '0');
         const formattedQuanHuyenId = address.idQuanHuyen.toString().padStart(3, '0');
-        const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');;
+        const formaterPhuongXaId = address.idPhuongXa.toString().padStart(5, '0');
         setSelectedProvince(formattedTinhThanhPhoId);
         setSelectedDistrict(formattedQuanHuyenId);
         setSelectedWard(formaterPhuongXaId);
@@ -596,23 +601,22 @@ function KhachHangAddress() {
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
       <Fab
-                color="primary"
-                aria-label="back"
-                sx={{
-                    position: 'fixed',
-                    bottom: 16,
-                    right: 16,
-                }}
-                onClick={handleNavigate}
-            >
-                <ArrowBackIcon />
-            </Fab>
+        color="primary"
+        aria-label="back"
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16
+        }}
+        onClick={handleNavigate}
+      >
+        <ArrowBackIcon />
+      </Fab>
       <Box sx={{ width: '33%', p: 2, borderRight: '1px solid #ddd' }}>
         <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center' }}>
           Thông tin khách hàng
         </Typography>
         <form onSubmit={handleSubmit(handleOpenDialog)}>
-
           <Grid container spacing={2}>
             {/* Image Preview */}
             <Grid item xs={12}>
@@ -628,13 +632,13 @@ function KhachHangAddress() {
                       cursor: 'pointer',
                       borderRadius: '50%',
                       boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.3s ease'
                     }}
                     onClick={openCloudinaryWidget}
                   />
                 ) : (
                   <img
-                    src='../src/assets/images/images.jpg'
+                    src="../src/assets/images/images.jpg"
                     alt="Ảnh đại diện"
                     style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%' }}
                   />
@@ -691,16 +695,8 @@ function KhachHangAddress() {
                   control={control}
                   render={({ field }) => (
                     <RadioGroup {...field} row>
-                      <FormControlLabel
-                        value="1"
-                        control={<Radio checked={field.value === "1"} onChange={field.onChange} />}
-                        label="Nam"
-                      />
-                      <FormControlLabel
-                        value="0"
-                        control={<Radio checked={field.value === "0"} onChange={field.onChange} />}
-                        label="Nữ"
-                      />
+                      <FormControlLabel value="1" control={<Radio checked={field.value === '1'} onChange={field.onChange} />} label="Nam" />
+                      <FormControlLabel value="0" control={<Radio checked={field.value === '0'} onChange={field.onChange} />} label="Nữ" />
                     </RadioGroup>
                   )}
                 />
@@ -716,19 +712,16 @@ function KhachHangAddress() {
               sx={{
                 mt: 2,
                 background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-                color: 'white',
+                color: 'white'
               }}
             >
               {loading ? 'Đang xử lý...' : 'Cập nhật'}
             </Button>
-
-
           </Grid>
         </form>
       </Box>
 
       <Box sx={{ width: '65%', p: 2 }}>
-
         <Grid item xs={8}>
           <Paper elevation={3}>
             <Box p={2}>
@@ -750,8 +743,8 @@ function KhachHangAddress() {
                           backgroundColor: '#f0f0f0',
                           boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
                           transform: 'scale(1.02)',
-                          transition: 'all 0.3s ease-in-out',
-                        },
+                          transition: 'all 0.3s ease-in-out'
+                        }
                       }}
                     >
                       <Box
@@ -761,12 +754,10 @@ function KhachHangAddress() {
                           right: 8,
                           display: 'flex',
                           alignItems: 'center',
-                          zIndex: 1,
+                          zIndex: 1
                         }}
                       >
-                        {address.loaiDiaChi === 1 && (
-                          <StarIcon color="warning" sx={{ mr: 1 }} />
-                        )}
+                        {address.loaiDiaChi === 1 && <StarIcon color="warning" sx={{ mr: 1 }} />}
                         <IconPencil stroke={1} onClick={() => handleOpenModal(address)} />
                       </Box>
                       <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
@@ -790,7 +781,7 @@ function KhachHangAddress() {
                           Tỉnh/Thành phố:
                         </Typography>
                         <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
-                          {provinces.find(p => p.ProvinceID == address.idTinhThanhPho)?.ProvinceName}
+                          {provinces.find((p) => p.ProvinceID == address.idTinhThanhPho)?.ProvinceName}
                         </Typography>
                       </Box>
                       <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
@@ -798,7 +789,7 @@ function KhachHangAddress() {
                           Quận/Huyện:
                         </Typography>
                         <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
-                          {districts.find(d => d.id == address.idQuanHuyen)?.name}
+                          {districts.find((d) => d.id == address.idQuanHuyen)?.name}
                         </Typography>
                       </Box>
                       <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
@@ -806,7 +797,7 @@ function KhachHangAddress() {
                           Phường/Xã:
                         </Typography>
                         <Typography variant="body1" sx={{ textAlign: 'center', ml: 1 }}>
-                          {wards.find(w => w.id == address.idPhuongXa)?.name}
+                          {wards.find((w) => w.id == address.idPhuongXa)?.name}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -824,11 +815,9 @@ function KhachHangAddress() {
             </Box>
           </Paper>
         </Grid>
-
       </Box>
 
-      <Modal open={isModalOpen} onClose={handleCloseModal} aria-labelledby="modal-title"
-        aria-describedby="modal-description">
+      <Modal open={isModalOpen} onClose={handleCloseModal} aria-labelledby="modal-title" aria-describedby="modal-description">
         <Box sx={{ width: '400px', bgcolor: 'background.paper', p: 4, mx: 'auto', mt: 4 }}>
           <Typography variant="h4">Địa Chỉ Của Tôi</Typography>
           <form onSubmit={handleSubmitAddress(onAddressSubmit)}>
@@ -872,12 +861,7 @@ function KhachHangAddress() {
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, mb: 2 }}>
               <FormControl fullWidth margin="normal">
                 <InputLabel id="province-label">Tỉnh/Thành phố</InputLabel>
-                <Select
-                  labelId="province-label"
-                  value={selectedProvince}
-                  onChange={handleProvinceChange}
-                  label="Tỉnh/Thành phố"
-                >
+                <Select labelId="province-label" value={selectedProvince} onChange={handleProvinceChange} label="Tỉnh/Thành phố">
                   {provinces.map((province) => (
                     <MenuItem key={province.ProvinceID} value={province.ProvinceID}>
                       {province.ProvinceName}
@@ -887,12 +871,7 @@ function KhachHangAddress() {
               </FormControl>
               <FormControl fullWidth margin="normal" disabled={!selectedProvince}>
                 <InputLabel id="district-label">Quận/Huyện</InputLabel>
-                <Select
-                  labelId="district-label"
-                  value={selectedDistrict}
-                  onChange={handleDistrictChange}
-                  label="Quận/Huyện"
-                >
+                <Select labelId="district-label" value={selectedDistrict} onChange={handleDistrictChange} label="Quận/Huyện">
                   {districts.map((district) => (
                     <MenuItem key={district.id} value={district.id}>
                       {district.name}
@@ -902,12 +881,7 @@ function KhachHangAddress() {
               </FormControl>
               <FormControl fullWidth margin="normal" disabled={!selectedDistrict}>
                 <InputLabel id="ward-label">Phường/Xã</InputLabel>
-                <Select
-                  labelId="ward-label"
-                  value={selectedWard}
-                  onChange={handleWardChange}
-                  label="Phường/Xã"
-                >
+                <Select labelId="ward-label" value={selectedWard} onChange={handleWardChange} label="Phường/Xã">
                   {wards.map((ward) => (
                     <MenuItem key={ward.id} value={ward.id}>
                       {ward.name}
@@ -922,29 +896,20 @@ function KhachHangAddress() {
               margin="normal"
               {...registerAddress('dia_chi_nhan_hang')}
               InputLabelProps={{ shrink: true }}
-
               error={Boolean(addressErrors.dia_chi_nhan_hang)}
               helperText={addressErrors.dia_chi_nhan_hang?.message}
               sx={{ fontFamily: 'Arial' }}
             />
             {isEditing && (
               <FormControlLabel
-                control={
-                  <Switch
-                    checked={selectedAddress?.id === defaultAddressId}
-                    onChange={handleDefaultChange}
-                  />
-                }
+                control={<Switch checked={selectedAddress?.id === defaultAddressId} onChange={handleDefaultChange} />}
                 label="Địa chỉ mặc định"
                 sx={{ mt: 2 }}
               />
             )}
 
             <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-              <Button
-                startIcon={<IconTrash stroke={2} />}
-                onClick={handleDeleteClick}
-              >
+              <Button startIcon={<IconTrash stroke={2} />} onClick={handleDeleteClick}>
                 Xóa Địa Chỉ
               </Button>
               <Button
@@ -956,26 +921,20 @@ function KhachHangAddress() {
                   background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
                   color: 'white',
                   '&:hover': {
-                    background: 'linear-gradient(45deg, #FE6B8B 50%, #FF8E53 100%)',
-                  },
+                    background: 'linear-gradient(45deg, #FE6B8B 50%, #FF8E53 100%)'
+                  }
                 }}
               >
                 {loading ? 'Đang xử lý...' : 'Lưu'}
               </Button>
             </Box>
-
           </form>
         </Box>
       </Modal>
 
-      <Dialog
-        open={openDialogDelete}
-        onClose={() => setOpenDialogDelete(false)}
-      >
+      <Dialog open={openDialogDelete} onClose={() => setOpenDialogDelete(false)}>
         <DialogTitle>Xóa Địa Chỉ</DialogTitle>
-        <DialogContent>
-          Bạn có chắc chắn muốn xóa địa chỉ này?
-        </DialogContent>
+        <DialogContent>Bạn có chắc chắn muốn xóa địa chỉ này?</DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialogDelete(false)} color="primary">
             Hủy
@@ -986,10 +945,7 @@ function KhachHangAddress() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openSetDefaultDialog}
-        onClose={() => setOpenSetDefaultDialog(false)}
-      >
+      <Dialog open={openSetDefaultDialog} onClose={() => setOpenSetDefaultDialog(false)}>
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
         <DialogContent>
           <Typography>Bạn có chắc chắn muốn đặt địa chỉ này làm mặc định không?</Typography>
@@ -1005,10 +961,7 @@ function KhachHangAddress() {
       </Dialog>
 
       {/* Thông báo bỏ làm giá trị mặc định */}
-      <Dialog
-        open={openUnsetDefaultDialog}
-        onClose={() => setOpenUnsetDefaultDialog(false)}
-      >
+      <Dialog open={openUnsetDefaultDialog} onClose={() => setOpenUnsetDefaultDialog(false)}>
         <DialogTitle>Xác nhận thay đổi</DialogTitle>
         <DialogContent>
           <Typography>Bạn có chắc chắn muốn bỏ địa chỉ này làm mặc định không?</Typography>
@@ -1025,9 +978,7 @@ function KhachHangAddress() {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Xác nhận cập nhật</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Bạn có chắc chắn muốn cập nhật thông tin khách hàng này không?
-          </DialogContentText>
+          <DialogContentText>Bạn có chắc chắn muốn cập nhật thông tin khách hàng này không?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="primary">
@@ -1044,16 +995,10 @@ function KhachHangAddress() {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          variant="filled"
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleCloseSnackbar} variant="filled" severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
     </Box>
   );
 }
