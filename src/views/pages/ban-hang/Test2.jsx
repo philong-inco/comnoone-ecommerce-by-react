@@ -28,7 +28,7 @@ import {
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { addCouponToBillByCode, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
+import { addCouponToBillByCode, getPDF, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
 import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 import PaymentDialog2 from '../billDetail/PaymentDialog2';
 import CouponDiaLog from '../billDetail/CouponDiaLog';
@@ -60,6 +60,9 @@ function Test2(props) {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   const [xacNhanThanhToanSau, setXacNhanThanhToanSau] = useState(false);
+
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const iframeRef = useRef();
 
   const [formData, setFormData] = useState({
     ten: '',
@@ -375,18 +378,49 @@ function Test2(props) {
         setSnackbarOpen(true);
         setFormData({});
         setXacNhanThanhToanSau(false);
+        await fetchInvoicePdf();
         onReload();
         onLoading();
       }
     } catch (error) {
       console.log(error);
 
-      setSnackbarMessage('Lỗi');
+      if (error.response && error.response.data && error.response.data.error) {
+        // Đặt thông báo lỗi từ response
+        setSnackbarMessage(error.response.data.error);
+      } else {
+        // Nếu không có response, đặt thông báo lỗi chung chung
+        setSnackbarMessage('Đã xảy ra lỗi. Vui lòng thử lại.');
+      }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
+  const fetchInvoicePdf = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf'
+        }
+      });
 
+      if (response.ok) {
+        const pdfBlob = await response.blob();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setPdfUrl(pdfUrl);
+
+        // Gọi in PDF từ iframe sau khi đã tải
+        setTimeout(() => {
+          iframeRef.current.contentWindow.print(); // In file PDF trong iframe
+        }, 500);
+      } else {
+        console.error('Failed to fetch PDF');
+      }
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+    }
+  };
   const loadAll = () => {
     onReload();
   };
@@ -601,7 +635,7 @@ function Test2(props) {
             </Typography>
           )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Khách cần trả:{' '}
+            Tổng hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
           <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
@@ -642,6 +676,16 @@ function Test2(props) {
       </Snackbar>
       {/* <PdfForm code={code} hiden={hiden} /> */}
       {/* Hiển thị PdfForm nếu hiden là false */}
+      {pdfUrl && (
+        <iframe
+          ref={iframeRef}
+          src={pdfUrl}
+          width="0"
+          height="0"
+          style={{ display: 'none' }} // Ẩn iframe
+          title="PDF"
+        />
+      )}
     </>
   );
 }

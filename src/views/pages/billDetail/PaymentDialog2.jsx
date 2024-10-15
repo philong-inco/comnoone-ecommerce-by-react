@@ -86,6 +86,8 @@ const PaymentDialog2 = (props) => {
         setSnackbarMessage('Giao dịch thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
+        await fetchInvoicePdf();
+
         fetchAll();
       }
     } catch (error) {
@@ -147,7 +149,31 @@ const PaymentDialog2 = (props) => {
   useEffect(() => {
     fetchAll();
   }, [id]);
+  const fetchInvoicePdf = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf'
+        }
+      });
 
+      if (response.ok) {
+        const pdfBlob = await response.blob();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setPdfUrl(pdfUrl);
+
+        // Gọi in PDF từ iframe sau khi đã tải
+        setTimeout(() => {
+          iframeRef.current.contentWindow.print(); // In file PDF trong iframe
+        }, 500);
+      } else {
+        console.error('Failed to fetch PDF');
+      }
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+    }
+  };
   // useEffect(() => {
   //   if (data.loaiHoaDon == 0) {
   //     setTienThieu(data.tongTienPhaiTra || 0);
@@ -183,7 +209,6 @@ const PaymentDialog2 = (props) => {
       tenPhuong: data.tenPhuong,
       ghiChu: data.ghiChu
     };
-    apiPayCounter(newData);
     console.log('new DATA : ', newData);
 
     setXacNhanThanhToan(false);
@@ -198,6 +223,7 @@ const PaymentDialog2 = (props) => {
         setSnackbarOpen(true);
         setXacNhanMo(false);
         setXacNhanThanhToan(false);
+        await fetchInvoicePdf();
         // setFormData({});
         // setBill({});
         // setFormDataAddress({});
@@ -208,7 +234,7 @@ const PaymentDialog2 = (props) => {
     } catch (error) {
       console.log(error);
 
-      setSnackbarMessage('Lỗi');
+      setSnackbarMessage('Không thể thực hiện thanh toán');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }

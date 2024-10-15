@@ -438,6 +438,8 @@ const ProductList = (props) => {
   // MUI UI
   const columns = [
     { id: 'maSPCT', label: 'Mã', minWidth: 70 },
+    { id: 'anh', label: 'Ảnh', minWidth: 70 },
+
     { id: 'sanPham', label: 'Tên', minWidth: 150 },
     {
       id: 'giaBan',
@@ -584,6 +586,15 @@ const ProductList = (props) => {
                         {/* lặp từng cell dựa vào tên cot */}
                         {columns.map((column) => {
                           const value = row[column.id];
+                          if (column.id === 'anh') {
+                            const listAnh = row.listUrlAnhSanPham ? row.listUrlAnhSanPham.split(',') : [];
+                            const anhDauTien = listAnh.length > 0 ? listAnh[0].trim() : 'https://via.placeholder.com/50';
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                <img src={anhDauTien} alt="Ảnh sản phẩm" width="50" />
+                              </TableCell>
+                            );
+                          }
                           if (column.id === 'hanhDong') {
                             const valueTrangThai = row['trangThai'];
                             return (

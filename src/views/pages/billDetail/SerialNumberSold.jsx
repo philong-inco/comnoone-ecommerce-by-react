@@ -235,7 +235,7 @@ function SerialNumberSold(props) {
                 <TableRow key={product.id}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>
-                    <img src="https://via.placeholder.com/50" alt="Product" width="50" />
+                    <img src={product.anh ? product.anh : 'https://via.placeholder.com/50'} alt="Product" width="100" />
                   </TableCell>
                   <TableCell>{product.productDetailCode}</TableCell>
                   <TableCell>

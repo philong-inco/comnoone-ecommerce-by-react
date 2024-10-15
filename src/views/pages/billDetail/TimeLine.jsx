@@ -23,10 +23,10 @@ import {
   CircularProgress
 } from '@mui/material';
 import { IconArticleFilledFilled } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { updateStatusByCode } from 'services/admin/bill/billService';
+import { getPDF, updateStatusByCode } from 'services/admin/bill/billService';
 
 import { getStatusBillHistory, getStatusBillHistoryColor } from 'utils/billUtil/billStatus';
 
@@ -34,6 +34,8 @@ function NewTimeLine(props) {
   const { id } = useParams();
   const { data, onLoading, bill } = props;
   const [loading, setLoading] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const iframeRef = useRef();
 
   const maxHeight = window.innerHeight * 0.5;
 
@@ -305,7 +307,31 @@ function NewTimeLine(props) {
   };
 
   console.log('BILL IN TIME LINE : ', bill);
+  const fetchInvoicePdf = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf'
+        }
+      });
 
+      if (response.ok) {
+        const pdfBlob = await response.blob();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        setPdfUrl(pdfUrl);
+
+        // Gọi in PDF từ iframe sau khi đã tải
+        setTimeout(() => {
+          iframeRef.current.contentWindow.print(); // In file PDF trong iframe
+        }, 500);
+      } else {
+        console.error('Failed to fetch PDF');
+      }
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+    }
+  };
   return (
     <>
       <div>
@@ -351,8 +377,15 @@ function NewTimeLine(props) {
           </div>
           <Grid item xs={12} sx={{ marginTop: 0 }}>
             <Grid container spacing={2} sx={{ justifyContent: 'space-between' }}>
-              <Grid item xs={10} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                 {renderButtons(bill)}
+              </Grid>
+              <Grid item xs={2}>
+                <Tooltip title="Lịch sử hóa đơn" arrow placement="top">
+                  <Button variant="contained" color="warning" fullWidth onClick={fetchInvoicePdf}>
+                    In Hóa Đơn
+                  </Button>
+                </Tooltip>
               </Grid>
               <Grid item xs={2}>
                 <Tooltip title="Lịch sử hóa đơn" arrow placement="top">
@@ -520,7 +553,16 @@ function NewTimeLine(props) {
           </Button>
         </DialogActions>
       </Dialog>
-
+      {pdfUrl && (
+        <iframe
+          ref={iframeRef}
+          src={pdfUrl}
+          width="0"
+          height="0"
+          style={{ display: 'none' }} // Ẩn iframe
+          title="PDF"
+        />
+      )}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
