@@ -451,14 +451,14 @@ const ProductList = (props) => {
       label: 'Giá bán',
       minWidth: 100,
       align: 'left',
-      format: (value) => parseFloat(value || 0).toLocaleString()
+      format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
     },
     {
       id: 'soTienDuocGiam',
       label: 'Số tiền được giảm',
       minWidth: 100,
-      align: 'left'
-      // format: (value) => formatNumber(value)
+      align: 'left',
+      format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
     },
     {
       id: 'hanhDong',
@@ -606,7 +606,7 @@ const ProductList = (props) => {
                               ) : column.format ? (
                                 <>
                                   <strong>
-                                    <span style={{ color: 'red' }}>{column.format(value)}&nbsp;</span> VNĐ
+                                    <span style={{ color: 'red' }}>{column.format(value) ? column.format(value) + ' VNĐ' : '-'}&nbsp;</span>
                                   </strong>
                                 </>
                               ) : (
