@@ -64,7 +64,7 @@ function PhieuGiamGiaConfiguration() {
 
   const validationSchema = yup.object({
     tenPhieu: yup.string().required('Tên phiếu giảm giá là bắt buộc'),
-
+    
     giaTri: yup
       .string()
       .required('Giá trị là bắt buộc')

@@ -57,7 +57,10 @@ const validationSchema = Yup.object().shape({
     }),
 
   gioi_tinh: Yup.number().required('Giới tính không được để trống'),
-  hinhAnh: Yup.string()
+  hinhAnh: Yup.string(),
+  dia_chi: Yup.string()
+    .required("Địa chỉ không được để trống")
+    .max(256, "Địa chỉ không được vượt quá 256 ký tự"),
 });
 
 function KhachHangConfiguration() {

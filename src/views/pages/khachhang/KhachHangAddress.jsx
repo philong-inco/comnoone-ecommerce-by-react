@@ -76,7 +76,7 @@ const addressValidationSchema = Yup.object().shape({
     .matches(/^\d{10}$/, 'Số điện thoại người nhận phải bao gồm đúng 10 chữ số'),
 
   dia_chi_nhan_hang: Yup.string()
-    .required('Địa chỉ nhận hàng không được để trống')
+    .required('Địa chỉ nhận hàng không được để trống').max(256, "Địa chỉ không được vượt quá 256 ký tự"),
 });
 
 function KhachHangAddress() {

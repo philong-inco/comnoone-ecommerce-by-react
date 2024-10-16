@@ -193,11 +193,14 @@ function DotGiamGiaConfiguration() {
       giaTriToiDa: '',
       tuNgay: '',
       denNgay: '',
-      loaiChietKhau: '1'
+      loaiChietKhau: '1',
+      moTa: '',
     },
     validationSchema: yup.object({
       tenPhieu: yup.string().required('Tên đợt giảm giá là bắt buộc'),
-
+      moTa: yup
+      .string()
+      .max(256, "Mô tả không được vượt quá 256 ký tự"),
       giaTri: yup
         .string()
         .required('Giá trị là bắt buộc')
@@ -246,6 +249,8 @@ function DotGiamGiaConfiguration() {
         .when('tuNgay', (tuNgay, schema) => {
           return schema.min(tuNgay, 'Ngày kết thúc phải sau ngày bắt đầu');
         })
+
+        
     }),
 
     onSubmit: async (values, { setErrors, validateForm }) => {
