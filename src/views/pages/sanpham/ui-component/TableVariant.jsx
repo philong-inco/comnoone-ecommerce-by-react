@@ -30,7 +30,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
         counts[countKey] = 0;
       }
       counts[countKey]++;
-        // console.log('cou:', counts[countKey])
+      // console.log('cou:', counts[countKey])
 
       if (firstOccurrences[countKey] === undefined) {
         firstOccurrences[countKey] = indexVariant;
@@ -45,17 +45,17 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
   const handlePriceAll = (e) => {
     const value = e.target.value.replace(/\D/g, '');
     setPriceAll(value);
-  }
+  };
   const changePriceAll = () => {
     console.log('priceAll: ', priceAll);
-    if(confirm("Xác nhận thay đổi toàn bộ giá bán thành: ", priceAll)){
-      const newVariantMap = variantList.map(varian => ({
-        ...varian, 
+    if (confirm('Xác nhận thay đổi toàn bộ giá bán thành: ', priceAll)) {
+      const newVariantMap = variantList.map((varian) => ({
+        ...varian,
         giaBan: priceAll
       }));
-    setVariantList(newVariantMap);
+      setVariantList(newVariantMap);
     }
-  }
+  };
 
   // Ảnh san pham
   const [imageList, setImageList] = useState([]);
@@ -64,40 +64,39 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
   // Ảnh san pham
 
   useEffect(() => {
-    console.log('imageList: ', imageList); 
-  }, [imageList])
+    console.log('imageList: ', imageList);
+  }, [imageList]);
 
   // biến lưu id album ảnh được hiện
   const [idAlbumImageVisiable, setAlbumImageVisiable] = useState(null);
   const handleShowAlbumImage = (id) => {
     setAlbumImageVisiable(id);
-  }
+  };
 
   // mac sac checked
   const [mauSacCheckedSelectAnh, setMauSacCheckedSelectAnh] = useState([]);
-  useEffect(()=>{
-    console.log('mauSacCheckedSelectAnhcha: ', mauSacCheckedSelectAnh); 
-  }, [mauSacCheckedSelectAnh])
+  useEffect(() => {
+    console.log('mauSacCheckedSelectAnhcha: ', mauSacCheckedSelectAnh);
+  }, [mauSacCheckedSelectAnh]);
 
   const onUpdateImage = (id, arr) => {
     let newMauSacSelect = mauSacCheckedSelectAnh.map((element) => {
       if (element.id === id) {
-        return {...element, urls: arr}
+        return { ...element, urls: arr };
       }
       return element;
     });
     setMauSacCheckedSelectAnh(newMauSacSelect);
-  }
+  };
   useEffect(() => {
-    const elementConvert = mauSacChecked.map(x => ({
+    const elementConvert = mauSacChecked.map((x) => ({
       id: x.id,
       ten: x.ten,
       urls: []
-    }))
+    }));
     setMauSacCheckedSelectAnh(elementConvert);
-  }, [mauSacChecked])
+  }, [mauSacChecked]);
   // mac sac checked
-  
 
   // set giá chung
 
@@ -112,14 +111,11 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 
   useEffect(() => {
     console.log('variantList:', variantList);
-    
   }, [variantList]);
-
-  
 
   const handleGiaBan = (index) => (e) => {
     const value = e.target.value.replace(/\D/g, '');
-    
+
     const updateVariant = variantList.map((item, idx) => {
       if (idx === index) {
         return {
@@ -171,40 +167,38 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     setOpenFormSerial(true);
   };
 
-//   const [priceAll, setPriceAll] = useState('');
-//   const [openPriceAll, setOpentPriceAll] = useState(false);
-//   useEffect(() => {
-//     const updateVariant = variantList.map((item) => {
-//       return {
-//         ...item,
-//         giaBan: priceAll
-//       };
-//     });
-//     setVariantList(updateVariant);
-//   }, [priceAll]);
-//   const handleDatGiaChung = () => {
-//     setOpentPriceAll(true);
-//   };
+  //   const [priceAll, setPriceAll] = useState('');
+  //   const [openPriceAll, setOpentPriceAll] = useState(false);
+  //   useEffect(() => {
+  //     const updateVariant = variantList.map((item) => {
+  //       return {
+  //         ...item,
+  //         giaBan: priceAll
+  //       };
+  //     });
+  //     setVariantList(updateVariant);
+  //   }, [priceAll]);
+  //   const handleDatGiaChung = () => {
+  //     setOpentPriceAll(true);
+  //   };
 
-// thay đổi serial number từng hàng
+  // thay đổi serial number từng hàng
   const setSerialFromChild = async (obj) => {
     const listSerialExist = [];
 
     async function isUniqueSerial(serial) {
       let isExistSeri = null; // chưa tồn tại API trả về false
-      try{
+      try {
         isExistSeri = await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serial}`);
-          
-      } catch(error){
-        if (error.response)
-        {
+      } catch (error) {
+        if (error.response) {
           isExistSeri = error.response.data;
         }
       }
       console.log(isExistSeri.data);
-      if (isExistSeri.data) {
+      if (isExistSeri.data.data) {
         listSerialExist.push(serial);
-        console.log('listSerialExist: ', listSerialExist)
+        console.log('listSerialExist: ', listSerialExist);
         return true;
       }
       return false;
@@ -218,15 +212,27 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
 
     const serialValidate = [];
     console.log('ListValid before: ', serialValidate);
-    
-    for (const serial of newSerial) {  
-      const check = await isUniqueSerial(serial); // Đợi kết quả từ isUniqueSerial  
-      console.log('Kết quả hàm: ', check); // Hiển thị kết quả trực tiếp  
-      if (check == false) {  
-          console.log('vào nè');  
-          serialValidate.push(serial);  
-      }  
-  }  
+    const listInValidLength = [];
+    const regex = /^[a-zA-Z0-9-]+$/;
+    for (const serial of newSerial) {
+      if (serial.length < 7 || serial.length > 20) {
+        listInValidLength.push(serial);
+      } else if (!regex.test(serial)) {
+        listInValidLength.push(serial);
+      }
+    }
+    if (listInValidLength.length > 0) {
+      showMessage('Serial phải từ 7-20 ký tự chữ số, các serial sau không hợp lệ: ' + listInValidLength.join(','));
+      return;
+    }
+    for (const serial of newSerial) {
+      const check = await isUniqueSerial(serial); // Đợi kết quả từ isUniqueSerial
+      console.log('Kết quả hàm: ', check); // Hiển thị kết quả trực tiếp
+      if (check == false) {
+        console.log('vào nè');
+        serialValidate.push(serial);
+      }
+    }
 
     console.log('ListValid after: ', serialValidate);
 
@@ -255,21 +261,20 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
       actionFather();
     } else {
       let noti = '';
-      if (check.message !== ''){
-        noti += 'Giá không hợp lệ tại dòng ' + check.message
-        noti = noti.substring(0, noti.length - 2)
+      if (check.message !== '') {
+        noti += 'Giá không hợp lệ tại dòng ' + check.message;
+        noti = noti.substring(0, noti.length - 2);
       }
-      
-      if (check.isDulicateSeri)
-      {
-        noti += '\n | Serial Number nhập trong danh sách bị trùng lặp.'
+
+      if (check.isDulicateSeri) {
+        noti += '\n | Serial Number nhập trong danh sách bị trùng lặp.';
       }
       showMessage(noti);
     }
   };
 
   const validateForm = () => {
-    console.log('run validate')
+    console.log('run validate');
     let check = {
       check: true,
       message: '',
@@ -279,38 +284,38 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     let seriVuaNhap = [];
     variantList.forEach((item, idx) => {
       // set mảng ảnh theo màu
-      mauSacCheckedSelectAnh.forEach(color => {
-        if (item.mauSac.id === color.id){
-          item.anhSanPham = color.urls
+      mauSacCheckedSelectAnh.forEach((color) => {
+        if (item.mauSac.id === color.id) {
+          item.anhSanPham = color.urls;
         }
-      })
+      });
       // check giá
       if (item.giaBan === '' || isNaN(item.giaBan) || parseFloat(item.giaBan) <= 0) {
         check.check = false;
         check.message += idx + 1 + ', ';
       }
-      if (Array.isArray(item.serialNumberList)){
-        console.log('...item.serialNumberList: ', item.serialNumberList)
+      if (Array.isArray(item.serialNumberList)) {
+        console.log('...item.serialNumberList: ', item.serialNumberList);
       } else {
-        console.log('k phải array')
+        console.log('k phải array');
       }
 
-      seriVuaNhap = [...seriVuaNhap, ...item.serialNumberList]
+      seriVuaNhap = [...seriVuaNhap, ...item.serialNumberList];
       // console.log('seriVuaNhap trong for: ',seriVuaNhap)
     });
-    console.log('seriVuaNhap ',seriVuaNhap)
-    if (new Set(seriVuaNhap).size != seriVuaNhap.length){
-        check.check = false;
-        check.isDulicateSeri = true;
+    console.log('seriVuaNhap ', seriVuaNhap);
+    if (new Set(seriVuaNhap).size != seriVuaNhap.length) {
+      check.check = false;
+      check.isDulicateSeri = true;
     }
-    
+
     return check;
   };
 
   function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
     return new Intl.NumberFormat(locale, {
       style: 'decimal',
-      currency: currency,
+      currency: currency
     }).format(amount);
   }
 
@@ -341,21 +346,24 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
    * }
    */
 
-
   return (
     <div>
-      <div style={{textAlign: "right"}}>
-      <TextField
+      <div style={{ textAlign: 'right' }}>
+        <TextField
           label="Nhập giá chung"
           id="outlined-start-adornment"
           sx={{ m: 1, width: '25ch' }}
           value={formatCurrency(priceAll)}
           onChange={handlePriceAll}
         />
-        <Button onClick={changePriceAll} variant="contained" color="secondary" sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}>
+        <Button
+          onClick={changePriceAll}
+          variant="contained"
+          color="secondary"
+          sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}
+        >
           <IconCheck />
         </Button>
-
       </div>
       <TableContainer component={Paper}>
         <Table>
@@ -393,7 +401,6 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
                     const attributeValue = combinedKey(index, variant);
                     const countKey = `${attributeValue}`;
                     if (firstOccurrences[countKey] === rowIndex) {
-                        
                       return (
                         <TableCell key={key} rowSpan={counts[countKey]}>
                           {variant[listKeySort[index]].ten}
@@ -404,7 +411,14 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
                   })}
                   <TableCell>{variant.serialNumberList.length}</TableCell>
                   <TableCell>
-                    <TextField value={formatCurrency(variant.giaBan)} onChange={handleGiaBan(rowIndex)} label="Giá bán" variant="standard" fullWidth color="secondary" />
+                    <TextField
+                      value={formatCurrency(variant.giaBan)}
+                      onChange={handleGiaBan(rowIndex)}
+                      label="Giá bán"
+                      variant="standard"
+                      fullWidth
+                      color="secondary"
+                    />
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -428,18 +442,17 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           </TableBody>
         </Table>
       </TableContainer>
-      <div style={{padding: "20px", margin: "50px 0 20px 0", textAlign: "center"}}>
-      <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn ảnh theo màu sắc</h3>
+      <div style={{ padding: '20px', margin: '50px 0 20px 0', textAlign: 'center' }}>
+        <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn ảnh theo màu sắc</h3>
       </div>
-       {
-        mauSacCheckedSelectAnh.map(element => (
-          <div key={element.id} style={{display: "flex", margin: "10px 0", minHeight: "115px"}}>
-            <div style={{width: "30%"}}>
-            <Button color='secondary' variant="outlined" onClick={() => handleShowAlbumImage(element.id)}>
+      {mauSacCheckedSelectAnh.map((element) => (
+        <div key={element.id} style={{ display: 'flex', margin: '10px 0', minHeight: '115px' }}>
+          <div style={{ width: '30%' }}>
+            <Button color="secondary" variant="outlined" onClick={() => handleShowAlbumImage(element.id)}>
               Màu {element.ten}
             </Button>
-            {idAlbumImageVisiable === element.id && 
-              <AlbumImage 
+            {idAlbumImageVisiable === element.id && (
+              <AlbumImage
                 key={element.id}
                 openAlbum={openAlbum}
                 setOpenAlbum={handleShowAlbumImage}
@@ -448,19 +461,17 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
                 idColor={element.id}
                 onUpdateImage={onUpdateImage}
               />
-            }
-            
-            </div>
-            <div style={{width:"70%", display: "flex"}}>
-              {element.urls.map(url => (
-                <div style={{width: "100px", margin: "5px"}}>
-                  <img src={url} style={{width: "100%"}} />
-                </div>
-              ))}
-            </div>
+            )}
           </div>
-        ))
-       }                     
+          <div style={{ width: '70%', display: 'flex' }}>
+            {element.urls.map((url) => (
+              <div style={{ width: '100px', margin: '5px' }}>
+                <img src={url} style={{ width: '100%' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
 
       {/* Anh sp */}
       {/* <div style={{margin: "10px 0", textAlign: "center"}}>
@@ -473,10 +484,16 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           listAnh={imageList} 
           />
       </div> */}
-      <div style={{textAlign: "center", padding: "20px 0"}}>
-      <Button title='Xác nhận' variant="contained" color="secondary" sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}  onClick={handleSetResult}>
-        Xác nhận
-      </Button>
+      <div style={{ textAlign: 'center', padding: '20px 0' }}>
+        <Button
+          title="Xác nhận"
+          variant="contained"
+          color="secondary"
+          sx={{ height: '47px', borderRadius: '7px', marginTop: '10px' }}
+          onClick={handleSetResult}
+        >
+          Xác nhận
+        </Button>
       </div>
 
       <div>
@@ -496,8 +513,6 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
           setPriceAll={setPriceAll}
         /> */}
       </div>
-      
-      
     </div>
     // <div>
 

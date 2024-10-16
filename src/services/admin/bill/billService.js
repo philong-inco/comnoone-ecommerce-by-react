@@ -126,3 +126,18 @@ export const revertBillStatus = async (code) => {
     throw error;
   }
 };
+
+export const getPDF = async (code) => {
+  try {
+    const result = await get(`bills/order-pdf/${code}`, {
+      headers: {
+        'Content-Type': 'application/pdf'
+        // 'Authorization': 'Bearer your_token_here' // Thêm Authorization nếu cần
+      }
+    });
+    return result;
+  } catch (error) {
+    console.error('Error fetching pdf by code:', error);
+    throw error;
+  }
+};
