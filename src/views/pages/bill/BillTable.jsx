@@ -29,7 +29,7 @@ function BillTable(props) {
   const tabList = [
     { key: '', label: 'TẤT CẢ' },
     { key: 'DON_MOI', label: 'Đơn mới' },
-    // { key: 'CHO_THANH_TOAN', label: 'Chờ thanh toán' },
+    // { key: 'TREO', label: 'Hóa đơn treo' },
     { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
     { key: 'CHO_GIAO', label: 'Chờ giao' },
     { key: 'DANG_GIAO', label: 'Đang giao' },
@@ -102,7 +102,7 @@ function BillTable(props) {
           size="small"
           Chip
           sx={{
-            width: 100,
+            width: '100%',
             color: 'white',
             fontWeight: 'bold',
             fontSize: '0.8rem',

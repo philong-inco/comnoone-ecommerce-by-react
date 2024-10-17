@@ -4,6 +4,7 @@ import { getBillByCode } from 'services/admin/bill/billService';
 import { useEffect, useState } from 'react';
 import CustomerInBill from './dialog-san-pham/CustomerInBill';
 import Test2 from './Test2';
+import HangBill from './HangBill';
 
 function SellManager(props) {
   const { onReload, exitingBill } = props;

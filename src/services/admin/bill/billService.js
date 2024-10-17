@@ -82,6 +82,16 @@ export const updateStatusByCode = async (code, status, data) => {
   }
 };
 
+export const changeStatusByCode = async (code, status) => {
+  try {
+    const result = await post(`bills/change-status/${code}?status=${status}`);
+    return result;
+  } catch (error) {
+    console.error('Error change status bill by code :', error);
+    throw error;
+  }
+};
+
 export const payCounter = async (billCode, data) => {
   console.log('Data request : ', data);
 
@@ -138,6 +148,16 @@ export const getPDF = async (code) => {
     return result;
   } catch (error) {
     console.error('Error fetching pdf by code:', error);
+    throw error;
+  }
+};
+
+export const listHangBill = async () => {
+  try {
+    const result = await get(`bills/list-hang-bill`);
+    return result;
+  } catch (error) {
+    console.error('Error fetching hang bill code:', error);
     throw error;
   }
 };

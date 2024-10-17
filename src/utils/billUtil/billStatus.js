@@ -22,6 +22,8 @@ export const getStatusDisplayName = (status) => {
       return 'Xoá';
     case 'XAC_NHAN':
       return 'Xác nhận';
+    case 'TREO':
+      return 'Đang treo';
     default:
       return 'Không xác định';
   }
@@ -49,6 +51,8 @@ export const getStatusColor = (status) => {
       return grey[500];
     case 'XAC_NHAN':
       return grey[500];
+    case 'TREO':
+      return orange[500];
     default:
       return grey[400];
   }
