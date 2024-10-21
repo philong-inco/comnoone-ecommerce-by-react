@@ -58,9 +58,7 @@ const validationSchema = Yup.object().shape({
 
   gioi_tinh: Yup.number().required('Giới tính không được để trống'),
   hinhAnh: Yup.string(),
-  dia_chi: Yup.string()
-    .required("Địa chỉ không được để trống")
-    .max(256, "Địa chỉ không được vượt quá 256 ký tự"),
+  dia_chi: Yup.string().required('Địa chỉ chi tiết không được để trống !').max(256, 'Địa chỉ không được vượt quá 256 ký tự'),
 });
 
 function KhachHangConfiguration() {
@@ -201,6 +199,7 @@ function KhachHangConfiguration() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [formData, setFormData] = useState(null);
   const onSubmit = (data) => {
+    debugger;
     setFormData(data);
     setConfirmDialogOpen(true);
   };
@@ -223,8 +222,9 @@ function KhachHangConfiguration() {
           idTinhThanhPho: selectedProvince,
           diaChiNhanHang: formData.dia_chi
         };
-
-        await validationSchema.validate(finalData);
+        console.log(finalData);
+        
+        await validationSchema.validate(formData);
 
         const response = await axios.post(`http://localhost:8080/api/khachhang/create`, finalData, {
           headers: { 'Content-Type': 'application/json' }

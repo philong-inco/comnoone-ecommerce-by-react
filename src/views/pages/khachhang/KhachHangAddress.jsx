@@ -314,7 +314,7 @@ function KhachHangAddress() {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
       }
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
-      const diaChiList = responseDiaChi.data;
+      const diaChiList = responseDiaChi.data; 
       setAddresses(diaChiList);
       const provinces = new Set();
       const districts = new Set();
