@@ -23,12 +23,16 @@ import {
   CircularProgress
 } from '@mui/material';
 import { IconArticleFilledFilled } from '@tabler/icons-react';
+import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
+
 import { useRef, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
+import { AiFillCarryOut, AiFillFile } from 'react-icons/ai';
 import { getPDF, updateStatusByCode } from 'services/admin/bill/billService';
 
 import { getStatusBillHistory, getStatusBillHistoryColor } from 'utils/billUtil/billStatus';
+// import { Timeline } from '@mui/icons-material';
 
 function NewTimeLine(props) {
   const { id } = useParams();
@@ -41,6 +45,7 @@ function NewTimeLine(props) {
 
   const showIcon = (statusBill) => {
     if (statusBill === 0) {
+      // return <AiFillFile />;
       return <IconArticleFilledFilled style={{ color: '#3f51b5', width: '100%', transform: 'scale(2)' }} />;
     } else if (statusBill === 1) {
       return <IconArticleFilledFilled style={{ color: '#f44336', width: '100%', transform: 'scale(2)' }} />; // Đỏ
@@ -320,6 +325,9 @@ function NewTimeLine(props) {
         const pdfBlob = await response.blob();
         const pdfUrl = URL.createObjectURL(pdfBlob);
         setPdfUrl(pdfUrl);
+        setSnackbarMessage('Xuất hóa đơn thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
 
         // Gọi in PDF từ iframe sau khi đã tải
         setTimeout(() => {
@@ -398,7 +406,6 @@ function NewTimeLine(props) {
           </Grid>
         </Grid>
       </div>
-
       {/* Dia log lịch sử thao tác */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
