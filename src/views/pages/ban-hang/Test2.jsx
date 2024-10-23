@@ -409,6 +409,9 @@ function Test2(props) {
         const pdfBlob = await response.blob();
         const pdfUrl = URL.createObjectURL(pdfBlob);
         setPdfUrl(pdfUrl);
+        setSnackbarMessage('Xuất hóa đơn thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
 
         // Gọi in PDF từ iframe sau khi đã tải
         setTimeout(() => {
@@ -641,7 +644,7 @@ function Test2(props) {
           <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
             {formData.thanhToanSau == 1 ? 'Xác nhận đặt hàng' : 'Tiến hành thanh toán'}
           </Button>
-          <PaymentDialog2 open={isPaymentDialogOpen} onClose={onClosePaymentDialog} data={formData} onReload={loadAll} />
+          <PaymentDialog2 open={isPaymentDialogOpen} onCloseDialog={onClosePaymentDialog} data={formData} onReload={loadAll} />
         </Grid>
       </Grid>
       <CouponDiaLog

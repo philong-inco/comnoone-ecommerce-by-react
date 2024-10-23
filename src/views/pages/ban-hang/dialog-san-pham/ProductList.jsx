@@ -109,8 +109,8 @@ const ProductList = (props) => {
   const urlFindFilter = 'http://localhost:8080/api/san-pham-chi-tiet/find/filter?';
   const [sanPham, setsanPham] = useState([]);
   const [filter, setFilter] = useState({
-    // page: 0,
-    // size: '5',
+    page: 0,
+    size: '5',
     tenSP: '',
     maSP: '',
     maSPCT: '',
@@ -632,7 +632,7 @@ const ProductList = (props) => {
               </TableBody>
             </Table>
           </TableContainer>
-          {/* <TablePagination
+          <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
             count={totalElement}
@@ -640,7 +640,7 @@ const ProductList = (props) => {
             page={filter.page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-          /> */}
+          />
         </Paper>
       </MainCard>
 

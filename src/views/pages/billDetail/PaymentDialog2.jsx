@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Grid,
   Typography,
@@ -26,7 +26,8 @@ import { payCounter } from 'services/admin/bill/billService';
 
 const PaymentDialog2 = (props) => {
   const { id } = useParams();
-  const { open, onClose, data, onReload } = props;
+  const iframeRef = useRef();
+  const { open, onCloseDialog, data, onReload } = props;
   const [loading, setLoading] = useState(true);
   const [lichSuThanhToan, setLichSuThanhToan] = useState([]);
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('');
@@ -41,6 +42,8 @@ const PaymentDialog2 = (props) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   const handlePhuongThucThanhToanChange = (phuongThuc) => {
     setPhuongThucThanhToan(phuongThuc);
@@ -86,7 +89,7 @@ const PaymentDialog2 = (props) => {
         setSnackbarMessage('Giao dịch thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        await fetchInvoicePdf();
+        // await fetchInvoicePdf();
 
         fetchAll();
       }
@@ -210,8 +213,7 @@ const PaymentDialog2 = (props) => {
       ghiChu: data.ghiChu
     };
     console.log('new DATA : ', newData);
-
-    setXacNhanThanhToan(false);
+    apiPayCounter(newData);
   };
 
   const apiPayCounter = async (data) => {
@@ -223,6 +225,7 @@ const PaymentDialog2 = (props) => {
         setSnackbarOpen(true);
         setXacNhanMo(false);
         setXacNhanThanhToan(false);
+        onCloseDialog();
         await fetchInvoicePdf();
         // setFormData({});
         // setBill({});
@@ -241,7 +244,7 @@ const PaymentDialog2 = (props) => {
   };
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      <Dialog open={open} onClose={onCloseDialog} fullWidth maxWidth="md">
         <DialogTitle variant="h4">Thanh toán</DialogTitle>
         <DialogContent>
           <Box>
@@ -373,7 +376,16 @@ const PaymentDialog2 = (props) => {
           </Button>
         </Grid>
       </Dialog>
-
+      {pdfUrl && (
+        <iframe
+          ref={iframeRef}
+          src={pdfUrl}
+          width="0"
+          height="0"
+          style={{ display: 'none' }} // Ẩn iframe
+          title="PDF"
+        />
+      )}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
