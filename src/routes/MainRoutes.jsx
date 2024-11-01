@@ -383,10 +383,8 @@ const MainRoutes = {
     },
     {
       path: '/',
-      element: (
-        <ErrorBoundary>
-          <DashboardDefault />
-        </ErrorBoundary>
+      element: (   
+          <DashboardDefault /> 
       )
     },
     {
@@ -395,9 +393,7 @@ const MainRoutes = {
         {
           path: 'default',
           element: (
-            <ErrorBoundary>
               <DashboardDefault />
-            </ErrorBoundary>
           )
         }
       ]

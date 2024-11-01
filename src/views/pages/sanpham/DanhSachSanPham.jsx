@@ -270,6 +270,7 @@ const DanhSachSanPham = () => {
     }, [filter]);
 
     const loadProducts = async () => {
+        debugger;
         const queryString = Object.entries(filter)
             .filter(([key, value]) => value !== '')
             .map(([key, value]) => `${key}=${value}`)

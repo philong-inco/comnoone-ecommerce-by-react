@@ -85,7 +85,6 @@ const ProfileSection = () => {
   useEffect(() => {
     const fetchNhanVien = async () => {
       try {
-        debugger;
         const response = await axios.get('https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/2');
         setNhanVien(response.data);
         console.log(response.data)
@@ -101,7 +100,6 @@ const ProfileSection = () => {
 
   const fetchVaiTro = async () => {
     try {
-      debugger;
       const response = await axios.get('https://weblaptop-by-springboot-and-reactjs.onrender.com/api/vaitro/findbynhanvien/2');
       setVaiTro(response.data);
       console.log(response.data)
