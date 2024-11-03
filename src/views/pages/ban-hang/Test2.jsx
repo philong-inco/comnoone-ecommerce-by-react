@@ -432,7 +432,7 @@ function Test2(props) {
 
   return (
     <>
-      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
+      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 1, borderRadius: 2 }}>
         <Grid item xs={8}>
           <Typography variant="h3">Thông tin đơn hàng </Typography>
         </Grid>
@@ -618,23 +618,23 @@ function Test2(props) {
             />
           )}
           <Typography mt={1} variant="h4">
-            Tổng tiền hàng: {id ? parseFloat(formData?.tongTienBanDau || 0).toLocaleString() || '0' : 0} VNĐ
+            Tạm tính: {id ? parseFloat(formData?.tongTienBanDau || 0).toLocaleString() || '0' : 0} đ
           </Typography>
           <Typography mt={1} variant="h4">
-            Phiếu giảm giá : {id ? formData?.maPGG || '' : ''}
+            Mã Voucher : {id ? formData?.maPGG || '' : ''}
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm giá: - {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} VNĐ
+            Voucher: - {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm hạng: - {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} VNĐ
+            Giảm hạng: - {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} VNĐ
+            Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           {isDelivery && (
             <Typography mt={1} variant="h4">
-              Tiền ship: + {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} VNĐ
+              Tiền ship: + {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} đ
             </Typography>
           )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">

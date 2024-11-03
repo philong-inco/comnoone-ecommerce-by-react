@@ -166,7 +166,7 @@ function CustomerInBill(props) {
 
   return (
     <>
-      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 5, borderRadius: 4 }}>
+      <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 1, borderRadius: 2 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Typography variant="h3">Khách hàng</Typography>
           <Button

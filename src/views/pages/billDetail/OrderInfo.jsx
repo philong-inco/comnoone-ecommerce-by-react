@@ -401,155 +401,214 @@ function OrderInfo(props) {
 
         <Grid item xs={8}>
           {isDelivery && id ? (
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  disabled={true}
-                  label="Tên của bạn"
-                  id="ten"
-                  placeholder="Nhập tên của bạn"
-                  value={formData.ten || ''}
-                  onChange={handleInputChange}
-                  error={!!formDataError.ten}
-                  helperText={formDataError.ten}
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: !!formData.ten
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  disabled={true}
-                  label="Số điện thoại"
-                  id="sdt"
-                  placeholder="Nhập số điện thoại"
-                  value={formData.sdt}
-                  onChange={handleInputChange}
-                  error={!!formDataError.sdt}
-                  helperText={formDataError.sdt}
-                  fullWidth
-                  margin="normal"
-                  type="tel"
-                  InputLabelProps={{
-                    shrink: !!formData.sdt // Đưa label lên nếu có dữ liệu
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  disabled={true}
-                  label="Email"
-                  id="email"
-                  placeholder="Nhập email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  error={!!formDataError.email}
-                  helperText={formDataError.email}
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: !!formData.email // Đưa label lên nếu có dữ liệu
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  disabled={true}
-                  label="Địa chỉ giao hàng"
-                  id="diaChi"
-                  placeholder="Nhập địa chỉ giao hàng"
-                  value={formData.diaChi}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={4}
-                  InputLabelProps={{
-                    shrink: !!formData.diaChi // Đưa label lên nếu có dữ liệu
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel id="tinh-label">Tỉnh/Thành Phố</InputLabel>
-                  <Select
+            <>
+              {/* <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <TextField
                     disabled={true}
-                    labelId="tinh-label"
-                    id="tinh"
-                    value={formData.tinh}
-                    onChange={handleProvinceChange}
-                    error={!!formDataError.tinh}
-                  >
-                    <MenuItem value="" disabled>
-                      Chọn Tỉnh/Thành Phố
-                    </MenuItem>
-                    {provinces.map((province) => (
-                      <MenuItem key={province.ProvinceID} value={province.ProvinceID}>
-                        {province.ProvinceName}
+                    label="Tên của bạn"
+                    id="ten"
+                    placeholder="Nhập tên của bạn"
+                    value={formData.ten || ''}
+                    onChange={handleInputChange}
+                    error={!!formDataError.ten}
+                    helperText={formDataError.ten}
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: !!formData.ten
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    disabled={true}
+                    label="Số điện thoại"
+                    id="sdt"
+                    placeholder="Nhập số điện thoại"
+                    value={formData.sdt}
+                    onChange={handleInputChange}
+                    error={!!formDataError.sdt}
+                    helperText={formDataError.sdt}
+                    fullWidth
+                    margin="normal"
+                    type="tel"
+                    InputLabelProps={{
+                      shrink: !!formData.sdt 
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    disabled={true}
+                    label="Email"
+                    id="email"
+                    placeholder="Nhập email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    error={!!formDataError.email}
+                    helperText={formDataError.email}
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: !!formData.email 
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    disabled={true}
+                    label="Địa chỉ giao hàng"
+                    id="diaChi"
+                    placeholder="Nhập địa chỉ giao hàng"
+                    value={formData.diaChi}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    multiline
+                    rows={4}
+                    InputLabelProps={{
+                      shrink: !!formData.diaChi
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="tinh-label">Tỉnh/Thành Phố</InputLabel>
+                    <Select
+                      disabled={true}
+                      labelId="tinh-label"
+                      id="tinh"
+                      value={formData.tinh}
+                      onChange={handleProvinceChange}
+                      error={!!formDataError.tinh}
+                    >
+                      <MenuItem value="" disabled>
+                        Chọn Tỉnh/Thành Phố
                       </MenuItem>
-                    ))}
-                  </Select>
-                  {formDataError.tinh && <Typography color="error">{formDataError.tinh}</Typography>}
-                </FormControl>
-              </Grid>
+                      {provinces.map((province) => (
+                        <MenuItem key={province.ProvinceID} value={province.ProvinceID}>
+                          {province.ProvinceName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formDataError.tinh && <Typography color="error">{formDataError.tinh}</Typography>}
+                  </FormControl>
+                </Grid>
 
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel id="huyen-label">Quận/Huyện</InputLabel>
-                  <Select disabled={true} labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
-                    <MenuItem value="">Chọn Quận/Huyện</MenuItem>
-                    {districts.map((district) => (
-                      <MenuItem key={district.DistrictID} value={district.DistrictID}>
-                        {district.DistrictName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formDataError.huyen && <Typography color="error">{formDataError.huyen}</Typography>}
-                </FormControl>
-              </Grid>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="huyen-label">Quận/Huyện</InputLabel>
+                    <Select disabled={true} labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
+                      <MenuItem value="">Chọn Quận/Huyện</MenuItem>
+                      {districts.map((district) => (
+                        <MenuItem key={district.DistrictID} value={district.DistrictID}>
+                          {district.DistrictName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formDataError.huyen && <Typography color="error">{formDataError.huyen}</Typography>}
+                  </FormControl>
+                </Grid>
 
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel id="phuong-label">Phường/Xã</InputLabel>
-                  <Select disabled={true} labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
-                    <MenuItem value="">Chọn Phường/Xã</MenuItem>
-                    {wards.map((ward) => (
-                      <MenuItem key={ward.WardCode} value={ward.WardCode}>
-                        {ward.WardName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formDataError.phuong && <Typography color="error">{formDataError.phuong}</Typography>}
-                </FormControl>
-              </Grid>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel id="phuong-label">Phường/Xã</InputLabel>
+                    <Select disabled={true} labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
+                      <MenuItem value="">Chọn Phường/Xã</MenuItem>
+                      {wards.map((ward) => (
+                        <MenuItem key={ward.WardCode} value={ward.WardCode}>
+                          {ward.WardName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formDataError.phuong && <Typography color="error">{formDataError.phuong}</Typography>}
+                  </FormControl>
+                </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  disabled={true}
-                  label="Ghi chú"
-                  id="ghiChu"
-                  placeholder="Ghi chú"
-                  value={formData.ghiChu}
-                  onChange={handleInputChange}
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={4}
-                  InputLabelProps={{
-                    shrink: !!formData.ghiChu // Đưa label lên nếu có dữ liệu
-                  }}
-                />
-              </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    disabled={true}
+                    label="Ghi chú"
+                    id="ghiChu"
+                    placeholder="Ghi chú"
+                    value={formData.ghiChu}
+                    onChange={handleInputChange}
+                    fullWidth
+                    margin="normal"
+                    multiline
+                    rows={4}
+                    InputLabelProps={{
+                      shrink: !!formData.ghiChu 
+                    }}
+                  />
+                </Grid>
 
-              <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <strong style={{ fontSize: '24px' }}> Phí ship : {formatCurrency(formData.tienShip)}</strong>
-                {/* <strong style={{ fontSize: '24px' }}>Ngày nhận hàng dự kiến : {formData.ngayNhanHangDuKien || ''}</strong> */}
+                <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <strong style={{ fontSize: '24px' }}> Phí ship : {formatCurrency(formData.tienShip)}</strong>
+                </Grid>
+              </Grid> */}
+              {/* /// */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Tên người nhận:
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }}>
+                    {formData.ten || 'Chưa có thông tin'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Số điện thoại:
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }}>
+                    {formData.sdt || 'Chưa có thông tin'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Email:
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }}>
+                    {formData.email || 'Chưa có thông tin'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Địa chỉ giao hàng:
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }} paragraph>
+                    {formData.diaChi || 'Chưa có thông tin'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Ghi chú:
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }} paragraph>
+                    {formData.ghiChu || 'Chưa có thông tin'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="subtitle1" style={{ color: 'black' }}>
+                    Phí ship :
+                  </Typography>
+                  <Typography variant="body1" style={{ color: 'black' }} paragraph>
+                    {formatCurrency(formData.tienShip) || 'Chưa có thông tin'}
+                  </Typography>
+
+                  {/* <strong style={{ fontSize: '24px' }}>Ngày nhận hàng dự kiến: {formData.ngayNhanHangDuKien || ''}</strong> */}
+                </Grid>
               </Grid>
-            </Grid>
+            </>
           ) : (
             <></>
           )}
@@ -569,28 +628,28 @@ function OrderInfo(props) {
             />
           )} */}
           <Typography mt={1} variant="h4">
-            Tổng tiền hàng: {id ? parseFloat(formData?.tongTienBanDau || 0).toLocaleString() || '0' : 0} VNĐ
+            Tạm tính: {id ? parseFloat(formData?.tongTienBanDau || 0).toLocaleString() || '0' : 0} đ
           </Typography>
           <Typography mt={1} variant="h4">
-            Phiếu giảm giá : {id ? formData?.maPGG || '' : ''}
+            Mã Voucher : {id ? formData?.maPGG || '' : ''}
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm giá: {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} VNĐ
+            Voucher : {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           <Typography mt={1} variant="h4">
-            Giảm hạng: {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} VNĐ
+            Giảm hạng: {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
-            Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} VNĐ
+            Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           {isDelivery && (
             <Typography mt={1} variant="h4">
-              Tiền ship: {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} VNĐ
+              Tiền ship: {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} đ
             </Typography>
           )}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
             Tổng tiền hóa đơn :{' '}
-            {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
+            {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           {/* <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
             Xác nhận thanh toán
