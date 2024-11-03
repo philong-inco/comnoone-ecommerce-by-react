@@ -15,11 +15,14 @@ import {
   Grid,
   Button,
   Slider,
+  TextField,
 } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, Line } from 'recharts';
 import { format, subDays, subMonths } from 'date-fns';
 import { getAllListProduct, getTopFiveProductSold, infoBillByDate, totalPriceToday, totalpriceByDate, countBill, countProduct } from '../../services/admin/product/productService'
-
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -32,6 +35,7 @@ const Dashboard = () => {
   const [revenue, setRevenue] = useState(0);
   const [totalPrice, setTotalPrice] = useState(null);
   const [totalBill, setTotalBill] = useState(null);
+  const [totalBillToday, settotalBillToday] = useState(null);
   const [totalProduct, setTotalProduct] = useState(null);
 
   useEffect(() => {
@@ -55,7 +59,6 @@ const Dashboard = () => {
     setRevenue(result.data?.data || 0);
   };
 
-
   const loadProducts = async () => {
     try {
       const result = await getAllListProduct(startDate, endDate);
@@ -64,7 +67,7 @@ const Dashboard = () => {
         .sort((a, b) => a.soLuong - b.soLuong);
       setProducts(filteredProducts);
     } catch (error) {
-      console.error("Failed to load products:", error);
+      console.error("Lỗi khi tải sản phẩm:", error);
     } finally {
       setLoading(false);
     }
@@ -82,10 +85,9 @@ const Dashboard = () => {
       const result = await getTopFiveProductSold(formattedStartDate, formattedEndDate);
       setTopSellingProducts(result.data);
     } catch (error) {
-      console.error("Failed to load top-selling products:", error);
+      console.error("Lỗi khi tải sản phẩm bán chạy nhất:", error);
     }
   };
-
 
   const loadChartData = async () => {
     try {
@@ -102,7 +104,7 @@ const Dashboard = () => {
 
       setChartData(formattedData);
     } catch (error) {
-      console.error("Failed to load chart data:", error);
+      console.error("Lỗi khi tải dữ liệu biểu đồ:", error);
     }
   };
 
@@ -114,8 +116,8 @@ const Dashboard = () => {
           format(endDate, 'yyyy-MM-dd HH:mm:ss'));
         setTotalPrice(result.data);
       } catch (error) {
-        console.error('Error fetching total price:', error);
-        setTotalPrice(0); // Trong trường hợp lỗi
+        console.error('Lỗi khi lấy tổng doanh thu:', error);
+        setTotalPrice(0);
       }
     }
   };
@@ -127,9 +129,28 @@ const Dashboard = () => {
           format(endDate, 'yyyy-MM-dd HH:mm:ss'));
         setTotalBill(result.data);
       } catch (error) {
-        console.error('Error fetching total price:', error);
+        console.error('Lỗi khi lấy tổng hóa đơn:', error);
         setTotalBill(0);
       }
+    }
+  };
+
+
+  const handleBillByToDay = async () => {
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    try {
+      const result = await countBill(
+        format(startDate, 'yyyy-MM-dd HH:mm:ss'),
+        format(endDate, 'yyyy-MM-dd HH:mm:ss')
+      );
+      settotalBillToday(result.data);
+    } catch (error) {
+      console.error('Lỗi khi lấy tổng hóa đơn:', error);
+      setTotalBill(0);
     }
   };
 
@@ -140,11 +161,13 @@ const Dashboard = () => {
           format(endDate, 'yyyy-MM-dd HH:mm:ss'));
         setTotalProduct(result.data);
       } catch (error) {
-        console.error('Error fetching total product:', error);
+        console.error('Lỗi khi lấy tổng sản phẩm đã bán:', error);
         setTotalBill(0);
       }
     }
   };
+
+
 
   useEffect(() => {
     loadChartData();
@@ -162,69 +185,108 @@ const Dashboard = () => {
         <CircularProgress />
       ) : (
         <Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Card sx={{ padding: 3, background: 'linear-gradient(#0250c5, #d43f8d)', color: '#fff', borderRadius: '8px', width: '30%' }}>
-              <Box textAlign="center">
-                <Typography variant="h6" gutterBottom color="white">
-                  Doanh Thu Hôm Nay
-                </Typography>
-                <Typography variant="h4" fontWeight="bold" color="white">
-                  {revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                </Typography>
-              </Box>
-            </Card>
-          </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3, mt: 5 }}>
-
+          <Box>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '40%',
-                padding: 1,
-                background: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)',
-                borderRadius: '8px',
-                color: '#fff'
               }}
             >
-              <Typography sx={{ marginRight: 2 }}>Từ ngày</Typography>
-              <input
+              {/* Thẻ Doanh Thu Hôm Nay */}
+              <Card
+                sx={{
+                  padding: 3,
+                  background: 'linear-gradient(#0250c5, #d43f8d)',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  width: '30%',
+                  marginRight: '10%',
+                }}
+              >
+                <Box textAlign="center">
+                  <AttachMoneyIcon sx={{ fontSize: 40, mb: 1 }} />
+                  <Typography variant="h6" gutterBottom color="white">
+                    Doanh Thu Hôm Nay
+                  </Typography>
+                  <Typography variant="h4" fontWeight="bold" color="white">
+                    {revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  </Typography>
+                </Box>
+              </Card>
+
+              <Card
+                sx={{
+                  padding: 3,
+                  background: 'linear-gradient(#0250c5, #d43f8d)',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  width: '30%',
+                  marginRight: '10%',
+                }}
+              >
+                <Box textAlign="center">
+                  <ReceiptIcon sx={{ fontSize: 40, mb: 1 }} />
+                  <Typography variant="h6" gutterBottom color="white">
+                    Tổng Hóa Đơn Ngày Hôm Nay
+                  </Typography>
+                  <Typography variant="h4" fontWeight="bold" color="white">
+                    {totalBillToday !== null
+                      ? totalBillToday
+                      : '0'}
+                  </Typography>
+                </Box>
+              </Card>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3, mt: 5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 1,
+                background: 'gray',
+                borderRadius: '8px',
+                color: '#fff',
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <Typography sx={{ marginRight: 2, fontWeight: 'bold' }}>Từ ngày</Typography>
+              <TextField
                 type="date"
                 value={format(startDate, 'yyyy-MM-dd')}
                 onChange={(e) => setStartDate(new Date(e.target.value))}
-                style={{
-                  marginRight: '16px',
+                sx={{
+                  marginRight: 2,
                   padding: '5px',
                   borderRadius: '6px',
-                  border: 'none',
-                  outline: 'none',
                   background: '#fff',
                   color: '#333',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  width: '150px',
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'transparent' },
+                  },
                 }}
               />
 
-              <Typography sx={{ marginRight: 2 }}>Đến ngày</Typography>
-              <input
+              <Typography sx={{ marginRight: 2, fontWeight: 'bold' }}>Đến ngày</Typography>
+              <TextField
                 type="date"
                 value={format(endDate, 'yyyy-MM-dd')}
                 onChange={(e) => setEndDate(new Date(e.target.value))}
-                style={{
+                sx={{
                   padding: '5px',
                   borderRadius: '6px',
-                  border: 'none',
-                  outline: 'none',
                   background: '#fff',
                   color: '#333',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  width: '150px',
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'transparent' },
+                  },
                 }}
               />
             </Box>
@@ -233,21 +295,22 @@ const Dashboard = () => {
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              gap: 2, // Khoảng cách giữa các thẻ
-              width: '100%', // Đảm bảo chiều rộng đầy đủ của container
+              gap: 2,
+              width: '100%',
             }}
           >
-            {/* Card tổng doanh thu */}
+            {/* Thẻ Tổng Doanh Thu */}
             <Card
               sx={{
                 padding: 3,
-                background: 'linear-gradient(#d7d2cc, #304352)',
+                background: 'linear-gradient(#6C8CBF,#96D7C6)',
                 color: '#fff',
                 borderRadius: '8px',
-                width: '48%', // Điều chỉnh để chiếm khoảng 48% của container
+                width: '48%',
               }}
             >
               <Box textAlign="center">
+                <AttachMoneyIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Doanh Thu */}
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng doanh thu
                 </Typography>
@@ -259,17 +322,18 @@ const Dashboard = () => {
               </Box>
             </Card>
 
-            {/* Card tổng hóa đơn */}
+            {/* Thẻ Tổng Hóa Đơn */}
             <Card
               sx={{
                 padding: 3,
-                background: 'linear-gradient(#d7d2cc, #304352)',
+                background: 'linear-gradient(#706695,#F8956F)',
                 color: '#fff',
                 borderRadius: '8px',
-                width: '48%', // Điều chỉnh để chiếm khoảng 48% của container
+                width: '48%',
               }}
             >
               <Box textAlign="center">
+                <ReceiptIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Hóa Đơn */}
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng hóa đơn
                 </Typography>
@@ -281,21 +345,23 @@ const Dashboard = () => {
               </Box>
             </Card>
 
+            {/* Thẻ Tổng Sản Phẩm Đã Bán */}
             <Card
               sx={{
                 padding: 3,
-                background: 'linear-gradient(#d7d2cc, #304352)',
+                background: 'linear-gradient(#FB7B8E,#031B88)',
                 color: '#fff',
                 borderRadius: '8px',
-                width: '48%', // Điều chỉnh để chiếm khoảng 48% của container
+                width: '48%',
               }}
             >
               <Box textAlign="center">
+                <ShoppingCartIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Sản Phẩm */}
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng sản phẩm đã bán
                 </Typography>
                 <Typography variant="h4" fontWeight="bold" color="white">
-                  {totalBill !== null
+                  {totalProduct !== null
                     ? totalProduct
                     : 'Vui lòng chọn khoảng thời gian'}
                 </Typography>
@@ -303,7 +369,6 @@ const Dashboard = () => {
             </Card>
           </Box>
 
-          {/* Biểu đồ */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5 }}>
             <Card sx={{ padding: 3, maxWidth: '90%', width: '100%', backgroundColor: '#f5f5f5' }}>
               <Typography variant="h4" gutterBottom align="center">
@@ -348,7 +413,6 @@ const Dashboard = () => {
           </Box>
 
           <Grid container spacing={3}>
-            {/* Table 1 - Sản phẩm sắp hết hàng */}
             <Grid item xs={12} md={6}>
               <Card sx={{ padding: 2, minHeight: 385, background: 'linear-gradient(to right,#a6c0fe,#f68084)', color: '#fff' }}>
                 <Typography variant="h5" gutterBottom textAlign="center">
@@ -391,8 +455,6 @@ const Dashboard = () => {
                 )}
               </Card>
             </Grid>
-
-            {/* Table 2 - Top 5 Sản Phẩm Bán Chạy */}
             <Grid item xs={12} md={6}>
               <Card sx={{ padding: 2, minHeight: 300, background: 'linear-gradient(to right,#a6c0fe,#f68084)', color: '#fff' }}>
                 <Typography variant="h5" gutterBottom textAlign="center">
