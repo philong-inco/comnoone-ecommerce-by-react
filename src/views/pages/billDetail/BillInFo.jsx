@@ -13,7 +13,7 @@ function BillInFo(props) {
   );
   return (
     <>
-      <Grid container spacing={2} padding={3} sx={{ backgroundColor: 'white', borderRadius: 4, mt: 2, boxShadow: 3 }}>
+      <Grid container spacing={2} padding={3} sx={{ borderRadius: 4, mt: 2, boxShadow: 3 }}>
         <Grid item xs={10}>
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
             Thông tin đơn hàng

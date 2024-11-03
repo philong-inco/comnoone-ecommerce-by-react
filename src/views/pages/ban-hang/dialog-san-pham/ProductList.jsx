@@ -118,7 +118,7 @@ const ProductList = (props) => {
     ngayTaoSau: '',
     ngaySuaTruoc: '',
     ngaySuaSau: '',
-    trangThai: '',
+    trangThai: '1',
     nhuCau: '',
     thuongHieu: '',
     ram: '',

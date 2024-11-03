@@ -9,6 +9,7 @@ import SerialNumberSold from './SerialNumberSold';
 import HistoryPayment from './HistoryPayment';
 import Test2 from '../ban-hang/Test2';
 import OrderInfo from './OrderInfo';
+import OrderStep from './OrderStep';
 
 function BillDetail() {
   const { id } = useParams();
@@ -71,7 +72,7 @@ function BillDetail() {
   console.log('BILL DETAIL => HISTORY : ', billHistory);
 
   return (
-    <>
+    <div style={{ backgroundColor: 'while' }}>
       <Fab
         color="primary"
         aria-label="back"
@@ -99,7 +100,7 @@ function BillDetail() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </>
+    </div>
   );
 }
 export default BillDetail;
