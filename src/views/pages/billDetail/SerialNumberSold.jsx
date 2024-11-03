@@ -243,7 +243,7 @@ function SerialNumberSold(props) {
                   <TableCell>{product.productDetailCode}</TableCell>
                   <TableCell>
                     {product.productName} <br />
-                    <strong style={{ color: 'red' }}>{parseFloat(product.price).toLocaleString()} VNĐ</strong>
+                    <strong style={{ color: 'black' }}>{parseFloat(product.price).toLocaleString()} đ</strong>
                   </TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -295,7 +295,7 @@ function SerialNumberSold(props) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <strong style={{ color: 'red' }}>{parseFloat(product.quantity * product.price).toLocaleString()} VNĐ</strong>
+                    <strong style={{ color: 'black' }}>{parseFloat(product.quantity * product.price).toLocaleString()} đ</strong>
                   </TableCell>
                   <TableCell>
                     <strong>
@@ -342,8 +342,8 @@ function SerialNumberSold(props) {
         </TableContainer>
         <Grid container justifyContent="end" alignItems="center" mt={2}>
           <Typography variant="h4">
-            Tổng tiền : <strong style={{ color: 'red' }}> {parseFloat(id ? bill.tongTienBanDau : 0 || 0).toLocaleString() || '0'} </strong>{' '}
-            VNĐ
+            Tổng tiền :{' '}
+            <strong style={{ color: 'black' }}> {parseFloat(id ? bill.tongTienBanDau : 0 || 0).toLocaleString() || '0'} </strong> đ
           </Typography>
         </Grid>
       </Grid>

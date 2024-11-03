@@ -72,6 +72,7 @@ function CouponDiaLog(props) {
       setSnackbarOpen(true);
     }
   };
+  console.log(coupons);
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
@@ -105,10 +106,11 @@ function CouponDiaLog(props) {
                     {/* <TableCell>{coupon.ten}</TableCell> */}
 
                     <TableCell>
-                      {parseInt(coupon.giaTriGiamGia || 0).toLocaleString() || '0'} {coupon.loaiGiamGia === 1 ? '%' : 'VNĐ' || ''}
+                      {/* {parseInt(coupon.giaTriGiamGia || 0).toLocaleString() || '0'} {coupon.loaiGiamGia === 1 ? '%' : 'VNĐ' || ''} */}
+                      {parseFloat(coupon.giaTriQuyDoi || 0).toLocaleString() || '0'}
                     </TableCell>
-                    <TableCell>{parseFloat(coupon.giaTriDonToiThieu || 0).toLocaleString() || '0'}</TableCell>
-                    <TableCell>{parseFloat(coupon.giamToiDa || 0).toLocaleString() || '0'} VNĐ </TableCell>
+                    <TableCell>{parseFloat(coupon.giaTriDonToiThieu || 0).toLocaleString() || '0'} đ</TableCell>
+                    <TableCell>{parseFloat(coupon.giamToiDa || 0).toLocaleString() || '0'} đ </TableCell>
                     <TableCell>{coupon.soLuong}</TableCell>
                     <TableCell>{coupon.phamViApDung == 1 ? 'Công khai' : 'Cá nhân'}</TableCell>
 

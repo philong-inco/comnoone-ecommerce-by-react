@@ -68,7 +68,7 @@ function HistoryPayment(props) {
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
-                      <strong>{payment.soTien ? payment.soTien.toLocaleString() + ' VNĐ' : 'Chưa có'}</strong>{' '}
+                      <strong>{payment.soTien ? payment.soTien.toLocaleString() + ' đ' : 'Chưa có'}</strong>{' '}
                     </TableCell>
                     <TableCell>
                       {payment.loaiThanhToan === 0 ? (

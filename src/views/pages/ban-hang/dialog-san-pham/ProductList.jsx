@@ -39,7 +39,7 @@ import {
 import ButtonAdd from 'views/pages/sanpham//ui-component/ButtonAdd.jsx';
 
 import Loader from 'ui-component/Loader';
-import { Box, maxHeight } from '@mui/system';
+import { Box, maxHeight, maxWidth } from '@mui/system';
 import { Download, Upload } from '@mui/icons-material';
 import { MenuButton } from '@mui/base';
 import MenuDownload from 'views/pages/sanpham//ui-component/Menu.jsx';
@@ -226,6 +226,8 @@ const ProductList = (props) => {
     setPageSerial(1);
     fetchSerialNumberByProduct(productId, newSearchSerial, 1, sizeSerial);
   };
+  console.log('FILTER : ', filter);
+
   // thêm serial
   const handleSubmitSerials = async () => {
     const data = {
@@ -271,10 +273,10 @@ const ProductList = (props) => {
   // useEffect Attribute Checked
 
   useEffect(() => {
-    const trangThaiInt = trangThaiChecked.join(',');
+    // const trangThaiInt = trangThaiChecked.join(',');
     setFilter((prev) => ({
       ...prev,
-      trangThai: trangThaiInt
+      trangThai: 1
     }));
   }, [trangThaiChecked]);
 
@@ -440,28 +442,30 @@ const ProductList = (props) => {
     { id: 'maSPCT', label: 'Mã', minWidth: 70 },
     { id: 'anh', label: 'Ảnh', minWidth: 70 },
 
-    { id: 'sanPham', label: 'Tên', minWidth: 150 },
-    {
-      id: 'giaBan',
-      label: 'Giá sản phẩm',
-      minWidth: 100,
-      align: 'left',
-      format: (value) => parseFloat(value || 0).toLocaleString()
-    },
-    {
-      id: 'giaSauKhuyenMai',
-      label: 'Giá bán',
-      minWidth: 100,
-      align: 'left',
-      format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
-    },
-    {
-      id: 'soTienDuocGiam',
-      label: 'Số tiền được giảm',
-      minWidth: 100,
-      align: 'left',
-      format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
-    },
+    { id: 'sanPham', label: 'Tên', minWidth: 70 },
+    // {
+    //   id: 'giaBan',
+    //   label: 'Giá sản phẩm',
+    //   minWidth: 100,
+    //   align: 'left',
+    //   format: (value) => parseFloat(value || 0).toLocaleString()
+    // },
+    // {
+    //   id: 'giaSauKhuyenMai',
+    //   label: 'Giá bán',
+    //   minWidth: 100,
+    //   align: 'left',
+    //   format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
+    // },
+    // {
+    //   id: 'soTienDuocGiam',
+    //   label: 'Số tiền được giảm',
+    //   minWidth: 100,
+    //   align: 'left',
+    //   format: (value) => (value !== null ? parseFloat(value).toLocaleString() : '')
+    // },
+    { id: 'giaHienThi', label: 'Giá hiển thị', minWidth: 100, align: 'left' },
+
     {
       id: 'hanhDong',
       label: 'Hành động',
@@ -585,7 +589,7 @@ const ProductList = (props) => {
                         <TableCell align="center">{rowIndex}</TableCell>
                         {/* lặp từng cell dựa vào tên cot */}
                         {columns.map((column) => {
-                          const value = row[column.id];
+                          let value = row[column.id];
                           if (column.id === 'anh') {
                             const listAnh = row.listUrlAnhSanPham ? row.listUrlAnhSanPham.split(',') : [];
                             const anhDauTien = listAnh.length > 0 ? listAnh[0].trim() : 'https://via.placeholder.com/50';
@@ -609,6 +613,10 @@ const ProductList = (props) => {
                                 </Button>
                               </TableCell>
                             );
+                          }
+                          if (column.id === 'giaHienThi') {
+                            value = row.giaSauKhuyenMai !== null ? row.giaSauKhuyenMai : row.giaBan;
+                            value = parseFloat(value).toLocaleString() + ' đ';
                           }
                           return (
                             <TableCell key={column.id} align={column.align}>
