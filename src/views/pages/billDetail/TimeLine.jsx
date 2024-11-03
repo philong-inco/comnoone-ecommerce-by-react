@@ -32,6 +32,7 @@ import { AiFillCarryOut, AiFillFile } from 'react-icons/ai';
 import { getPDF, updateStatusByCode } from 'services/admin/bill/billService';
 
 import { getStatusBillHistory, getStatusBillHistoryColor } from 'utils/billUtil/billStatus';
+import OrderStep from './OrderStep';
 // import { Timeline } from '@mui/icons-material';
 
 function NewTimeLine(props) {
@@ -343,12 +344,12 @@ function NewTimeLine(props) {
   return (
     <>
       <div>
-        <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', borderRadius: 4 }}>
-          <Grid item xs={12}>
+        <Grid container spacing={2} padding={2} sx={{ borderRadius: 4, border: 1 }}>
+          {/* <Grid item xs={12}>
             <Typography variant="h2">Lịch sử đơn hàng</Typography>
-          </Grid>
+          </Grid> */}
 
-          {/* Bọc các phần tử với div có overflow */}
+          {/* Bọc các phần tử với div có overflow
           <div style={{ display: 'flex', overflowX: 'auto', paddingBottom: '10px', justifyContent: 'center' }}>
             {data.map((item) => (
               <Grid
@@ -382,7 +383,8 @@ function NewTimeLine(props) {
                 </Card>
               </Grid>
             ))}
-          </div>
+          </div> */}
+          <OrderStep data={data} />
           <Grid item xs={12} sx={{ marginTop: 0 }}>
             <Grid container spacing={2} sx={{ justifyContent: 'space-between' }}>
               <Grid item xs={8} sx={{ display: 'flex', justifyContent: 'flex-start' }}>

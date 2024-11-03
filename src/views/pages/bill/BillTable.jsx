@@ -155,7 +155,9 @@ function BillTable(props) {
                   <TableHead>
                     <TableRow>
                       {columns.map((column) => (
-                        <TableCell key={column.key}>{column.title}</TableCell>
+                        <TableCell key={column.key} style={{ fontSize: '0.75rem' }}>
+                          {column.title}
+                        </TableCell>
                       ))}
                     </TableRow>
                   </TableHead>
@@ -174,7 +176,7 @@ function BillTable(props) {
                     {bills.map((bill, index) => (
                       <TableRow key={bill.id}>
                         {columns.map((column) => (
-                          <TableCell key={column.key}>
+                          <TableCell key={column.key} style={{ fontSize: '0.75rem' }}>
                             {/* Kiểm tra nếu cột là "STT", hiển thị số thứ tự */}
                             {column.key === 'key'
                               ? index + 1

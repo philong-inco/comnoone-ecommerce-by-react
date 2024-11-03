@@ -26,7 +26,10 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { findSerialNumberByProductIdAndCodeSerial } from 'services/admin/serial-number/serialNumber';
+import {
+  findSerialNumberByProductIdAndCodeSerial,
+  findSerialNumberByProductIdAndCodeSerialAndBillCode
+} from 'services/admin/serial-number/serialNumber';
 import {
   createSerialNumberSold,
   deletedById,
@@ -86,7 +89,7 @@ function SerialNumberSold(props) {
   }, [bill]);
   // serial in product
   const fetchSerialNumberByProduct = async (productId, codeSerial, page, size) => {
-    const response = await findSerialNumberByProductIdAndCodeSerial(productId, codeSerial || '', page - 1, size);
+    const response = await findSerialNumberByProductIdAndCodeSerialAndBillCode(id, productId, codeSerial || '', page - 1, size);
     if (response.status_code === 200) {
       setSerials(response.data.result);
       setTotalSerial(response.data.meta.total);
