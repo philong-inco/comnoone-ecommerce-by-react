@@ -63,7 +63,6 @@ export const totalpriceByDate = async (startDate, endDate) => {
 
 export const countBill = async (startDate, endDate) => {
   try {
-    debugger;
     const result = await get(`/bills/countbill?startDate=${startDate}&endDate=${endDate}`);
     return result;
   } catch (error) {
@@ -74,11 +73,22 @@ export const countBill = async (startDate, endDate) => {
 
 export const countProduct = async (startDate, endDate) => {
   try {
-    debugger;
     const result = await get(`/bills/dashboard/sumproductsoldout?startDate=${startDate}&endDate=${endDate}`);
     return result;
   } catch (error) {
     console.error('Error getting information of bill:', error);
+    return { data: { data: [] } };
+  }
+};
+
+export const trangThaiHoaDonCalulate = async (startDate, endDate) => {
+  try {
+    const result = await get(`/bills/dashboard/calculatebillpercentage?startDate=${startDate}&endDate=${endDate}`);
+    console.log(result);
+    
+    return result;
+  } catch (error) {
+    console.error('Error getting information of bill calulate:', error);
     return { data: { data: [] } };
   }
 };

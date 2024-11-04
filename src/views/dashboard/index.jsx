@@ -17,9 +17,10 @@ import {
   Slider,
   TextField,
 } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format, subDays, subMonths } from 'date-fns';
-import { getAllListProduct, getTopFiveProductSold, infoBillByDate, totalPriceToday, totalpriceByDate, countBill, countProduct } from '../../services/admin/product/productService'
+import { getAllListProduct, getTopFiveProductSold, infoBillByDate, totalPriceToday, totalpriceByDate, countBill, countProduct } from '../../services/admin/product/productService.js';
+import { trangThaiHoaDonCalulate } from '../../services/admin/product/productService.js'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const [totalBill, setTotalBill] = useState(null);
   const [totalBillToday, settotalBillToday] = useState(null);
   const [totalProduct, setTotalProduct] = useState(null);
+  const [totalPrecentBill, settotalPrecentBill] = useState(null);
 
   useEffect(() => {
     loadProducts();
@@ -44,6 +46,8 @@ const Dashboard = () => {
     fetchRevenue();
     handleCountBillByDate();
     handleCountProductSoldOutByDate();
+    handleBillByToDay();
+    handleCalculateBillPercentage();
   }, []);
 
   useEffect(() => {
@@ -51,12 +55,40 @@ const Dashboard = () => {
       handleFetchTotalPrice();
       handleCountBillByDate();
       handleCountProductSoldOutByDate();
+      handleCalculateBillPercentage();
     }
   }, [startDate, endDate]);
 
   const fetchRevenue = async () => {
     const result = await totalPriceToday();
     setRevenue(result.data?.data || 0);
+  };
+  const COLORS = [
+    '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DD1', 
+    '#FF4560', '#33FF33', '#FF33FF', '#FF6633', '#33CCFF'
+  ];
+
+  const mapOrderStatus = (status) => {
+    switch (status) {
+      case 0:
+        return "Đơn mới";
+      case 2:
+        return "Chờ xác nhận";
+      case 3:
+        return "Chờ lấy hàng";
+      case 4:
+        return "Đang vận chuyển";
+      case 6:
+        return "Hoàn thành";
+      case 7:
+        return "Hủy";
+      case 9:
+        return "Xác nhận";
+      case 11:
+        return "Hóa đơn chờ";
+      default:
+        return "Khác";
+    }
   };
 
   const loadProducts = async () => {
@@ -135,7 +167,6 @@ const Dashboard = () => {
     }
   };
 
-
   const handleBillByToDay = async () => {
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
@@ -167,7 +198,18 @@ const Dashboard = () => {
     }
   };
 
-
+  const handleCalculateBillPercentage = async () => {
+    if (startDate && endDate) {
+      try {
+        const result = await trangThaiHoaDonCalulate(format(startDate, 'yyyy-MM-dd HH:mm:ss'),
+          format(endDate, 'yyyy-MM-dd HH:mm:ss'));
+        settotalPrecentBill(result.data);
+      } catch (error) {
+        console.error('Lỗi khi lấy % trạng thái đơn hàng:', error);
+        setTotalBill(0);
+      }
+    }
+  };
 
   useEffect(() => {
     loadChartData();
@@ -193,7 +235,6 @@ const Dashboard = () => {
                 justifyContent: 'center',
               }}
             >
-              {/* Thẻ Doanh Thu Hôm Nay */}
               <Card
                 sx={{
                   padding: 3,
@@ -299,7 +340,6 @@ const Dashboard = () => {
               width: '100%',
             }}
           >
-            {/* Thẻ Tổng Doanh Thu */}
             <Card
               sx={{
                 padding: 3,
@@ -310,7 +350,7 @@ const Dashboard = () => {
               }}
             >
               <Box textAlign="center">
-                <AttachMoneyIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Doanh Thu */}
+                <AttachMoneyIcon sx={{ fontSize: 40, mb: 1 }} />
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng doanh thu
                 </Typography>
@@ -321,8 +361,6 @@ const Dashboard = () => {
                 </Typography>
               </Box>
             </Card>
-
-            {/* Thẻ Tổng Hóa Đơn */}
             <Card
               sx={{
                 padding: 3,
@@ -333,7 +371,7 @@ const Dashboard = () => {
               }}
             >
               <Box textAlign="center">
-                <ReceiptIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Hóa Đơn */}
+                <ReceiptIcon sx={{ fontSize: 40, mb: 1 }} />
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng hóa đơn
                 </Typography>
@@ -344,8 +382,6 @@ const Dashboard = () => {
                 </Typography>
               </Box>
             </Card>
-
-            {/* Thẻ Tổng Sản Phẩm Đã Bán */}
             <Card
               sx={{
                 padding: 3,
@@ -356,7 +392,7 @@ const Dashboard = () => {
               }}
             >
               <Box textAlign="center">
-                <ShoppingCartIcon sx={{ fontSize: 40, mb: 1 }} /> {/* Biểu tượng Sản Phẩm */}
+                <ShoppingCartIcon sx={{ fontSize: 40, mb: 1 }} />
                 <Typography variant="h6" gutterBottom color="white">
                   Tổng sản phẩm đã bán
                 </Typography>
@@ -411,6 +447,42 @@ const Dashboard = () => {
               )}
             </Card>
           </Box>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 5 }}>
+      <Typography variant="h4" gutterBottom align="center">
+        Thống kê trạng thái đơn hàng
+      </Typography>
+      {totalPrecentBill.length > 0 ? (
+        <ResponsiveContainer width="100%" height={400}>
+          <PieChart>
+            <Pie
+              data={totalPrecentBill}
+              dataKey="tiLeTrangThaiHoaDon"
+              nameKey="trangThaiHoaDon"
+              cx="50%"
+              cy="50%"
+              outerRadius={150}
+              fill="#8884d8"
+              label={({ trangThaiHoaDon, percent }) =>
+                `${mapOrderStatus(trangThaiHoaDon)}: ${(percent * 100).toFixed(2)}%`
+              }
+            >
+              {totalPrecentBill.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+            <Legend
+              formatter={(value) => mapOrderStatus(parseInt(value, 10))}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      ) : (
+        <Typography variant="body1" color="text.secondary" align="center">
+          Không có dữ liệu để hiển thị.
+        </Typography>
+      )}
+    </Box>
 
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
