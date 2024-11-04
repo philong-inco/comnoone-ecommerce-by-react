@@ -113,6 +113,10 @@ function KhachHangAddress() {
   const [isProvincesLoaded, setIsProvincesLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loading1, setLoading1] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [loading3, setLoading3] = useState(false);
+  const [loading4, setLoading4] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -247,18 +251,18 @@ function KhachHangAddress() {
       setOpenUnsetDefaultDialog(true);
     }
   };
-
-
   const handleConfirmSetDefault = async () => {
     setOpenSetDefaultDialog(false);
     if (selectedAddress) {
       try {
-        setLoading(true);
+        setLoading1(true);
         await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
         console.error('Failed to set default address', error);
+      } finally {
+        setLoading1(false);
       }
     }
   };
@@ -267,12 +271,14 @@ function KhachHangAddress() {
     setOpenUnsetDefaultDialog(false);
     if (selectedAddress) {
       try {
-        setLoading(true);
+        setLoading2(true);
         await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(null); // Unset the default address
         handleCloseModal();
       } catch (error) {
         console.error('Failed to unset default address', error);
+      } finally {
+        setLoading2(false);
       }
     }
   };
@@ -284,13 +290,14 @@ function KhachHangAddress() {
 
   const handleDeleteAddress = async () => {
     try {
-      setLoading(true);
+      setLoading3(true);
       await axios.delete(`http://localhost:8080/api/diachi/${addressId}`);
     } catch (error) {
       console.error('Lỗi khi xóa địa chỉ:', error);
     } finally {
       setOpenDialogDelete(false);
       handleCloseModal();
+      setLoading3(false);
     }
   };
 
@@ -475,7 +482,7 @@ function KhachHangAddress() {
 
   const onAddressSubmit = async (data) => {
     try {
-      setLoading(true);
+      setLoading4(true);
       let formDataAddress = {};
       formDataAddress.tenNguoiNhan = data.ten_nguoi_nhan;
       formDataAddress.sdtNguoiNhan = data.sdt_nguoi_nhan;
@@ -520,7 +527,7 @@ function KhachHangAddress() {
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {
-      setLoading(false);
+      setLoading4(false);
       setTimeout(() => {
         handleCloseSnackbar();
       }, 1000);

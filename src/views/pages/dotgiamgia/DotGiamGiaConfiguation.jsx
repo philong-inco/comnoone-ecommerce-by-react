@@ -219,6 +219,9 @@ function DotGiamGiaConfiguration() {
             if (!bigNumberValue.isGreaterThan(0)) {
               return context.createError({ message: 'Giá trị phải lớn hơn 0$' });
             }
+            if (!bigNumberValue.isLessThanOrEqualTo(2000000)) {
+              return context.createError({ message: 'Giá trị không được vượt quá 2,000,000' });
+            }
           } else {
             return context.createError({ message: 'Loại phiếu không hợp lệ' });
           }
