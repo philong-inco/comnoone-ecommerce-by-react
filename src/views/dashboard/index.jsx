@@ -61,7 +61,7 @@ const Dashboard = () => {
 
   const fetchRevenue = async () => {
     const result = await totalPriceToday();
-    setRevenue(result.data?.data || 0);
+    setRevenue(result.data);
   };
   const COLORS = [
     '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28DD1', 
@@ -146,6 +146,7 @@ const Dashboard = () => {
         const result = await totalpriceByDate(
           format(startDate, 'yyyy-MM-dd HH:mm:ss'),
           format(endDate, 'yyyy-MM-dd HH:mm:ss'));
+          debugger;
         setTotalPrice(result.data);
       } catch (error) {
         console.error('Lỗi khi lấy tổng doanh thu:', error);
@@ -251,7 +252,7 @@ const Dashboard = () => {
                     Doanh Thu Hôm Nay
                   </Typography>
                   <Typography variant="h4" fontWeight="bold" color="white">
-                    {revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {revenue != null ? revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }): 0}
                   </Typography>
                 </Box>
               </Card>
@@ -355,9 +356,9 @@ const Dashboard = () => {
                   Tổng doanh thu
                 </Typography>
                 <Typography variant="h4" fontWeight="bold" color="white">
-                  {totalPrice !== null
+                  {totalPrice 
                     ? totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-                    : 'Vui lòng chọn khoảng thời gian'}
+                    : '0'}
                 </Typography>
               </Box>
             </Card>

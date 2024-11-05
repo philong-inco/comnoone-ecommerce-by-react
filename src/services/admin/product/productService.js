@@ -44,6 +44,7 @@ export const infoBillByDate = async (startDate, endDate) => {
 export const totalPriceToday = async () => {
   try {
     const result = await get(`/bills/dashboard/totalpricenow`);
+  
     return result;
   } catch (error) {
     console.error('Error getting information of bill:', error);
