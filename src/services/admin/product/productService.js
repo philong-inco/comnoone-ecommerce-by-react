@@ -93,3 +93,14 @@ export const trangThaiHoaDonCalulate = async (startDate, endDate) => {
     return { data: { data: [] } };
   }
 };
+
+export const countCustomerByDate = async (startDate, endDate) => {
+  try {
+    const result = await get(`/khachhang/countcustomerbydate?startDate=${startDate}&endDate=${endDate}`);
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.error('Error getting information of bill calulate:', error);
+    return { data: { data: [] } };
+  }
+};
