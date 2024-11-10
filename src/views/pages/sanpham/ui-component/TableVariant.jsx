@@ -10,8 +10,9 @@ import axios from 'axios';
 import ListVariant from './ListVariant.jsx';
 import { margin } from '@mui/system';
 import { element } from 'prop-types';
+import { IconTrash } from '@tabler/icons-react';
 
-const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
+const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
   const [variantList, setVariantList] = useState([]);
   const combinedKey = (index, variant) => {
     let result = '';
@@ -96,6 +97,22 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
     }));
     setMauSacCheckedSelectAnh(elementConvert);
   }, [mauSacChecked]);
+
+  const fetchMauSacAfterDelete = () => {
+    const variantMau = [];
+    for(let i = 0; i < variantList.length; i++){
+      if (!variantMau.includes(variantList[i].mauSac.id)){
+        variantMau.push(variantList[i].mauSac.id);
+      }
+    }
+    console.log('mauSacCheckedSelectAnh1111: ', mauSacCheckedSelectAnh); 
+    console.log('variantMau: ', variantMau);
+    const temp = mauSacCheckedSelectAnh.filter(x => variantMau.includes(x.id));
+    console.log('temp: ', temp);
+    setMauSacCheckedSelectAnh(temp);
+  }
+
+
   // mac sac checked
 
   // set giá chung
@@ -112,6 +129,15 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
   useEffect(() => {
     console.log('variantList:', variantList);
   }, [variantList]);
+
+  const handleDeleteBT = (index) => {
+    if (confirm("Xác nhận xóa")){
+      variantList.splice(index, 1);
+      setProductVarriant(variantList);
+      fetchMauSacAfterDelete();
+    }
+    
+  }
 
   const handleGiaBan = (index) => (e) => {
     const value = e.target.value.replace(/\D/g, '');
@@ -435,6 +461,9 @@ const TableVariant = ({ listKeySort, variantListFromParent, showMessage, setResu
                       />
                       <Switch onChange={handleChangeSwitch(rowIndex)} defaultChecked={variant.trangThai === 1} color="secondary" />
                     </div>
+                  </TableCell>
+                  <TableCell sx={{color:"#EF4444"}}>
+                    <IconTrash stroke={2} onClick={() => {handleDeleteBT(rowIndex)}}/>
                   </TableCell>
                 </TableRow>
               </>

@@ -673,6 +673,7 @@ const ThemSanPham = () => {
             <TableVariant
               listKeySort={selectedKeyToChild}
               variantListFromParent={productVarriant}
+              setProductVarriant={setProductVarriant}
               showMessage={showAlertMessage}
               setResult={setResultVariant}
               actionFather={handleUpdateContinue}
