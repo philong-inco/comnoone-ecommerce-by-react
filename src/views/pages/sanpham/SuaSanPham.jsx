@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios';
 import MainCard from 'ui-component/cards/MainCard';
 import { IconEye } from '@tabler/icons-react';
-import { Autocomplete , TextField, Button } from '@mui/material';
+import { Autocomplete , TextField, Button,Switch } from '@mui/material';
 import { IconCheck } from '@tabler/icons-react';
 import SelectDropOneValueForUpdate from './ui-component/SelectDropOneValueForUpdate.jsx';
 import AlertDialogSlide from '../sanpham/ui-component/AlertDialogSlide.jsx';
@@ -233,7 +233,7 @@ const SuaSanPham = () => {
 
 
   ///// Bảng biến thể ///////////
-
+ 
  
 
   ///// Bảng biến thể ///////////
@@ -242,12 +242,26 @@ const SuaSanPham = () => {
     setIsOpenAddSPCT(status);
   }
 
+  const handleSwitchChange = (id) => (e) => {
+    e.target.checked ? suaTrangThai(id, 1) : suaTrangThai(id, 0);
+};
+
+const suaTrangThai = (id, status) => {
+    axios.get(`http://localhost:8080/api/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
+        .then(response => {
+          fetchDataBienThe();
+        })
+        .catch(error => {
+          fetchDataBienThe();
+        });
+};
+
   return (
     <>
       <MainCard>
         <div>
           <div style={{ padding: '10px' }}>
-            <h3>Sửa sản phẩm</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Sửa sản phẩm</h3>
             <div style={{ margin: '15px 0', display: 'flex', justifyContent: 'space-between' }}>
             <TextField 
                 id="nameProduct" 
@@ -305,7 +319,7 @@ const SuaSanPham = () => {
       <MainCard sx={{marginTop: "20px"}}>
         <div style={{display: "flex", justifyContent: "space-between"}}>
           <div>
-            <h3>Danh sách biến thể</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Danh sách biến thể</h3>
           </div>
           <div>
             <Button title='Thêm biến thể' onClick={() => openAddSPCT(true)}><IconCirclePlus stroke={2} /></Button>
@@ -328,7 +342,8 @@ const SuaSanPham = () => {
             <TableCell align="left">Ổ cứng</TableCell>
             <TableCell align="left">Màu sắc</TableCell>
             <TableCell align="left">Giá bán</TableCell>
-            <TableCell align="left">Serial</TableCell>
+            <TableCell align="left">Chi tiết</TableCell>
+            <TableCell align="left">Trạng thái</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -346,6 +361,13 @@ const SuaSanPham = () => {
               <TableCell align="left">{row.mauSac}</TableCell>
               <TableCell align="left">{row.giaBan} đ</TableCell>
               <TableCell align="left"><IconEye onClick={() => handleViewSerial(row.id)} stroke={2} /><p sx={{color: '#85EA2D'}}>{row.listSerialNumber !== '' ? row.listSerialNumber.split(',').length : 0}</p>  </TableCell>
+              <TableCell align="left">
+                {row.trangThai === 1 ?
+                  <Switch defaultChecked color="secondary"
+                          onChange={handleSwitchChange(row.id)}/>
+                    :
+                  <Switch onChange={handleSwitchChange(row.id)} />}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

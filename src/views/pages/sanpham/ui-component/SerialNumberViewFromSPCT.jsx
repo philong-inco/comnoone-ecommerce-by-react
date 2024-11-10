@@ -22,6 +22,9 @@ import Chip from '@mui/material/Chip';
 import { format } from 'date-fns';  
 import { useState } from 'react';
 import { maxHeight, width } from '@mui/system';
+import { useEffect } from 'react';
+import AlbumImageForUpdateSPCT from "./AlbumImageForUpdateSPCT";
+import { IconReload } from '@tabler/icons-react';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -31,6 +34,7 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
   
     const [listSeriTemp, setListSeriTemp] = React.useState([]);
     const [addSeriStr, setAddSeriStr] = React.useState('');
+    
 
     React.useEffect(() => {
         setListSeriTemp(list);
@@ -135,7 +139,61 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
 
     // validate và gọi API get
   }
+  function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
+    return new Intl.NumberFormat(locale, {
+      style: 'decimal',
+      currency: currency
+    }).format(amount);
+  }
 
+  const handleGiaBan = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setBienThe(prev => ({...prev, giaBan: value}));
+  };
+
+
+  const [bienThe, setBienThe] = useState({
+    id: idSPCT,
+    giaBan: 0,
+    listUrlAnhSanPham: []
+  });
+  useEffect(()=>{
+    console.log('bienThe: ', bienThe);
+  },[bienThe])
+
+  useEffect( () => {
+    loadBienThe();
+  }, [idSPCT]);
+
+  const loadBienThe = async () => {
+    const spctResult = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSPCT}`);
+    console.log('spctResult: ', spctResult); 
+    const bt = spctResult.data.data;
+    const arrImg = bt.listUrlAnhSanPham.split(',');
+    bt.listUrlAnhSanPham = arrImg;
+
+    const temp = {
+      id: idSPCT,
+      giaBan: bt.giaBan,
+      listUrlAnhSanPham: arrImg
+    }
+    setBienThe(temp);
+  }
+
+  const [openAlbum, setOpenAlbum] = useState(false);
+
+  const handleUpdateSPCT = async () => {
+    if(bienThe.giaBan == 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined){
+      alert("Điền đủ thông tin")
+    } else {
+      try{
+        await axios.put(`http://localhost:8080/api/san-pham-chi-tiet/update-price-image`, bienThe);
+        alert("Sửa thành công")
+      } catch(error){
+        alert("Sửa thất bại")
+      }
+    }
+  }
 
   return (
     <React.Fragment>
@@ -159,7 +217,7 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <MainCard>
-            <h2>Danh sách serial number:</h2>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Danh sách serial number:</h2>
             <TableContainer component={Paper}>
             <Table sx={{ minWidth: 1000 }} aria-label="simple table">
                 <TableHead>
@@ -213,24 +271,53 @@ export default function SerialNumberViewFromSPCT({title, list ,open, setOpen, id
               </div>
             </div>
 
-            <div style={{margin: "30px 0"}}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Ảnh biến thể</h3>
-            <div style={{display: "flex"}}>
-              {listImg.map(url => (
-                  <div style={{width: "100px", margin: "5px"}}>
-                    <img src={url} style={{width: "100%"}} />
+                  <div style={{display: "flex", justifyContent:"space-between", margin: "30px 0"}}>
+                    <div style={{width: "75%"}}>
+                      <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Ảnh biến thể</h3>
+                      <div style={{display: "flex"}}>
+                        {bienThe.listUrlAnhSanPham.map(url => (
+                            <div style={{width: "100px", margin: "5px"}}>
+                              <img src={url} style={{width: "100%"}} />
+                            </div>
+                        ))}
+                        <Button variant="contained" color="secondary" onClick={()=>setOpenAlbum(true)} sx={{ height: '40px', borderRadius: '7px', marginTop: '20px' }}>
+                          <IconReload stroke={2} />
+                        </Button>
+                    </div>
+                    <div>
+                      {openAlbum == true &&
+                      <AlbumImageForUpdateSPCT
+                      setOpenAlbum={setOpenAlbum}
+                      listCurrent={bienThe.listUrlAnhSanPham}
+                      setVariant={setBienThe}
+                      />}
+                    </div>
                   </div>
-              ))}
+                  <div style={{width: "25%"}}>
+                      <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Giá bán</h3>
+                      <TextField
+                      value={formatCurrency(bienThe.giaBan)}
+                      onChange={handleGiaBan}
+                      label="Giá bán"
+                      variant="standard"
+                      fullWidth
+                      color="secondary"
+                      />
+                    </div>
+                          
             </div>
-            
+            <div style={{margin: "100px 0 0 0", textAlign: "center"}}>
+            <Button onClick={handleUpdateSPCT} variant="contained" color="secondary" sx={{ height: '60px', borderRadius: '7px', margin: '10px' }}>
+                  <IconCheck /> Lưu lại
+                </Button>
+                <Button onClick={handleClose} variant="contained"  sx={{ height: '60px', borderRadius: '7px', margin: '10px', backgroundColor:"#EDE7F6", color: "#000000" }}>
+                  <IconCheck /> Đóng
+                </Button>
             </div>
             
           </MainCard>
 
         </DialogContent>
-        <DialogActions>
-          <Button color='secondary' onClick={handleClose}>Đóng</Button>
-        </DialogActions>
       </Dialog>
     </React.Fragment>
   );
