@@ -7,6 +7,7 @@ import { IconCheck } from '@tabler/icons-react';
 import SelectDropOneValueForUpdate from './ui-component/SelectDropOneValueForUpdate.jsx';
 import AlertDialogSlide from '../sanpham/ui-component/AlertDialogSlide.jsx';
 import SerialNumberViewFromSPCT from '../sanpham/ui-component/SerialNumberViewFromSPCT.jsx';
+import AddSPCT from './ui-component/AddSPCT.jsx';
 import { useParams } from 'react-router-dom';  
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -18,6 +19,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { IconCirclePlus } from '@tabler/icons-react';
 
 const SuaSanPham = () => {
   const { id } = useParams();  
@@ -108,6 +110,11 @@ const SuaSanPham = () => {
   useEffect(() => {
     console.log('nhuCauChecked: ', nhuCauChecked);
   }, [nhuCauChecked]);
+
+  const fetchDataBienThe = async () => {
+    const dataSpct = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+    setspct(dataSpct.data.data);
+  }
 
   const loadData = async () => {
     const dataSanPham = await axios.get(`http://localhost:8080/api/san-pham/detail/${id}`)
@@ -230,7 +237,10 @@ const SuaSanPham = () => {
  
 
   ///// Bảng biến thể ///////////
-  
+  const [isOpenAddSPCT, setIsOpenAddSPCT] = useState(false);
+  const openAddSPCT = (status) => {
+    setIsOpenAddSPCT(status);
+  }
 
   return (
     <>
@@ -292,7 +302,22 @@ const SuaSanPham = () => {
         </div>
       </MainCard>
 
-      <MainCard>
+      <MainCard sx={{marginTop: "20px"}}>
+        <div style={{display: "flex", justifyContent: "space-between"}}>
+          <div>
+            <h3>Danh sách biến thể</h3>
+          </div>
+          <div>
+            <Button title='Thêm biến thể' onClick={() => openAddSPCT(true)}><IconCirclePlus stroke={2} /></Button>
+          </div>
+        </div>
+        <div>
+          {isOpenAddSPCT && <AddSPCT
+            idSP={id}
+            setIsOpenAddSCPT={openAddSPCT}
+            fetchDataBienThe={fetchDataBienThe}
+          />}
+        </div>
       <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
