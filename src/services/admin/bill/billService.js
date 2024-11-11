@@ -118,7 +118,6 @@ export const updateAddressInBill = async (billCode, data) => {
 export const getBillHistoryByBillId = async (id) => {
   try {
     const result = await get(`bills/bill-history/${id}`);
-
     return result;
   } catch (error) {
     console.error('Error fetching bill history:', error);

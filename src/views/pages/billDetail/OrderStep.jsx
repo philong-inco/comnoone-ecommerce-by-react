@@ -5,19 +5,25 @@ import { useMemo } from 'react';
 const getStatus = (stt) => {
   switch (stt) {
     case 0:
-      return 'Đã tạo ĐH';
+      return 'Tạo hóa đơn';
+    case 1:
+      return 'Chờ thanh toán';
     case 2:
       return 'Chờ xác nhận';
     case 3:
       return 'Chờ lấy hàng';
     case 4:
       return 'Đang giao hàng';
-    case 5:
-      return 'Đã giao';
+    case 6:
+      return 'Hoàn thành';
     case 7:
       return 'Đã huỷ';
     case 9:
       return 'Đã xác nhận';
+    case 10:
+      return 'Đã thanh toán';
+    case 11:
+      return 'Treo';
     default:
       return '';
   }
@@ -32,7 +38,7 @@ const OrderStep = (props) => {
     let remainingStep = maxStep - data.length;
 
     // Kiểm tra nếu có phần tử trong data và phần tử cuối có trangThai là 7
-    if (data.length > 0 && data[data.length - 1].trangThai === 7) {
+    if (data.length > 0 && (data[data.length - 1].trangThai === 7 || data[data.length - 1].trangThai === 6)) {
       remainingStep = 0;
     }
 
@@ -51,12 +57,11 @@ const OrderStep = (props) => {
       <Stepper activeStep={data.length - 1} alternativeLabel sx={{ width: '100%' }}>
         {items.map((step, index) => (
           <Step key={index} orientation="horizontal">
-            <img src={'../../../../'} alt={step.description} style={{ width: '24px', height: '24px', marginRight: '8px' }} />
+            {/* <img src={'../../../../'} alt={step.description} style={{ width: '24px', height: '24px', marginRight: '8px' }} /> */}
             <StepLabel optional={<span>{step.description}</span>}>{step.label}</StepLabel>
           </Step>
         ))}
       </Stepper>
-      
     </>
   );
 };
