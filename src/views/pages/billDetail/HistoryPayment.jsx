@@ -43,42 +43,55 @@ function HistoryPayment(props) {
                 <TableRow>
                   {' '}
                   <TableCell>STT</TableCell>
-                  <TableCell>Số tiền</TableCell>
-                  {/* <TableCell>Phương thanh toán</TableCell> */}
-                  <TableCell>Trạng thái</TableCell> <TableCell>Ngày tạo</TableCell>
-                  <TableCell>Người tạo</TableCell> {/* Cột mới */}
+                  <TableCell>Mã giao dịch</TableCell>
+                  <TableCell>Số tiền</TableCell>
+                  <TableCell>Phương thanh toán</TableCell>
+                  <TableCell>Loại thanh toán</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                  <TableCell>Người tạo</TableCell>
+                  <TableCell>Ngày tạo</TableCell>
                 </TableRow>
               </TableHead>
-              {/* <TableBody>
+              <TableBody>
                 {historyPayments.map((payment, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{payment.ngayTao}</TableCell>
-                    <TableCell>{payment.soTien ? payment.soTien.toLocaleString() : 'Chưa có'}</TableCell>
-                    <TableCell>
-                      {payment.phuongThanhToan === null ? '' : payment.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}
+                    <TableCell>{payment.maGiaoDich}</TableCell>
+                    <TableCell style={{ fontWeight: 'bold' }}>
+                      {payment.tienNhan ? payment.tienNhan.toLocaleString() + ' đ' : 'Chưa có'}
                     </TableCell>
-                    <TableCell>{payment.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={payment.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}
+                        style={{
+                          backgroundColor: payment.phuongThanhToan === 1 ? 'purple' : '#00E676',
+                          color: 'white',
+                          borderRadius: '5px'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={payment.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}
+                        style={{
+                          backgroundColor: payment.loaiThanhToan === 0 ? '#00E676' : 'red',
+                          color: 'white',
+                          borderRadius: '5px'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={payment.trangThai == 0 ? 'Thành công' : 'Chờ'}
+                        style={{
+                          backgroundColor: payment.trangThai === 0 ? '#00E676' : '#FFB74D',
+                          color: 'white',
+                          borderRadius: '5px'
+                        }}
+                      />
+                    </TableCell>
                     <TableCell>{payment.nguoiTao ? payment.nguoiTao : 'Chưa xác định'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody> */}
-              <TableBody>
-                {Array.from(new Map(historyPayments.map((payment) => [payment.soTien, payment])).values()).map((payment, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <strong>{payment.soTien ? payment.soTien.toLocaleString() + ' đ' : 'Chưa có'}</strong>{' '}
-                    </TableCell>
-                    <TableCell>
-                      {payment.loaiThanhToan === 0 ? (
-                        <Chip label="Thanh toán" color="success" size="small" /> // Chip màu xanh cho 'Thanh toán'
-                      ) : (
-                        <Chip label="Trả Sau" color="error" size="small" /> // Chip màu đỏ cho 'Trả Sau'
-                      )}
-                    </TableCell>
-                    <TableCell>{payment.ngayTao}</TableCell>
-                    <TableCell>{payment.nguoiTao ? payment.nguoiTao : 'Chưa xác định'}</TableCell>
+                    <TableCell style={{ fontWeight: 'bold' }}>{payment.ngayTao}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -86,7 +99,7 @@ function HistoryPayment(props) {
           </TableContainer>
         )}
       </Grid>
-      {error && <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleCloseSnackbar} message={error} />}
+      {error && <Snackbar open={Boolean(error)} autoHideDuration={3000} onClose={handleCloseSnackbar} message={error} />}
     </Grid>
   );
 }

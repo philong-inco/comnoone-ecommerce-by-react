@@ -378,7 +378,8 @@ function Test2(props) {
         setSnackbarOpen(true);
         setFormData({});
         setXacNhanThanhToanSau(false);
-        await fetchInvoicePdf();
+        ///
+        // await fetchInvoicePdf();
         onReload();
         onLoading();
       }
