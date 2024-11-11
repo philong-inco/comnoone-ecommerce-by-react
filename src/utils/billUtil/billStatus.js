@@ -9,9 +9,9 @@ export const getStatusDisplayName = (status) => {
     case 'CHO_XAC_NHAN':
       return 'Chờ xác nhận';
     case 'CHO_GIAO':
-      return 'Chờ giao';
+      return 'Chờ giao hàng';
     case 'DANG_GIAO':
-      return 'Đang giao';
+      return 'Đang giao vận chuyển';
     case 'TRA_HANG_HOAN_TIEN':
       return 'Trả hàng hoàn tiền';
     case 'HOAN_THANH':
@@ -21,7 +21,7 @@ export const getStatusDisplayName = (status) => {
     case 'XOA':
       return 'Xoá';
     case 'XAC_NHAN':
-      return 'Xác nhận';
+      return 'Đã xác nhận';
     case 'TREO':
       return 'Đang treo';
     default:
@@ -33,6 +33,8 @@ export const getStatusColor = (status) => {
   switch (status) {
     case 'DON_MOI':
       return blue[500];
+    case 'CHO_THANH_TOAN':
+      return orange[500];
     case 'CHO_THANH_TOAN':
       return orange[500];
     case 'CHO_XAC_NHAN':
@@ -50,7 +52,7 @@ export const getStatusColor = (status) => {
     case 'XOA':
       return grey[500];
     case 'XAC_NHAN':
-      return grey[500];
+      return blue[500];
     case 'TREO':
       return orange[500];
     default:
@@ -90,7 +92,7 @@ export const getStatusBillHistory = (status) => {
     case 0:
       return 'Tạo đơn hàng 0';
     case 1:
-      return 'Cập nhập đơn hàng 1';
+      return 'Chờ thanh toán 1';
     case 2:
       return 'Chờ xác nhận 2';
     case 3:

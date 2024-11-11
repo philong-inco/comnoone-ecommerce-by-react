@@ -23,6 +23,7 @@ import { addPaymentHistory, deleteHDHTT, getAllHistoryPaymentByBillCode } from '
 import { useParams } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { payCounter } from 'services/admin/bill/billService';
+import { createVNPay } from 'services/admin/vnpay';
 
 const PaymentDialog2 = (props) => {
   const { id } = useParams();
@@ -39,6 +40,10 @@ const PaymentDialog2 = (props) => {
   //
   const [xacNhanThanhToan, setXacNhanThanhToan] = useState(false);
 
+  //
+  const [isPrintPdf, setIsPrintPdf] = useState(false);
+  const [isConformPdf, setIsConformPdf] = useState(false);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
@@ -50,7 +55,9 @@ const PaymentDialog2 = (props) => {
     setXacNhanMo(true);
   };
   console.log('DATA PAY : ', data);
-
+  const handleClickVnPay = () => {
+    genVnPay(soTien);
+  };
   const handleConfirm = () => {
     const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
     const newData = {
@@ -80,31 +87,67 @@ const PaymentDialog2 = (props) => {
     setXacNhanMo(false);
   };
 
+  const saveVnPay = (amount) => {
+    const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
+    const newData = {
+      idHTTT: idThanhToan,
+      soTien: data.tongTienPhaiTra + (data.loaiHoaDon == 1 ? data.tienShip : 0),
+      tienNhan: parseFloat(amount),
+      loaiThanhToan: '0',
+      // tienShip: data.tienShip,
+      loaiHoaDon: data.loaiHoaDon,
+      //
+      ten: data.ten,
+      sdt: data.sdt,
+      email: data.email
+      // diaChi: data.diaChi,
+      // tinh: data.tinh,
+      // tenTinh: data.tenTinh,
+      // huyen: data.huyen,
+      // tenHuyen: data.tenHuyen,
+      // phuong: data.phuong,
+      // tenPhuong: data.tenPhuong,
+      // ghiChu: data.ghiChu
+    };
+    console.log('Data veef HDHTT : ', newData);
+
+    create(newData);
+    setSoTien('');
+    setXacNhanMo(false);
+  };
+
   const create = async (newData) => {
     console.log(id);
+    console.log('Chạy 0', data.ma);
 
     try {
       const response = await addPaymentHistory(data.ma, newData);
+      console.log('Chạy 1');
+
       if (response.status_code === 201) {
         setSnackbarMessage('Giao dịch thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
+        console.log('Chạy 2');
+
         // await fetchInvoicePdf();
 
         fetchAll();
       }
     } catch (error) {
       if (error.response) {
-        const errorData = error.response.data;
-        if (errorData && errorData.message) {
-          const errorMessage = errorData.message.map((err) => `${err.messages}`);
-          setSnackbarMessage(errorMessage);
-        } else {
-          setSnackbarMessage('Đã xảy ra lỗi không xác định.');
-        }
-      } else {
+        //   const errorData = error.response.data;
+        //   if (errorData && errorData.message) {
+        //     const errorMessage = errorData.message.map((err) => `${err.messages}`);
+        //     setSnackbarMessage(errorMessage);
+        //   } else {
+        //     setSnackbarMessage('Đã xảy ra lỗi không xác định.');
+        //   }
+        // } else {
         setSnackbarMessage('Lỗi mạng hoặc không thể kết nối đến server.');
       }
+      console.log('Chạy Lỗi');
+
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       console.log(error);
@@ -152,9 +195,15 @@ const PaymentDialog2 = (props) => {
   useEffect(() => {
     fetchAll();
   }, [id]);
-  const fetchInvoicePdf = async () => {
+  const printPdf = () => {
+    setIsPrintPdf(true);
+    const code = localStorage.getItem('billCode');
+    fetchInvoicePdf(code);
+    setIsConformPdf(false);
+  };
+  const fetchInvoicePdf = async (code) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${code}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/pdf'
@@ -162,6 +211,7 @@ const PaymentDialog2 = (props) => {
       });
 
       if (response.ok) {
+        setIsConformPdf(false);
         const pdfBlob = await response.blob();
         const pdfUrl = URL.createObjectURL(pdfBlob);
         setPdfUrl(pdfUrl);
@@ -175,6 +225,8 @@ const PaymentDialog2 = (props) => {
       }
     } catch (error) {
       console.error('Error fetching PDF:', error);
+    } finally {
+      localStorage.setItem('billCode', '');
     }
   };
   // useEffect(() => {
@@ -226,11 +278,13 @@ const PaymentDialog2 = (props) => {
         setXacNhanMo(false);
         setXacNhanThanhToan(false);
         onCloseDialog();
-        await fetchInvoicePdf();
+        localStorage.setItem('billCode', response.data);
+        // await fetchInvoicePdf();
         // setFormData({});
         // setBill({});
         // setFormDataAddress({});
         // setShowPDF(true);
+        setIsConformPdf(true);
         onReload();
         // onReload();
       }
@@ -242,6 +296,93 @@ const PaymentDialog2 = (props) => {
       setSnackbarOpen(true);
     }
   };
+
+  const genVnPay = async (amount) => {
+    const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
+    const newData = {
+      idHTTT: idThanhToan,
+      soTien: data.tongTienPhaiTra + (data.loaiHoaDon == 1 ? data.tienShip : 0),
+      tienNhan: parseFloat(amount),
+      loaiThanhToan: '0',
+      // tienShip: data.tienShip,
+      loaiHoaDon: data.loaiHoaDon,
+      //
+      ten: data.ten,
+      sdt: data.sdt,
+      email: data.email
+      // diaChi: data.diaChi,
+      // tinh: data.tinh,
+      // tenTinh: data.tenTinh,
+      // huyen: data.huyen,
+      // tenHuyen: data.tenHuyen,
+      // phuong: data.phuong,
+      // tenPhuong: data.tenPhuong,
+      // ghiChu: data.ghiChu
+    };
+    try {
+      const response = await createVNPay(id, amount);
+      if (response.status_code === 201) {
+        localStorage.setItem('bill', JSON.stringify(newData));
+        localStorage.setItem('billCode', id);
+
+        window.open(response.data, '_self');
+      }
+    } catch (error) {
+      setSnackbarMessage('Không thể tạo Vnpay');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const createHistoryVnPay = async (ma, data) => {
+    try {
+      const response = await addPaymentHistory(ma, data);
+      console.log('Chạy 1');
+
+      if (response.status_code === 201) {
+        setSnackbarMessage('Giao dịch thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        fetchAll();
+        // window.open('http://localhost:3000/ban-hang/hoa-don/' + localStorage.getItem('billCode'), '_self');
+      }
+    } catch (error) {
+      if (error.response) {
+        setSnackbarMessage('Lỗi mạng hoặc không thể kết nối đến server.');
+      }
+      setSnackbarMessage(error);
+      console.log('Chạy Lỗi');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      console.log(error);
+    }
+  };
+
+  const urlObject = new URL(window.location.href);
+  const vnp_ResponseCode = urlObject.searchParams.get('vnp_ResponseCode');
+  const vnp_Amount = urlObject.searchParams.get('vnp_Amount');
+
+  console.log('vnp_ResponseCode', vnp_ResponseCode);
+  console.log('vnp_Amount', vnp_Amount);
+
+  useEffect(() => {
+    if (vnp_ResponseCode == '00') {
+      const data = JSON.parse(localStorage.getItem('bill'));
+      const code = localStorage.getItem('vnp_ResponseCode');
+      const billCode = localStorage.getItem('billCode');
+      const tranCode = localStorage.getItem('tranCode');
+      if (code === '00') {
+        data.maGD = tranCode;
+        createHistoryVnPay(billCode, data);
+      }
+    } else {
+      if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
+        setSnackbarMessage('Thanh toan không thành công');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
+    }
+  });
   return (
     <>
       <Dialog open={open} onClose={onCloseDialog} fullWidth maxWidth="md">
@@ -282,7 +423,7 @@ const PaymentDialog2 = (props) => {
               <Grid item xs={6}>
                 <Button
                   variant={phuongThucThanhToan === 'transfer' ? 'contained' : 'outlined'}
-                  onClick={() => handlePhuongThucThanhToanChange('transfer')}
+                  onClick={() => handleClickVnPay()}
                   fullWidth
                 >
                   Chuyển khoản
@@ -307,7 +448,7 @@ const PaymentDialog2 = (props) => {
                       <TableRow>
                         <TableCell>STT</TableCell>
                         <TableCell>Ngày tạo</TableCell>
-                        {/* <TableCell>Số tiền</TableCell> */}
+                        <TableCell>Mã giao dịch</TableCell>
                         <TableCell>Tiền nhận</TableCell>
                         <TableCell>Phương thanh toán</TableCell>
                         <TableCell>Trạng thái</TableCell>
@@ -320,6 +461,8 @@ const PaymentDialog2 = (props) => {
                         <TableRow key={index}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{thanhToan.ngayTao}</TableCell>
+                          <TableCell>{thanhToan.maGiaoDich}</TableCell>
+
                           {/* <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell> */}
                           <TableCell>{thanhToan.tienNhan ? thanhToan.tienNhan.toLocaleString() : ''}</TableCell>
                           <TableCell>{thanhToan.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>
@@ -372,6 +515,37 @@ const PaymentDialog2 = (props) => {
         <Grid item xs={12} sx={{ textAlign: 'right' }}>
           <Button onClick={() => setXacNhanThanhToan(false)}>Hủy</Button>
           <Button onClick={handleConfirmThanhToan} color="primary">
+            OK
+          </Button>
+        </Grid>
+      </Dialog>
+
+      <Dialog
+        open={isConformPdf}
+        onClose={() => {
+          setIsConformPdf(false);
+          localStorage.setItem('billCode', '');
+        }}
+      >
+        <DialogTitle>Xác nhận in hóa đơn</DialogTitle>
+        <DialogContent>Bạn có muốn in hóa đơn không </DialogContent>
+        <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Button
+            onClick={() => {
+              setIsConformPdf(false);
+              localStorage.setItem('billCode', '');
+              onReload();
+            }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              setIsConformPdf(false);
+              printPdf();
+            }}
+            color="primary"
+          >
             OK
           </Button>
         </Grid>

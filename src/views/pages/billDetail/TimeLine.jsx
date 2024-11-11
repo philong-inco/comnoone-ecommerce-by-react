@@ -29,7 +29,7 @@ import { useRef, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { AiFillCarryOut, AiFillFile } from 'react-icons/ai';
-import { getPDF, updateStatusByCode } from 'services/admin/bill/billService';
+import { changeStatusByCode, getPDF, updateStatusByCode } from 'services/admin/bill/billService';
 
 import { getStatusBillHistory, getStatusBillHistoryColor } from 'utils/billUtil/billStatus';
 import OrderStep from './OrderStep';
@@ -133,6 +133,7 @@ function NewTimeLine(props) {
   // dialog lịch sử hóa đơn
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpenNoMessage, setIsDialogOpenNoMessage] = useState(false);
 
   // dialog xác nhận
   const [openDialogConfirm, setDialogConfirm] = useState(false);
@@ -173,6 +174,26 @@ function NewTimeLine(props) {
     }
   };
 
+  const updateStatusByCodeNoMessage = async () => {
+    try {
+      const response = await changeStatusByCode(id, keyStatus);
+      if (response.status_code == 201) {
+        setSnackbarMessage('Cập nhập trạng thái hóa đơn ' + id + ' thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setIsDialogOpenNoMessage(false);
+        setErrorMessages({});
+        setKeyStatus('');
+        onLoading();
+      }
+    } catch (error) {
+      setSnackbarMessage('Cập trạng thái hóa đơn thất bại !');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      console.log(error);
+    }
+  };
+
   // form
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -191,6 +212,14 @@ function NewTimeLine(props) {
     // };
     apiUpdateStatusBill(formData);
   };
+  // no
+  const handleSaveNoMessage = (event) => {
+    // const data = {
+    //   hiChuCuaHang: formData.ghiChuCuaHang.trim(),
+    // ghiChuKhachHang: formData.ghiChuKhachHang.trim()
+    // };
+    updateStatusByCodeNoMessage();
+  };
 
   // dialog lịch sử
   const handleOpenDialog = () => {
@@ -199,6 +228,14 @@ function NewTimeLine(props) {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
+  };
+  // NoMessage
+  const handleOpenDialogNoMessage = () => {
+    setIsDialogOpenNoMessage(true);
+  };
+
+  const handleCloseDialogNoMessage = () => {
+    setIsDialogOpenNoMessage(false);
   };
 
   const handleOpenDialogConfirm = () => {
@@ -209,6 +246,11 @@ function NewTimeLine(props) {
     setKeyStatus(key);
     handleOpenDialogConfirm();
     // handleSave(key);
+  };
+
+  const handleClickBtnStatusNoMessage = (key) => {
+    setKeyStatus(key);
+    handleOpenDialogNoMessage();
   };
 
   const handleCloneForm = () => {
@@ -235,9 +277,10 @@ function NewTimeLine(props) {
       bill.trangThai === 'CHO_THANH_TOAN' ||
       bill.trangThai === 'CHO_XAC_NHAN' ||
       bill.trangThai === 'CHO_GIAO' ||
-      bill.trangThai === 'DANG_GIAO' ||
+      // bill.trangThai === 'DANG_GIAO' ||
       bill.trangThai === 'XAC_NHAN' ||
-      bill.trangThai === 'DON_MOI'
+      bill.trangThai === 'DON_MOI' ||
+      bill.trangThai === 'TREO'
     ) {
       buttons.push(
         <Grid item xs={3} key="huy-button">
@@ -249,10 +292,10 @@ function NewTimeLine(props) {
     }
 
     // Nút Chờ Giao
-    if ((bill.trangThai === 'DON_MOI' || bill.trangThai === 'CHO_XAC_NHAN') && bill.loaiHoaDon === 1) {
+    if ((bill.trangThai === 'DON_MOI' || bill.trangThai === 'CHO_XAC_NHAN' || bill.trangThai === 'TREO') && bill.loaiHoaDon === 1) {
       buttons.push(
         <Grid item xs={3} key="xac-nhan-button">
-          <Button variant="contained" onClick={() => handleClickBtnStatus('XAC_NHAN')} fullWidth>
+          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('XAC_NHAN')} fullWidth>
             XÁC NHẬN
           </Button>
         </Grid>
@@ -268,7 +311,7 @@ function NewTimeLine(props) {
     } else if (bill.trangThai === 'XAC_NHAN' && bill.loaiHoaDon === 1) {
       buttons.push(
         <Grid item xs={3} key="hoan-thanh-button">
-          <Button variant="contained" onClick={() => handleClickBtnStatus('CHO_GIAO')} fullWidth>
+          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('CHO_GIAO')} fullWidth>
             CHỜ VẬN CHUYỂN
           </Button>
         </Grid>
@@ -288,7 +331,7 @@ function NewTimeLine(props) {
       buttons.push(
         <Grid item xs={3} key="dang-giao-button">
           <Button variant="contained" onClick={() => handleClickBtnStatus('DANG_GIAO')} fullWidth>
-            VẬN CHUYỂN
+            ĐÃ VẬN CHUYỂN
           </Button>
         </Grid>
       );
@@ -485,12 +528,12 @@ function NewTimeLine(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Xác nhận hành động</DialogTitle>
-        <DialogContent>
+        <DialogTitle id="alert-dialog-title5">Xác nhận hành động</DialogTitle>
+        {/* <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Chuyên đối trạng thái hóa đơn từ {showLabel(bill.trangThai)} thành {showLabel(keyStatus)}
           </DialogContentText>
-        </DialogContent>
+        </DialogContent> */}
         <DialogContent>
           <div>
             <TextField
@@ -554,6 +597,40 @@ function NewTimeLine(props) {
             onClick={() => {
               handleSave(keyStatus);
               setOpenConfirmOk(false);
+            }}
+            color="primary"
+            autoFocus
+          >
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* NoMessage */}
+      <Dialog
+        open={isDialogOpenNoMessage}
+        onClose={handleCloseDialogNoMessage}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title"></DialogTitle>
+
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" style={{ color: 'black' }}>
+            <strong>
+              Bạn muốn {/* {showLabel(keyStatus)} */}
+              chắc chắn muốn chuyển trạng thái hóa đơn {id}
+            </strong>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialogNoMessage} color="secondary">
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              // handleSave(keyStatus);
+              handleSaveNoMessage();
+              // setOpenConfirmOk(false);
             }}
             color="primary"
             autoFocus
