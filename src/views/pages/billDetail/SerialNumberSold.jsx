@@ -39,6 +39,7 @@ import ProductList from '../ban-hang/dialog-san-pham/ProductList';
 import { Box } from '@mui/system';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 import { GridDeleteIcon } from '@mui/x-data-grid';
+import { IconTrash } from '@tabler/icons-react';
 
 function SerialNumberSold(props) {
   const { id } = useParams();
@@ -245,7 +246,8 @@ function SerialNumberSold(props) {
                     {product.productName} <br />
                     <strong style={{ color: 'black' }}>{parseFloat(product.price).toLocaleString()} đ</strong>
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
+                    {product.quantity}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Tooltip title="Cập nhập số lượng" placement="top">
                         <IconButton
@@ -293,6 +295,40 @@ function SerialNumberSold(props) {
                         </IconButton>
                       </Tooltip>
                     </div>
+                  </TableCell> */}
+                  <TableCell>
+                    {bill.trangThai === 'DANG_GIAO' ||
+                    bill.trangThai === 'HOAN_THANH' ||
+                    bill.trangThai === 'CHO_GIAO' ||
+                    bill.trangThai === 'HUY' ? (
+                      <strong>{product.quantity}</strong>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Tooltip title="Cập nhập số lượng" placement="top">
+                          <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                            <RemoveCircleOutline />
+                          </IconButton>
+                        </Tooltip>
+                        <TextField
+                          type="number"
+                          value={product.quantity}
+                          onChange={(e) => handleOpenDialog(product.productDetailId)}
+                          inputProps={{ min: 0 }}
+                          sx={{
+                            width: 50,
+                            height: 30,
+                            '& .MuiInputBase-input': {
+                              padding: '5px 10px'
+                            }
+                          }}
+                        />
+                        <Tooltip title="Cập nhập số lượng" placement="top">
+                          <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                            <AddCircleOutline />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <strong style={{ color: 'black' }}>{parseFloat(product.quantity * product.price).toLocaleString()} đ</strong>
@@ -321,18 +357,20 @@ function SerialNumberSold(props) {
                       <GridDeleteIcon />
                     </Button> */}
                     <Tooltip title={'Hủy toàn bộ sản phẩm : ' + product.productName} placement="top">
-                      <IconButton
+                      <Button
                         disabled={
                           bill.trangThai == 'DANG_GIAO' ||
                           bill.trangThai == 'HOAN_THANH' ||
                           bill.trangThai == 'CHO_GIAO' ||
                           bill.trangThai == 'HUY'
                         }
+                        variant="contained"
+                        color="error"
                         onClick={() => handleDelete(product)}
-                        style={{ color: 'red' }}
+                        sx={{ color: '#FFFFFF', backgroundColor: '#AA0000', marginTop: '10px' }}
                       >
-                        <GridDeleteIcon />
-                      </IconButton>
+                        <IconTrash stroke={2} />
+                      </Button>
                     </Tooltip>
                   </TableCell>
                 </TableRow>
