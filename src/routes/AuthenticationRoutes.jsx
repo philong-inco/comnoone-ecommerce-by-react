@@ -1,28 +1,20 @@
-import { lazy } from 'react';
+import React, { lazy } from 'react';
+import { Route, Routes } from 'react-router-dom';
 
 // project imports
 import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
+import MainLayout from 'layout/MainLayout';
 
 // login option 3 routing
-const AuthLogin3 = Loadable(lazy(() => import('views/pages/authentication3/Login3')));
-const AuthRegister3 = Loadable(lazy(() => import('views/pages/authentication3/Register3')));
+const Login = Loadable(lazy(() => import('views/pages/SignIn/SignIn.jsx')));
 
-// ==============================|| AUTHENTICATION ROUTING ||============================== //
-
-const AuthenticationRoutes = {
-  path: '/',
-  element: <MinimalLayout />,
-  children: [
-    {
-      path: '/pages/login/login3',
-      element: <AuthLogin3 />
-    },
-    {
-      path: '/pages/register/register3',
-      element: <AuthRegister3 />
-    }
-  ]
-};
+const AuthenticationRoutes = () => (
+  <Routes>
+    <Route element={<MainLayout />}>
+      <Route path="/login/form" element={<Login />} />
+    </Route>
+  </Routes>
+);
 
 export default AuthenticationRoutes;

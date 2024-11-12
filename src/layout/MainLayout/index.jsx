@@ -1,3 +1,7 @@
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth'
+
 import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -55,19 +59,26 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && pr
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const MainLayout = () => {
+  const { isLogin, onLogOut } = useAuth(); 
   const theme = useTheme();
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
-  // Handle left drawer
   const leftDrawerOpened = useSelector((state) => state.customization.opened);
   const dispatch = useDispatch();
   const handleLeftDrawerToggle = () => {
     dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
   };
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLogin) {
+      navigate('/loginform'); 
+    }
+  }, [isLogin, navigate]);
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      {/* header */}
       <AppBar
         enableColorOnDark
         position="fixed"
@@ -83,16 +94,11 @@ const MainLayout = () => {
         </Toolbar>
       </AppBar>
 
-      {/* drawer */}
       <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
-
-      {/* main content */}
       <Main theme={theme} open={leftDrawerOpened}>
-        {/* breadcrumb */}
         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
         <Outlet />
       </Main>
-      {/* <Customization /> */}
     </Box>
   );
 };
