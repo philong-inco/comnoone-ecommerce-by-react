@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import { REG_EMAIL } from "../../constants/reg";
+import { REG_EMAIL } from "../../../constants/reg";
 import { Button } from "antd";
 import { Link } from "react-router-dom";
-import { ROUTE_PATH } from "../../constants/routes";
+import { ROUTE_PATH } from "../../../constants/routes";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";

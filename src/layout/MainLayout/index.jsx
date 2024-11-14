@@ -72,7 +72,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     if (!isLogin) {
-      navigate('/loginform'); 
+      navigate('/login'); 
     }
   }, [isLogin, navigate]);
 

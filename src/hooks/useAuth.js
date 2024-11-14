@@ -13,7 +13,6 @@ export const onLogOut = () => {
 };
 
 export const useAuth = () => {
-  debugger;
   const isLogged = localStorage.getItem(TOKEN_STORAGE_KEY);
   const userInfo = JSON.parse(
     localStorage.getItem(USER_INFO_STORAGE_KEY) || "{}"
@@ -21,6 +20,7 @@ export const useAuth = () => {
   const sessionId = localStorage.getItem(SESSION_ID_STORAGE_KEY);
 
   const onLogin = (data) => {
+    debugger;
     localStorage.setItem(TOKEN_STORAGE_KEY, data.jwt);
     localStorage.setItem(USER_INFO_STORAGE_KEY, JSON.stringify(data));
     window.location.href = ROUTE_PATH.HOME;

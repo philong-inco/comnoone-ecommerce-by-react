@@ -333,7 +333,7 @@ function NhanVienConfiguration() {
       formData.hinh_anh = data.hinh_anh;
       const diaChi = `${data.dia_chi}, ${selectedWard ? wards.find((ward) => ward.id === selectedWard).ten : ''}, ${selectedDistrict ? districts.find((district) => district.id === selectedDistrict).ten : ''}, ${selectedProvince ? provinces.find((province) => province.id === selectedProvince).name : ''}`;
       formData.dia_chi = diaChi;
-      formData.list_vai_tro = ['Nhân Viên'];
+      formData.list_vai_tro = ['STAFF'];
 
       await schema.validate(formData);
       const url = id ? `http://localhost:8080/api/nhan_vien/update/${id}` : 'http://localhost:8080/api/nhan_vien/create';

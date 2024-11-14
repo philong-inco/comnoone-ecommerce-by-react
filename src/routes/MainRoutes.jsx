@@ -62,24 +62,11 @@ const BillDetail2 = Loadable(lazy(() => import('views/pages/billDetail/BillDetai
 
 // Bán hàng
 const Sell = Loadable(lazy(() => import('views/pages/ban-hang/index.jsx')));
-// Login
-const Login = Loadable(lazy(() => import('views/pages/SignIn/SignIn.jsx')));
 
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
   children: [
-    // Login Form
-    {
-      path: 'login',
-      children: [
-        {
-          path: 'form',
-          element: <Login />
-        }
-      ]
-    },
-    // Hóa đơn
     {
       path: 'hoa-don',
       children: [
