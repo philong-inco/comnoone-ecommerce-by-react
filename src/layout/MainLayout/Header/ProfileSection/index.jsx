@@ -81,32 +81,8 @@ const ProfileSection = () => {
     prevOpen.current = open;
   }, [open]);
 
-  // Gọi API để lấy thông tin nhân viên
-  useEffect(() => {
-    const fetchNhanVien = async () => {
-      try {
-        const response = await axios.get('https://weblaptop-by-springboot-and-reactjs.onrender.com/api/nhan_vien/2');
-        setNhanVien(response.data);
-        console.log(response.data)
-      } catch (error) {
-        console.error('Error fetching employee data:', error);
-      }
-    };
-
-    fetchNhanVien();
-    fetchVaiTro();
-  }, []);
-
-
-  const fetchVaiTro = async () => {
-    try {
-      const response = await axios.get('https://weblaptop-by-springboot-and-reactjs.onrender.com/api/vaitro/findbynhanvien/2');
-      setVaiTro(response.data);
-      console.log(response.data)
-    } catch (error) {
-      console.error('Error fetching role data:', error);
-    }
-  };
+  const { data } = useProfile();
+  const { onLogOut } = useAuth();
 
 
   return (
