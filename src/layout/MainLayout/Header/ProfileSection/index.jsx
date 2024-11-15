@@ -31,6 +31,9 @@ import User1 from 'assets/images/users/user-round.svg';
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
 
+import { useProfile } from "../../../../hooks/useProfile";
+import { useAuth } from "../../../../hooks/useAuth";
+import apiClient from "../../../../services/api";
 const ProfileSection = () => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
@@ -48,24 +51,14 @@ const ProfileSection = () => {
 
   const anchorRef = useRef(null);
 
-  const handleLogout = async () => {
-    console.log('Logout');
-  };
+  const { onLogOut } = useAuth();
+
 
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
     setOpen(false);
-  };
-
-  const handleListItemClick = (event, index, route = '') => {
-    setSelectedIndex(index);
-    handleClose(event);
-
-    if (route && route !== '') {
-      navigate(route);
-    }
   };
 
   const handleToggle = () => {
@@ -81,8 +74,35 @@ const ProfileSection = () => {
     prevOpen.current = open;
   }, [open]);
 
-  const { data } = useProfile();
-  const { onLogOut } = useAuth();
+  const { isLogin, userInfo } = useAuth();
+
+  useEffect(() => {
+    const fetchNhanVien = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/nhan_vien/${userInfo.id}`);
+        setNhanVien(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+      }
+    };
+
+    fetchNhanVien();
+    fetchVaiTro();
+  }, []);
+
+
+  const fetchVaiTro = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/vaitro/findbynhanvien/${userInfo.id}`);
+      setVaiTro(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Error fetching role data:', error);
+    }
+  };
+
+
 
 
   return (
@@ -156,12 +176,14 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2, pb: 0 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Chào bạn,</Typography>
+                        <Typography variant="h4">Nhân Viên:</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
                           {nhanVien.ten || 'Tên nhân viên'}
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Typography variant="h4">Chức vụ:</Typography>
+                        <Typography variant="subtitle2">
                         {vaiTro.length > 0 ? vaiTro.map((role, index) => (
                           <span key={index}>
                             {role.ten}
@@ -169,6 +191,8 @@ const ProfileSection = () => {
                           </span>
                         )) : 'Chức vụ'}
                       </Typography>
+                      </Stack>
+                      
                     </Stack>
                     <Divider />
                   </Box>
@@ -189,41 +213,11 @@ const ProfileSection = () => {
                             mt: 0.5
                           }
                         }}
-                      >
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) => handleListItemClick(event, 0, '#')}
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Cài đặt tài khoản</Typography>} />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 1}
-                          onClick={(event) => handleListItemClick(event, 1, '#')}
-                        >
-                          <ListItemIcon>
-                            <IconUser stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Grid container spacing={1} justifyContent="space-between">
-                                <Grid item>
-                                  <Typography variant="body2">Cập nhật thông tin</Typography>
-                                </Grid>
-                                <Grid item></Grid>
-                              </Grid>
-                            }
-                          />
-                        </ListItemButton>
+                      >           
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}
-                          onClick={handleLogout}
-                        >
+                          onClick={onLogOut}                        >
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
