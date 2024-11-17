@@ -337,6 +337,7 @@ const suaTrangThai = (id, status) => {
         <TableHead>
           <TableRow>
             <TableCell>STT</TableCell>
+            <TableCell>Mã</TableCell>
             <TableCell align="left">RAM</TableCell>
             <TableCell align="left">CPU</TableCell>
             <TableCell align="left">Ổ cứng</TableCell>
@@ -349,12 +350,13 @@ const suaTrangThai = (id, status) => {
         <TableBody>
           {spct.map((row, index) => (
             <TableRow
-              key={row.ram}
+              key={row.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row">
                 {index + 1}
               </TableCell>
+              <TableCell align="left">{row.ma}</TableCell>
               <TableCell align="left">{row.ram}</TableCell>
               <TableCell align="left">{row.cpu}</TableCell>
               <TableCell align="left">{row.ocung}</TableCell>

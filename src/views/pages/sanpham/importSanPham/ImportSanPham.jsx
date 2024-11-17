@@ -40,7 +40,7 @@ const ImportSanPham = () => {
                     <div style={{ display: 'inline-block' }}>
                         {/* <ModalUpdate fetchRams={fetchRams} info={params.row} /> */}
                     </div>
-                    <IconButton color="error" onClick={() => handleDelete(params.id)}>
+                    <IconButton color="error" onClick={() => handleDeleteProduct(params.row.ten)}>
                         <Delete />
                     </IconButton>
                 </div>
@@ -51,7 +51,7 @@ const ImportSanPham = () => {
         {
             field: 'stt',
             headerName: 'STT',
-            width: 70,
+            width: 20,
             flex: 1,
             renderCell: (params) => (
                 <div>
@@ -181,6 +181,17 @@ const ImportSanPham = () => {
             )
         },
         {
+            field: 'serials',
+            headerName: 'Serials',
+            width: 130,
+            flex: 1,
+            renderCell: (params) => (
+                <div>
+                    {params.row.serials}
+                </div>
+            )
+        },
+        {
             field: 'actions',
             headerName: 'Thao Tác',
             sortable: false,
@@ -191,7 +202,7 @@ const ImportSanPham = () => {
                     <div style={{ display: 'inline-block' }}>
                         {/* <ModalUpdate fetchRams={fetchRams} info={params.row} /> */}
                     </div>
-                    <IconButton color="error" onClick={() => handleDelete(params.id)}>
+                    <IconButton color="error" onClick={() => handleDeleteProductDetail(params.row)}>
                         <Delete />
                     </IconButton>
                 </div>
@@ -219,6 +230,34 @@ const ImportSanPham = () => {
         { id: 0, ten: 'Đã tắt' }
     ]);
 
+    const handleDeleteProduct = (ten) => {
+        console.log('ten: ', ten);
+        var bienTheTemp = bienThes.filter(x => x.sanPhamInfo.ten != ten);
+        setBienThes(bienTheTemp);
+        console.log('bienTheTemp: ', bienTheTemp);
+        var sanPhamTemp = sanphams.filter(x => x.ten != ten);
+        console.log('sanPhamTemp: ', sanPhamTemp);
+        setSanPhams(sanPhamTemp);
+    }
+
+    const handleDeleteProductDetail = (row) => {
+        console.log('row: ', row);
+        var bienTheTemp = bienThes.filter(x => x.id != row.id);
+        console.log('bienTheTemp: ', bienTheTemp);
+        setBienThes(bienTheTemp);
+        handleDeleteProductHaveNotBienThe(row);
+    }
+
+    const handleDeleteProductHaveNotBienThe = (row) => {
+        var exist = bienThes.filter(x => x.tenSanPham == row.tenSanPham && x.id != row.id);
+        if (exist.length > 0){
+            return;
+        } else {
+            var sanPhamTemp = sanphams.filter(x => x.ten != row.tenSanPham);
+            setSanPhams(sanPhamTemp);
+        }
+    }
+
 
     const handleButtonClick = () => {
         fileInputRef.current.click();
@@ -235,8 +274,8 @@ const ImportSanPham = () => {
             // sheet 1 là san pham
             const sheetProduct = workbook.SheetNames[0];
             const worksheetProduct = workbook.Sheets[sheetProduct];
-            const jsonDataProduct = XLSX.utils.sheet_to_json(worksheetProduct);
-            const listNewProduct = jsonDataProduct.map((data, index) => {
+            const jsonDataProduct = XLSX.utils.sheet_to_json(worksheetProduct); // tạo json từ sheet
+            const listNewProduct = jsonDataProduct.map((data, index) => { // map nhu cau va thuong hieu vao
                 const nhuCauInfo = nhuCau.find(nc => nc.ten.toLowerCase() === data.nhuCau.toLowerCase())
                 const thuongHieuInfo = thuongHieu.find(nc => nc.ten.toLowerCase() === data.thuongHieu.toLowerCase())
 
@@ -255,7 +294,7 @@ const ImportSanPham = () => {
             }));
             if(listNewProductDuplicates.length > 0) {
                 const array = listNewProductDuplicates.map(item => item.ten);
-                toast.error(`Dữ liệu bị lặp lại ở sản phẩm: ${array.join(', ')}`)
+                alert(`Dữ liệu bị lặp lại ở sản phẩm: ${array.join(', ')}`);
                 return;
             }
 
@@ -265,17 +304,19 @@ const ImportSanPham = () => {
             const jsonDataBienthe = XLSX.utils.sheet_to_json(worksheetBienThe);
 
             const listBienThe = jsonDataBienthe.map((bienthe, index) => {
-                const banPhimInfo = banPhim.find(banphim => banphim.ten.toLowerCase() === bienthe.tenBanPhim.toLowerCase())
-                const cpuInfo = CPU.find(cpu => cpu.ten.toLowerCase() === bienthe.tenCPU.toLowerCase())
-                const heDieuHanhInfo = heDieuHanh.find(hdh => hdh.ten.toLowerCase() === bienthe.tenHeDieuHanh.toLowerCase())
-                const manHinhInfo = manHinh.find(mh => mh.ten.toLowerCase() === bienthe.tenManHinh.toLowerCase())
-                const mauSacInfo = mauSac.find(ms => ms.ten.toLowerCase() === bienthe.tenMauSac.toLowerCase())
-                const ramInfo = ram.find(r => r.ten.toLowerCase() === bienthe.tenRam.toLowerCase())
-                const vgaInfo = VGA.find(v => v.ten.toLowerCase() === bienthe.tenVGA.toLowerCase())
-                const webcamInfo = webcam.find(cam => cam.ten.toLowerCase() === bienthe.tenWebcam.toLowerCase())
-                const oCungInfo = oCung.find(rom => rom.ten.toLowerCase() === bienthe.tenOCung.toLowerCase())
-                const sanPhamInfo = listNewProduct.find(product => product.ten.toLowerCase() === bienthe.tenSanPham.toLowerCase())
+                const banPhimInfo = banPhim.find(banphim => banphim.ten.trim().toLowerCase() === bienthe.tenBanPhim.trim().toLowerCase())
+                const cpuInfo = CPU.find(cpu => cpu.ten.trim().toLowerCase() === bienthe.tenCPU.trim().toLowerCase())
+                const heDieuHanhInfo = heDieuHanh.find(hdh => hdh.ten.trim().toLowerCase() === bienthe.tenHeDieuHanh.trim().toLowerCase())
+                const manHinhInfo = manHinh.find(mh => mh.ten.trim().toLowerCase() === bienthe.tenManHinh.trim().toLowerCase())
+                const mauSacInfo = mauSac.find(ms => ms.ten.trim().toLowerCase() === bienthe.tenMauSac.trim().toLowerCase())
+                const ramInfo = ram.find(r => r.ten.trim().toLowerCase() === bienthe.tenRam.trim().toLowerCase())
+                const vgaInfo = VGA.find(v => v.ten.trim().toLowerCase() === bienthe.tenVGA.trim().toLowerCase())
+                const webcamInfo = webcam.find(cam => cam.ten.trim().toLowerCase() === bienthe.tenWebcam.trim().toLowerCase())
+                const oCungInfo = oCung.find(rom => rom.ten.trim().toLowerCase() === bienthe.tenOCung.trim().toLowerCase())
+                const sanPhamInfo = listNewProduct.find(product => product.ten.toLowerCase() === bienthe.tenSanPham.trim().toLowerCase())
                 const giaBan = bienthe.giaBan
+                const serials = bienthe.serials
+
                 const id = index
 
                 return {
@@ -291,6 +332,7 @@ const ImportSanPham = () => {
                     oCungInfo,
                     sanPhamInfo,
                     giaBan,
+                    serials,
                     tenSanPham: bienthe.tenSanPham
                 }
             });
@@ -298,7 +340,8 @@ const ImportSanPham = () => {
             let isNotMatchProductName = false;
             for(const bienthe of listBienThe){
                 if(!bienthe?.sanPhamInfo){
-                    toast.error(`Tên sản phẩm "${bienthe.tenSanPham}" ở mục BIẾN THỂ không khớp`)
+                    alert(`Tên sản phẩm "${bienthe.tenSanPham}" ở mục BIẾN THỂ không khớp`)
+                   
                     isNotMatchProductName = true;
                     return;
                 }
@@ -314,7 +357,8 @@ const ImportSanPham = () => {
             }));
             if(listBienTheDuplicates.length > 0) {
                 const array = listBienTheDuplicates.map(item => item.sanPhamInfo.ten);
-                toast.error(`Dữ liệu bị lặp lại ở biến thể có tên sản phẩm là: ${array.join(', ')}`)
+
+                alert(`Dữ liệu bị lặp lại ở biến thể có tên sản phẩm là: ${array.join(', ')}`)
                 return;
             }
             
@@ -354,6 +398,7 @@ const ImportSanPham = () => {
         setBanPhim(banPhimResult.data.data);
     };
 
+    // hàm add sản phẩm
     const addMultiProduct = async () => {
         const requests = sanphams.map(item => {
             return createSanPham({
@@ -376,19 +421,19 @@ const ImportSanPham = () => {
                     errorListNoti.push(index + 1)
                     if (index === results.length - 1) {
                         // Thông báo khi code 999
-                        toast.error(`Sản phẩm thứ ${errorListNoti.join(', ')} đã tồn tại`);
+                        alert(`Sản phẩm thứ ${errorListNoti.join(', ')} đã tồn tại`);
                     }
                 } else {
                     successListNoti.push(index + 1);
                     successList.push(response)
 
                     if ((index === results.length - 1)) {
-                        toast.success(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        alert(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
                 // Thông báo khi promise bị rejected
-                toast.error(`Thêm sản phẩm thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
+                alert(`Thêm sản phẩm thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
             }
         });
         
@@ -407,6 +452,8 @@ const ImportSanPham = () => {
                         vgaId: item.vgaInfo.id,
                         webcamId: item.webcamInfo.id,
                         giaBan: item.giaBan,
+                        listUrlAnhSanPham: '',
+                        listSerialNumber: item.serials,
                         trangThai: 1
                     });
                 }
@@ -423,34 +470,112 @@ const ImportSanPham = () => {
                     errorListNoti.push(index + 1)
                     if (index === results.length - 1) {
                         // Thông báo khi code 999
-                        toast.error(`Biến thể thứ ${errorListNoti.join(', ')} đã tồn tại`);
+                        alert(`Biến thể thứ ${errorListNoti.join(', ')} đã tồn tại`);
                     }
                 } else {
                     successListNoti.push(index + 1);
 
                     if ((index === resultsBienThe.length - 1)) {
-                        toast.success(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        alert(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
                 // Thông báo khi promise bị rejected
-                toast.error(`Thêm Biến thể thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
+                alert(`Thêm Biến thể thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
             }
         });
 
         return resultsBienThe;
     };
 
-
+    const [messCheck, setMessCheck] = useState('');
+    useEffect(()=>{
+        if(messCheck !== ''){
+            alert(messCheck);
+        }
+    }, [messCheck])
     const handleAddMultiProduct = async () => {
-        await toast.promise(
-            addMultiProduct(),
-            {
-                pending: 'Đang thêm sản phẩm...',
-                error: 'Có lỗi xảy ra, vui lòng thử lại 🤯'
-            }
-        );
+        if (await validateBeforeAddMultiProduct()) {
+            console.log('validateBeforeAddMultiProduct: hợp lệ');
+            await toast.promise(
+                addMultiProduct(),
+                {
+                    pending: 'Đang thêm sản phẩm...',
+                    error: 'Có lỗi xảy ra, vui lòng thử lại 🤯'
+                }
+            );
+        }
+        
     };
+
+    const validateBeforeAddMultiProduct = async () => {
+        let mess = '';
+        let isValid = true;
+        // check tên sản phẩm trùng trong DB
+        const seriTotal = [];
+        const tenSPTotal = [];
+        let seriLengtInvalid = '';
+        let seriTonTai = '';
+        let tenSPTrung = '';
+        let giaSai = '';
+        
+        for(let i = 0; i < sanphams.length; i++){
+            tenSPTotal.push(sanphams[i].ten);
+            if((await axios.get(`http://localhost:8080/api/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
+                tenSPTrung += `${sanphams[i].ten}, `;
+                isValid = false;
+            }
+            let bienThe = bienThes.filter(x => x.tenSanPham == sanphams[i].ten);
+            
+            
+            for (let j = 0; j < bienThe.length; j++){
+                if (!(bienThe[j].giaBan !== '' && /^(0|[1-9]\d*)(\.\d+)?$/.test(bienThe[j].giaBan))){
+                    giaSai += `${bienThe.tenSanPham}, `;
+                    isValid = false;
+                }
+                let serialsTemp = (bienThe[j].serials + '').split(',');
+                for(let k = 0; k < serialsTemp.length; k++){
+                    seriTotal.push(serialsTemp[k]);
+                    if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20){
+                        seriLengtInvalid += `${serialsTemp[k]}, `
+                        isValid = false;
+                    }
+                    if ((await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
+                        seriTonTai += `${serialsTemp[k]}, `
+                    
+                        isValid = false;
+                    }
+                }
+                
+
+            }
+        }
+        const tenSPTotalCheck = new Set(tenSPTotal);
+        if(tenSPTotalCheck.size !== tenSPTotal.length){
+            mess += `Tên sản phẩm trong excel bị trùng lặp, `
+        }
+        if (tenSPTrung !== ''){
+            mess += "Sản phẩm đã tồn tại: " + tenSPTrung;
+        }
+        if (seriLengtInvalid !== ''){
+            mess += 'Độ dài serial không nằm trong khoảng 7-20 ký tự: ' + seriLengtInvalid;
+        }
+        if (seriTonTai !== ''){
+            mess += "Serial đã tồn tại: " + seriTonTai;
+        }
+        
+        const seriTotalCheck = new Set(seriTotal);
+        if(seriTotalCheck.size !== seriTotal.length){
+            mess += `Serial trong excel bị trùng lặp, `
+        }
+        if (giaSai !== ''){
+            mess += `Giá không hợp lệ tại sản phẩm: ${giaSai}, `;
+        }
+        let mess1 = mess.substring(0, mess.length-2)
+        setMessCheck(mess1);
+        return isValid;
+        
+    }
 
     const getDuplicateObjects = (array) => {
         const duplicates = [];
