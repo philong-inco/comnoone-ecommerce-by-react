@@ -614,7 +614,7 @@ function SerialNumberSold(props) {
       >
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial 2</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial </span>
             <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchQrChange} />
           </Box>
         </DialogTitle>
