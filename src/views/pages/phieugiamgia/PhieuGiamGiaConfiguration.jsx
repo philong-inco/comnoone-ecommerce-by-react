@@ -78,6 +78,9 @@ function PhieuGiamGiaConfiguration() {
           if (!bigNumberValue.isLessThanOrEqualTo(100)) {
             return context.createError({ message: 'Giá trị không được vượt quá 100%' });
           }
+          if (!bigNumberValue.isLessThanOrEqualTo(2000000)) {
+            return context.createError({ message: 'Giá trị giảm không được vượt quá 2,000,000' });
+          }
         } else if (currencyType === '$') {
           if (!bigNumberValue.isGreaterThan(0)) {
             return context.createError({ message: 'Giá trị phải lớn hơn 0$' });
