@@ -8,17 +8,16 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json;charset=UTF-8'
   }
 });
-
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     const token = getToken()
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`
-//     }
-//     return config
-//   },
-//   (error) => Promise.reject(error),
-// )
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('TOKEN_STORAGE_KEY');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export const get = async (path) => {
   try {
