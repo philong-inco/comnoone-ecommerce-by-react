@@ -636,9 +636,9 @@ function OrderInfo(props) {
           <Typography mt={1} variant="h4">
             Voucher : {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
-          <Typography mt={1} variant="h4">
+          {/* <Typography mt={1} variant="h4">
             Giảm hạng: {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
-          </Typography>
+          </Typography> */}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
             Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>

@@ -41,3 +41,15 @@ export const findSerialNumberByProductIdAndCodeSerialAndBillCode = async (billCo
     throw error;
   }
 };
+
+export const findSerialNumberByProductCodeAndCodeSerialAndBillCode = async (billCode, productCode, codeSerial, page, size) => {
+  try {
+    const result = await get(
+      `serial-number/product-detail-code-serial-in-bill-tow/${productCode}?size=${size}&page=${page}&codeSerial=${codeSerial}&codeBill=${billCode}`
+    );
+    return result;
+  } catch (error) {
+    console.error('Error fetching serial number by product id :', error);
+    throw error;
+  }
+};

@@ -1,4 +1,5 @@
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import CropFreeOutlinedIcon from '@mui/icons-material/CropFreeOutlined';
 import {
   Divider,
   Grid,
@@ -27,11 +28,13 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
+  findSerialNumberByProductCodeAndCodeSerialAndBillCode,
   findSerialNumberByProductIdAndCodeSerial,
   findSerialNumberByProductIdAndCodeSerialAndBillCode
 } from 'services/admin/serial-number/serialNumber';
 import {
   createSerialNumberSold,
+  createSerialNumberSoldByProductCode,
   deletedById,
   getAllSerialNumberSoldByBillId
 } from 'services/admin/serialNumberSold/serialNumberSoldService';
@@ -40,6 +43,7 @@ import { Box } from '@mui/system';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 import { GridDeleteIcon } from '@mui/x-data-grid';
 import { IconTrash } from '@tabler/icons-react';
+import { QrReader } from 'react-qr-reader';
 
 function SerialNumberSold(props) {
   const { id } = useParams();
@@ -48,6 +52,7 @@ function SerialNumberSold(props) {
   const [showModal, setShowModal] = useState(false);
   // show dialog seril
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogQr, setOpenDialogQr] = useState(false);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -58,10 +63,15 @@ function SerialNumberSold(props) {
   const [defaultSelectRows, setDefaultSelectRows] = useState([]);
   const [serials, setSerials] = useState([]);
   const [productId, setProductId] = useState(null);
+  const [productCode, setProductCode] = useState(null);
+
   const [pageSerial, setPageSerial] = useState(1);
   const [sizeSerial, setSizeSerial] = useState(5);
   const [totalSerial, setTotalSerial] = useState(0);
   const [searchSerial, setSearchSerial] = useState('');
+  //
+  const [openQR, setOpenQR] = useState(false);
+  const [dataQR, setDataQR] = useState('');
 
   const fetchSerialNumberSold = async () => {
     const response = await getAllSerialNumberSoldByBillId(id);
@@ -98,6 +108,15 @@ function SerialNumberSold(props) {
     }
   };
 
+  const fetchSerialNumberByProductCode = async (productCode, codeSerial, page, size) => {
+    const response = await findSerialNumberByProductCodeAndCodeSerialAndBillCode(id, productCode, codeSerial || '', page - 1, size);
+    if (response.status_code === 200) {
+      setSerials(response.data.result);
+      setTotalSerial(response.data.meta.total);
+      setPageSerial(response.data.meta.page + 1);
+    }
+  };
+
   // delete all by product
   const handleDelete = (value) => {
     console.log('ID cần xóa', value);
@@ -116,9 +135,6 @@ function SerialNumberSold(props) {
       listSerialNumberId: selectedRows,
       productId: productId
     };
-
-    console.log('DATA REQUEST : ', data);
-
     const response = await createSerialNumberSold(data);
     if (response.status_code === 201) {
       setSnackbarMessage('Cập nhập số lượng sản phẩm thành công');
@@ -131,6 +147,36 @@ function SerialNumberSold(props) {
       setProductId(null);
       fetchSerialNumberSold();
       onLoading();
+    }
+  };
+
+  const handleSubmitSerialsQr = async () => {
+    const data = {
+      billCode: id,
+      listSerialNumberId: selectedRows,
+      productCode: productCode
+    };
+    try {
+      const response = await createSerialNumberSoldByProductCode(data);
+      if (response.status_code === 201) {
+        setSnackbarMessage('Cập nhập số lượng sản phẩm thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setOpenDialog(false);
+        setOpenDialogQr(false);
+        setSelectedRows([]);
+        setSearchSerial('');
+        setPageSerial(1);
+        setProductId(null);
+        setProductCode(null);
+        fetchSerialNumberSold();
+        onLoading();
+      }
+    } catch (error) {
+      console.log(error);
+      setSnackbarMessage(error.response.data.message);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 
@@ -166,6 +212,35 @@ function SerialNumberSold(props) {
     setSearchSerial(newSearchSerial.trim());
     fetchSerialNumberByProduct(productId, newSearchSerial, pageSerial, sizeSerial);
   };
+  // Qr
+  const handleChangePageQrSerial = (newPage) => {
+    setSelectedRows(selectedRows);
+    setPageSerial(newPage);
+    fetchSerialNumberByProductCode(productCode, searchSerial, newPage, sizeSerial);
+  };
+
+  const handleOpenDialogQrSerial = (code) => {
+    setProductCode(code);
+    // // xem lại
+    fetchSerialNumberSold();
+    fetchSerialNumberByProductCode(code, searchSerial, pageSerial, 5);
+    setOpenDialogQr(true);
+  };
+
+  const handleSearchQrChange = (event) => {
+    const newSearchSerial = event.target.value;
+    setSearchSerial(newSearchSerial.trim());
+    fetchSerialNumberByProductCode(productCode, newSearchSerial, pageSerial, sizeSerial);
+  };
+
+  const handleCloseQrDialog = () => {
+    setSearchSerial('');
+    setOpenDialogQr(false);
+    setSelectedRows([]);
+    setDefaultSelectRows([]);
+    setPageSerial(1);
+    setProductCode(null);
+  };
 
   const handleSelectRow = (id) => {
     setSelectedRows((prevSelected) => {
@@ -196,7 +271,29 @@ function SerialNumberSold(props) {
 
   console.log('Select ROW ', selectedRows);
   console.log('Select Dèauk ', selectedRows);
+  // QR
+  const handleClickOpenQR = () => {
+    setOpenQR(true);
+  };
 
+  const handleCloseQR = () => {
+    setOpenQR(false);
+    setDataQR(''); // Reset dữ liệu khi đóng dialog
+  };
+
+  const handleScanQR = (data) => {
+    console.log('QR : ', data);
+
+    if (data) {
+      setDataQR(data);
+      handleOpenDialogQrSerial(data);
+      handleCloseQR(); // Đóng dialog sau khi quét
+    }
+  };
+
+  const handleErrorQR = (err) => {
+    console.error(err);
+  };
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 2, borderRadius: 4 }}>
@@ -204,19 +301,48 @@ function SerialNumberSold(props) {
           <Grid item xs={12} container justifyContent="space-between" alignItems="center">
             <Typography variant="h3">{title}</Typography>
             {/* <PdfForm serials={serialNumberSold} code={billInFo.ma} hiden={true} /> */}
-            <Tooltip title="Thêm sản phẩm" placement="top">
-              <Button
-                hidden={
-                  bill.trangThai == 'DANG_GIAO' || bill.trangThai == 'HOAN_THANH' || bill.trangThai == 'CHO_GIAO' || bill.trangThai == 'HUY'
-                }
-                variant="contained"
-                color="warning"
-                onClick={handleShowModal}
-                disabled={id ? false : true}
+            <Grid item container xs="auto" justifyContent="flex-end" alignItems="center" spacing={1}>
+              {/* <Button
+                onClick={() => {
+                  handleOpenDialogQrSerial('PDEGQECZ');
+                }}
               >
-                Thêm sản phẩm
-              </Button>
-            </Tooltip>
+                Mowr
+              </Button> */}
+              <Tooltip title="Quét Qr sản phẩm" placement="top">
+                <IconButton
+                  color="primary"
+                  aria-label="quét QR"
+                  onClick={handleClickOpenQR}
+                  hidden={
+                    bill.trangThai == 'DANG_GIAO' ||
+                    bill.trangThai == 'HOAN_THANH' ||
+                    bill.trangThai == 'CHO_GIAO' ||
+                    bill.trangThai == 'HUY'
+                  }
+                  variant="contained"
+                >
+                  <CropFreeOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Thêm sản phẩm" placement="top">
+                <Button
+                  hidden={
+                    bill.trangThai == 'DANG_GIAO' ||
+                    bill.trangThai == 'HOAN_THANH' ||
+                    bill.trangThai == 'CHO_GIAO' ||
+                    bill.trangThai == 'HUY'
+                  }
+                  variant="contained"
+                  color="warning"
+                  onClick={handleShowModal}
+                  disabled={!id}
+                >
+                  Thêm sản phẩm
+                </Button>
+              </Tooltip>
+            </Grid>
           </Grid>
         </Grid>
         <Divider sx={{ marginY: 2 }} />
@@ -475,7 +601,109 @@ function SerialNumberSold(props) {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* QR */}
+      {/* Qr serial */}
+      <Dialog
+        open={openDialogQr}
+        onClose={handleCloseQrDialog}
+        PaperProps={{
+          style: {
+            width: '700px'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial 2</span>
+            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchQrChange} />
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Chọn</TableCell>
+                  <TableCell>Mã</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {serials.map((row) => (
+                  <TableRow key={row.id}>
+                    <Checkbox
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => handleSelectRow(row.id)}
+                      // disabled={row.trangThai == 1}
+                      disabled={row.trangThai === 1 && !selectedRows.includes(row.id) && !defaultSelectRows.includes(row.id)}
+                    />
+                    <TableCell>{row.ma}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={row.trangThai == 0 ? 'Chưa bán' : row.trangThai == 1 ? 'Đã bán' : 'Hủy'}
+                        style={{ backgroundColor: getStatusSerialColor(row.trangThai), color: '#fff' }}
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Pagination
+            sx={{ marginTop: '10px', textAlign: 'center' }}
+            count={Math.ceil(totalSerial / sizeSerial)}
+            page={pageSerial}
+            onChange={(event, value) => handleChangePageQrSerial(value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseQrDialog} variant="contained" color="error">
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              handleSubmitSerialsQr();
+            }}
+            variant="contained"
+            color="primary"
+          >
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
 
+      <Dialog open={openQR} onClose={handleCloseQR} maxWidth="sm" fullWidth>
+        <DialogTitle>Quét Mã QR</DialogTitle>
+        {/* <DialogActions>
+          <Button onClick={handleCloseQR} color="primary">
+            Đóng
+          </Button>
+        </DialogActions> */}
+        <DialogContent>
+          <QrReader
+            // onScan={handleScanQR}
+            onResult={(result, error) => {
+              console.log('Kết quả:', result);
+              console.log('Lỗi:', error);
+              if (!!result) {
+                handleScanQR(result?.text);
+              }
+
+              if (!!error) {
+                console.error('Lỗi quét QR:', error); // Log lỗi nếu có
+              }
+            }}
+            onError={handleErrorQR}
+            style={{ width: '100%' }}
+          />
+          {dataQR && (
+            <Typography variant="h6" style={{ marginTop: '20px' }}>
+              Dữ liệu quét được (QR): {dataQR}
+            </Typography>
+          )}
+        </DialogContent>
+      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

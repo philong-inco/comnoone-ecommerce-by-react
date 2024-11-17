@@ -107,6 +107,8 @@ const ProductList = (props) => {
   };
 
   const urlFindFilter = 'http://localhost:8080/api/san-pham-chi-tiet/find/filter?';
+  const urlFindFilter2 = 'http://localhost:8080/api/san-pham-chi-tiet/find/filter-page?';
+
   const [sanPham, setsanPham] = useState([]);
   const [filter, setFilter] = useState({
     page: 0,
@@ -400,7 +402,7 @@ const ProductList = (props) => {
       .filter(([key, value]) => value !== '')
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
-    const urlQuery = urlFindFilter + queryString;
+    const urlQuery = urlFindFilter2 + queryString;
     const result = await axios.get(urlQuery);
     setsanPham(result.data.data);
     setTotalElement(parseInt(result.data.totalElement));

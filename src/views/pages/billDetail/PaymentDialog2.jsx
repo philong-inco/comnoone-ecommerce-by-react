@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import mbBankImage from '../../../assets/images/MB-Banl.jpg';
+import CropFreeOutlinedIcon from '@mui/icons-material/CropFreeOutlined';
+
 import {
   Grid,
   Typography,
@@ -17,7 +20,8 @@ import {
   Paper,
   Snackbar,
   Alert,
-  Tooltip
+  Tooltip,
+  IconButton
 } from '@mui/material';
 import { addPaymentHistory, deleteHDHTT, getAllHistoryPaymentByBillCode } from 'services/admin/hdhttt';
 import { useParams } from 'react-router-dom';
@@ -48,6 +52,8 @@ const PaymentDialog2 = (props) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
 
+  const [openQr, setOpenQr] = useState(false);
+
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const handlePhuongThucThanhToanChange = (phuongThuc) => {
@@ -55,9 +61,7 @@ const PaymentDialog2 = (props) => {
     setXacNhanMo(true);
   };
   console.log('DATA PAY : ', data);
-  const handleClickVnPay = () => {
-    genVnPay(soTien);
-  };
+
   const handleConfirm = () => {
     const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
     const newData = {
@@ -87,51 +91,17 @@ const PaymentDialog2 = (props) => {
     setXacNhanMo(false);
   };
 
-  const saveVnPay = (amount) => {
-    const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
-    const newData = {
-      idHTTT: idThanhToan,
-      soTien: data.tongTienPhaiTra + (data.loaiHoaDon == 1 ? data.tienShip : 0),
-      tienNhan: parseFloat(amount),
-      loaiThanhToan: '0',
-      // tienShip: data.tienShip,
-      loaiHoaDon: data.loaiHoaDon,
-      //
-      ten: data.ten,
-      sdt: data.sdt,
-      email: data.email
-      // diaChi: data.diaChi,
-      // tinh: data.tinh,
-      // tenTinh: data.tenTinh,
-      // huyen: data.huyen,
-      // tenHuyen: data.tenHuyen,
-      // phuong: data.phuong,
-      // tenPhuong: data.tenPhuong,
-      // ghiChu: data.ghiChu
-    };
-    console.log('Data veef HDHTT : ', newData);
-
-    create(newData);
-    setSoTien('');
-    setXacNhanMo(false);
-  };
-
   const create = async (newData) => {
     console.log(id);
     console.log('Chạy 0', data.ma);
 
     try {
       const response = await addPaymentHistory(data.ma, newData);
-      console.log('Chạy 1');
-
       if (response.status_code === 201) {
         setSnackbarMessage('Giao dịch thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         console.log('Chạy 2');
-
-        // await fetchInvoicePdf();
-
         fetchAll();
       }
     } catch (error) {
@@ -146,8 +116,6 @@ const PaymentDialog2 = (props) => {
         // } else {
         setSnackbarMessage('Lỗi mạng hoặc không thể kết nối đến server.');
       }
-      console.log('Chạy Lỗi');
-
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       console.log(error);
@@ -201,6 +169,7 @@ const PaymentDialog2 = (props) => {
     fetchInvoicePdf(code);
     setIsConformPdf(false);
   };
+
   const fetchInvoicePdf = async (code) => {
     try {
       const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${code}`, {
@@ -211,6 +180,9 @@ const PaymentDialog2 = (props) => {
       });
 
       if (response.ok) {
+        setSnackbarMessage('In hóa đơn thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         setIsConformPdf(false);
         const pdfBlob = await response.blob();
         const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -220,13 +192,20 @@ const PaymentDialog2 = (props) => {
         setTimeout(() => {
           iframeRef.current.contentWindow.print(); // In file PDF trong iframe
         }, 500);
+        onReload();
       } else {
+        console.error(response);
+
         console.error('Failed to fetch PDF');
       }
     } catch (error) {
       console.error('Error fetching PDF:', error);
+      setSnackbarMessage('In hóa đơn thất bại');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     } finally {
       localStorage.setItem('billCode', '');
+      setSnackbarOpen(true);
     }
   };
   // useEffect(() => {
@@ -279,110 +258,21 @@ const PaymentDialog2 = (props) => {
         setXacNhanThanhToan(false);
         onCloseDialog();
         localStorage.setItem('billCode', response.data);
-        // await fetchInvoicePdf();
-        // setFormData({});
-        // setBill({});
-        // setFormDataAddress({});
-        // setShowPDF(true);
         setIsConformPdf(true);
         onReload();
-        // onReload();
       }
     } catch (error) {
       console.log(error);
-
       setSnackbarMessage('Không thể thực hiện thanh toán');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
 
-  const genVnPay = async (amount) => {
-    const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
-    const newData = {
-      idHTTT: idThanhToan,
-      soTien: data.tongTienPhaiTra + (data.loaiHoaDon == 1 ? data.tienShip : 0),
-      tienNhan: parseFloat(amount),
-      loaiThanhToan: '0',
-      // tienShip: data.tienShip,
-      loaiHoaDon: data.loaiHoaDon,
-      //
-      ten: data.ten,
-      sdt: data.sdt,
-      email: data.email
-      // diaChi: data.diaChi,
-      // tinh: data.tinh,
-      // tenTinh: data.tenTinh,
-      // huyen: data.huyen,
-      // tenHuyen: data.tenHuyen,
-      // phuong: data.phuong,
-      // tenPhuong: data.tenPhuong,
-      // ghiChu: data.ghiChu
-    };
-    try {
-      const response = await createVNPay(id, amount);
-      if (response.status_code === 201) {
-        localStorage.setItem('bill', JSON.stringify(newData));
-        localStorage.setItem('billCode', id);
-
-        window.open(response.data, '_self');
-      }
-    } catch (error) {
-      setSnackbarMessage('Không thể tạo Vnpay');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
+  const handleClickOpenQR = () => {
+    setOpenQr(true);
   };
 
-  const createHistoryVnPay = async (ma, data) => {
-    try {
-      const response = await addPaymentHistory(ma, data);
-      console.log('Chạy 1');
-
-      if (response.status_code === 201) {
-        setSnackbarMessage('Giao dịch thành công');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-        fetchAll();
-        // window.open('http://localhost:3000/ban-hang/hoa-don/' + localStorage.getItem('billCode'), '_self');
-      }
-    } catch (error) {
-      if (error.response) {
-        setSnackbarMessage('Lỗi mạng hoặc không thể kết nối đến server.');
-      }
-      setSnackbarMessage(error);
-      console.log('Chạy Lỗi');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      console.log(error);
-    }
-  };
-
-  const urlObject = new URL(window.location.href);
-  const vnp_ResponseCode = urlObject.searchParams.get('vnp_ResponseCode');
-  const vnp_Amount = urlObject.searchParams.get('vnp_Amount');
-
-  console.log('vnp_ResponseCode', vnp_ResponseCode);
-  console.log('vnp_Amount', vnp_Amount);
-
-  useEffect(() => {
-    if (vnp_ResponseCode == '00') {
-      const data = JSON.parse(localStorage.getItem('bill'));
-      const code = localStorage.getItem('vnp_ResponseCode');
-      const billCode = localStorage.getItem('billCode');
-      const tranCode = localStorage.getItem('tranCode');
-      if (code === '00') {
-        data.maGD = tranCode;
-        createHistoryVnPay(billCode, data);
-      }
-    } else {
-      if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
-        setSnackbarMessage('Thanh toan không thành công');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-      }
-    }
-  });
   return (
     <>
       <Dialog open={open} onClose={onCloseDialog} fullWidth maxWidth="md">
@@ -390,11 +280,20 @@ const PaymentDialog2 = (props) => {
         <DialogContent>
           <Box>
             <Grid container spacing={2} sx={{ marginTop: 2 }}>
-              <Grid item xs={12}>
-                <Typography variant="h3" color="error">
-                  Cần thanh toán : {(data.loaiHoaDon === 0 ? data.tongTienPhaiTra : data.tongTienPhaiTra + data.tienShip).toLocaleString()}{' '}
-                  VNĐ
-                </Typography>
+              <Grid container alignItems="center">
+                <Grid item xs={6} style={{ textAlign: 'left' }}>
+                  <Typography variant="h3" color="error">
+                    Cần thanh toán: {(data.loaiHoaDon === 0 ? data.tongTienPhaiTra : data.tongTienPhaiTra + data.tienShip).toLocaleString()}{' '}
+                    VNĐ
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} style={{ textAlign: 'right' }}>
+                  <Tooltip title="QR thanh toán" placement="top">
+                    <IconButton color="primary" aria-label="quét QR" onClick={handleClickOpenQR}>
+                      <CropFreeOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -423,14 +322,14 @@ const PaymentDialog2 = (props) => {
               <Grid item xs={6}>
                 <Button
                   variant={phuongThucThanhToan === 'transfer' ? 'contained' : 'outlined'}
-                  onClick={() => handleClickVnPay()}
+                  onClick={() => handlePhuongThucThanhToanChange('transfer')}
                   fullWidth
                 >
                   Chuyển khoản
                 </Button>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h4">Tiền dư: {tienDu.toLocaleString()} VNĐ</Typography>
+                <Typography variant="h4">Khách thanh toán : {tienDaThanhToan.toLocaleString()} VNĐ</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="h4" color="error">
@@ -438,9 +337,8 @@ const PaymentDialog2 = (props) => {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h4">Khách thanh toán : {tienDaThanhToan.toLocaleString()} VNĐ</Typography>
+                <Typography variant="h4">Tiền dư: {tienDu.toLocaleString()} VNĐ</Typography>
               </Grid>
-
               <Grid item xs={12}>
                 <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
                   <Table>
@@ -448,7 +346,7 @@ const PaymentDialog2 = (props) => {
                       <TableRow>
                         <TableCell>STT</TableCell>
                         <TableCell>Ngày tạo</TableCell>
-                        <TableCell>Mã giao dịch</TableCell>
+                        {/* <TableCell>Mã giao dịch</TableCell> */}
                         <TableCell>Tiền nhận</TableCell>
                         <TableCell>Phương thanh toán</TableCell>
                         <TableCell>Trạng thái</TableCell>
@@ -461,10 +359,10 @@ const PaymentDialog2 = (props) => {
                         <TableRow key={index}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{thanhToan.ngayTao}</TableCell>
-                          <TableCell>{thanhToan.maGiaoDich}</TableCell>
+                          {/* <TableCell>{thanhToan.maGiaoDich}</TableCell> */}
 
                           {/* <TableCell>{thanhToan.soTien ? thanhToan.soTien.toLocaleString() : 'Chưa có'}</TableCell> */}
-                          <TableCell>{thanhToan.tienNhan ? thanhToan.tienNhan.toLocaleString() : ''}</TableCell>
+                          <TableCell>{thanhToan.tienNhan ? thanhToan.tienNhan.toLocaleString() + ' đ' : ''}</TableCell>
                           <TableCell>{thanhToan.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}</TableCell>
                           <TableCell>{thanhToan.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
                           <TableCell>{thanhToan.nguoiTao ? thanhToan.nguoiTao : 'Chưa xác định'}</TableCell>
@@ -549,6 +447,14 @@ const PaymentDialog2 = (props) => {
             OK
           </Button>
         </Grid>
+      </Dialog>
+      <Dialog
+        open={openQr}
+        onClose={() => {
+          setOpenQr(false);
+        }}
+      >
+        <img src={mbBankImage} alt="" />
       </Dialog>
       {pdfUrl && (
         <iframe

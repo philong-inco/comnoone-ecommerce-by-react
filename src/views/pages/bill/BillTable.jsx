@@ -29,7 +29,7 @@ function BillTable(props) {
   const tabList = [
     { key: '', label: 'TẤT CẢ' },
     { key: 'DON_MOI', label: 'Đơn mới' },
-    { key: 'TREO', label: 'Hóa đơn treo' },
+    { key: 'TREO', label: 'Hóa đơn chờ' },
     { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
     { key: 'CHO_GIAO', label: 'Chờ giao' },
     { key: 'DANG_GIAO', label: 'Đang giao' },
