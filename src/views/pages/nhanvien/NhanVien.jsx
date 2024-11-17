@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Switch } from '@mui/material';
+import { Snackbar, Switch } from '@mui/material';
 import * as XLSX from 'xlsx';
 import {
     Box,
@@ -31,11 +31,13 @@ import {
     Chip,
     Fab,
     Grid,
-    TablePagination 
+    TablePagination,
+    Alert,
 } from '@mui/material';
+import KeyIcon from '@mui/icons-material/Key';
 
 import MainCard from 'ui-component/cards/MainCard';
-import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, searchYearOfEmplpyee, getDanhSachNhanVien } from 'services/admin/employee/employeeService';
+import { searchNhanVienKeyWord, getAll, searchTrangThai, deleteNhanVien, rollBackStatus, searchGioiTinh, sentEmailForgotPassword, getDanhSachNhanVien } from 'services/admin/employee/employeeService';
 import { IconEdit } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
@@ -51,7 +53,11 @@ const DanhSachNhanVien = () => {
     const [nhanVien, setNhanVien] = useState([]);
     const [allNhanVien, setAllNhanVien] = useState([]);
     const [selectGioiTinh, setSelectGioiTinh] = useState('');
-
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+    const [nvEmail, setNvEmail] = useState(null);
     const statuses = [
         { id: '', name: 'Tất Cả' },
         { id: '0', name: 'Đã Nghỉ Việc' },
@@ -61,8 +67,8 @@ const DanhSachNhanVien = () => {
     const navigate = useNavigate();
 
     const [filter, setFilter] = useState({
-        page: 0, 
-        size: 5, 
+        page: 0,
+        size: 5,
     });
 
     const [totalElement, setTotalElement] = useState(0);
@@ -249,7 +255,7 @@ const DanhSachNhanVien = () => {
             } else {
                 filteredData = await getAll(filter.page, filter.size);
             }
-    
+
             const ws = XLSX.utils.json_to_sheet(filteredData.content.map((nv, index) => ({
                 STT: index + 1 + (filter.page - 1) * filter.size,
                 'Hình Ảnh': nv.hinhAnh,
@@ -261,7 +267,7 @@ const DanhSachNhanVien = () => {
                 'Địa Chỉ': nv.diaChi,
                 'Trạng Thái': nv.trangThai === 1 ? 'Đang Làm Việc' : 'Đã Nghỉ Việc'
             })));
-    
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Nhân Viên");
             XLSX.writeFile(wb, "danh_sach_nhan_vien.xlsx");
@@ -269,7 +275,49 @@ const DanhSachNhanVien = () => {
             console.log("Lỗi khi xuất file Excel:", error);
         }
     };
-    
+    const openDialog = (email) => {
+        setIsDialogOpen(true);
+        setNvEmail(email);
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+    };
+    const handleResetPassword = async (email) => {
+        if (!email) {
+            setSnackbar({
+                open: true,
+                message: "Email không hợp lệ.",
+                severity: "error",
+            });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await sentEmailForgotPassword(email);
+            setSnackbar({
+                open: true,
+                message: "Email reset mật khẩu đã được gửi!",
+                severity: "success",
+            });
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: "Có lỗi xảy ra khi gửi email.",
+                severity: "error",
+            });
+        } finally {
+            setLoading(false);
+            setIsDialogOpen(false);
+        }
+    };
+
+    const handleSnackbarClose = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+
     return (
         <MainCard style={{ textAlign: "center" }}>
             <Box
@@ -345,7 +393,7 @@ const DanhSachNhanVien = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        zIndex: 1300,                 
+                        zIndex: 1300,
                     }}
                 >
                     <Fab
@@ -442,18 +490,26 @@ const DanhSachNhanVien = () => {
                                     <TableCell>{nv.sdt}</TableCell>
                                     <TableCell>{nv.email}</TableCell>
                                     <TableCell>{nv.diaChi}</TableCell>
-
                                     <TableCell>{getStatusNhanVien(nv.trangThai)}</TableCell>
                                     <TableCell>
                                         <Button className="btn btn-link" title="Sửa Nhân Viên">
                                             <IconEdit stroke={2} onClick={() => handleEdit(nv.id)} />
                                         </Button>
+
                                         <Switch
                                             checked={nv.trangThai === 1}
                                             onChange={() => handleSwitchChange(nv.id, nv.trangThai)}
                                             color="primary"
                                             title="Trạng thái nhân viên"
                                         />
+                                        <Button
+                                            title="Cấp lại mật khẩu cho nhân viên"
+                                            onClick={() => openDialog(nv.email)} 
+                                            variant="text"
+                                            sx={{ minWidth: 0, padding: 0 }}
+                                        >
+                                            <KeyIcon sx={{ fontSize: 30, color: 'green' }} />
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -489,6 +545,40 @@ const DanhSachNhanVien = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {/* Dialog Xác Nhận */}
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Xác nhận cấp lại mật khẩu</DialogTitle>
+                <DialogContent>
+                    {nvEmail ? (
+                        <Typography>
+                            Bạn có chắc chắn muốn cấp lại mật khẩu cho nhân viên <strong>{nvEmail}</strong> không?
+                        </Typography>
+                    ) : (
+                        <Typography color="error">
+                            Không thể lấy thông tin email của nhân viên. Vui lòng kiểm tra lại dữ liệu.
+                        </Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
+                    <Button onClick={() => handleResetPassword(nvEmail)}>Xác nhận</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Snackbar Thông Báo */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };
