@@ -317,6 +317,13 @@ function PhieuGiamGiaConfiguration() {
           }
         }
 
+        if (currencyType === '%') {
+          if (!giamToiDa.isLessThanOrEqualTo(2000000)) {
+            setErrors({ giaTriToiDa: 'Giá trị giảm không được vượt quá 2,000,000.' });
+            return;
+          }
+        }
+
         const data = {
           ten: values.tenPhieu,
           giaTriDonToiThieu: new BigNumber(String(values.dieuKien).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi

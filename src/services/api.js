@@ -34,6 +34,7 @@ apiClient.interceptors.response.use(
         message.error("Vui lòng đăng nhập lại tài khoản!");
         setTimeout(() => {
           onLogOut();
+          window.location.href = "/login";
         }, 2000);
         break;
       }

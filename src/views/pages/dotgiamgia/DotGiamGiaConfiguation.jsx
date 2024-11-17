@@ -278,6 +278,13 @@ function DotGiamGiaConfiguration() {
             return;
           }
         }
+
+        if (currencyType === '%') {
+          if (!giamToiDa.isLessThanOrEqualTo(2000000)) {
+            setErrors({ giaTriToiDa: 'Giá trị giảm không được vượt quá 2,000,000' });
+            return;
+          }
+        }
         
         const data = {
           ten: values.tenPhieu,

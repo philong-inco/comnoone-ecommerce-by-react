@@ -507,7 +507,7 @@ const Dashboard = () => {
 
     try {
       const result = await countCustomerByDate(startDateInMilliseconds, endDateInMilliseconds);
-      setCustomerMounth(result);
+      setCustomerMounth(result || 0);
       debugger;
     } catch (error) {
       console.error("Error counting customers by month:", error);
@@ -524,7 +524,7 @@ const Dashboard = () => {
 
     try {
       const result = await countCustomerByDate(startDateInMilliseconds, endDateInMilliseconds);
-      setCustomerPreviousMonth(result);
+      setCustomerPreviousMonth(result || 0);
       debugger;
     } catch (error) {
       console.error("Error counting customers for previous month:", error);
