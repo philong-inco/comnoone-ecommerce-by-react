@@ -56,19 +56,11 @@ function Sell() {
 
   const fetchBillCodes = async () => {
     const response = await getBillCodes();
-    // if (response.status_code === 200) {
-    //   setTabs(response.data);
-    // }
     if (response.status_code === 200) {
       if (response.data.length > 0) {
         setTabs(response.data);
-        let billCode = localStorage.getItem('billCode');
-        if (billCode !== '') {
-          navigate(`/ban-hang/hoa-don/${billCode}`);
-        } else {
-          setValue(0); // Chọn hóa đơn đầu tiên
-          navigate(`/ban-hang/hoa-don/${response.data[0]}`);
-        }
+        setValue(0);
+        navigate(`/ban-hang/hoa-don/${response.data[0]}`);
       } else {
         setTabs([]); // Nếu không còn hóa đơn nào thì set về mảng rỗng
         setValue(null);
@@ -151,26 +143,6 @@ function Sell() {
       handleCloseDialog(); // Đóng dialog sau khi xác nhận
     }
   };
-
-  const urlObject = new URL(window.location.href);
-  const vnp_ResponseCode = urlObject.searchParams.get('vnp_ResponseCode');
-  const vnp_Amount = urlObject.searchParams.get('vnp_Amount');
-  const tranCode = urlObject.searchParams.get('vnp_TxnRef');
-
-  console.log('vnp_ResponseCode', vnp_ResponseCode);
-  console.log('vnp_Amount', vnp_Amount);
-  useEffect(() => {
-    if (vnp_ResponseCode == '00') {
-      localStorage.setItem('vnp_ResponseCode', String(vnp_ResponseCode));
-      localStorage.setItem('tranCode', String(tranCode));
-    } else {
-      if (vnp_ResponseCode && vnp_ResponseCode !== '00') {
-        if (vnp_ResponseCode == '00') {
-          localStorage.setItem('vnp_ResponseCode', vnp_ResponseCode);
-        }
-      }
-    }
-  });
   return (
     <>
       <Box>

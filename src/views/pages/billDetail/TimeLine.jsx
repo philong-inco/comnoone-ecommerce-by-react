@@ -300,6 +300,22 @@ function NewTimeLine(props) {
           </Button>
         </Grid>
       );
+    } else if (bill.trangThai === 'TREO' && bill.loaiHoaDon === 1) {
+      buttons.push(
+        <Grid item xs={3} key="xac-nhan-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('XAC_NHAN')} fullWidth>
+            XÁC NHẬN
+          </Button>
+        </Grid>
+      );
+    } else if (bill.trangThai === 'TREO' && bill.loaiHoaDon === 0) {
+      buttons.push(
+        <Grid item xs={3} key="hoan-thanh-button">
+          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
+            Hoàn thành
+          </Button>
+        </Grid>
+      );
     } else if (bill.trangThai === 'DON_MOI' && bill.loaiHoaDon === 0) {
       buttons.push(
         <Grid item xs={3} key="hoan-thanh-button">
@@ -319,7 +335,7 @@ function NewTimeLine(props) {
     } else if (bill.trangThai === 'DANG_GIAO' && bill.loaiHoaDon === 1) {
       buttons.push(
         <Grid item xs={3} key="hoan-thanh-button">
-          <Button variant="contained" onClick={() => handleClickBtnStatus('HOAN_THANH')} fullWidth>
+          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
             HOÀN THÀNH
           </Button>
         </Grid>
@@ -387,7 +403,7 @@ function NewTimeLine(props) {
   return (
     <>
       <div>
-        <Grid container spacing={2} padding={2} sx={{ borderRadius: 4, border: 1 }}>
+        <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', borderRadius: 4, mt: 1, boxShadow: 3 }}>
           {/* <Grid item xs={12}>
             <Typography variant="h2">Lịch sử đơn hàng</Typography>
           </Grid> */}

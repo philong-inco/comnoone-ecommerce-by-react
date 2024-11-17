@@ -62,6 +62,8 @@ function Test2(props) {
   const [xacNhanThanhToanSau, setXacNhanThanhToanSau] = useState(false);
 
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [isConformPdf, setIsConformPdf] = useState(false);
+
   const iframeRef = useRef();
 
   const [formData, setFormData] = useState({
@@ -139,7 +141,7 @@ function Test2(props) {
             phuong: bill.phuong,
             tenPhuong: selectedWard ? selectedWard.WardName : ''
           }));
-          getDeliveryDate(selectedDistrict, bill.phuong);
+          getDeliveryDate(bill.huyen, bill.phuong);
         }
       }
     }
@@ -377,9 +379,10 @@ function Test2(props) {
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         setFormData({});
+        setIsDelivery(false);
         setXacNhanThanhToanSau(false);
-        ///
-        // await fetchInvoicePdf();
+        localStorage.setItem('billCode', response.data);
+        setIsConformPdf(true);
         onReload();
         onLoading();
       }
@@ -397,9 +400,10 @@ function Test2(props) {
       setSnackbarOpen(true);
     }
   };
-  const fetchInvoicePdf = async () => {
+
+  const fetchInvoicePdf = async (code) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${code}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/pdf'
@@ -423,7 +427,17 @@ function Test2(props) {
       }
     } catch (error) {
       console.error('Error fetching PDF:', error);
+    } finally {
+      localStorage.setItem('billCode', '');
+      setSnackbarOpen(true);
     }
+  };
+
+  const printPdf = () => {
+    // setIsPrintPdf(true);
+    const code = localStorage.getItem('billCode');
+    fetchInvoicePdf(code);
+    setIsConformPdf(false);
   };
   const loadAll = () => {
     onReload();
@@ -627,9 +641,9 @@ function Test2(props) {
           <Typography mt={1} variant="h4">
             Voucher: - {id ? parseFloat(formData?.giaTriPhieuGiamGia || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
-          <Typography mt={1} variant="h4">
+          {/* <Typography mt={1} variant="h4">
             Giảm hạng: - {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
-          </Typography>
+          </Typography> */}
           <Typography mt={1} variant="h4" fontWeight="bold" color="error">
             Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
@@ -678,8 +692,37 @@ function Test2(props) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      {/* <PdfForm code={code} hiden={hiden} /> */}
-      {/* Hiển thị PdfForm nếu hiden là false */}
+
+      <Dialog
+        open={isConformPdf}
+        onClose={() => {
+          setIsConformPdf(false);
+          localStorage.setItem('billCode', '');
+        }}
+      >
+        <DialogTitle>Xác nhận in hóa đơn</DialogTitle>
+        <DialogContent>Bạn có muốn in hóa đơn không </DialogContent>
+        <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Button
+            onClick={() => {
+              setIsConformPdf(false);
+              localStorage.setItem('billCode', '');
+              // onReload();
+            }}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={() => {
+              setIsConformPdf(false);
+              printPdf();
+            }}
+            color="primary"
+          >
+            OK
+          </Button>
+        </Grid>
+      </Dialog>
       {pdfUrl && (
         <iframe
           ref={iframeRef}

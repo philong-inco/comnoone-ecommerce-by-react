@@ -24,6 +24,8 @@ const getStatus = (stt) => {
       return 'Đã thanh toán';
     case 11:
       return 'Treo';
+    case 12:
+      return 'Cập nhập đơn hàng';
     default:
       return '';
   }

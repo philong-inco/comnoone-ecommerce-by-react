@@ -23,7 +23,7 @@ export const getStatusDisplayName = (status) => {
     case 'XAC_NHAN':
       return 'Đã xác nhận';
     case 'TREO':
-      return 'Đang treo';
+      return 'Hóa đơn chờ';
     default:
       return 'Không xác định';
   }
@@ -82,6 +82,9 @@ export const getStatusBillHistoryColor = (status) => {
       return grey[500];
     case 9:
       return grey[500];
+    case 12:
+      return orange[500];
+
     default:
       return grey[400];
   }
@@ -109,6 +112,8 @@ export const getStatusBillHistory = (status) => {
       return 'Xoá 8';
     case 9:
       return 'Đã xác nhận 9';
+    case 12:
+      return 'Cập nhập đơn hàng';
     default:
       return 'Không xác định 10';
   }

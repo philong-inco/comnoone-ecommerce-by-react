@@ -64,7 +64,7 @@ function HistoryPayment(props) {
                       <Chip
                         label={payment.phuongThanhToan === 1 ? 'Tiền mặt' : 'Chuyển khoản'}
                         style={{
-                          backgroundColor: payment.phuongThanhToan === 1 ? 'purple' : '#00E676',
+                          backgroundColor: payment.phuongThanhToan === 1 ? 'purple' : '#4CAF50',
                           color: 'white',
                           borderRadius: '5px'
                         }}
@@ -74,7 +74,7 @@ function HistoryPayment(props) {
                       <Chip
                         label={payment.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}
                         style={{
-                          backgroundColor: payment.loaiThanhToan === 0 ? '#00E676' : 'red',
+                          backgroundColor: payment.loaiThanhToan === 0 ? '#4CAF50' : 'red',
                           color: 'white',
                           borderRadius: '5px'
                         }}
@@ -84,7 +84,7 @@ function HistoryPayment(props) {
                       <Chip
                         label={payment.trangThai == 0 ? 'Thành công' : 'Chờ'}
                         style={{
-                          backgroundColor: payment.trangThai === 0 ? '#00E676' : '#FFB74D',
+                          backgroundColor: payment.trangThai === 0 ? '#4CAF50' : '#FFB74D',
                           color: 'white',
                           borderRadius: '5px'
                         }}

@@ -10,6 +10,16 @@ export const createSerialNumberSold = async (data) => {
   }
 };
 
+export const createSerialNumberSoldByProductCode = async (data) => {
+  try {
+    const result = await post(`serial-number-sold/create-by-product-code`, data);
+    return result;
+  } catch (error) {
+    console.error('Error create all:', error);
+    throw error;
+  }
+};
+
 export const getAllSerialNumberSoldByBillId = async (codeBill) => {
   try {
     const result = await get(`serial-number-sold?code=${codeBill}`);
