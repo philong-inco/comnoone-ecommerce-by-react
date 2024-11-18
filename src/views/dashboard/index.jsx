@@ -16,7 +16,7 @@ import {
   Select,
   TextField, MenuItem
 } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { format, subDays, subMonths } from 'date-fns';
 import { getAllListProduct, getTopFiveProductSold, infoBillByDate, totalPriceToday, totalpriceByDate, countBill, countProduct, countCustomerByDate } from '../../services/admin/product/productService.js';
 import { trangThaiHoaDonCalulate } from '../../services/admin/product/productService.js'
@@ -879,9 +879,22 @@ const Dashboard = () => {
                         labelFormatter={(label) => `Ngày: ${label}`}
                       />
                       <Legend />
-                      <Bar dataKey="soldQuantity" fill="url(#colorQuantity)" name="Số lượng sản phẩm đã bán" />
-
-                      <Bar dataKey="quantity" fill="url(#colorOrders)" name="Số hóa đơn" />
+                      <Bar dataKey="soldQuantity" fill="url(#colorQuantity)" name="Số lượng sản phẩm đã bán">
+                        <LabelList
+                          dataKey="soldQuantity"
+                          position="top"
+                          style={{ fill: 'red', fontWeight: 'bold', fontSize: 14 }}
+                          formatter={(value) => value}
+                        />
+                      </Bar>
+                      <Bar dataKey="quantity" fill="url(#colorOrders)" name="Số hóa đơn">
+                        <LabelList
+                          dataKey="quantity"
+                          position="top"
+                          style={{ fill: 'red', fontWeight: 'bold', fontSize: 14 }}
+                          formatter={(value) => value}
+                        />
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -891,6 +904,7 @@ const Dashboard = () => {
                 )}
               </Card>
             </Box>
+
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, mt: 5, gap: 10 }}>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
