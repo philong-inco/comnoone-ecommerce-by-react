@@ -553,6 +553,7 @@ const ImportSanPham = () => {
         const tenSPTotalCheck = new Set(tenSPTotal);
         if(tenSPTotalCheck.size !== tenSPTotal.length){
             mess += `Tên sản phẩm trong excel bị trùng lặp, `
+            isValid = false;
         }
         if (tenSPTrung !== ''){
             mess += "Sản phẩm đã tồn tại: " + tenSPTrung;
@@ -567,6 +568,7 @@ const ImportSanPham = () => {
         const seriTotalCheck = new Set(seriTotal);
         if(seriTotalCheck.size !== seriTotal.length){
             mess += `Serial trong excel bị trùng lặp, `
+            isValid = false;
         }
         if (giaSai !== ''){
             mess += `Giá không hợp lệ tại sản phẩm: ${giaSai}, `;
