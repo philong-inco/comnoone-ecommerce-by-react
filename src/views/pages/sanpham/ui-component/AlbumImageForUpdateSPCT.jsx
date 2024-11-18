@@ -32,7 +32,8 @@ const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
         loadAllAnh();
     }, [])
     useEffect(() => {
-        setImageSelect([...listCurrent]);
+      const temp = listCurrent.filter(x => x.trim() != '')
+        setImageSelect([...temp]);
     }, [listCurrent])
 
     const loadAllAnh = async () => {
