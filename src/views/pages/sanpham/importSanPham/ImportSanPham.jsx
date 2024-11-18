@@ -536,7 +536,7 @@ const ImportSanPham = () => {
                 let serialsTemp = (bienThe[j].serials + '').split(',');
                 for(let k = 0; k < serialsTemp.length; k++){
                     seriTotal.push(serialsTemp[k]);
-                    if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20){
+                    if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20 || serialsTemp[k].includes(" ")){
                         seriLengtInvalid += `${serialsTemp[k]}, `
                         isValid = false;
                     }
@@ -559,7 +559,7 @@ const ImportSanPham = () => {
             mess += "Sản phẩm đã tồn tại: " + tenSPTrung;
         }
         if (seriLengtInvalid !== ''){
-            mess += 'Độ dài serial không nằm trong khoảng 7-20 ký tự: ' + seriLengtInvalid;
+            mess += 'Độ dài serial không nằm trong khoảng 7-20 ký tự (không chứa dấu cách): ' + seriLengtInvalid;
         }
         if (seriTonTai !== ''){
             mess += "Serial đã tồn tại: " + seriTonTai;
