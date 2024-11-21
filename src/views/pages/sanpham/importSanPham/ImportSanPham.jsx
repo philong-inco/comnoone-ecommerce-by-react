@@ -9,7 +9,7 @@ import axios from 'axios';
 import { createSanPham } from 'api/sanpham/sanPham';
 import { toast } from 'react-toastify';
 import { createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham';
-
+import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank';
 
 
 const ImportSanPham = () => {
@@ -533,7 +533,7 @@ const ImportSanPham = () => {
                     giaSai += `${bienThe.tenSanPham}, `;
                     isValid = false;
                 }
-                let serialsTemp = (bienThe[j].serials + '').split(',');
+                let serialsTemp = (bienThe[j].serials + '').split(',').map(x => x.trim());
                 for(let k = 0; k < serialsTemp.length; k++){
                     seriTotal.push(serialsTemp[k]);
                     if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20 || serialsTemp[k].includes(" ")){
@@ -605,6 +605,12 @@ const ImportSanPham = () => {
             <div>
                 <MainCard title="Import Sản phẩm của bạn">
                     <div style={{ display: "flex", justifyContent: "center" }}>
+                        <div>
+                            <Button
+                            size="medium"
+                            style={{ background: "#2196F3", color: "#fff", padding: "5px 20px", marginRight: "20px" }}
+                            onClick={() => excelImportBlank("Template")}>Tải mẫu xuống</Button>
+                        </div>
                         <Button
                             size="medium"
                             onClick={handleButtonClick}

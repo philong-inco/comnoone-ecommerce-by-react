@@ -431,7 +431,7 @@ const DanhSachSanPham = () => {
                                     </Fab>
                                 </Box>
                                 <Box title="Xuất Excel" style={{ marginRight: "10px" }}>
-                                    <MenuDownload data={sanPham} />
+                                    <MenuDownload data={sanPham} filterCurrent ={filter}/>
                                 </Box>
 
                                 <ButtonAdd

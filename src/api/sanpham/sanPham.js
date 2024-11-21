@@ -34,6 +34,24 @@ export const getAllSanPham = async () => {
     }
 }
 
+export const getAllForExcel = async (filterCurrent) => {
+    try {
+        const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
+       
+        filterCurrent.size = '99999';
+        const queryString = Object.entries(filterCurrent)
+            .filter(([key, value]) => value !== '')
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
+        const urlQuery = urlFindFilter + queryString;
+        const result = await axios.get(urlQuery);
+
+        return result?.data?.data
+    } catch (error) {
+        console.log('Error getAllForExcel', error);
+    }
+}
+
 export const getSanPhamById = async (id) => {
     try {
         const res = await axios.get(`${backEndUrl}/${path}/detail/${id}`)
