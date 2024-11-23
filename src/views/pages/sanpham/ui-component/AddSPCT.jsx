@@ -12,7 +12,7 @@ import { IconCheck } from '@tabler/icons-react';
 import axios from 'axios';
 import Slide from '@mui/material/Slide';
 import { useNavigate } from 'react-router-dom';
-
+import { backEndUrl } from '../../../../utils/back-end.js';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -72,11 +72,11 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
 
   const loadAttributes = async () => {
     // get các bảng
-    const SPCTResult = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
-    const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
-    const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
-    const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
+    const SPCTResult = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
+    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
+    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
+    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
+    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
     setListSPCT(SPCTResult.data.data);
     const spctTemp = SPCTResult.data.data[0];
     console.log('spctTemp: ', spctTemp); 
@@ -102,7 +102,7 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
     }
 
     try{
-        const check = await axios.post(`http://localhost:8080/api/san-pham-chi-tiet/valid-for-add`, variant);
+        const check = await axios.post(`${backEndUrl}/san-pham-chi-tiet/valid-for-add`, variant);
     } catch (error){
         if (error.response.status){
             alert("Đã tồn tại biến thể này");
@@ -114,7 +114,7 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
             variant.listUrlAnhSanPham = listSPCT[i].listUrlAnhSanPham
         }
     }
-    const addResult = await axios.post(`http://localhost:8080/api/san-pham-chi-tiet/add`, variant);
+    const addResult = await axios.post(`${backEndUrl}/san-pham-chi-tiet/add`, variant);
         if (addResult.data.code == 200){
             alert("Thêm thành công");
             // điều hướng tới trang sửa

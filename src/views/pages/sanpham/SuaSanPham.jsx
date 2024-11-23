@@ -20,6 +20,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { IconCirclePlus } from '@tabler/icons-react';
+import { backEndUrl } from '../../../utils/back-end.js';
 
 const SuaSanPham = () => {
   const { id } = useParams();  
@@ -112,13 +113,13 @@ const SuaSanPham = () => {
   }, [nhuCauChecked]);
 
   const fetchDataBienThe = async () => {
-    const dataSpct = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+    const dataSpct = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
     setspct(dataSpct.data.data);
   }
 
   const loadData = async () => {
-    const dataSanPham = await axios.get(`http://localhost:8080/api/san-pham/detail/${id}`)
-    const dataSpct = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+    const dataSanPham = await axios.get(`${backEndUrl}/san-pham/detail/${id}`)
+    const dataSpct = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
     setSanPham(dataSanPham.data.data);
     setspct(dataSpct.data.data);
     setTenSanPham(dataSanPham.data.data.ten)
@@ -126,17 +127,17 @@ const SuaSanPham = () => {
     setMotaSanPham(dataSanPham.data.data.moTa)
     // thuộc tính
     
-    const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
-    const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
-    const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
-    const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
-    const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
-    const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
-    const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
-    const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
-    const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
-    const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
+    const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
+    const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
+    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
+    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
+    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
+    const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
+    const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
+    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
+    const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
+    const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
+    const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
 
     
     setNhuCau(nhuCauResult.data.data);
@@ -191,7 +192,7 @@ const SuaSanPham = () => {
     console.log('spUpdate: ', spUpdate);
 
     try {
-      const check = await axios.get(`http://localhost:8080/api/san-pham/exist-name-for-update?ten=${spUpdate.tenSP}&id=${id}`);
+      const check = await axios.get(`${backEndUrl}/san-pham/exist-name-for-update?ten=${spUpdate.tenSP}&id=${id}`);
       if (check.data.data){
         alert("Tên sản phẩm đã tồn tại");
         return;
@@ -203,7 +204,7 @@ const SuaSanPham = () => {
     }  
 
     try {
-      await axios.put(`http://localhost:8080/api/san-pham/updateSanPhamAndSPCT/${id}`, spUpdate);
+      await axios.put(`${backEndUrl}/san-pham/updateSanPhamAndSPCT/${id}`, spUpdate);
       alert('Cập nhật thành công');
     } catch (error) {  
       // Xử lý lỗi  
@@ -223,9 +224,9 @@ const SuaSanPham = () => {
     const handleViewSerial = async (id) => {
       // view serial ở đây
       console.log('spctId: ', id); 
-      const seriGet = await axios.get(`http://localhost:8080/api/serial-number/find-by-spct-id/${id}`);
+      const seriGet = await axios.get(`${backEndUrl}/serial-number/find-by-spct-id/${id}`);
       setListSeri(seriGet.data.data);
-      const imgListGet = await axios.get(`http://localhost:8080/api/anh-san-pham/find-by-spct-id?idSPCT=${id}`);
+      const imgListGet = await axios.get(`${backEndUrl}/anh-san-pham/find-by-spct-id?idSPCT=${id}`);
       setListImg(imgListGet.data.data);
       setIdSPCT(id);
       setOpenSeri(true);
@@ -247,7 +248,7 @@ const SuaSanPham = () => {
 };
 
 const suaTrangThai = (id, status) => {
-    axios.get(`http://localhost:8080/api/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
+    axios.get(`${backEndUrl}/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
         .then(response => {
           fetchDataBienThe();
         })

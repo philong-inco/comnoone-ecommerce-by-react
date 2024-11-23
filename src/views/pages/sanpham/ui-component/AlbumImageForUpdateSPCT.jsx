@@ -17,6 +17,7 @@ import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { backEndUrl } from '../../../../utils/back-end';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -37,7 +38,7 @@ const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
     }, [listCurrent])
 
     const loadAllAnh = async () => {
-        const temp = await axios.get(`http://localhost:8080/api/anh-san-pham/list`);
+        const temp = await axios.get(`${backEndUrl}/anh-san-pham/list`);
         setListAnhTemp(temp.data.data);
     }
 

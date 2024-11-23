@@ -10,7 +10,7 @@ import { createSanPham } from 'api/sanpham/sanPham';
 import { toast } from 'react-toastify';
 import { createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham';
 import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank';
-
+import { backEndUrl } from '../../../../utils/back-end';
 
 const ImportSanPham = () => {
     const columnsSanPham = [
@@ -373,17 +373,17 @@ const ImportSanPham = () => {
 
     const loadFilterOptions = async () => {
         // get các bảng
-        const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
-        const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
-        const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
-        const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
-        const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
-        const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
-        const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
-        const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
-        const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
-        const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
-        const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
+        const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
+        const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
+        const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
+        const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
+        const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
+        const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
+        const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
+        const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
+        const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
+        const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
+        const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
 
         setNhuCau(nhuCauResult.data.data);
         setThuongHieu(thuongHieuResult.data.data);
@@ -521,7 +521,7 @@ const ImportSanPham = () => {
         
         for(let i = 0; i < sanphams.length; i++){
             tenSPTotal.push(sanphams[i].ten);
-            if((await axios.get(`http://localhost:8080/api/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
+            if((await axios.get(`${backEndUrl}/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
                 tenSPTrung += `${sanphams[i].ten}, `;
                 isValid = false;
             }
@@ -540,7 +540,7 @@ const ImportSanPham = () => {
                         seriLengtInvalid += `${serialsTemp[k]}, `
                         isValid = false;
                     }
-                    if ((await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
+                    if ((await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
                         seriTonTai += `${serialsTemp[k]}, `
                     
                         isValid = false;
