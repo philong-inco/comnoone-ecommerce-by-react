@@ -11,8 +11,10 @@ import { toast } from 'react-toastify';
 import { createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham';
 import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank';
 import { backEndUrl } from '../../../../utils/back-end';
+import { useNavigate } from 'react-router-dom';
 
 const ImportSanPham = () => {
+    const navigate = useNavigate();
     const columnsSanPham = [
         {
             field: 'index',
@@ -286,6 +288,16 @@ const ImportSanPham = () => {
                     thuongHieuInfo
                 }
             })
+            for(const product of listNewProduct){
+                if(!product?.nhuCauInfo){
+                    alert(`Tên nhu cầu không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!product?.thuongHieuInfo){
+                    alert(`Tên thương hiệu không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+            }
             const listNewProductDuplicates = getDuplicateObjects(listNewProduct.map(item => {
                 return {
                     ...item,
@@ -341,11 +353,47 @@ const ImportSanPham = () => {
             for(const bienthe of listBienThe){
                 if(!bienthe?.sanPhamInfo){
                     alert(`Tên sản phẩm "${bienthe.tenSanPham}" ở mục BIẾN THỂ không khớp`)
-                   
                     isNotMatchProductName = true;
                     return;
                 }
+                if(!bienthe?.banPhimInfo){
+                    alert(`Tên bàn phím không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.cpuInfo){
+                    alert(`Tên CPU không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.heDieuHanhInfo){
+                    alert(`Tên hệ điều hành không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.manHinhInfo){
+                    alert(`Tên màn hình không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.mauSacInfo){
+                    alert(`Tên màu sắc không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.ramInfo){
+                    alert(`Tên RAM không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.vgaInfo){
+                    alert(`Tên VGA không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.webcamInfo){
+                    alert(`Tên Webcam không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.oCungInfo){
+                    alert(`Tên ổ cứng không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
             }
+
             if(isNotMatchProductName){
             }
 
@@ -428,7 +476,7 @@ const ImportSanPham = () => {
                     successList.push(response)
 
                     if ((index === results.length - 1)) {
-                        alert(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        // alert(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
@@ -476,7 +524,7 @@ const ImportSanPham = () => {
                     successListNoti.push(index + 1);
 
                     if ((index === resultsBienThe.length - 1)) {
-                        alert(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        // alert(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
@@ -484,7 +532,6 @@ const ImportSanPham = () => {
                 alert(`Thêm Biến thể thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
             }
         });
-
         return resultsBienThe;
     };
 
@@ -504,7 +551,9 @@ const ImportSanPham = () => {
                     error: 'Có lỗi xảy ra, vui lòng thử lại 🤯'
                 }
             );
+            navigate(`/sanpham/danhsach`);
         }
+        
         
     };
 
@@ -542,7 +591,6 @@ const ImportSanPham = () => {
                     }
                     if ((await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
                         seriTonTai += `${serialsTemp[k]}, `
-                    
                         isValid = false;
                     }
                 }

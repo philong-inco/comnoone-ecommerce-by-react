@@ -101,6 +101,36 @@ const DanhSachRam = () => {
       }
     });
 
+    // filter
+  }
+  const [filter, setFilter] = useState({
+    ten: '',
+    trangThai: '',
+    page: '',
+    sizePage: ''
+  });
+
+  useEffect(()=>{
+    console.log('filter: ', filter);
+  },[filter])
+
+  const changeTextSearch = (e) => {
+    let value = e.target.value;
+    setFilter(prev => ({
+      ...prev, ten: value
+    }));
+  }
+  const handleTrangThai = (e) => {
+    let value = e.target.value;
+    setFilter(prev => ({
+      ...prev, trangThai: value
+    }));
+  }
+  const handlePageSize = (e) => {
+    let value = e.target.value;
+    setFilter(prev => ({
+      ...prev, sizePage: value
+    }));
   }
 
   return (
@@ -108,8 +138,7 @@ const DanhSachRam = () => {
       <MainCard title="Danh sách RAM">
         <div className="mb-5 flex" style={{ justifyContent: "space-between", alignItems: 'center' }}>
           <div className="flex gap-3">
-            <TextField label="Tìm RAM" style={{ width: '300px' }} />
-            <Button className="btn rounded-lg">Làm mới</Button>
+            <TextField onChange={changeTextSearch} value={filter.ten} label="Nhập tên..." style={{ width: '300px' }} />
           </div>
           <div className="flex gap-3">
             <FormControl fullWidth>
@@ -119,10 +148,11 @@ const DanhSachRam = () => {
                 id="status"
                 label="Trạng Thái"
                 className="w-[300px]"
+                value={filter.trangThai}
+                onChange={handleTrangThai}
               >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={0}>Không hoạt động</MenuItem>
+                <MenuItem value={1}>Hoạt động</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth style={{ width: '400px' }}>
@@ -131,10 +161,13 @@ const DanhSachRam = () => {
                 labelId="display"
                 id="display"
                 label="Hiển thị"
+                value={filter.sizePage}
+                onChange={handlePageSize}
               >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={20}>20</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
               </Select>
             </FormControl>
           </div>

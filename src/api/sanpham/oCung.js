@@ -34,14 +34,20 @@ export const getRams = async ({
 }
 
 export const filterRam = async ({
-    ma,
-    dungLuong,
+    page,
+    size,
     name,
-    trangThai
+    trangThai,
 }) => {
+  
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?ma=${ma}&dungLuong=${dungLuong}&name=${name}&trangThai=${trangThai}`)
-
+        let queryStr = '';
+        queryStr += (page === undefined || page === '') ? 'page=0' : 'page=' + page;
+        queryStr += (size === undefined) ? '&size=5' : '&size=' + size;
+        queryStr += (name === undefined) ? '' : '&name=' + name;
+        queryStr += (trangThai === undefined) ? '' : '&trangThai=' + trangThai;
+        console.log('queryStr: ', queryStr);
+        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?${queryStr}`);
         return res
     } catch (error) {
         console.log('Error filterRam', error);

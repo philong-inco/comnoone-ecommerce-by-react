@@ -83,7 +83,7 @@ const DanhSachSanPham = () => {
         setResetFilter(prev => prev + 1);
     }
 
-    const urlFindFilter = `${backEndUrl}/api/san-pham/find/filter-id?`;
+    const urlFindFilter = `${backEndUrl}/san-pham/find/filter-id?`;
     const [sanPham, setsanPham] = useState([]);
     const [filter, setFilter] = useState({
         page: 0,
