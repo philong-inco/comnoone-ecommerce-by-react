@@ -36,6 +36,18 @@ const quanLy = {
           url: '/sanpham/danhsach'
         },
         {
+          id: 'nhucau',
+          title: 'Nhu cầu',
+          type: 'item',
+          url: '/sanpham/nhucau/danhsach'
+        },
+        {
+          id: 'thuonghieu',
+          title: 'Thương hiệu',
+          type: 'item',
+          url: '/sanpham/thuonghieu/danhsach'
+        },
+        {
           id: 'ram',
           title: 'Ram',
           type: 'item',

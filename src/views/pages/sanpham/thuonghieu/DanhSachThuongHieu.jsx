@@ -1,159 +1,191 @@
+import { useState, useEffect } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
-import { DataGrid } from '@mui/x-data-grid';
-import { Button, FormControl, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { 
+  Button, FormControl, IconButton, InputLabel, MenuItem, Select, TextField,
+  Paper,Table,TableBody,TableCell,TableContainer,TableHead,TablePagination,TableRow,Switch
+} from '@mui/material';
 import { Add, Delete, Edit } from '@mui/icons-material';
-import TransitionsModal from './components/ModalCreate';
-import { useEffect, useState } from 'react';
-import { deleteRam, getRams } from 'api/sanpham/thuonghieu';
-import { toast } from 'react-toastify';
-import { NotificationStatus } from 'utils/notification';
-import Swal from 'sweetalert2';
+import axios from 'axios';
+import { backEndUrl } from 'utils/back-end';
+
+import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/thuonghieu';
 import ModalUpdate from './components/ModalUpdate';
+import TransitionsModal from './components/ModalCreate';
 
 
 
 const DanhSachThuongHieu = () => {
   const columns = [
-    {
-      field: 'index',
-      headerName: 'STT',
-      width: 70,
-      flex: 1,
-    },
-    { field: 'ma', headerName: 'Mã', width: 130, flex: 1 },
-    { field: 'ten', headerName: 'Tên Nhu Cầu', width: 130, flex: 1 },
-    { field: 'moTa', headerName: 'Mô Tả', width: 130, flex: 1 },
-    {
-      field: 'actions',
-      headerName: 'Thao Tác',
-      sortable: false,
-      width: 160,
-      flex: 1,
-      renderCell: (params) => (
-        <div>
-          <div style={{ display: 'inline-block' }}>
-            <ModalUpdate fetchRams={fetchRams} info={params.row} />
-          </div>
-          <IconButton color="error" onClick={() => handleDelete(params.id)}>
-            <Delete />
-          </IconButton>
-        </div>
-      ),
-    },
+    
+    { id: 'ma', label: 'Mã', minWidth: 70 },
+    { id: 'ten', label: 'Tên', minWidth: 300 },
+    { id: 'moTa', label: 'Mô tả', minWidth: 120 },
+    { id: 'trangThai', label: 'Trạng thái', minWidth: 80},
+    { id: 'hanhDong', label: 'Hành động', minWidth: 170 },
   ];
 
-  const [rams, setRams] = useState([]);
-  const [page, setPage] = useState(0);
-  const [totalPage, setTotalPage] = useState(1);
-  const [totalRam, setTotalRam] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [pageInfo, setPageInfo] = useState({
+    pageNo: '', pageSize: '', totalPage:'', totalElement:''
+  })
+  const [data, setData] = useState([]);
+  useEffect(()=>{
+    console.log('data: ', data);
+  },[data])
+  const[filter, setFilter] = useState({
+    page: '0', size: '5', name: '', trangThai: ''
+  })
+  useEffect(()=> {
+    console.log('filter: ', filter); 
+    fetchData();
+  }, [filter])
 
-
-  useEffect(() => {
-    fetchRams();
-  }, [page]);
-
-  const fetchRams = async () => {
-    try {
-      setIsLoading(true);
-
-      const res = await getRams({ page, size: 5 });
-
-      setIsLoading(false);
-
-      if (res.status === 200) {
-        setRams(res.data.data.map((ram, index) => ({ ...ram, index: index + page * 5 + 1 })));
-
-        setTotalRam(parseInt(res.data.totalElement))
-
-        setTotalPage(parseInt(res.data.totalPage));
-      } else {
-        toast.error('Error loading data');
-      }
-    } catch (error) {
-      toast.error('Error loading data');
-    }
-  };
-
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#9c27b0",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const res = await deleteRam({id});
-        
-        if (res && res.data.code === 200) {
-          toast.success(NotificationStatus.DELETED)
-          fetchRams()
-        } else {
-          toast.error(NotificationStatus.ERROR)
-        }
-      }
-    });
-
+  const fetchData = async () => {
+    const data = await filterRam(filter);
+    setData(data.data.data);
+    setPageInfo(prev => ({
+      ...prev, pageNo: data.data.pageNo, pageSize: data.data.pageSize, 
+      totalPage:data.data.totalPage, totalElement:data.data.totalElement
+    }))
   }
+
+  
+  const handleName = (e) => {
+    setFilter(prev => ({...prev, page: 0, size: 5, name: e.target.value}));
+  }
+  const handleTrangThai = (e) => {
+    setFilter(prev => ({...prev,page: 0, size: 5, trangThai: e.target.value}));
+  }
+  const handleChangePage = (event, newPage) => {
+    console.log('newPage: ', newPage);
+    setFilter(prev => ({
+        ...prev,
+        page: newPage
+    }));
+};
+
+const handleChangeRowsPerPage = (event) => {
+    setFilter(prev => ({
+        ...prev,
+        size: event.target.value
+    }));
+};
+const handleSwitchChange = (id) => (e) => {
+  e.target.checked ? suaTrangThai(id, 1) : suaTrangThai(id, 0);
+};
+
+const suaTrangThai = async (id, status) => {
+  let tempData = await axios.get(`${backEndUrl}/thuong-hieu/detail/${id}`);
+  let temp = tempData.data.data;
+  console.log('temp: ', temp);
+  let temp1 = {...temp, trangThai: status}
+  console.log('temp1: ', temp1);
+  await updateRam(temp1);
+  fetchData();
+};
+
 
   return (
     <div>
-      <MainCard title="Danh sách màu sắc">
-        <div className="mb-5 flex" style={{ justifyContent: "space-between", alignItems: 'center' }}>
-          <div className="flex gap-3">
-            <TextField label="Tìm RAM" style={{ width: '300px' }} />
-            <Button className="btn rounded-lg">Làm mới</Button>
-          </div>
-          <div className="flex gap-3">
-            <FormControl fullWidth>
-              <InputLabel id="status">Trạng Thái</InputLabel>
-              <Select
-                labelId="status"
-                id="status"
-                label="Trạng Thái"
-                className="w-[300px]"
+      <MainCard>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        
+          <div style={{display: 'flex', justifyContent:'space-between', paddingTop: '10px'}}>
+            <div>
+              <TextField sx={{ width: '400px' }} color='secondary' onChange={handleName} id="outlined-basic" label="Tìm theo tên" variant="outlined" />
+              <FormControl
+                sx={{width: '200px', marginLeft: '20px'}}
               >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth style={{ width: '400px' }}>
-              <InputLabel id="display">Hiển thị</InputLabel>
-              <Select
-                labelId="display"
-                id="display"
-                label="Hiển thị"
-              >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
+                <InputLabel id="demo-simple-select-label">Trạng Thái</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={filter.trangThai}
+                  label="Trạng thái"
+                  onChange={handleTrangThai}
+                >
+                  <MenuItem value={''}>Tất cả</MenuItem>
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  <MenuItem value={0}>Không hoạt động</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+            <div>
+              <TransitionsModal fetchRams={fetchData} />
+            </div>
           </div>
-          <div>
-            <TransitionsModal fetchRams={fetchRams} />
-          </div>
-        </div>
-        <div style={{ height: 400, width: '100%' }}>
-          <DataGrid
-            rows={rams}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
-              },
-            }}
-            pageSizeOptions={[5]}
-            onPaginationModelChange={({ page }) => setPage(page)}
-            rowCount={totalRam}
-            paginationMode="server"
-            loading={isLoading}
-          />
-        </div>
-      </MainCard>
+          
+        
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              <TableCell>STT</TableCell>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  style={{ minWidth: column.minWidth }}
+                >
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row, index) => {
+              const rowIndex = filter.page * filter.size + index + 1;
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                     <TableCell align='left'>{rowIndex}</TableCell>
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      if (column.id === 'trangThai'){
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {value === 1 
+                            // ? <Switch defaultChecked color="secondary" onChange={handleSwitchChange(row.id)}/>
+                            //     : <Switch color="secondary" onChange={handleSwitchChange(row.id)}/>
+                            ? 'Hoạt động' : 'Đã tắt'
+                            }
+                            </TableCell>
+                        )
+                      }
+                      if (column.id === 'hanhDong'){
+                        let value1 = row['trangThai'];
+                        return (
+                          <div style={{display: 'flex'}}>
+                            <TableCell sx={{display: 'flex'}} key={column.id} align={column.align}>
+                              <ModalUpdate fetchRams={fetchData} info={row}/>
+                              {value1 === 1 && <Switch defaultChecked color="secondary" onChange={handleSwitchChange(row.id)}/>}
+                              {value1 === 0 && <Switch color="secondary" onChange={handleSwitchChange(row.id)}/>}
+                            </TableCell>
+                           
+                          </div> 
+                        )
+                      }
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+        component="div"
+        count={pageInfo.totalElement}
+        rowsPerPage={filter.size}
+        page={filter.page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Paper>
+    </MainCard>
     </div>
   );
 }

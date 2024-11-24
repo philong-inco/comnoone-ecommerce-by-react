@@ -3,10 +3,10 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
-import { Add, Edit } from '@mui/icons-material';
-import { IconButton, TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { createNewRam, updateRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/banPhim';
+import { Add } from '@mui/icons-material';
+import { TextField } from '@mui/material';
+import { useState } from 'react';
+import { createNewRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/nhucau';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 
@@ -22,33 +22,24 @@ const style = {
     p: 5,
 };
 
-export default function ModalUpdate({fetchRams, info}) {
-    const [open, setOpen] = useState(false);
+export default function CreateQuickly({fetchRams,setHide}) {
+    const [open, setOpen] = useState(true);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
         resetForm();
-        setOpen(false);
+        setHide(prev => ({...prev, nhuCau: false}))
     };
 
-    
-    
     const [ram, setRam] = useState({
         ten: "",
+        moTa: "",
         trangThai: 1
     });
     const [error, setError] = useState({
         ten: "",
+        moTa: "",
         trangThai: 1
     });
-
-    useEffect(() => {
-        if(info && open){
-            setRam({
-                ten: info.ten,
-                trangThai: 1
-            })
-        }
-    }, [info, open])
 
 
     const handleChange = (e) => {
@@ -69,11 +60,13 @@ export default function ModalUpdate({fetchRams, info}) {
     const resetForm = () => {
         setRam({
             ten: "",
+            moTa: "",
             trangThai: 1
         });
 
         setError({
             ten: "",
+            moTa: "",
             trangThai: 1
         });
     };
@@ -90,20 +83,19 @@ export default function ModalUpdate({fetchRams, info}) {
         }
 
         setError(newError);
-
-        const checkName = await IsValidUpdate(ram.ten, info.id);
+        const checkName = await IsValidAdd(ram.ten);
         if (!checkName){
             formValid = false;
             console.log('checkName: ', checkName);
             alert('Tên đã tồn tại')
         }
-
         if (formValid) {
-           const res = await updateRam({
-            id: info.id,
+           const res = await createNewRam({
             ten: ram.ten,
+            moTa: ram.moTa,
             trangThai: ram.trangThai
            })
+           
            
            if(res){
             toast.success(NotificationStatus.CREATED)
@@ -117,9 +109,6 @@ export default function ModalUpdate({fetchRams, info}) {
 
     return (
         <div>
-            <IconButton sx={{color: '#6C6C6C'}} onClick={handleOpen}>
-            <Edit />
-            </IconButton>
             
             <Modal
                 aria-labelledby="transition-modal-title"
@@ -149,35 +138,34 @@ export default function ModalUpdate({fetchRams, info}) {
                                     fontSize: '30px'
                                 }}
                             >
-                                CHỈNH SỬA
+                                THÊM NHU CẦU
                             </h2>
                             <TextField 
-                                label="Tên Bàn Phím" 
+                                label="Tên Nhu Cầu" 
                                 style={{ width: '100%' }} 
                                 name="ten"
                                 error={!!error.ten}
                                 helperText={error.ten}
                                 onChange={handleChange}
-                                value={ram.ten}
+                            />
+                            <TextField 
+                                label="Mô tả" 
+                                style={{ width: '100%' }} 
+                                name="moTa"
+                                error={!!error.moTa}
+                                helperText={error.moTa}
+                                onChange={handleChange}
                             />
                         </div>
-                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                            <div style={{marginTop: '10px', fontStyle:'italic', color: 'gray'}}>
-                                <p>Ngày tạo: {info.ngayTao}</p>
-                                <p>Người tạo: {info.nguoiTao}</p>
-                                <p>Ngày sửa: {info.ngaySua}</p>
-                                <p>Người sửa: {info.nguoiSua}</p>
-                            </div>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'end',
-                                alignItems: 'end',
-                                marginTop: '20px',
-                                gap: '10px'
-                            }}>
-                                <Button variant="contained" color="secondary" onClick={handleClose}>Hủy</Button>
-                                <Button variant="contained" color="secondary" onClick={handleSubmit}>Xác Nhận</Button>
-                            </div>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'end',
+                            alignItems: 'end',
+                            marginTop: '20px',
+                            gap: '10px'
+                        }}>
+                            <Button variant="contained" color="secondary" onClick={handleClose}>Hủy</Button>
+                            <Button variant="contained" color="secondary" onClick={handleSubmit}>Xác Nhận</Button>
                         </div>
                     </Box>
                 </Fade>

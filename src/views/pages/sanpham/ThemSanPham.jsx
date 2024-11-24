@@ -634,13 +634,13 @@ const ThemSanPham = () => {
             </div>
           </div>
           <div>
-            <SelectDropOneValue list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
-            <SelectDropOneValue list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
-            <SelectDropOneValue list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
-            <SelectDropOneValue list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
-            <SelectDropOneValue list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
-            <SelectDropOneValue list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
-            <SelectDropOneValue list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
           </div>
         </div>
 
@@ -652,10 +652,10 @@ const ThemSanPham = () => {
         <div style={{ padding: '10px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn các thuộc tính</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <SelectDropdownForAdd list={ram} setListChecked={setRamChecked} nameDropDown={'Ram'} />
-            <SelectDropdownForAdd list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
-            <SelectDropdownForAdd list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
-            <SelectDropdownForAdd list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={ram} setListChecked={setRamChecked} nameDropDown={'RAM'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
             <Button variant="contained" onClick={checkAttributeSelected} color="secondary" sx={{ height: '60px', borderRadius: '7px' }}>
               <IconCheck />
             </Button>

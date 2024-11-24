@@ -299,7 +299,7 @@ const suaTrangThai = (id, status) => {
             </div>
           </div>
           <div>
-            <SelectDropOneValueForUpdate valueOld={thuongHieuEntityChecked} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
+            <SelectDropOneValueForUpdate  valueOld={thuongHieuEntityChecked} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
             <SelectDropOneValueForUpdate valueOld={nhuCauEntityChecked} list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
             <SelectDropOneValueForUpdate valueOld={VGAEntityChecked} list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
             <SelectDropOneValueForUpdate valueOld={webcamEntityChecked} list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />

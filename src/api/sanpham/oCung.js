@@ -85,3 +85,29 @@ export const updateRam = async ({
         console.log('Error updateRam', error);
     }
 }
+
+export const IsValidAdd = async (name) => {
+    try {
+        const res = await axios.get(`${backEndUrl}/${path}/exist-name?name=${name}`)
+        const result = res.data.data;
+        if (result){
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log('Error createNewRam', error);
+    }
+}
+
+export const IsValidUpdate = async (name, id) => {
+    try {
+        const res = await axios.get(`${backEndUrl}/${path}/exist-name-diff-id?name=${name}&id=${id}`)
+        const result = res.data.data;
+        if (result){
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log('Error createNewRam', error);
+    }
+}

@@ -39,9 +39,9 @@ const SelectDropOneValueForUpdate = ({ list, setValueSelect, name, valueOld }) =
           <Chip sx={{ backgroundColor: '#EDE7F6' }} key={item.id} label={item.ten}></Chip>
           : null}
         endAdornment={<InputAdornment style={{ marginRight: "10px" }} position="end">
-          <IconButton>
+          {/* <IconButton>
             <AddIcon />
-          </IconButton>
+          </IconButton> */}
         </InputAdornment>}
       >
         {list.map((item) => (

@@ -1,22 +1,16 @@
-import MainCard from 'ui-component/cards/MainCard';
-import TransitionsModal from './components/ModalCreate';
-import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/oCung';
-import { Button, FormControl, IconButton, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import ModalUpdate from './components/ModalUpdate';
-import { Add, Delete, Edit } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import {Switch} from '@mui/material';
+import MainCard from 'ui-component/cards/MainCard';
+import { 
+  Button, FormControl, IconButton, InputLabel, MenuItem, Select, TextField,
+  Paper,Table,TableBody,TableCell,TableContainer,TableHead,TablePagination,TableRow,Switch
+} from '@mui/material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import axios from 'axios';
 import { backEndUrl } from 'utils/back-end';
 
+import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/oCung';
+import ModalUpdate from './components/ModalUpdate';
+import TransitionsModal from './components/ModalCreate';
 
 
 const DanhSachOCung = () => {
@@ -91,9 +85,9 @@ const suaTrangThai = async (id, status) => {
 
   return (
     <div>
+      <MainCard>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <MainCard>
-          <div style={{display: 'flex', justifyContent:'space-between'}}>
+          <div style={{display: 'flex', justifyContent:'space-between', paddingTop: '10px'}}>
             <div>
               <TextField sx={{ width: '400px' }} color='secondary' onChange={handleName} id="outlined-basic" label="Tìm theo tên" variant="outlined" />
               <FormControl
@@ -118,7 +112,7 @@ const suaTrangThai = async (id, status) => {
             </div>
           </div>
           
-        </MainCard>
+        
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -189,6 +183,7 @@ const suaTrangThai = async (id, status) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Paper>
+    </MainCard>
     </div>
   );
 }

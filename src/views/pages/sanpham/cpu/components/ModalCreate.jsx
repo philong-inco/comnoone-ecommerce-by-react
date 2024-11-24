@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import { Add } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import { useState } from 'react';
-import { createNewRam } from 'api/sanpham/cpu';
+import { createNewRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/cpu';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 
@@ -17,7 +17,8 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 800,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: '2px solid #673AB7',
+    borderRadius: '10px',
     p: 5,
 };
 
@@ -86,7 +87,12 @@ export default function TransitionsModal({ fetchRams }) {
         }
 
         setError(newError);
-
+        const checkName = await IsValidAdd(ram.ten);
+        if (!checkName){
+            formValid = false;
+            console.log('checkName: ', checkName);
+            alert('Tên đã tồn tại')
+        }
         if (formValid) {
             const res = await createNewRam({
                 ten: ram.ten,
@@ -108,7 +114,7 @@ export default function TransitionsModal({ fetchRams }) {
 
     return (
         <div>
-            <Button endIcon={<Add />} onClick={handleOpen}>
+            <Button variant="contained" color="secondary"  endIcon={<Add />} onClick={handleOpen}>
                 Tạo mới
             </Button>
             <Modal
@@ -173,8 +179,8 @@ export default function TransitionsModal({ fetchRams }) {
                             marginTop: '20px',
                             gap: '10px'
                         }}>
-                            <Button className='btn' onClick={handleClose}>Hủy</Button>
-                            <Button className='btn' onClick={handleSubmit}>Xác Nhận</Button>
+                            <Button variant="contained" color="secondary" onClick={handleClose}>Hủy</Button>
+                            <Button variant="contained" color="secondary" onClick={handleSubmit}>Xác Nhận</Button>
                         </div>
                     </Box>
                 </Fade>

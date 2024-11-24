@@ -166,10 +166,10 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
             <div style={{ padding: '10px' }}>
             <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn các thuộc tính</h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <SelectDropOneValue list={ram} setValueSelect={setRamChecked} name={'RAM'} />
-            <SelectDropOneValue list={CPU} setValueSelect={setCPUChecked} name={'CPU'} />
-            <SelectDropOneValue list={oCung} setValueSelect={setOCungChecked} name={'Ổ cứng'} />
-            <SelectDropOneValue list={mauSac} setValueSelect={setMauSacChecked} name={'Màu sắc'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={ram} setValueSelect={setRamChecked} name={'RAM'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={CPU} setValueSelect={setCPUChecked} name={'CPU'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={oCung} setValueSelect={setOCungChecked} name={'Ổ cứng'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={mauSac} setValueSelect={setMauSacChecked} name={'Màu sắc'} />
             </div>
             <div style={{display: "flex", marginTop: "30px"}}>
             <div>
