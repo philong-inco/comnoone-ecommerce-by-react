@@ -11,15 +11,16 @@ import { Fab } from '@mui/material';
 import { Download } from '@mui/icons-material';
 import { exportToExcel } from 'utils/excel';
 import { getAllSanPham } from 'api/sanpham/sanPham';
+import { getAllForExcel } from 'api/sanpham/sanPham';
 
-export default function MenuComponent({data}) {
+export default function MenuComponent({data, filterCurrent}) {
     const createHandleMenuClick = async (menuItem) => {
         const today = new Date();
 
         if(menuItem === 'exportPage'){
             exportToExcel(data, `Danh sách sản phẩm ${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`);
         } else if(menuItem === 'exportAll'){
-            const allProduct = await getAllSanPham();
+            const allProduct = await getAllForExcel(filterCurrent);
             
             exportToExcel(allProduct, `Danh sách tất cả sản phẩm ${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`);
         }
@@ -33,9 +34,9 @@ export default function MenuComponent({data}) {
                     </Fab>
             </MenuButton>
             <Menu slots={{ listbox: AnimatedListbox }} style={{zIndex: "999"}}>
-                <MenuItem style={{cursor: "pointer"}} onClick={() => createHandleMenuClick('exportPage')}>Xuất excel sản phẩm ở trang hiện tại</MenuItem>
+                <MenuItem style={{cursor: "pointer"}} onClick={() => createHandleMenuClick('exportPage')}>Xuất excel chỉ trang hiện tại</MenuItem>
                 <MenuItem style={{cursor: "pointer"}} onClick={() => createHandleMenuClick('exportAll')}>
-                    Xuất excel tất cả sản phẩm
+                    Xuất excel tất cả các trang
                 </MenuItem>
             </Menu>
         </Dropdown>

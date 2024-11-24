@@ -25,6 +25,7 @@ import { Download, Upload } from '@mui/icons-material';
 import { MenuButton } from '@mui/base';
 import MenuDownload from "./ui-component/Menu.jsx"
 import ImportProduct from './ui-component/ImportProduct.jsx';
+import { backEndUrl } from '../../../utils/back-end.js';
 
 const DanhSachSanPham = () => {
     const navigate = useNavigate();
@@ -82,7 +83,7 @@ const DanhSachSanPham = () => {
         setResetFilter(prev => prev + 1);
     }
 
-    const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
+    const urlFindFilter = `${backEndUrl}/san-pham/find/filter-id?`;
     const [sanPham, setsanPham] = useState([]);
     const [filter, setFilter] = useState({
         page: 0,
@@ -283,17 +284,17 @@ const DanhSachSanPham = () => {
 
     const loadFilterOptions = async () => {
         // get các bảng
-        const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list`);
-        const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list`);
-        const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list`);
-        const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list`);
-        const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list`);
-        const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list`);
-        const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list`);
-        const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list`);
-        const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list`);
-        const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list`);
-        const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list`);
+        const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list`);
+        const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list`);
+        const ramResult = await axios.get(`${backEndUrl}/ram/all-list`);
+        const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list`);
+        const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list`);
+        const vgaResult = await axios.get(`${backEndUrl}/vga/all-list`);
+        const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list`);
+        const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list`);
+        const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list`);
+        const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list`);
+        const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list`);
 
         setNhuCau(nhuCauResult.data.data);
         setThuongHieu(thuongHieuResult.data.data);
@@ -357,7 +358,7 @@ const DanhSachSanPham = () => {
     };
 
     const suaTrangThai = (id, status) => {
-        axios.get(`http://localhost:8080/api/san-pham/change-status?id=${id}&status=${status}`)
+        axios.get(`${backEndUrl}/san-pham/change-status?id=${id}&status=${status}`)
             .then(response => {
                 loadProducts();
             })
@@ -431,7 +432,7 @@ const DanhSachSanPham = () => {
                                     </Fab>
                                 </Box>
                                 <Box title="Xuất Excel" style={{ marginRight: "10px" }}>
-                                    <MenuDownload data={sanPham} />
+                                    <MenuDownload data={sanPham} filterCurrent ={filter}/>
                                 </Box>
 
                                 <ButtonAdd

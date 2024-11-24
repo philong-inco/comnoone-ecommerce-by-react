@@ -8,7 +8,7 @@ import { IconButton, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
-import { updateRam } from 'api/sanpham/ram';
+import { updateRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/ram';
 
 const style = {
     position: 'absolute',
@@ -17,7 +17,8 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 800,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
+    border: '2px solid #673AB7',
+    borderRadius: '10px',
     p: 5,
 };
 
@@ -95,7 +96,12 @@ export default function ModalUpdate({fetchRams, info}) {
         }
 
         setError(newError);
-
+        const checkName = await IsValidUpdate(ram.ten, info.id);
+        if (!checkName){
+            formValid = false;
+            console.log('checkName: ', checkName);
+            alert('Tên đã tồn tại')
+        }
         if (formValid) {
            const res = await updateRam({
             id: info.id,
@@ -117,7 +123,7 @@ export default function ModalUpdate({fetchRams, info}) {
 
     return (
         <div>
-            <IconButton color="primary" onClick={handleOpen}>
+            <IconButton sx={{color: '#6C6C6C'}} onClick={handleOpen}>
             <Edit />
             </IconButton>
             
@@ -179,15 +185,23 @@ export default function ModalUpdate({fetchRams, info}) {
                                 value={ram.tocDoBus}
                             />
                         </div>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'end',
-                            alignItems: 'end',
-                            marginTop: '20px',
-                            gap: '10px'
-                        }}>
-                            <Button className='btn' onClick={handleClose}>Hủy</Button>
-                            <Button className='btn' onClick={handleSubmit}>Xác Nhận</Button>
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                            <div style={{marginTop: '10px', fontStyle:'italic', color: 'gray'}}>
+                                <p>Ngày tạo: {info.ngayTao}</p>
+                                <p>Người tạo: {info.nguoiTao}</p>
+                                <p>Ngày sửa: {info.ngaySua}</p>
+                                <p>Người sửa: {info.nguoiSua}</p>
+                            </div>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'end',
+                                alignItems: 'end',
+                                marginTop: '20px',
+                                gap: '10px'
+                            }}>
+                                <Button variant="contained" color="secondary" onClick={handleClose}>Hủy</Button>
+                                <Button variant="contained" color="secondary" onClick={handleSubmit}>Xác Nhận</Button>
+                            </div>
                         </div>
                     </Box>
                 </Fade>

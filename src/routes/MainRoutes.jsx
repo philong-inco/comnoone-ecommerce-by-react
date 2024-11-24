@@ -210,9 +210,7 @@ const MainRoutes = {
             {
               path: 'danhsach',
               element: (
-                <ErrorBoundary>
-                  <DanhSachBanPhim />
-                </ErrorBoundary>
+                <DanhSachBanPhim />
               )
             } // Thêm các route add update detail ở đây
           ]

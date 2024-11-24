@@ -33,6 +33,7 @@ export default function AlertDialogSlide({title, message,open, setOpen}) {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
@@ -41,7 +42,7 @@ export default function AlertDialogSlide({title, message,open, setOpen}) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color='secondary' onClick={handleClose}>Biết rồi</Button>
+          <Button color='secondary' onClick={handleClose}>Xác nhận</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>
