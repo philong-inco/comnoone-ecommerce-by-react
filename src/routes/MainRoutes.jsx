@@ -5,6 +5,8 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ErrorBoundary from '../error/ErrorBoundary.jsx';
 import { element } from 'prop-types';
+import AuthGuard from './AuthGuard.jsx';
+import ForbiddenPage from 'views/pages/403/ForbiddenPage.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -72,15 +74,32 @@ const MainRoutes = {
       children: [
         {
           path: 'danh-sach',
-          element: <Bill />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <Bill />{' '}
+            </AuthGuard>
+          )
         },
 
         {
           path: 'chi-tiet/:id',
-          element: <BillDetail2 />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <BillDetail2 />{' '}
+            </AuthGuard>
+          )
         }
 
         // Thêm các route add update detail ở đây
+      ]
+    },
+    {
+      path: '/403',
+      children: [
+        {
+          path: '',
+          element: <ForbiddenPage></ForbiddenPage>
+        }
       ]
     },
     // Bán hàng tại quầy
@@ -89,11 +108,19 @@ const MainRoutes = {
       children: [
         {
           path: '',
-          element: <Sell />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <Sell />
+            </AuthGuard>
+          )
         },
         {
           path: 'hoa-don/:id',
-          element: <Sell />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <Sell />
+            </AuthGuard>
+          )
         }
       ]
     },
@@ -317,7 +344,11 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachnhanvien',
-          element: <DanhSachNhanVien />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <DanhSachNhanVien />
+            </AuthGuard>
+          )
         },
         {
           path: 'configuration',
@@ -381,18 +412,14 @@ const MainRoutes = {
     },
     {
       path: '/',
-      element: (   
-          <DashboardDefault /> 
-      )
+      element: <DashboardDefault />
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: (
-              <DashboardDefault />
-          )
+          element: <DashboardDefault />
         }
       ]
     },

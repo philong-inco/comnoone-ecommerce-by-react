@@ -55,6 +55,7 @@ const PaymentDialog2 = (props) => {
   const [openQr, setOpenQr] = useState(false);
 
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [error, setError] = useState(false);
 
   const handlePhuongThucThanhToanChange = (phuongThuc) => {
     setPhuongThucThanhToan(phuongThuc);
@@ -63,6 +64,12 @@ const PaymentDialog2 = (props) => {
   console.log('DATA PAY : ', data);
 
   const handleConfirm = () => {
+    if (soTien === '' || soTien === null || soTien == undefined) {
+      setError(true);
+      return;
+    } else {
+      setError(false);
+    }
     const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
     const newData = {
       idHTTT: idThanhToan,
@@ -302,10 +309,12 @@ const PaymentDialog2 = (props) => {
                   value={soTien}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (parseFloat(value) >= 0 || value === '') {
+                    if (parseFloat(value) >= 0 || value !== '') {
                       setSoTien(value);
                     }
                   }}
+                  error={error}
+                  helperText={error ? 'Số tiền không được để trống' : ''}
                   fullWidth
                 />
               </Grid>
