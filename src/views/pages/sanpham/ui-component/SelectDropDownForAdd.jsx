@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { MenuItem, FormControl, Select, Box, OutlinedInput, InputLabel, Chip, InputAdornment, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import AddRam from '../../../pages/sanpham/ram/components/CreateQuickly';
+import AddCPU from '../../../pages/sanpham/cpu/components/CreateQuickly';
+import AddMauSac from '../../../pages/sanpham/mausac/components/CreateQuickly';
+import AddOCung from '../../../pages/sanpham/ocung/components/CreateQuickly';
 
-const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown }) => {
+const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown, fetchAgain }) => {
     // SELECT DROPDOWN
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
@@ -50,6 +54,55 @@ const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown }) => {
         const { value } = event.target;
         setselectItemss(value);
     };
+    const [hienThi, setHienThi] = useState({
+        thuongHieu: false,
+        nhuCau: false,
+        vga: false,
+        webcam: false,
+        manHinh: false,
+        banPhim: false,
+        heDieuHanh: false,
+        ram: false,
+        cpu: false,
+        oCung: false,
+        mauSac: false
+      })
+
+      const handleAddQuickly = () => {
+        if(nameDropDown === 'Thương hiệu'){
+          setHienThi(prev => ({...prev, thuongHieu: true}))
+        }
+        if(nameDropDown === 'Nhu cầu'){
+          setHienThi(prev => ({...prev, nhuCau: true}))
+        }
+        if(nameDropDown === 'VGA'){
+          setHienThi(prev => ({...prev, vga: true}))
+        }
+        if(nameDropDown === 'Webcam'){
+          setHienThi(prev => ({...prev, webcam: true}))
+        }
+        if(nameDropDown === 'Màn hình'){
+          setHienThi(prev => ({...prev, manHinh: true}))
+        }
+        if(nameDropDown === 'Bàn phím'){
+          setHienThi(prev => ({...prev, banPhim: true}))
+        }
+        if(nameDropDown === 'Hệ điều hành'){
+          setHienThi(prev => ({...prev, heDieuHanh: true}))
+        }
+        if(nameDropDown === 'RAM'){
+          setHienThi(prev => ({...prev, ram: true}))
+        }
+        if(nameDropDown === 'CPU'){
+          setHienThi(prev => ({...prev, cpu: true}))
+        }
+        if(nameDropDown === 'Ổ cứng'){
+          setHienThi(prev => ({...prev, oCung: true}))
+        }
+        if(nameDropDown === 'Màu sắc'){
+          setHienThi(prev => ({...prev, mauSac: true}))
+        }
+      }
 
     return (
         <div>
@@ -73,11 +126,16 @@ const SelectDropdownForAdd = ({ list, setListChecked, nameDropDown }) => {
                     )}
                     endAdornment={
                         <InputAdornment style={{marginRight: "10px"}} position="end">
-                          <IconButton>
+                          <IconButton  onClick={()=>handleAddQuickly()}>
                             <AddIcon />
                           </IconButton>
+                            {hienThi.ram == true && <AddRam fetchRams={fetchAgain} setHide={setHienThi}></AddRam>}
+                            {hienThi.cpu == true && <AddCPU fetchRams={fetchAgain} setHide={setHienThi}></AddCPU>}
+                            {hienThi.oCung == true && <AddOCung fetchRams={fetchAgain} setHide={setHienThi}></AddOCung>}
+                            {hienThi.mauSac == true && <AddMauSac fetchRams={fetchAgain} setHide={setHienThi}></AddMauSac>}
                         </InputAdornment>
                       }
+                        
                     MenuProps={MenuProps}
                 >
                     {list.map((element) => (

@@ -309,7 +309,7 @@ function SerialNumberSold(props) {
               >
                 Mowr
               </Button> */}
-              <Tooltip title="Quét Qr sản phẩm" placement="top">
+              {/* <Tooltip title="Quét Qr sản phẩm" placement="top">
                 <IconButton
                   color="primary"
                   aria-label="quét QR"
@@ -324,7 +324,7 @@ function SerialNumberSold(props) {
                 >
                   <CropFreeOutlinedIcon />
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
 
               <Tooltip title="Thêm sản phẩm" placement="top">
                 <Button

@@ -36,6 +36,18 @@ const quanLy = {
           url: '/sanpham/danhsach'
         },
         {
+          id: 'nhucau',
+          title: 'Nhu cầu',
+          type: 'item',
+          url: '/sanpham/nhucau/danhsach'
+        },
+        {
+          id: 'thuonghieu',
+          title: 'Thương hiệu',
+          type: 'item',
+          url: '/sanpham/thuonghieu/danhsach'
+        },
+        {
           id: 'ram',
           title: 'Ram',
           type: 'item',
@@ -118,16 +130,16 @@ const quanLy = {
       icon: icons.IconReceipt2,
       children: [
         {
-          id: 'nhanvien',
-          title: 'Nhân viên',
-          type: 'item',
-          url: '/nhanvien/danhsachnhanvien'
-        },
-        {
           id: 'khachhang',
           title: 'Khách hàng',
           type: 'item',
           url: '/khachhang/danhsachkhachhang'
+        },
+        {
+          id: 'nhanvien',
+          title: 'Nhân viên',
+          type: 'item',
+          url: '/nhanvien/danhsachnhanvien'
         }
       ]
     }

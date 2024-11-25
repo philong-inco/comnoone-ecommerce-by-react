@@ -11,6 +11,7 @@ import ListVariant from './ListVariant.jsx';
 import { margin } from '@mui/system';
 import { element } from 'prop-types';
 import { IconTrash } from '@tabler/icons-react';
+import { backEndUrl } from '../../../../utils/back-end.js';
 
 const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
   const [variantList, setVariantList] = useState([]);
@@ -215,7 +216,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
     async function isUniqueSerial(serial) {
       let isExistSeri = null; // chưa tồn tại API trả về false
       try {
-        isExistSeri = await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serial}`);
+        isExistSeri = await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serial}`);
       } catch (error) {
         if (error.response) {
           isExistSeri = error.response.data;

@@ -15,6 +15,7 @@ import { createSanPham } from 'api/sanpham/sanPham.js';
 import { checkToAdd, createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham.js';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification.js';
+import { backEndUrl } from '../../../utils/back-end.js';
 
 const ThemSanPham = () => {
   const navigate = useNavigate();
@@ -67,19 +68,19 @@ const ThemSanPham = () => {
 
   const loadAttributes = async () => {
     // get các bảng
-    const sanPhamResult = await axios.get(`http://localhost:8080/api/san-pham/all-list-active`);
-    const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
-    const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
-    const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
-    const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
-    const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
-    const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
-    const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
-    const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
-    const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
-    const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
-    const anhSanPhamAll = await axios.get(`http://localhost:8080/api/anh-san-pham/list`);
+    const sanPhamResult = await axios.get(`${backEndUrl}/san-pham/all-list-active`);
+    const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
+    const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
+    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
+    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
+    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
+    const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
+    const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
+    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
+    const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
+    const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
+    const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
+    const anhSanPhamAll = await axios.get(`${backEndUrl}/anh-san-pham/list`);
 
     setSanPham(sanPhamResult.data.data);
     setNhuCau(nhuCauResult.data.data);
@@ -102,7 +103,7 @@ const ThemSanPham = () => {
   const [resultVariant, setResultVariant] = useState([]); // thằng này nhận kết quả cuối cùng của TableVariant
 
   const checkTenSP = async (name) => {
-    const checkUniqueNameProduct = await axios.get(`http://localhost:8080/api/san-pham/exist-name?name=${name}`);
+    const checkUniqueNameProduct = await axios.get(`${backEndUrl}/san-pham/exist-name?name=${name}`);
     console.log('checkUniqueNameProduct: ', checkUniqueNameProduct); 
     if (checkUniqueNameProduct.data.code === 999) {
       return false;
@@ -633,13 +634,13 @@ const ThemSanPham = () => {
             </div>
           </div>
           <div>
-            <SelectDropOneValue list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
-            <SelectDropOneValue list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
-            <SelectDropOneValue list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
-            <SelectDropOneValue list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
-            <SelectDropOneValue list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
-            <SelectDropOneValue list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
-            <SelectDropOneValue list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={thuongHieu} setValueSelect={setThuongHieuChecked} name={'Thương hiệu'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={nhuCau} setValueSelect={setNhuCauChecked} name={'Nhu cầu'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={VGA} setValueSelect={setVGAChecked} name={'VGA'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={webcam} setValueSelect={setWebcamChecked} name={'Webcam'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={manHinh} setValueSelect={setManHinhChecked} name={'Màn hình'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={banPhim} setValueSelect={setBanPhimChecked} name={'Bàn phím'} />
+            <SelectDropOneValue fetchAgain={loadAttributes} list={heDieuHanh} setValueSelect={setHeDieuHanhChecked} name={'Hệ điều hành'} />
           </div>
         </div>
 
@@ -651,10 +652,10 @@ const ThemSanPham = () => {
         <div style={{ padding: '10px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 'bolder', marginBottom: '20px' }}>Chọn các thuộc tính</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <SelectDropdownForAdd list={ram} setListChecked={setRamChecked} nameDropDown={'Ram'} />
-            <SelectDropdownForAdd list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
-            <SelectDropdownForAdd list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
-            <SelectDropdownForAdd list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={ram} setListChecked={setRamChecked} nameDropDown={'RAM'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={CPU} setListChecked={setCPUChecked} nameDropDown={'CPU'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={oCung} setListChecked={setOCungChecked} nameDropDown={'Ổ cứng'} />
+            <SelectDropdownForAdd fetchAgain={loadAttributes} list={mauSac} setListChecked={setmauSacChecked} nameDropDown={'Màu sắc'} />
             <Button variant="contained" onClick={checkAttributeSelected} color="secondary" sx={{ height: '60px', borderRadius: '7px' }}>
               <IconCheck />
             </Button>

@@ -25,6 +25,7 @@ import { maxHeight, width } from '@mui/system';
 import { useEffect } from 'react';
 import AlbumImageForUpdateSPCT from './AlbumImageForUpdateSPCT';
 import { IconReload } from '@tabler/icons-react';
+import { backEndUrl } from '../../../../utils/back-end';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -56,20 +57,20 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
     if (!confirm('Xác nhận xóa?')) {
       return;
     }
-    await axios.delete(`http://localhost:8080/api/serial-number/delete/${id}`);
+    await axios.delete(`${backEndUrl}/serial-number/delete/${id}`);
     let removeSeriListNew = listSeriTemp.filter((x) => x.id != id);
     setListSeriTemp(removeSeriListNew);
     loadDataSpceAfter();
   };
 
   const loadDataSpceAfter = async () => {
-    const dataSpctAfter = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
+    const dataSpctAfter = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
     console.log('dataSpctAfter: ', dataSpctAfter);
     setListSPCT(dataSpctAfter.data.data);
   };
 
   const loadSeriList = async () => {
-    const seriGetAgain = await axios.get(`http://localhost:8080/api/serial-number/find-by-spct-id/${idSPCT}`);
+    const seriGetAgain = await axios.get(`${backEndUrl}/serial-number/find-by-spct-id/${idSPCT}`);
 
     setListSeriTemp(seriGetAgain.data.data);
   };
@@ -105,7 +106,7 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
     }
     for (let i = 0; i < seriConverted.length; i++) {
       let seri = seriConverted[i];
-      const check = await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${seri}`);
+      const check = await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${seri}`);
       if (check.data.data) {
         seriDuplicated = seriDuplicated + seri + ', ';
         isDulicate = true;
@@ -132,7 +133,7 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
           ngayNhap: new Date().toISOString(),
           sanPhamChiTietId: idSPCT
         };
-        await axios.post(`http://localhost:8080/api/serial-number/add`, seriAdd);
+        await axios.post(`${backEndUrl}/serial-number/add`, seriAdd);
       }
       alert('Thêm seri thành công');
       loadSeriList();
@@ -167,11 +168,11 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
   }, [idSPCT]);
 
   const loadBienThe = async () => {
-    const spctResult = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSPCT}`);
+    const spctResult = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSPCT}`);
     console.log('spctResult: ', spctResult);
     const bt = spctResult.data.data;
 
-    const qrValue = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/qr-code?value=${bt.ma}`);
+    const qrValue = await axios.get(`${backEndUrl}/san-pham-chi-tiet/qr-code?value=${bt.ma}`);
     console.log('qrValue: ', qrValue);
     setQr(qrValue.data);
     const arrImg = bt.listUrlAnhSanPham.split(',');
@@ -192,7 +193,7 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
       alert('Điền đủ thông tin');
     } else {
       try {
-        await axios.put(`http://localhost:8080/api/san-pham-chi-tiet/update-price-image`, bienThe);
+        await axios.put(`${backEndUrl}/san-pham-chi-tiet/update-price-image`, bienThe);
         alert('Sửa thành công');
       } catch (error) {
         alert('Sửa thất bại');

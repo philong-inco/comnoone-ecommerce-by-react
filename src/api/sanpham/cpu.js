@@ -36,15 +36,20 @@ export const getRams = async ({
 }
 
 export const filterRam = async ({
-    ma,
-    dungLuong,
+    page,
+    size,
     name,
-    tocDoBus,
-    trangThai
+    trangThai,
 }) => {
+  
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?ma=${ma}&dungLuong=${dungLuong}&name=${name}&tocDoBus=${tocDoBus}&trangThai=${trangThai}`)
-
+        let queryStr = '';
+        queryStr += (page === undefined || page === '') ? 'page=0' : 'page=' + page;
+        queryStr += (size === undefined) ? '&size=5' : '&size=' + size;
+        queryStr += (name === undefined) ? '' : '&name=' + name;
+        queryStr += (trangThai === undefined) ? '' : '&trangThai=' + trangThai;
+        console.log('queryStr: ', queryStr);
+        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?${queryStr}`);
         return res
     } catch (error) {
         console.log('Error filterRam', error);
@@ -82,5 +87,31 @@ export const updateRam = async ({
         return res
     } catch (error) {
         console.log('Error updateRam', error);
+    }
+}
+
+export const IsValidAdd = async (name) => {
+    try {
+        const res = await axios.get(`${backEndUrl}/${path}/exist-name?name=${name}`)
+        const result = res.data.data;
+        if (result){
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log('Error createNewRam', error);
+    }
+}
+
+export const IsValidUpdate = async (name, id) => {
+    try {
+        const res = await axios.get(`${backEndUrl}/${path}/exist-name-diff-id?name=${name}&id=${id}`)
+        const result = res.data.data;
+        if (result){
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log('Error createNewRam', error);
     }
 }

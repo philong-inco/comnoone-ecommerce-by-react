@@ -9,10 +9,12 @@ import axios from 'axios';
 import { createSanPham } from 'api/sanpham/sanPham';
 import { toast } from 'react-toastify';
 import { createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham';
-
-
+import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank';
+import { backEndUrl } from '../../../../utils/back-end';
+import { useNavigate } from 'react-router-dom';
 
 const ImportSanPham = () => {
+    const navigate = useNavigate();
     const columnsSanPham = [
         {
             field: 'index',
@@ -286,6 +288,16 @@ const ImportSanPham = () => {
                     thuongHieuInfo
                 }
             })
+            for(const product of listNewProduct){
+                if(!product?.nhuCauInfo){
+                    alert(`Tên nhu cầu không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!product?.thuongHieuInfo){
+                    alert(`Tên thương hiệu không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+            }
             const listNewProductDuplicates = getDuplicateObjects(listNewProduct.map(item => {
                 return {
                     ...item,
@@ -341,11 +353,47 @@ const ImportSanPham = () => {
             for(const bienthe of listBienThe){
                 if(!bienthe?.sanPhamInfo){
                     alert(`Tên sản phẩm "${bienthe.tenSanPham}" ở mục BIẾN THỂ không khớp`)
-                   
                     isNotMatchProductName = true;
                     return;
                 }
+                if(!bienthe?.banPhimInfo){
+                    alert(`Tên bàn phím không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.cpuInfo){
+                    alert(`Tên CPU không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.heDieuHanhInfo){
+                    alert(`Tên hệ điều hành không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.manHinhInfo){
+                    alert(`Tên màn hình không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.mauSacInfo){
+                    alert(`Tên màu sắc không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.ramInfo){
+                    alert(`Tên RAM không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.vgaInfo){
+                    alert(`Tên VGA không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.webcamInfo){
+                    alert(`Tên Webcam không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
+                if(!bienthe?.oCungInfo){
+                    alert(`Tên ổ cứng không tồn tại hoặc không còn được sử dụng`)
+                    return;
+                }
             }
+
             if(isNotMatchProductName){
             }
 
@@ -373,17 +421,17 @@ const ImportSanPham = () => {
 
     const loadFilterOptions = async () => {
         // get các bảng
-        const nhuCauResult = await axios.get(`http://localhost:8080/api/nhu-cau/all-list-active`);
-        const thuongHieuResult = await axios.get(`http://localhost:8080/api/thuong-hieu/all-list-active`);
-        const ramResult = await axios.get(`http://localhost:8080/api/ram/all-list-active`);
-        const mauSacResult = await axios.get(`http://localhost:8080/api/mau-sac/all-list-active`);
-        const cpuResult = await axios.get(`http://localhost:8080/api/cpu/all-list-active`);
-        const vgaResult = await axios.get(`http://localhost:8080/api/vga/all-list-active`);
-        const webcamResult = await axios.get(`http://localhost:8080/api/webcam/all-list-active`);
-        const oCungResult = await axios.get(`http://localhost:8080/api/o-cung/all-list-active`);
-        const manHinhResult = await axios.get(`http://localhost:8080/api/man-hinh/all-list-active`);
-        const heDieuHanhResult = await axios.get(`http://localhost:8080/api/he-dieu-hanh/all-list-active`);
-        const banPhimResult = await axios.get(`http://localhost:8080/api/ban-phim/all-list-active`);
+        const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
+        const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
+        const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
+        const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
+        const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
+        const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
+        const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
+        const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
+        const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
+        const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
+        const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
 
         setNhuCau(nhuCauResult.data.data);
         setThuongHieu(thuongHieuResult.data.data);
@@ -428,7 +476,7 @@ const ImportSanPham = () => {
                     successList.push(response)
 
                     if ((index === results.length - 1)) {
-                        alert(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        // alert(`Sản phẩm thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
@@ -476,7 +524,7 @@ const ImportSanPham = () => {
                     successListNoti.push(index + 1);
 
                     if ((index === resultsBienThe.length - 1)) {
-                        alert(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
+                        // alert(`Biến thể thứ ${successListNoti.join(', ')} đã thêm thành công`);
                     }
                 }
             } else if (result.status === 'rejected') {
@@ -484,7 +532,6 @@ const ImportSanPham = () => {
                 alert(`Thêm Biến thể thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
             }
         });
-
         return resultsBienThe;
     };
 
@@ -504,7 +551,9 @@ const ImportSanPham = () => {
                     error: 'Có lỗi xảy ra, vui lòng thử lại 🤯'
                 }
             );
+            navigate(`/sanpham/danhsach`);
         }
+        
         
     };
 
@@ -521,7 +570,7 @@ const ImportSanPham = () => {
         
         for(let i = 0; i < sanphams.length; i++){
             tenSPTotal.push(sanphams[i].ten);
-            if((await axios.get(`http://localhost:8080/api/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
+            if((await axios.get(`${backEndUrl}/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
                 tenSPTrung += `${sanphams[i].ten}, `;
                 isValid = false;
             }
@@ -533,16 +582,15 @@ const ImportSanPham = () => {
                     giaSai += `${bienThe.tenSanPham}, `;
                     isValid = false;
                 }
-                let serialsTemp = (bienThe[j].serials + '').split(',');
+                let serialsTemp = (bienThe[j].serials + '').split(',').map(x => x.trim());
                 for(let k = 0; k < serialsTemp.length; k++){
                     seriTotal.push(serialsTemp[k]);
                     if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20 || serialsTemp[k].includes(" ")){
                         seriLengtInvalid += `${serialsTemp[k]}, `
                         isValid = false;
                     }
-                    if ((await axios.get(`http://localhost:8080/api/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
+                    if ((await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
                         seriTonTai += `${serialsTemp[k]}, `
-                    
                         isValid = false;
                     }
                 }
@@ -605,6 +653,12 @@ const ImportSanPham = () => {
             <div>
                 <MainCard title="Import Sản phẩm của bạn">
                     <div style={{ display: "flex", justifyContent: "center" }}>
+                        <div>
+                            <Button
+                            size="medium"
+                            style={{ background: "#2196F3", color: "#fff", padding: "5px 20px", marginRight: "20px" }}
+                            onClick={() => excelImportBlank("Template")}>Tải mẫu xuống</Button>
+                        </div>
                         <Button
                             size="medium"
                             onClick={handleButtonClick}
