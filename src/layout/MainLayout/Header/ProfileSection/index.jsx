@@ -182,17 +182,19 @@ const ProfileSection = () => {
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                      <Typography variant="h4">Chức vụ:</Typography>
-                        <Typography variant="subtitle2">
-                        {vaiTro.length > 0 ? vaiTro.map((role, index) => (
-                          <span key={index}>
-                            {role.ten}
-                            {index < vaiTro.length - 1 ? ', ' : ''}
-                          </span>
-                        )) : 'Chức vụ'}
-                      </Typography>
+                        <Typography variant="h4">Chức vụ:</Typography>
+                        <Typography variant="subtitle1">
+                          {vaiTro.length > 0 ? vaiTro.map((role, index) => (
+                            <span key={index}>
+                              {/* Kiểm tra giá trị của role.ten để hiển thị theo yêu cầu */}
+                              {role.ten === 'STAFF' ? 'Nhân viên' : role.ten === 'ADMIN' ? 'Quản lý' : role.ten}
+                              {index < vaiTro.length - 1 ? ', ' : ''}
+                            </span>
+                          )) : 'Chức vụ'}
+                        </Typography>
+
                       </Stack>
-                      
+
                     </Stack>
                     <Divider />
                   </Box>
@@ -213,7 +215,7 @@ const ProfileSection = () => {
                             mt: 0.5
                           }
                         }}
-                      >           
+                      >
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}

@@ -5,6 +5,7 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ErrorBoundary from '../error/ErrorBoundary.jsx';
 import { element } from 'prop-types';
+import ChinhSach from 'views/utilities/ChinhSach.jsx';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard')));
@@ -59,10 +60,9 @@ const DotGiamGiaConfiguration = Loadable(lazy(() => import('views/pages/dotgiamg
 const Bill = Loadable(lazy(() => import('views/pages/bill/index.jsx')));
 const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetail.jsx')));
 const BillDetail2 = Loadable(lazy(() => import('views/pages/billDetail/BillDetail.jsx')));
-
 // Bán hàng
 const Sell = Loadable(lazy(() => import('views/pages/ban-hang/index.jsx')));
-
+//Chính sách 
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -400,7 +400,7 @@ const MainRoutes = {
       path: 'chinhsach',
       element: (
         <ErrorBoundary>
-          <ComNo1PageDemo />
+          <ChinhSach />
         </ErrorBoundary>
       )
     }
