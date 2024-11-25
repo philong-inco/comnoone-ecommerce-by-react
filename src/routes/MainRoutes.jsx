@@ -77,7 +77,7 @@ const MainRoutes = {
         {
           path: 'danh-sach',
           element: (
-            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+            <AuthGuard allowedRoles={['ADMIN']}>
               <Bill />{' '}
             </AuthGuard>
           )
@@ -302,19 +302,31 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachphieugiamgia',
-          element: <DanhSachPhieuGiamGia />
+          element:
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <DanhSachPhieuGiamGia />
+            </AuthGuard>
         },
         {
           path: 'cauhinhphieugiamgia',
-          element: <PhieuGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <PhieuGiamGiaConfiguration />
+            </AuthGuard>
         },
         {
           path: 'cauhinhphieugiamgia/:id',
-          element: <PhieuGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <PhieuGiamGiaConfiguration />
+            </AuthGuard>
         },
         {
           path: 'chitietphieugiamgia/:id',
-          element: <PhieuGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <PhieuGiamGiaConfiguration />
+            </AuthGuard>
         }
       ]
     },
@@ -323,19 +335,32 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachdotgiamgia',
-          element: <DanhSachDotGiamGia />
+          element:
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <DanhSachDotGiamGia />
+            </AuthGuard>
+
         },
         {
           path: 'cauhinhdotgiamgia',
-          element: <DotGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <DotGiamGiaConfiguration />
+            </AuthGuard>
         },
         {
           path: 'cauhinhdotgiamgia/edit/:id',
-          element: <DotGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <DotGiamGiaConfiguration />
+            </AuthGuard>
         },
         {
           path: 'cauhinhdotgiamgia/view/:id',
-          element: <DotGiamGiaConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <DotGiamGiaConfiguration />
+            </AuthGuard>
         }
       ]
     },
@@ -345,18 +370,24 @@ const MainRoutes = {
         {
           path: 'danhsachnhanvien',
           element: (
-            <AuthGuard allowedRoles={['ADMIN']}>
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <DanhSachNhanVien />
             </AuthGuard>
           )
         },
         {
           path: 'configuration',
-          element: <NhanVienConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <NhanVienConfiguration />
+            </AuthGuard>
         },
         {
           path: 'configuration/:id',
-          element: <NhanVienConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN']}>
+              <NhanVienConfiguration />
+            </AuthGuard>
         }
       ]
     },
@@ -366,15 +397,24 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachkhachhang',
-          element: <KhachHang />
+          element:
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <KhachHang />
+            </AuthGuard>
         },
         {
           path: 'khachhangconfiguration',
-          element: <KhachHangConfiguration />
+          element:
+            <AuthGuard allowedRoles={['ADMIN', "STAFF"]}>
+              <KhachHangConfiguration />
+            </AuthGuard>
         },
         {
           path: 'khachhangaddress/:id',
-          element: <KhachHangAddress />
+          element:
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <KhachHangAddress />
+            </AuthGuard>
         }
       ]
     },
@@ -388,28 +428,6 @@ const MainRoutes = {
     //     }
     //   ]
     // },
-
-    {
-      path: 'thongke',
-      children: [
-        {
-          path: 'sanpham',
-          element: (
-            <ErrorBoundary>
-              <ComNo1PageDemo />
-            </ErrorBoundary>
-          )
-        },
-        {
-          path: 'doanhthu',
-          element: (
-            <ErrorBoundary>
-              <ComNo1PageDemo />
-            </ErrorBoundary>
-          )
-        }
-      ]
-    },
     {
       path: '/',
       element: <DashboardDefault />

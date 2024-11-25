@@ -1,17 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Alert, Box, Typography, Container, Stack } from '@mui/material'; 
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const AuthGuard = ({ children, allowedRoles }) => {
+  const [authError, setAuthError] = useState(null);  
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('COMNOONE_TOKEN');
       console.log('JWT Token:', token);
-      // const tk =
-      //   'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYW5oQGdtYWlsLmNvbSIsImlhdCI6MTczMTg1NDAzMywiZXhwIjoxNzMxOTQwNDMzfQ.6Xq8NAVShFsROwhqsNOy46lw9voAfsuFY6mSraeIjVU';
+
       if (!token) {
-        return navigate('/login');
+        setAuthError('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
+        return;
       }
 
       try {
@@ -19,45 +22,69 @@ const AuthGuard = ({ children, allowedRoles }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
+
         console.log('response', response);
 
         if (response.status === 200) {
           const userData = await response.json();
           console.log(userData);
 
-          // if (userData.role === 'CUSTOMER') {
-          //   return navigate('/403');
-          // }
-
-          // if (['ADMIN', 'STAFF'].includes(userData.role)) {
-          //   console.log('Quyền truy cập hợp lệ:', userData.role);
-          // }
           if (!allowedRoles.includes(userData.role)) {
-            alert('Bạn không có quyền truy cập vào trang này.');
-            return navigate('/403');
+            setAuthError('Bạn không có quyền truy cập vào trang này.');
+            return;
           }
           console.log('Quyền truy cập hợp lệ:', userData.role);
         } else {
           const errorData = await response.json();
           console.error('Lỗi:', errorData);
-          if (errorData.code == 701) {
-            alert('Token hết hạn');
-            navigate('/login');
+          if (errorData.code === 701) {
+            setAuthError('Token đã hết hạn, vui lòng đăng nhập lại.');
+          } else {
+            setAuthError(`Lỗi xác thực: ${errorData.code}`);
           }
-          console.error('Lỗi:', errorData.message);
-          alert(`Lỗi xác thực: ${errorData.code}`);
         }
       } catch (error) {
         console.error('Error verifying token:', error);
-        navigate('/login');
+        setAuthError('Xảy ra lỗi trong quá trình xác thực, vui lòng thử lại.');
       }
     };
 
     checkAuth();
-  }, [navigate, allowedRoles]);
+  }, [allowedRoles]);
+  if (authError) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="50vh"
+        bgcolor="#f3f4f6" 
+      >
+        <Container maxWidth="sm">
+          <Stack spacing={3} alignItems="center"> 
+            <ErrorOutlineIcon sx={{ fontSize: 64, color: '#d32f2f' }} /> 
+            
+            <Alert 
+              severity="error" 
+              variant="outlined"
+              sx={{ width: '100%', bgcolor: '#ffe6e6', p: 2, border: '1px solid #d32f2f', borderRadius: 2 }}
+            >
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
+                Xác thực thất bại!
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#d32f2f' }}>
+                {authError}
+              </Typography>
+            </Alert>
+          </Stack>
+        </Container>
+      </Box>
+    );
+  }
+
   return children;
 };
 
