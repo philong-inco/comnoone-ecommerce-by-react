@@ -7,25 +7,161 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#2296f3" />
-    <meta name="title"
-      content="Berry - React Material Admin Dashboard Template by CodedThemes" />
+    <meta name="title" content="ComNoOne Admin Dashboard" />
     <meta
       name="description"
-      content="Start your next React project with Berry admin template. It build with Reactjs, Material-UI, Redux, and Hook for faster web development." />
-    <meta
-      name="keywords"
-      content="react admin template, material-ui react dashboard template, reactjs admin template, reactjs dashboard, react backend template" />
-    <meta name="author" content="CodedThemes" />
+    />
+    <meta name="keywords" content="react, admin, dashboard, template" />
+    <meta name="author" content="ComNoOne" />
 
-    <script src="https://widget.cloudinary.com/v2.0/global/all.js"
-      type="text/javascript"></script>
+    <script
+      src="https://widget.cloudinary.com/v2.0/global/all.js"
+      type="text/javascript"
+    ></script>
+    
+    <!-- Custom Styles for Loading Screen -->
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    <script type="module" crossorigin src="/assets/index-BIssY3ES.js"></script>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+      }
+
+      #loading-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(-45deg, #2296f3, #6dd5ed, #f5f5f5, #ffffff);
+        background-size: 400% 400%;
+        animation: gradientShift 6s ease infinite;
+      }
+
+      .loading-content {
+        text-align: center;
+      }
+
+      /* Laptop SVG icon animation */
+      .laptop-icon {
+        width: 150px;
+        margin-bottom: 20px;
+        animation: float 2s infinite ease-in-out;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      /* Gradient shifting animation */
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* Progress bar styling */
+      .loading-bar {
+        position: relative;
+        height: 4px;
+        width: 150px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .loading-bar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #2296f3;
+        animation: loadingBar 2s infinite;
+      }
+
+      @keyframes loadingBar {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .loading-text {
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .brand-logo {
+        width: 100px;
+        margin-top: 20px;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BmIX3_3w.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-B8gOHMMN.css">
   </head>
+
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <h1>COMNOONE</h1>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loading-content">
+       
+        <svg
+          class="laptop-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.75 17.25h4.5M9.75 14.25h4.5M8.25 9.75L9.75 8.25L12 6L14.25 8.25L15.75 9.75M3 9v10.5A2.25 2.25 0 005.25 21.75h13.5A2.25 2.25 0 0021 19.5V9M3 9L12 3.75L21 9M3 9v10.5M21 9v10.5"
+          />
+        </svg>
+
+        <!-- Loading bar -->
+        <div class="loading-bar"></div>
+        <div class="loading-text">Loading... Please wait.</div>
+      </div>
+    </div>
+
+    <!-- React root -->
+    <div id="root" style="display: none;"></div>
+
+    <!-- Script to hide loading after React loads -->
+
+    <script>
+      // Function to hide loading screen and show the React app
+      window.addEventListener('load', function () {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('root').style.display = 'block';
+      });
+    </script>
   </body>
 </html>
