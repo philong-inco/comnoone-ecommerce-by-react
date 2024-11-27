@@ -10,7 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { filterCoupons, deletedCoupons, stopKhPGG, startKhPGG } from 'services/admin/coupons/couponsService';
+import { filterCoupons, deletedCoupons, stopKhPGG, startKhPGG, checkStatusForBill } from 'services/admin/coupons/couponsService';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import moment from 'moment';
@@ -61,19 +61,29 @@ function PhieuGiamGia() {
   };
 
   const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage + 1); // Điều chỉnh vì TablePagination bắt đầu từ 0
+    setCurrentPage(newPage + 1); 
   };
 
   const handleRowsPerPageChange = (event) => {
     setSize(parseInt(event.target.value, 10));
-    setCurrentPage(1); // Reset về trang đầu khi thay đổi số hàng mỗi trang
+    setCurrentPage(1); 
   };
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const i = 1;
+      console.log("Check status: "+ i);
+    
+      checkStatusForBill();
+    }, 5000); 
+    return () => clearInterval(intervalId);
+  }, []);
+
 
   useEffect(() => {
     fetchApi(currentPage, size);
     const intervalId = setInterval(() => {
       fetchApi(currentPage, size);
-    }, 15000); // 2 seconds
+    }, 60000); 
     return () => clearInterval(intervalId);
   }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
 

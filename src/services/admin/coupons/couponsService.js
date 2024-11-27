@@ -114,3 +114,13 @@ export const getAllCouponsToBill = async (billCode) => {
   }
 };
 
+export const checkStatusForBill = async () => {
+  try {
+    const result = await put(`coupons/checkupdatestatus`);
+    return result;
+  } catch (error) {
+    console.log('Error check status :', error);
+    throw error;
+  }
+}
+
