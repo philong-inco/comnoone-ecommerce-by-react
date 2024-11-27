@@ -788,7 +788,7 @@ function PhieuGiamGiaConfiguration() {
                   <TableCell>Tên khách hàng</TableCell>
                   <TableCell>Số điện thoại</TableCell>
                   <TableCell>Ngày sinh</TableCell>
-                  <TableCell>Hạng khách hàng</TableCell>
+                  {/* <TableCell>Hạng khách hàng</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -804,7 +804,7 @@ function PhieuGiamGiaConfiguration() {
                     <TableCell>{row.ten}</TableCell>
                     <TableCell>{row.sdt}</TableCell>
                     <TableCell>{formatDate(row.ngaySinh)}</TableCell>
-                    <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell>
+                    {/* <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>

@@ -491,7 +491,7 @@ const DanhSachNhanVien = () => {
                                     <TableCell>{nv.email}</TableCell>
                                     <TableCell>{nv.diaChi}</TableCell>
                                     <TableCell>{getStatusNhanVien(nv.trangThai)}</TableCell>
-                                    <TableCell>
+                                    <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>
                                         <Button className="btn btn-link" title="Sửa Nhân Viên">
                                             <IconEdit stroke={2} onClick={() => handleEdit(nv.id)} />
                                         </Button>
