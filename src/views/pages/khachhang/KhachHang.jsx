@@ -437,16 +437,16 @@ const KhachHang = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">STT</TableCell>
-              <TableCell align="center">Hình Ảnh</TableCell>
-              <TableCell align="center">Mã Khách Hàng</TableCell>
-              <TableCell align="center">Tên Khách Hàng</TableCell>
-              {/* <TableCell align="center">Hạng Khách Hàng</TableCell> */}
-              <TableCell align="center">Ngày Sinh</TableCell>
-              <TableCell align="center">Email</TableCell>
-              <TableCell align="center">Số Điện Thoại</TableCell>
-              <TableCell align="center">Giới Tính</TableCell>
-              <TableCell align="center">Thao Tác</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>STT</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hình Ảnh</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Mã Khách Hàng</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Tên Khách Hàng</TableCell>
+              {/* <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hạng Khách Hàng</TableCell> */}
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Ngày Sinh</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Email</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Số Điện Thoại</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Giới Tính</TableCell>
+              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Thao Tác</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -456,18 +456,17 @@ const KhachHang = () => {
                 const { text: hangText, color: hangColor } = getHangKhachHang(kh.hangKhachHang);
                 return (
                   <TableRow key={kh.id}>
-                    <TableCell align="center">{index + 1 + (currentPage - 1) * 5}</TableCell>
-                    <TableCell align="center">
+                    <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>{index + 1 + (currentPage - 1) * 5}</TableCell>
+                    <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>
                       <Avatar alt={kh.ten} src={kh.hinhAnh} sx={{ width: 100, height: 100 }} />
                     </TableCell>
-                    <TableCell align="center">{kh.ma}</TableCell>
-                    <TableCell align="center">{kh.ten}</TableCell>
-                    {/* <TableCell>{getHangKhachHang(kh.hangKhachHang)}</TableCell> */}
-                    <TableCell align="center">{ngaySinh}</TableCell>
-                    <TableCell align="center">{kh.email}</TableCell>
-                    <TableCell align="center">{kh.sdt}</TableCell>
-                    <TableCell align="center">{getGioiTinhKhachHang(kh.gioiTinh)}</TableCell>
-                    <TableCell align="center">
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.ma}</TableCell>
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.ten}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{ngaySinh}</TableCell>
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.email}</TableCell>
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.sdt}</TableCell>
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{getGioiTinhKhachHang(kh.gioiTinh)}</TableCell>
+                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>
                       <Button className="btn btn-link">
                         <IconEdit stroke={2} onClick={() => handleEdit(kh.id)} />
                       </Button>

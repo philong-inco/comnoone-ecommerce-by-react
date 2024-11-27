@@ -459,16 +459,16 @@ const DanhSachNhanVien = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>STT</TableCell>
-                            <TableCell>Hình Ảnh</TableCell>
-                            <TableCell>Mã</TableCell>
-                            <TableCell>Tên</TableCell>
-                            <TableCell>Ngày Sinh</TableCell>
-                            <TableCell>Số Điện Thoại</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Địa Chỉ</TableCell>
-                            <TableCell>Trạng Thái</TableCell>
-                            <TableCell>Hành Động</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>STT</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Mã</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Tên</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Ngày Sinh</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>SĐT</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Email</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hình Ảnh</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Địa Chỉ</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Trạng Thái</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hành Động</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -504,7 +504,7 @@ const DanhSachNhanVien = () => {
                                         />
                                         <Button
                                             title="Cấp lại mật khẩu cho nhân viên"
-                                            onClick={() => openDialog(nv.email)} 
+                                            onClick={() => openDialog(nv.email)}
                                             variant="text"
                                             sx={{ minWidth: 0, padding: 0 }}
                                         >
