@@ -1005,7 +1005,7 @@ const Dashboard = () => {
               <Typography variant="h4" gutterBottom align="center">
                 Thống kê trạng thái đơn hàng
               </Typography>
-              {totalPrecentBill.length > 0 ? (
+              {totalPrecentBill != null ? (
                 <ResponsiveContainer width="100%" height={400}>
                   <PieChart>
                     <Pie
@@ -1043,7 +1043,7 @@ const Dashboard = () => {
                 <Typography variant="h5" gutterBottom textAlign="center">
                   Sản phẩm sắp hết hàng
                 </Typography>
-                {products.length > 0 ? (
+                {products != null ? (
                   <>
                     <TableContainer component={Paper} sx={{ background: 'transparent' }}>
                       <Table>
@@ -1085,7 +1085,7 @@ const Dashboard = () => {
                 <Typography variant="h5" gutterBottom textAlign="center">
                   Top 5 Sản Phẩm Bán Tốt Nhất
                 </Typography>
-                {topSellingProducts.length > 0 ? (
+                {topSellingProducts != null ? (
                   <TableContainer component={Paper} sx={{ background: 'transparent' }}>
                     <Table>
                       <TableHead>

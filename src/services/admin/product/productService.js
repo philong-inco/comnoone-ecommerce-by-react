@@ -33,7 +33,6 @@ export const getTopFiveProductSold = async (startDate, endDate) => {
 export const infoBillByDate = async (startDate, endDate) => {
   try {
     const result = await get(`/bills/dashboard/infobill?startDate=${startDate}&endDate=${endDate}`);
-    console.log(result);   
     return result;
   } catch (error) {
     console.error('Error getting information of bill:', error);
@@ -86,7 +85,7 @@ export const trangThaiHoaDonCalulate = async (startDate, endDate) => {
   try {
     const result = await get(`/bills/dashboard/calculatebillpercentage?startDate=${startDate}&endDate=${endDate}`);
     console.log(result);
-    
+    debugger;
     return result;
   } catch (error) {
     console.error('Error getting information of bill calulate:', error);
