@@ -23,7 +23,6 @@ import {
   CircularProgress
 } from '@mui/material';
 import { IconArticleFilledFilled } from '@tabler/icons-react';
-import { Timeline, TimelineEvent } from '@mailtop/horizontal-timeline';
 
 import { useRef, useState } from 'react';
 import { Card } from 'react-bootstrap';

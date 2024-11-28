@@ -43,8 +43,8 @@ import { Box } from '@mui/system';
 import { getStatusSerialColor } from 'utils/serialUtil/serialUtil';
 import { GridDeleteIcon } from '@mui/x-data-grid';
 import { IconTrash } from '@tabler/icons-react';
-import { QrReader } from 'react-qr-reader';
-
+import { QrScanner } from 'react-qrcode-scanner';
+// import { QrReader } from 'react-qr-reader';
 function SerialNumberSold(props) {
   const { id } = useParams();
   const { onLoading, bill, title } = props;
@@ -681,7 +681,7 @@ function SerialNumberSold(props) {
           </Button>
         </DialogActions> */}
         <DialogContent>
-          <QrReader
+          <QrScanner
             // onScan={handleScanQR}
             onResult={(result, error) => {
               console.log('Kết quả:', result);
