@@ -379,7 +379,7 @@ function AddressDiaLog(props) {
   return (
     <>
       <Tooltip title="Chọn địa chỉ cho đơn hàng" placement="top">
-        <Button variant="contained" color="primary" onClick={handleOpen}>
+        <Button variant="contained" color="secondary" onClick={handleOpen}>
           Cập nhật địa chỉ
         </Button>
       </Tooltip>

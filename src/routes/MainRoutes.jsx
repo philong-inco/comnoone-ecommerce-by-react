@@ -66,7 +66,7 @@ const BillDetail = Loadable(lazy(() => import('views/pages/bill-detail/BillDetai
 const BillDetail2 = Loadable(lazy(() => import('views/pages/billDetail/BillDetail.jsx')));
 // Bán hàng
 const Sell = Loadable(lazy(() => import('views/pages/ban-hang/index.jsx')));
-//Chính sách 
+//Chính sách
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -77,7 +77,7 @@ const MainRoutes = {
         {
           path: 'danh-sach',
           element: (
-            <AuthGuard allowedRoles={['ADMIN']}>
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <Bill />{' '}
             </AuthGuard>
           )
@@ -134,7 +134,9 @@ const MainRoutes = {
           path: 'danhsach',
           element: (
             <ErrorBoundary>
-              <DanhSachSanPham />
+              <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+                <DanhSachSanPham />
+              </AuthGuard>
             </ErrorBoundary>
           )
         },
@@ -211,9 +213,7 @@ const MainRoutes = {
           children: [
             {
               path: 'danhsach',
-              element: (
-                <DanhSachBanPhim />
-              )
+              element: <DanhSachBanPhim />
             } // Thêm các route add update detail ở đây
           ]
         },
@@ -302,31 +302,35 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachphieugiamgia',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <DanhSachPhieuGiamGia />
             </AuthGuard>
+          )
         },
         {
           path: 'cauhinhphieugiamgia',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <PhieuGiamGiaConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'cauhinhphieugiamgia/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <PhieuGiamGiaConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'chitietphieugiamgia/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <PhieuGiamGiaConfiguration />
             </AuthGuard>
+          )
         }
       ]
     },
@@ -335,32 +339,35 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachdotgiamgia',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <DanhSachDotGiamGia />
             </AuthGuard>
-
+          )
         },
         {
           path: 'cauhinhdotgiamgia',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <DotGiamGiaConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'cauhinhdotgiamgia/edit/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <DotGiamGiaConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'cauhinhdotgiamgia/view/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <DotGiamGiaConfiguration />
             </AuthGuard>
+          )
         }
       ]
     },
@@ -377,17 +384,19 @@ const MainRoutes = {
         },
         {
           path: 'configuration',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <NhanVienConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'configuration/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN']}>
               <NhanVienConfiguration />
             </AuthGuard>
+          )
         }
       ]
     },
@@ -397,24 +406,27 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachkhachhang',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <KhachHang />
             </AuthGuard>
+          )
         },
         {
           path: 'khachhangconfiguration',
-          element:
-            <AuthGuard allowedRoles={['ADMIN', "STAFF"]}>
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <KhachHangConfiguration />
             </AuthGuard>
+          )
         },
         {
           path: 'khachhangaddress/:id',
-          element:
+          element: (
             <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
               <KhachHangAddress />
             </AuthGuard>
+          )
         }
       ]
     },
@@ -430,14 +442,22 @@ const MainRoutes = {
     // },
     {
       path: '/',
-      element: <DashboardDefault />
+      element: (
+        <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+          <DashboardDefault />
+        </AuthGuard>
+      )
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: <DashboardDefault />
+          element: (
+            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+              <DashboardDefault />
+            </AuthGuard>
+          )
         }
       ]
     },
@@ -445,7 +465,9 @@ const MainRoutes = {
       path: 'chinhsach',
       element: (
         <ErrorBoundary>
-          <ChinhSach />
+          <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
+            <ChinhSach />
+          </AuthGuard>
         </ErrorBoundary>
       )
     }

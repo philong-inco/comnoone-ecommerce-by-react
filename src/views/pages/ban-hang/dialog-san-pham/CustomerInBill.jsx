@@ -171,7 +171,7 @@ function CustomerInBill(props) {
           <Typography variant="h3">Khách hàng</Typography>
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
             onClick={() => {
               handleShowDiaLogCustomer();
             }}

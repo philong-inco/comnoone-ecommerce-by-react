@@ -451,14 +451,14 @@ function NewTimeLine(props) {
               </Grid>
               <Grid item xs={2}>
                 <Tooltip title="Lịch sử hóa đơn" arrow placement="top">
-                  <Button variant="contained" color="warning" fullWidth onClick={fetchInvoicePdf}>
+                  <Button variant="contained" color="secondary" fullWidth onClick={fetchInvoicePdf}>
                     In Hóa Đơn
                   </Button>
                 </Tooltip>
               </Grid>
               <Grid item xs={2}>
                 <Tooltip title="Lịch sử hóa đơn" arrow placement="top">
-                  <Button variant="contained" color="warning" fullWidth onClick={handleOpenDialog}>
+                  <Button variant="contained" color="secondary" fullWidth onClick={handleOpenDialog}>
                     Chi tiết
                   </Button>
                 </Tooltip>
