@@ -111,12 +111,26 @@ function Sell() {
       navigate('/ban-hang');
       return;
     }
-    const response = await createBill();
-    if (response.status_code === 201) {
-      setTabs((prevTabs) => [response.data.ma, ...prevTabs]);
-      setValue(0);
-      navigate(`/ban-hang/hoa-don/${response.data.ma}`);
-      toast.success(NotificationStatus.CREATED);
+    try {
+      const response = await createBill();
+
+      if (response.status_code === 201) {
+        setTabs((prevTabs) => [response.data.ma, ...prevTabs]);
+        setValue(0);
+        navigate(`/ban-hang/hoa-don/${response.data.ma}`);
+        // toast.success(NotificationStatus.CREATED);
+      }
+    } catch (error) {
+      if (error.status == 401) {
+        setSnackbarMessage('Bạn cần đăng nhập');
+        setSnackbarSeverity('error');
+      }
+      if (error.status == 403) {
+        setSnackbarMessage('Bạn không có quền thực hiện chức năng này');
+        setSnackbarSeverity('error');
+      }
+    } finally {
+      setSnackbarOpen(true);
     }
   };
 

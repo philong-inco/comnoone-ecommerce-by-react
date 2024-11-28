@@ -335,7 +335,7 @@ function SerialNumberSold(props) {
                     bill.trangThai == 'HUY'
                   }
                   variant="contained"
-                  color="warning"
+                  color="secondary"
                   onClick={handleShowModal}
                   disabled={!id}
                 >

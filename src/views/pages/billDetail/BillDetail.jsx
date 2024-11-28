@@ -74,7 +74,7 @@ function BillDetail() {
   return (
     <div style={{ backgroundColor: 'while' }}>
       <Fab
-        color="primary"
+        color="secondary"
         aria-label="back"
         sx={{
           position: 'fixed',

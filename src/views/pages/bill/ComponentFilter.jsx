@@ -28,14 +28,14 @@ function ComponentFilter(props) {
         <Grid item xs={12} sm={6} container justifyContent="flex-end">
           {/* <Button variant="outlined" color="primary" startIcon={<FileDownload />}></Button> */}
           <Tooltip title="Tải file excel" arrow placement="top">
-            <Button variant="outlined" color="primary" style={{ marginLeft: '10px' }} onClick={handlePrint}>
+            <Button variant="outlined" color="secondary" style={{ marginLeft: '10px' }} onClick={handlePrint}>
               <FileDownload />
             </Button>
           </Tooltip>
           <Tooltip title="Tạo hóa đơn" arrow placement="top">
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               // startIcon={<Add />}
               onClick={() => {
                 navigate('/ban-hang');

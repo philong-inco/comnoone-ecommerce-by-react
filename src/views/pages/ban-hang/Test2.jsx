@@ -601,7 +601,7 @@ function Test2(props) {
           <Box display="flex" alignItems="center" sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
             <Button
               variant="contained"
-              color="warning"
+              color="secondary"
               size="small"
               sx={{ padding: 1, borderRadius: 3, mr: 2 }}
               onClick={() => {
@@ -656,7 +656,7 @@ function Test2(props) {
             Tổng hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
-          <Button variant="contained" color="primary" onClick={openPaymentDialog} disabled={!id}>
+          <Button variant="contained" color="secondary" onClick={openPaymentDialog} disabled={!id}>
             {formData.thanhToanSau == 1 ? 'Xác nhận đặt hàng' : 'Tiến hành thanh toán'}
           </Button>
           <PaymentDialog2 open={isPaymentDialogOpen} onCloseDialog={onClosePaymentDialog} data={formData} onReload={loadAll} />
