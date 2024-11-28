@@ -448,7 +448,7 @@ function SerialNumberSold(props) {
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <Tooltip title="Cập nhập số lượng" placement="top">
-                          <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                          <IconButton color="secondary" onClick={() => handleOpenDialog(product.productDetailId)}>
                             <RemoveCircleOutline />
                           </IconButton>
                         </Tooltip>
@@ -457,6 +457,7 @@ function SerialNumberSold(props) {
                           value={product.quantity}
                           onChange={(e) => handleOpenDialog(product.productDetailId)}
                           inputProps={{ min: 0 }}
+                          color="secondary"
                           sx={{
                             width: 50,
                             height: 30,
@@ -466,7 +467,7 @@ function SerialNumberSold(props) {
                           }}
                         />
                         <Tooltip title="Cập nhập số lượng" placement="top">
-                          <IconButton onClick={() => handleOpenDialog(product.productDetailId)}>
+                          <IconButton color="secondary" onClick={() => handleOpenDialog(product.productDetailId)}>
                             <AddCircleOutline />
                           </IconButton>
                         </Tooltip>
@@ -563,7 +564,14 @@ function SerialNumberSold(props) {
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial</span>
-            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchChange} />
+            <TextField
+              color="secondary"
+              variant="outlined"
+              size="small"
+              label="Tìm kiếm"
+              style={{ marginRight: '16px' }}
+              onChange={handleSearchChange}
+            />
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -606,13 +614,15 @@ function SerialNumberSold(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button color="error" variant="contained" onClick={handleCloseDialog}>
+            Hủy
+          </Button>
           <Button
             onClick={() => {
               handleSubmitSerials();
             }}
             variant="contained"
-            color="primary"
+            color="secondary"
           >
             Xác nhận
           </Button>
@@ -632,7 +642,14 @@ function SerialNumberSold(props) {
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial </span>
-            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchQrChange} />
+            <TextField
+              color="secondary"
+              variant="outlined"
+              size="small"
+              label="Tìm kiếm"
+              style={{ marginRight: '16px' }}
+              onChange={handleSearchQrChange}
+            />
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -683,7 +700,7 @@ function SerialNumberSold(props) {
               handleSubmitSerialsQr();
             }}
             variant="contained"
-            color="primary"
+            color="secondary"
           >
             Xác nhận
           </Button>

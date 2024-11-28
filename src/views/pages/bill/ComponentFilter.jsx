@@ -15,6 +15,7 @@ function ComponentFilter(props) {
       <Grid container spacing={2} className="mb-10">
         <Grid item xs={12} sm={6}>
           <TextField
+            color="secondary"
             fullWidth
             placeholder="Tìm kiếm mã hóa đơn , sdt , email"
             InputProps={{
@@ -52,6 +53,7 @@ function ComponentFilter(props) {
       <Grid container spacing={2}>
         <Grid item xs={6} sm={3}>
           <TextField
+            color="secondary"
             label="Từ ngày"
             type="date"
             name="tuNgay"
@@ -65,6 +67,7 @@ function ComponentFilter(props) {
         </Grid>
         <Grid item xs={6} sm={3}>
           <TextField
+            color="secondary"
             label="Đến ngày"
             name="denNgay"
             type="date"
@@ -82,9 +85,9 @@ function ComponentFilter(props) {
               Loại:
             </FormLabel> */}
             <RadioGroup row defaultValue={''} onChange={handleBillTypeChange} style={{ display: 'flex', flexDirection: 'row' }}>
-              <FormControlLabel value={''} control={<Radio />} label="Tất cả" />
-              <FormControlLabel value={'0'} control={<Radio />} label="Tại quầy" />
-              <FormControlLabel value={'1'} control={<Radio />} label="Online" />
+              <FormControlLabel value={''} control={<Radio color="secondary" />} label="Tất cả" />
+              <FormControlLabel value={'0'} control={<Radio color="secondary" />} label="Tại quầy" />
+              <FormControlLabel value={'1'} control={<Radio color="secondary" />} label="Online" />
             </RadioGroup>
           </FormControl>
         </Grid>

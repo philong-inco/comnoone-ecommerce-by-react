@@ -86,7 +86,7 @@ function BillTable(props) {
               padding: '15px 4px'
             }}
             label={loaiHoaDon == 0 ? 'Tại quầy' : 'Ship'}
-            color={loaiHoaDon == 0 ? 'primary' : 'success'}
+            color={loaiHoaDon == 0 ? 'secondary' : 'success'}
           />
         </Tooltip>
       )
@@ -116,8 +116,8 @@ function BillTable(props) {
       key: 'action',
       render: (text, record) => (
         <>
-          <Tooltip title="Xem chi tiết">
-            <IconButton onClick={() => handleNavigate(record.ma)}>
+          <Tooltip title="Xem chi tiết" placement="top">
+            <IconButton color="secondary" onClick={() => handleNavigate(record.ma)}>
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
@@ -142,7 +142,7 @@ function BillTable(props) {
         allowScrollButtonsMobile
       >
         {tabList.map((tab) => (
-          <Tab key={tab.key} label={tab.label} value={tab.key} sx={{ marginLeft: '10px' }} />
+          <Tab key={tab.key} label={tab.label} value={tab.key} sx={{ marginLeft: '10px', color: '#5F35B2' }} />
         ))}
       </Tabs>
 

@@ -32,7 +32,7 @@ export const getStatusDisplayName = (status) => {
 export const getStatusColor = (status) => {
   switch (status) {
     case 'DON_MOI':
-      return blue[500];
+      return '#5F35B2';
     case 'CHO_THANH_TOAN':
       return orange[500];
     case 'CHO_THANH_TOAN':
@@ -63,7 +63,7 @@ export const getStatusColor = (status) => {
 export const getStatusBillHistoryColor = (status) => {
   switch (status) {
     case 0:
-      return blue[500];
+      return '#5F35B2';
     case 1:
       return orange[500];
     case 2:
