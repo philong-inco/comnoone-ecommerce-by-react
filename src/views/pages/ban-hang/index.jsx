@@ -144,7 +144,7 @@ function Sell() {
     try {
       const response = await changeStatusByCode(selectedCode, 'TREO'); // Sử dụng selectedCode
       if (response.status_code === 201) {
-        setSnackbarMessage('Hủy treo hóa đơn thành công');
+        setSnackbarMessage('Hóa đơn đã chuyển sang trạng thái trờ');
         setSnackbarSeverity('success');
         fetchBillCodes(); // Cập nhật danh sách hóa đơn
       }
@@ -164,12 +164,14 @@ function Sell() {
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
             {tabs.map((tab, index) => (
               <Tab
+                color="secondary"
                 key={tab}
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {tab}
                     <Tooltip title="Treo hóa đơn này" placement="top">
                       <IconButton
+                        color="secondary"
                         onClick={() => {
                           handleClickOpen(tab);
                         }}
@@ -195,10 +197,10 @@ function Sell() {
                     padding: '10px',
                     height: '30px',
                     width: '30px',
-                    border: '2px solid #697586'
+                    border: '2px solid #5F35B2'
                   }}
                 >
-                  <AddIcon onClick={() => handleCreateBill()} sx={{ fontSize: 30 }} />
+                  <AddIcon color="secondary" onClick={() => handleCreateBill()} sx={{ fontSize: 30 }} />
                 </Box>
               }
             />
