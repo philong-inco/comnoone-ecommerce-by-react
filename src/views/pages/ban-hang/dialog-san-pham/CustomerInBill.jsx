@@ -268,7 +268,7 @@ function CustomerInBill(props) {
                           onClick={() => {
                             handleAddCustomerToBill(customer.id);
                           }}
-                          color="primary"
+                          color="secondary"
                           disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
                         >
                           <GridCheckCircleIcon />

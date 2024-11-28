@@ -588,10 +588,9 @@ function Test2(props) {
                 />
               </Grid>
 
-              <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <strong style={{ fontSize: '24px' }}> Phí ship : {formatCurrency(formData.tienShip)}</strong>
-                {/* <strong style={{ fontSize: '24px' }}>Ngày nhận hàng dự kiến : {formData.ngayNhanHangDuKien || ''}</strong> */}
-              </Grid>
+              </Grid> */}
             </Grid>
           ) : (
             <></>
@@ -623,12 +622,12 @@ function Test2(props) {
           </Box>
           <FormControlLabel
             disabled={id ? false : true}
-            control={<Switch checked={isDelivery} onChange={handleSwitchChange} color="primary" />}
+            control={<Switch color="secondary" checked={isDelivery} onChange={handleSwitchChange} />}
             label={isDelivery ? 'Giao hàng' : 'Tại quầy'}
           />
           {isDelivery && (
             <FormControlLabel
-              control={<Switch checked={formData?.thanhToanSau === 1} onChange={handlePaymentSwitchChange} color="primary" />}
+              control={<Switch checked={formData?.thanhToanSau === 1} onChange={handlePaymentSwitchChange} color="secondary" />}
               label={'Trả sau'}
             />
           )}
@@ -644,7 +643,7 @@ function Test2(props) {
           {/* <Typography mt={1} variant="h4">
             Giảm hạng: - {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
           </Typography> */}
-          <Typography mt={1} variant="h4" fontWeight="bold" color="error">
+          <Typography mt={1} variant="h4" fontWeight="bold">
             Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           {isDelivery && (
@@ -652,7 +651,7 @@ function Test2(props) {
               Tiền ship: + {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} đ
             </Typography>
           )}
-          <Typography mt={1} variant="h4" fontWeight="bold" color="error">
+          <Typography mt={1} variant="h4" fontWeight="bold">
             Tổng hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>

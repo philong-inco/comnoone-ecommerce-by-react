@@ -121,7 +121,7 @@ function CouponDiaLog(props) {
                             handleAddCouponToBill(coupon.id);
                           }}
                           variant="contained"
-                          color="primary"
+                          color="secondary"
                           disabled={bill.idPhieuGiamGia === coupon.id ? true : false || false}
                         >
                           <GridCheckCircleIcon />

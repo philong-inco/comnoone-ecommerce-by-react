@@ -25,7 +25,7 @@ import {
   Button,
   Tooltip
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   findSerialNumberByProductCodeAndCodeSerialAndBillCode,
@@ -294,6 +294,23 @@ function SerialNumberSold(props) {
   const handleErrorQR = (err) => {
     console.error(err);
   };
+
+  const qrScannerRef = useRef(null); // Tạo ref để tham chiếu đến QrScanner
+
+  // Khi mở và đóng Dialog, chúng ta có thể dừng và khởi động lại quét QR
+  useEffect(() => {
+    if (!openQR && qrScannerRef.current) {
+      // Tắt camera khi đóng Dialog
+      qrScannerRef.current.stop();
+    }
+
+    return () => {
+      if (qrScannerRef.current) {
+        // Dọn dẹp khi component bị hủy
+        qrScannerRef.current.stop();
+      }
+    };
+  }, [openQR]);
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 2, borderRadius: 4 }}>
@@ -309,9 +326,9 @@ function SerialNumberSold(props) {
               >
                 Mowr
               </Button> */}
-              {/* <Tooltip title="Quét Qr sản phẩm" placement="top">
+              <Tooltip title="Quét Qr sản phẩm" placement="top">
                 <IconButton
-                  color="primary"
+                  color="secondary"
                   aria-label="quét QR"
                   onClick={handleClickOpenQR}
                   hidden={
@@ -324,7 +341,7 @@ function SerialNumberSold(props) {
                 >
                   <CropFreeOutlinedIcon />
                 </IconButton>
-              </Tooltip> */}
+              </Tooltip>
 
               <Tooltip title="Thêm sản phẩm" placement="top">
                 <Button
@@ -675,33 +692,33 @@ function SerialNumberSold(props) {
 
       <Dialog open={openQR} onClose={handleCloseQR} maxWidth="sm" fullWidth>
         <DialogTitle>Quét Mã QR</DialogTitle>
-        {/* <DialogActions>
-          <Button onClick={handleCloseQR} color="primary">
-            Đóng
-          </Button>
-        </DialogActions> */}
         <DialogContent>
-          <QrScanner
-            // onScan={handleScanQR}
-            onResult={(result, error) => {
-              console.log('Kết quả:', result);
-              console.log('Lỗi:', error);
-              if (!!result) {
-                handleScanQR(result?.text);
-              }
+          <div>
+            <QrScanner
+              ref={qrScannerRef}
+              onScan={(result, error) => {
+                console.log('Kết quả:', result);
+                console.log('Lỗi:', error);
 
-              if (!!error) {
-                console.error('Lỗi quét QR:', error); // Log lỗi nếu có
-              }
-            }}
-            onError={handleErrorQR}
-            style={{ width: '100%' }}
-          />
-          {dataQR && (
-            <Typography variant="h6" style={{ marginTop: '20px' }}>
-              Dữ liệu quét được (QR): {dataQR}
-            </Typography>
-          )}
+                if (result) {
+                  handleScanQR(result); // Gọi hàm xử lý quét thành công
+                }
+
+                if (error) {
+                  // Nếu có lỗi quét
+                  handleErrorQR(error); // Gọi hàm xử lý lỗi
+                }
+              }}
+              onError={handleErrorQR} // Xử lý lỗi nếu có
+              style={{ width: '100%' }} // Đảm bảo camera quét chiếm toàn bộ chiều rộng
+            />
+            {dataQR && (
+              <div>
+                <h3>Mã QR quét được:</h3>
+                <p>{dataQR}</p> {/* Hiển thị mã QR quét được */}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
       <Snackbar
