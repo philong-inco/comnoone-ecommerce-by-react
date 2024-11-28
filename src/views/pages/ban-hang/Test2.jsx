@@ -459,6 +459,7 @@ function Test2(props) {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  color="secondary"
                   label="Tên của bạn"
                   id="ten"
                   placeholder="Nhập tên của bạn"
@@ -475,6 +476,7 @@ function Test2(props) {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  color="secondary"
                   label="Số điện thoại"
                   id="sdt"
                   placeholder="Nhập số điện thoại"
@@ -492,6 +494,7 @@ function Test2(props) {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
+                  color="secondary"
                   label="Email"
                   id="email"
                   placeholder="Nhập email"
@@ -509,6 +512,7 @@ function Test2(props) {
 
               <Grid item xs={12}>
                 <TextField
+                  color="secondary"
                   label="Địa chỉ giao hàng"
                   id="diaChi"
                   placeholder="Nhập địa chỉ giao hàng"
@@ -527,7 +531,14 @@ function Test2(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="tinh-label">Tỉnh/Thành Phố</InputLabel>
-                  <Select labelId="tinh-label" id="tinh" value={formData.tinh} onChange={handleProvinceChange} error={!!formDataError.tinh}>
+                  <Select
+                    color="secondary"
+                    labelId="tinh-label"
+                    id="tinh"
+                    value={formData.tinh}
+                    onChange={handleProvinceChange}
+                    error={!!formDataError.tinh}
+                  >
                     <MenuItem value="" disabled>
                       Chọn Tỉnh/Thành Phố
                     </MenuItem>
@@ -544,7 +555,7 @@ function Test2(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="huyen-label">Quận/Huyện</InputLabel>
-                  <Select labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
+                  <Select color="secondary" labelId="huyen-label" id="huyen" value={formData.huyen} onChange={handleDistrictChange}>
                     <MenuItem value="">Chọn Quận/Huyện</MenuItem>
                     {districts.map((district) => (
                       <MenuItem key={district.DistrictID} value={district.DistrictID}>
@@ -559,7 +570,7 @@ function Test2(props) {
               <Grid item xs={12} sm={4}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="phuong-label">Phường/Xã</InputLabel>
-                  <Select labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
+                  <Select color="secondary" labelId="phuong-label" id="phuong" value={formData.phuong} onChange={handleWardChange}>
                     <MenuItem value="">Chọn Phường/Xã</MenuItem>
                     {wards.map((ward) => (
                       <MenuItem key={ward.WardCode} value={ward.WardCode}>
@@ -573,6 +584,7 @@ function Test2(props) {
 
               <Grid item xs={12}>
                 <TextField
+                  color="secondary"
                   label="Ghi chú"
                   id="ghiChu"
                   placeholder="Ghi chú"

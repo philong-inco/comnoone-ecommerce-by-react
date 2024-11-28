@@ -202,6 +202,7 @@ function CustomerInBill(props) {
                   style={{ width: '50%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                 /> */}
                 <TextField
+                  color="secondary"
                   type="text"
                   placeholder="Số điện thoại"
                   name="sdt"
