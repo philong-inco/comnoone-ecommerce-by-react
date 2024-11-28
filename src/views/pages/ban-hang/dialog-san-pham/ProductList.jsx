@@ -607,8 +607,7 @@ const ProductList = (props) => {
                               <TableCell key={column.id} align={column.align}>
                                 <Button
                                   variant="contained"
-                                  color="primary"
-                                  //  onClick={loadProductInBill}
+                                  color="secondary" //  onClick={loadProductInBill}
                                   onClick={() => handleOpenDialog(row.id)}
                                 >
                                   Chọn serial
@@ -666,7 +665,14 @@ const ProductList = (props) => {
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Danh sách serial</span>
-            <TextField variant="outlined" size="small" label="Tìm kiếm" style={{ marginRight: '16px' }} onChange={handleSearchChange} />
+            <TextField
+              color="secondary"
+              variant="outlined"
+              size="small"
+              label="Tìm kiếm"
+              style={{ marginRight: '16px' }}
+              onChange={handleSearchChange}
+            />
           </Box>
         </DialogTitle>
         <DialogContent>
@@ -708,13 +714,15 @@ const ProductList = (props) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button color="error" variant="contained" onClick={handleCloseDialog}>
+            Hủy
+          </Button>
           <Button
             onClick={() => {
               handleSubmitSerials();
             }}
             variant="contained"
-            color="primary"
+            color="secondary"
           >
             Xác nhận
           </Button>
