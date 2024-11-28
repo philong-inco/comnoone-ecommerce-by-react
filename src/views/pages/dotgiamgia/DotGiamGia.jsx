@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Switch, TablePagination, 
+    Switch, TablePagination,
     FormControl, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
     TextField, Grid, IconButton, Tooltip, Box, Table, TableBody, Fab, InputAdornment, InputLabel,
     TableCell, TableContainer, TableHead, TableRow, Paper, Button, Snackbar, Alert, MenuItem, Select
@@ -11,7 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import { listDotGiamGia, startDGG, stopDPGG, deleteDGG } from 'services/admin/coupons/dotGiamGiaService';
+import { listDotGiamGia, startDGG, stopDPGG, deleteDGG, CheckStatus } from 'services/admin/coupons/dotGiamGiaService';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
 function DotGiamGia() {
@@ -53,12 +53,21 @@ function DotGiamGia() {
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            fetchCoupons(false); // Không áp dụng bộ lọc khi tải lại định kỳ
+            fetchCoupons(false);
         }, 2000);
+        return () => clearInterval(intervalId);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const i = 1;
+            console.log("Check status: " + i);
+            CheckStatus();
+        }, 5000);
 
         return () => clearInterval(intervalId);
     }, []);
-    
+
     useEffect(() => {
         fetchCoupons();
     }, [currentPage, size, filters]);
@@ -71,9 +80,9 @@ function DotGiamGia() {
     };
 
     const handlePageChange = (event, newPage) => {
-        setCurrentPage(newPage + 1); 
+        setCurrentPage(newPage + 1);
     };
-    
+
     const handleRowsPerPageChange = (event) => {
         setSize(parseInt(event.target.value, 10));
         setCurrentPage(1);

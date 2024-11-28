@@ -88,3 +88,13 @@ export const deleteDGG = async (id) => {
     throw error;
   }
 };
+
+
+export const CheckStatus = async () =>{
+  try {
+    const response = await axios.put('http://localhost:8080/api/v1/discounts/checkupdatestatus');
+    return response;
+  } catch (error){
+    console.log('Error check status :', error);
+  }
+}

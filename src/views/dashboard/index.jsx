@@ -425,7 +425,6 @@ const Dashboard = () => {
       if (result && result.data) {
         setTotalPriceMounthNow(result.data || 0);
         console.log(result.data.totalPrice);
-
       } else {
         setTotalPriceMounthNow(0);
       }
