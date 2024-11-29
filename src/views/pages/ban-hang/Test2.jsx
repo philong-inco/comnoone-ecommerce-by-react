@@ -403,7 +403,7 @@ function Test2(props) {
 
   const fetchInvoicePdf = async (code) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${code}`, {
+      const response = await fetch(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/bills/order-pdf/${code}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/pdf'
