@@ -206,7 +206,7 @@ function NhanVienConfiguration() {
 
   const fetchNhanVien = async (id) => {
     try {
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/nhan_vien/${id}`);
+      const response = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
       const nhanVienData = response.data;
       const gioiTinhString = nhanVienData.gioiTinh !== undefined ? nhanVienData.gioiTinh.toString() : '1';
       console.log('Giới tính sau khi convert: ', gioiTinhString);
@@ -336,7 +336,7 @@ function NhanVienConfiguration() {
       formData.list_vai_tro = ['STAFF'];
 
       await schema.validate(formData);
-      const url = id ? `https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/nhan_vien/update/${id}` : 'https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/nhan_vien/create';
+      const url = id ? `http://localhost:8080/api/nhan_vien/update/${id}` : 'http://localhost:8080/api/nhan_vien/create';
       const method = id ? 'put' : 'post';
 
       const response = await axios({

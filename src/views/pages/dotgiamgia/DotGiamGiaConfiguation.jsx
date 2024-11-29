@@ -299,10 +299,10 @@ function DotGiamGiaConfiguration() {
 
         let response;
         if (id) {
-          response = await axios.put(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/v1/discounts/update/${id}`, data);
+          response = await axios.put(`http://localhost:8080/api/v1/discounts/update/${id}`, data);
           setSnackbar({ open: true, message: 'Đợt giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
-          response = await axios.post('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/v1/discounts/add', data);
+          response = await axios.post('http://localhost:8080/api/v1/discounts/add', data);
           setSnackbar({ open: true, message: 'Đợt giảm giá đã được tạo thành công!', severity: 'success' });
         }
 
@@ -346,7 +346,7 @@ function DotGiamGiaConfiguration() {
   const fetchDggDetail = async () => {
     try {
       debugger;
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/v1/discounts/${id}`);
+      const response = await axios.get(`http://localhost:8080/api/v1/discounts/${id}`);
       const data = response.data;
 
       formik.setValues({
@@ -366,7 +366,7 @@ function DotGiamGiaConfiguration() {
       const sanPhamChiTietData = await Promise.all(
         sanPhamChiTietIds.map(async (idSanPhamChiTiet) => {
           const spctResponse = await axios.get(
-            `https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSanPhamChiTiet}`
+            `http://localhost:8080/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSanPhamChiTiet}`
           );
           return spctResponse.data.data;
         })
@@ -439,7 +439,7 @@ function DotGiamGiaConfiguration() {
     setResetFilter((prev) => prev + 1);
   };
 
-  const urlFindFilter = 'https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/san-pham/find/filter-id?';
+  const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
   const [filter, setFilter] = useState({
     page: 0,
     size: '5',

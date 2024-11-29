@@ -36,7 +36,7 @@ export const getAllSanPham = async () => {
 
 export const getAllForExcel = async (filterCurrent) => {
     try {
-        const urlFindFilter = 'https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/san-pham/find/filter-id?';
+        const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
        
         filterCurrent.size = '99999';
         const queryString = Object.entries(filterCurrent)
