@@ -1,6 +1,7 @@
 import axios from "axios"
 import { backEndUrl } from "utils/back-end"
 const path = 'san-pham-chi-tiet'
+import { get, post, put, del } from "utils/requestSanPham"
 
 export const createSanPhamChiTiet = async ({
     giaBan,
@@ -20,8 +21,7 @@ export const createSanPhamChiTiet = async ({
 
 }) => {
     try {
-        
-        const res = await axios.post(`${backEndUrl}/${path}/add`, {
+        const res = await post(`${path}/add`, {
             giaBan,
             trangThai,
             banPhimId,
@@ -59,7 +59,7 @@ export const checkToAdd = async ({
     ocungId
 }) => {
     try {
-        const res = await axios.post(`${backEndUrl}/${path}/valid-for-add`, {
+        const res = await post(`${path}/valid-for-add`, {
             giaBan,
             trangThai,
             banPhimId,

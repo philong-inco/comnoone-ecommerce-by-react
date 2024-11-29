@@ -1,6 +1,7 @@
 import axios from "axios"
 import { backEndUrl } from "utils/back-end"
 const path = 'cpu'
+import { get, post, put, del } from "utils/requestSanPham"
 
 export const createNewRam = async ({
     ten,
@@ -9,7 +10,7 @@ export const createNewRam = async ({
     trangThai
 }) => {
     try {
-        const res = await axios.post(`${backEndUrl}/${path}/add`, {
+        const res = await post(`${path}/add`, {
             ten,
             dongCPU,
             nhaSanXuat,
@@ -27,7 +28,7 @@ export const getRams = async ({
     size
 }) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/all?page=${page}&limit=${size}`)
+        const res = await get(`${path}/all?page=${page}&limit=${size}`)
 
         return res
     } catch (error) {
@@ -49,7 +50,7 @@ export const filterRam = async ({
         queryStr += (name === undefined) ? '' : '&name=' + name;
         queryStr += (trangThai === undefined) ? '' : '&trangThai=' + trangThai;
         console.log('queryStr: ', queryStr);
-        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?${queryStr}`);
+        const res = await get(`${path}/find/filter-id?${queryStr}`);
         return res
     } catch (error) {
         console.log('Error filterRam', error);
@@ -60,7 +61,7 @@ export const deleteRam = async ({
     id
 }) => {
     try {
-        const res = await axios.delete(`${backEndUrl}/${path}/delete/${id}`)
+        const res = await del(`${path}/delete/${id}`)
 
         return res
     } catch (error) {
@@ -76,7 +77,7 @@ export const updateRam = async ({
     trangThai
 }) => {
     try {
-        const res = await axios.put(`${backEndUrl}/${path}/update/${id}`, {
+        const res = await put(`${path}/update/${id}`, {
             id,
             ten,
             dongCPU,
@@ -92,7 +93,7 @@ export const updateRam = async ({
 
 export const IsValidAdd = async (name) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/exist-name?name=${name}`)
+        const res = await get(`${path}/exist-name?name=${name}`)
         const result = res.data.data;
         if (result){
             return false;
@@ -105,7 +106,7 @@ export const IsValidAdd = async (name) => {
 
 export const IsValidUpdate = async (name, id) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/exist-name-diff-id?name=${name}&id=${id}`)
+        const res = await get(`${path}/exist-name-diff-id?name=${name}&id=${id}`)
         const result = res.data.data;
         if (result){
             return false;
