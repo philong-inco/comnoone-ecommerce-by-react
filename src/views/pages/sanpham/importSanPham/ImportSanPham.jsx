@@ -279,8 +279,8 @@ const ImportSanPham = () => {
             const worksheetProduct = workbook.Sheets[sheetProduct];
             const jsonDataProduct = XLSX.utils.sheet_to_json(worksheetProduct); // tạo json từ sheet
             const listNewProduct = jsonDataProduct.map((data, index) => { // map nhu cau va thuong hieu vao
-                const nhuCauInfo = nhuCau.find(nc => nc.ten.toLowerCase() === data.nhuCau.toLowerCase())
-                const thuongHieuInfo = thuongHieu.find(nc => nc.ten.toLowerCase() === data.thuongHieu.toLowerCase())
+                const nhuCauInfo = nhuCau.find(nc => nc.ten.trim().toLowerCase() === data.nhuCau.trim().toLowerCase())
+                const thuongHieuInfo = thuongHieu.find(nc => nc.ten.trim().toLowerCase() === data.thuongHieu.trim().toLowerCase())
 
                 return {
                     ...data,
@@ -459,6 +459,7 @@ const ImportSanPham = () => {
 
     // hàm add sản phẩm
     const addMultiProduct = async () => {
+        try{
         const requests = sanphams.map(item => {
             return createSanPham({
                 moTa: item.moTa,
@@ -495,7 +496,7 @@ const ImportSanPham = () => {
                 alert(`Thêm sản phẩm thứ ${index + 1} thất bại: ${result.reason.message || result.reason}`);
             }
         });
-        try{
+        
             const requestsBienThe = bienThes.map(item => {
                 for(const response of successList) {
                     if(response.ten === item.sanPhamInfo.ten){
@@ -518,14 +519,7 @@ const ImportSanPham = () => {
                     }
                 }
             });
-        }catch(error){
-           if (error.status == 403){
-              alert("Không đủ quyền thực hiện chức năng này")
-           }
-           if (error.status == 401){
-              navigate(`/login`);
-           }
-        }
+        
         
 
         errorListNoti = [];
@@ -553,6 +547,14 @@ const ImportSanPham = () => {
             }
         });
         return resultsBienThe;
+    }catch(error){
+        if (error.status == 403){
+           alert("Không đủ quyền thực hiện chức năng này")
+        }
+        if (error.status == 401){
+           navigate(`/login`);
+        }
+     }
     };
 
     const [messCheck, setMessCheck] = useState('');
