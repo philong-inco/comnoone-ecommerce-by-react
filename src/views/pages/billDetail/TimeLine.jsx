@@ -110,7 +110,7 @@ function NewTimeLine(props) {
   const columns = [
     { id: 'stt', label: 'STT' },
     { id: 'ngayTao', label: 'Thời gian', minWidth: 100, maxWidth: 250 },
-    { id: 'nguoiSua', label: 'Người chỉnh sửa', minWidth: 100, maxWidth: 150 },
+    { id: 'nguoiTao', label: 'Người thực hiện', minWidth: 100, maxWidth: 150 },
     { id: 'ghiChuChoCuaHang', label: 'Ghi chú của hàng', minWidth: 150, maxWidth: 200 },
     { id: 'ghiChuChoKhachHang', label: 'Ghi chú khách hàng', minWidth: 150, maxWidth: 200 },
     { id: 'trangThai', label: 'Trạng Thái', minWidth: 120, maxWidth: 150 }
@@ -158,18 +158,37 @@ function NewTimeLine(props) {
         onLoading();
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        const messages = error.response.data.message;
-        const minError = messages.reduce((prev, curr) => {
-          return prev.error_code < curr.error_code ? prev : curr;
-        });
-        setErrorMessages({
-          [minError.field]: minError.messages
-        });
+      // if (error.response && error.response.data) {
+      //   const messages = error.response.data.message;
+      //   const minError = messages.reduce((prev, curr) => {
+      //     return prev.error_code < curr.error_code ? prev : curr;
+      //   });
+      //   setErrorMessages({
+      //     [minError.field]: minError.messages
+      //   });
+      // }
+      const messages = error.response.data.message;
+      console.log(messages);
+
+      if (Array.isArray(messages)) {
+        // Nếu là mảng
+        if (messages.length > 0) {
+          const minError = messages.reduce((prev, curr) => {
+            return prev.error_code < curr.error_code ? prev : curr;
+          });
+          setErrorMessages({
+            [minError.field]: minError.messages
+          });
+          console.log('Error nhỏ nhất:', minError);
+        } else {
+          console.log('Messages là mảng rỗng');
+        }
+      } else {
+        setSnackbarMessage(messages);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        console.log('Messages không hợp lệ');
       }
-      setSnackbarMessage(error.data.message.data.message);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
     }
   };
 
@@ -186,7 +205,9 @@ function NewTimeLine(props) {
         onLoading();
       }
     } catch (error) {
-      setSnackbarMessage('Cập trạng thái hóa đơn thất bại !');
+      console.log(error);
+
+      setSnackbarMessage(error.response.data.message);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       console.log(error);
@@ -491,7 +512,7 @@ function NewTimeLine(props) {
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell style={{ minWidth: columns[0].minWidth, maxWidth: columns[0].maxWidth }}>{row.ngayTao}</TableCell>
-                    <TableCell style={{ minWidth: columns[1].minWidth, maxWidth: columns[1].maxWidth }}>{row.nguoiSua}</TableCell>
+                    <TableCell style={{ minWidth: columns[1].minWidth, maxWidth: columns[1].maxWidth }}>{row.nguoiTao}</TableCell>
 
                     <TableCell
                       style={{
