@@ -12,9 +12,11 @@ import { margin } from '@mui/system';
 import { element } from 'prop-types';
 import { IconTrash } from '@tabler/icons-react';
 import { backEndUrl } from '../../../../utils/back-end.js';
-
+import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
   const [variantList, setVariantList] = useState([]);
+  const navigate = useNavigate();
   const combinedKey = (index, variant) => {
     let result = '';
     for (let i = index; i >= 0; i--) {
@@ -216,8 +218,14 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
     async function isUniqueSerial(serial) {
       let isExistSeri = null; // chưa tồn tại API trả về false
       try {
-        isExistSeri = await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serial}`);
+        isExistSeri = await get(`/serial-number/exist-for-add?ma=${serial}`);
       } catch (error) {
+        if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
         if (error.response) {
           isExistSeri = error.response.data;
         }

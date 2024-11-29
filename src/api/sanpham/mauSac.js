@@ -1,6 +1,7 @@
 import axios from "axios"
 import { backEndUrl } from "utils/back-end"
 const path = 'mau-sac'
+import { get, post, put, del } from "utils/requestSanPham"
 
 export const createNewRam = async ({
     ten,
@@ -9,7 +10,7 @@ export const createNewRam = async ({
     trangThai
 }) => {
     try {
-        const res = await axios.post(`${backEndUrl}/${path}/add`, {
+        const res = await post(`${path}/add`, {
             ten,
             dungLuong,
             tocDoBus,
@@ -19,6 +20,7 @@ export const createNewRam = async ({
         return res?.data?.data
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
@@ -27,11 +29,12 @@ export const getRams = async ({
     size
 }) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/all?page=${page}&limit=${size}`)
+        const res = await get(`${path}/all?page=${page}&limit=${size}`)
 
         return res
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
@@ -49,10 +52,11 @@ export const filterRam = async ({
         queryStr += (name === undefined) ? '' : '&name=' + name;
         queryStr += (trangThai === undefined) ? '' : '&trangThai=' + trangThai;
         console.log('queryStr: ', queryStr);
-        const res = await axios.get(`${backEndUrl}/${path}/find/filter-id?${queryStr}`);
+        const res = await get(`${path}/find/filter-id?${queryStr}`);
         return res
     } catch (error) {
         console.log('Error filterRam', error);
+        throw error
     }
 }
 
@@ -60,11 +64,12 @@ export const deleteRam = async ({
     id
 }) => {
     try {
-        const res = await axios.delete(`${backEndUrl}/${path}/delete/${id}`)
+        const res = await del(`${path}/delete/${id}`)
 
         return res
     } catch (error) {
         console.log('Error deleteRam', error);
+        throw error
     }
 }
 
@@ -76,7 +81,7 @@ export const updateRam = async ({
     trangThai
 }) => {
     try {
-        const res = await axios.put(`${backEndUrl}/${path}/update/${id}`, {
+        const res = await put(`${path}/update/${id}`, {
             id,
             ten,
             dungLuong,
@@ -87,12 +92,13 @@ export const updateRam = async ({
         return res
     } catch (error) {
         console.log('Error updateRam', error);
+        throw error
     }
 }
 
 export const IsValidAdd = async (name) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/exist-name?name=${name}`)
+        const res = await get(`${path}/exist-name?name=${name}`)
         const result = res.data.data;
         if (result){
             return false;
@@ -100,12 +106,13 @@ export const IsValidAdd = async (name) => {
         return true;
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
 export const IsValidUpdate = async (name, id) => {
     try {
-        const res = await axios.get(`${backEndUrl}/${path}/exist-name-diff-id?name=${name}&id=${id}`)
+        const res = await get(`${path}/exist-name-diff-id?name=${name}&id=${id}`)
         const result = res.data.data;
         if (result){
             return false;
@@ -113,5 +120,6 @@ export const IsValidUpdate = async (name, id) => {
         return true;
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }

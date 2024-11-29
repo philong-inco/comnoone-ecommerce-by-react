@@ -26,12 +26,14 @@ import { useEffect } from 'react';
 import AlbumImageForUpdateSPCT from './AlbumImageForUpdateSPCT';
 import { IconReload } from '@tabler/icons-react';
 import { backEndUrl } from '../../../../utils/back-end';
-
+import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, idSP, idSPCT, setListSPCT, listImg }) {
+  const navigate = useNavigate();
   const [listSeriTemp, setListSeriTemp] = React.useState([]);
   const [addSeriStr, setAddSeriStr] = React.useState('');
 
@@ -54,25 +56,55 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
   };
 
   const removeSeri = async (id) => {
-    if (!confirm('Xác nhận xóa?')) {
-      return;
+    try{
+      if (!confirm('Xác nhận xóa?')) {
+        return;
+      }
+      await del(`/serial-number/delete/${id}`);
+      let removeSeriListNew = listSeriTemp.filter((x) => x.id != id);
+      setListSeriTemp(removeSeriListNew);
+      loadDataSpceAfter();
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
     }
-    await axios.delete(`${backEndUrl}/serial-number/delete/${id}`);
-    let removeSeriListNew = listSeriTemp.filter((x) => x.id != id);
-    setListSeriTemp(removeSeriListNew);
-    loadDataSpceAfter();
+    
   };
 
   const loadDataSpceAfter = async () => {
-    const dataSpctAfter = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
-    console.log('dataSpctAfter: ', dataSpctAfter);
-    setListSPCT(dataSpctAfter.data.data);
+    try{
+      const dataSpctAfter = await get(`/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
+      console.log('dataSpctAfter: ', dataSpctAfter);
+      setListSPCT(dataSpctAfter.data.data);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   };
 
   const loadSeriList = async () => {
-    const seriGetAgain = await axios.get(`${backEndUrl}/serial-number/find-by-spct-id/${idSPCT}`);
+    try{
+      const seriGetAgain = await get(`/serial-number/find-by-spct-id/${idSPCT}`);
 
-    setListSeriTemp(seriGetAgain.data.data);
+      setListSeriTemp(seriGetAgain.data.data);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+   
   };
 
   const handleWriteSerial = (e) => {
@@ -94,51 +126,61 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
   };
 
   const handleAddSeri = async () => {
-    console.log('addSeriStr: ', addSeriStr);
-    const seriConverted = addSeriStr.split(',').filter((x) => x.trim() !== '');
-    console.log('seriConverted: ', seriConverted);
-    let seriDuplicated = '';
-    let isDulicate = false;
-    let checkValidate = validateSeriLength(seriConverted);
-    if (!checkValidate) {
-      alert('Quy ước SerialNumber cho phép 7-20 ký tự liền nhau và không có ký tự đặc biệt');
-      return;
-    }
-    for (let i = 0; i < seriConverted.length; i++) {
-      let seri = seriConverted[i];
-      const check = await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${seri}`);
-      if (check.data.data) {
-        seriDuplicated = seriDuplicated + seri + ', ';
-        isDulicate = true;
+    try{
+      console.log('addSeriStr: ', addSeriStr);
+      const seriConverted = addSeriStr.split(',').filter((x) => x.trim() !== '');
+      console.log('seriConverted: ', seriConverted);
+      let seriDuplicated = '';
+      let isDulicate = false;
+      let checkValidate = validateSeriLength(seriConverted);
+      if (!checkValidate) {
+        alert('Quy ước SerialNumber cho phép 7-20 ký tự liền nhau và không có ký tự đặc biệt');
+        return;
       }
-    }
-
-    let setSeri = new Set();
-    for (let i = 0; i < seriConverted.length; i++) {
-      setSeri.add(seriConverted[i].toLowerCase());
-    }
-    if (setSeri.size != seriConverted.length) {
-      alert('Seri bị trùng lặp trong danh sách đang nhập');
-      return;
-    }
-
-    if (isDulicate) {
-      alert('Seri bị trùng lặp: ' + seriDuplicated.substring(0, seriDuplicated.length - 2));
-      return;
-    } else {
       for (let i = 0; i < seriConverted.length; i++) {
-        let seriAdd = {
-          trangThai: 0,
-          ma: seriConverted[i],
-          ngayNhap: new Date().toISOString(),
-          sanPhamChiTietId: idSPCT
-        };
-        await axios.post(`${backEndUrl}/serial-number/add`, seriAdd);
+        let seri = seriConverted[i];
+        const check = await get(`/serial-number/exist-for-add?ma=${seri}`);
+        if (check.data.data) {
+          seriDuplicated = seriDuplicated + seri + ', ';
+          isDulicate = true;
+        }
       }
-      alert('Thêm seri thành công');
-      loadSeriList();
-      loadDataSpceAfter();
+  
+      let setSeri = new Set();
+      for (let i = 0; i < seriConverted.length; i++) {
+        setSeri.add(seriConverted[i].toLowerCase());
+      }
+      if (setSeri.size != seriConverted.length) {
+        alert('Seri bị trùng lặp trong danh sách đang nhập');
+        return;
+      }
+  
+      if (isDulicate) {
+        alert('Seri bị trùng lặp: ' + seriDuplicated.substring(0, seriDuplicated.length - 2));
+        return;
+      } else {
+        for (let i = 0; i < seriConverted.length; i++) {
+          let seriAdd = {
+            trangThai: 0,
+            ma: seriConverted[i],
+            ngayNhap: new Date().toISOString(),
+            sanPhamChiTietId: idSPCT
+          };
+          await post(`/serial-number/add`, seriAdd);
+        }
+        alert('Thêm seri thành công');
+        loadSeriList();
+        loadDataSpceAfter();
+      }
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
     }
+    
 
     // validate và gọi API get
   };
@@ -168,37 +210,57 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
   }, [idSPCT]);
 
   const loadBienThe = async () => {
-    const spctResult = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSPCT}`);
-    console.log('spctResult: ', spctResult);
-    const bt = spctResult.data.data;
-
-    const qrValue = await axios.get(`${backEndUrl}/san-pham-chi-tiet/qr-code?value=${bt.ma}`);
-    console.log('qrValue: ', qrValue);
-    setQr(qrValue.data);
-    const arrImg = bt.listUrlAnhSanPham.split(',');
-    bt.listUrlAnhSanPham = arrImg;
-
-    const temp = {
-      id: idSPCT,
-      giaBan: bt.giaBan,
-      listUrlAnhSanPham: arrImg
-    };
-    setBienThe(temp);
+    try{
+      const spctResult = await get(`/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSPCT}`);
+      console.log('spctResult: ', spctResult);
+      const bt = spctResult.data.data;
+  
+      const qrValue = await get(`/san-pham-chi-tiet/qr-code?value=${bt.ma}`);
+      console.log('qrValue: ', qrValue);
+      setQr(qrValue.data);
+      const arrImg = bt.listUrlAnhSanPham.split(',');
+      bt.listUrlAnhSanPham = arrImg;
+  
+      const temp = {
+        id: idSPCT,
+        giaBan: bt.giaBan,
+        listUrlAnhSanPham: arrImg
+      };
+      setBienThe(temp);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   };
 
   const [openAlbum, setOpenAlbum] = useState(false);
 
   const handleUpdateSPCT = async () => {
-    if (bienThe.giaBan == 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined) {
-      alert('Điền đủ thông tin');
-    } else {
-      try {
-        await axios.put(`${backEndUrl}/san-pham-chi-tiet/update-price-image`, bienThe);
-        alert('Sửa thành công');
-      } catch (error) {
-        alert('Sửa thất bại');
+    try{
+      if (bienThe.giaBan == 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined) {
+        alert('Điền đủ thông tin');
+      } else {
+        try {
+          await put(`/san-pham-chi-tiet/update-price-image`, bienThe);
+          alert('Sửa thành công');
+        } catch (error) {
+          alert('Sửa thất bại');
+        }
       }
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
     }
+    
   };
 
   return (

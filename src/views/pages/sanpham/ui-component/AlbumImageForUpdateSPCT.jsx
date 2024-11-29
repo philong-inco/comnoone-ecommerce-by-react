@@ -18,12 +18,14 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { backEndUrl } from '../../../../utils/back-end';
-
+import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
 const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
+  const navigate = useNavigate();
 
     const [listAnhTemp, setListAnhTemp] = useState([]);
     useEffect(() => {
@@ -38,8 +40,18 @@ const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
     }, [listCurrent])
 
     const loadAllAnh = async () => {
-        const temp = await axios.get(`${backEndUrl}/anh-san-pham/list`);
+      try{
+        const temp = await get(`/anh-san-pham/list`);
         setListAnhTemp(temp.data.data);
+      }catch(error){
+         if (error.status == 403){
+            alert("Không đủ quyền thực hiện chức năng này")
+         }
+         if (error.status == 401){
+            navigate(`/login`);
+         }
+      }
+       
     }
 
     // anh selected

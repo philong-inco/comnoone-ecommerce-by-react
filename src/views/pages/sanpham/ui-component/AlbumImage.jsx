@@ -17,12 +17,14 @@ import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { backEndUrl } from '../../../../utils/back-end';
-
+import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
 const AlbumImage = ({openAlbum, setOpenAlbum, listAnh, nameColor, idColor, onUpdateImage}) => {
+  const navigate = useNavigate();
 
     const [listAnhTemp, setListAnhTemp] = useState([]);
     useEffect(() => {

@@ -11,10 +11,11 @@ import { backEndUrl } from 'utils/back-end';
 import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/cpu';
 import ModalUpdate from './components/ModalUpdate';
 import TransitionsModal from './components/ModalCreate';
-
+import { useNavigate } from 'react-router-dom';
 
 
 const DanhSachCpu = () => {
+  const navigate = useNavigate();
   const columns = [
     
     { id: 'ma', label: 'Mã', minWidth: 70 },
@@ -41,12 +42,22 @@ const DanhSachCpu = () => {
   }, [filter])
 
   const fetchData = async () => {
-    const data = await filterRam(filter);
-    setData(data.data.data);
-    setPageInfo(prev => ({
-      ...prev, pageNo: data.data.pageNo, pageSize: data.data.pageSize, 
-      totalPage:data.data.totalPage, totalElement:data.data.totalElement
-    }))
+    try{
+      const data = await filterRam(filter);
+      setData(data.data.data);
+      setPageInfo(prev => ({
+        ...prev, pageNo: data.data.pageNo, pageSize: data.data.pageSize, 
+        totalPage:data.data.totalPage, totalElement:data.data.totalElement
+      }))
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   }
 
   
@@ -80,7 +91,17 @@ const suaTrangThai = async (id, status) => {
   console.log('temp: ', temp);
   let temp1 = {...temp, trangThai: status}
   console.log('temp1: ', temp1);
-  await updateRam(temp1);
+  
+  try{
+    await updateRam(temp1);
+  }catch(error){
+     if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+     }
+     if (error.status == 401){
+        navigate(`/login`);
+     }
+  }
   fetchData();
 };
 

@@ -12,6 +12,7 @@ import { createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham';
 import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank';
 import { backEndUrl } from '../../../../utils/back-end';
 import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 
 const ImportSanPham = () => {
     const navigate = useNavigate();
@@ -278,8 +279,8 @@ const ImportSanPham = () => {
             const worksheetProduct = workbook.Sheets[sheetProduct];
             const jsonDataProduct = XLSX.utils.sheet_to_json(worksheetProduct); // tạo json từ sheet
             const listNewProduct = jsonDataProduct.map((data, index) => { // map nhu cau va thuong hieu vao
-                const nhuCauInfo = nhuCau.find(nc => nc.ten.toLowerCase() === data.nhuCau.toLowerCase())
-                const thuongHieuInfo = thuongHieu.find(nc => nc.ten.toLowerCase() === data.thuongHieu.toLowerCase())
+                const nhuCauInfo = nhuCau.find(nc => nc.ten.trim().toLowerCase() === data.nhuCau.trim().toLowerCase())
+                const thuongHieuInfo = thuongHieu.find(nc => nc.ten.trim().toLowerCase() === data.thuongHieu.trim().toLowerCase())
 
                 return {
                     ...data,
@@ -420,34 +421,45 @@ const ImportSanPham = () => {
     };
 
     const loadFilterOptions = async () => {
-        // get các bảng
-        const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
-        const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
-        const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
-        const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
-        const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
-        const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
-        const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
-        const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
-        const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
-        const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
-        const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
+        try{
+            // get các bảng
+            const nhuCauResult = await get(`/nhu-cau/all-list-active`);
+            const thuongHieuResult = await get(`/thuong-hieu/all-list-active`);
+            const ramResult = await get(`/ram/all-list-active`);
+            const mauSacResult = await get(`/mau-sac/all-list-active`);
+            const cpuResult = await get(`/cpu/all-list-active`);
+            const vgaResult = await get(`/vga/all-list-active`);
+            const webcamResult = await get(`/webcam/all-list-active`);
+            const oCungResult = await get(`/o-cung/all-list-active`);
+            const manHinhResult = await get(`/man-hinh/all-list-active`);
+            const heDieuHanhResult = await get(`/he-dieu-hanh/all-list-active`);
+            const banPhimResult = await get(`/ban-phim/all-list-active`);
 
-        setNhuCau(nhuCauResult.data.data);
-        setThuongHieu(thuongHieuResult.data.data);
-        setRam(ramResult.data.data);
-        setmauSac(mauSacResult.data.data);
-        setCPU(cpuResult.data.data);
-        setVGA(vgaResult.data.data);
-        setWebcam(webcamResult.data.data);
-        setOCung(oCungResult.data.data);
-        setManHinh(manHinhResult.data.data);
-        setHeDieuHanh(heDieuHanhResult.data.data);
-        setBanPhim(banPhimResult.data.data);
+            setNhuCau(nhuCauResult.data.data);
+            setThuongHieu(thuongHieuResult.data.data);
+            setRam(ramResult.data.data);
+            setmauSac(mauSacResult.data.data);
+            setCPU(cpuResult.data.data);
+            setVGA(vgaResult.data.data);
+            setWebcam(webcamResult.data.data);
+            setOCung(oCungResult.data.data);
+            setManHinh(manHinhResult.data.data);
+            setHeDieuHanh(heDieuHanhResult.data.data);
+            setBanPhim(banPhimResult.data.data);
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
+        }
+        
     };
 
     // hàm add sản phẩm
     const addMultiProduct = async () => {
+        try{
         const requests = sanphams.map(item => {
             return createSanPham({
                 moTa: item.moTa,
@@ -485,28 +497,30 @@ const ImportSanPham = () => {
             }
         });
         
-        const requestsBienThe = bienThes.map(item => {
-            for(const response of successList) {
-                if(response.ten === item.sanPhamInfo.ten){
-                    return createSanPhamChiTiet({
-                        banPhimId: item.banPhimInfo.id,
-                        cpuId: item.cpuInfo.id,
-                        heDieuHanhId: item.heDieuHanhInfo.id,
-                        manHinhId: item.manHinhInfo.id,
-                        mauSacId: item.mauSacInfo.id,
-                        ocungId: item.oCungInfo.id,
-                        ramId: item.ramInfo.id,
-                        sanPhamId: response.id,
-                        vgaId: item.vgaInfo.id,
-                        webcamId: item.webcamInfo.id,
-                        giaBan: item.giaBan,
-                        listUrlAnhSanPham: '',
-                        listSerialNumber: item.serials,
-                        trangThai: 1
-                    });
+            const requestsBienThe = bienThes.map(item => {
+                for(const response of successList) {
+                    if(response.ten === item.sanPhamInfo.ten){
+                        return createSanPhamChiTiet({
+                            banPhimId: item.banPhimInfo.id,
+                            cpuId: item.cpuInfo.id,
+                            heDieuHanhId: item.heDieuHanhInfo.id,
+                            manHinhId: item.manHinhInfo.id,
+                            mauSacId: item.mauSacInfo.id,
+                            ocungId: item.oCungInfo.id,
+                            ramId: item.ramInfo.id,
+                            sanPhamId: response.id,
+                            vgaId: item.vgaInfo.id,
+                            webcamId: item.webcamInfo.id,
+                            giaBan: item.giaBan,
+                            listUrlAnhSanPham: '',
+                            listSerialNumber: item.serials,
+                            trangThai: 1
+                        });
+                    }
                 }
-            }
-        });
+            });
+        
+        
 
         errorListNoti = [];
         successListNoti = [];
@@ -533,6 +547,14 @@ const ImportSanPham = () => {
             }
         });
         return resultsBienThe;
+    }catch(error){
+        if (error.status == 403){
+           alert("Không đủ quyền thực hiện chức năng này")
+        }
+        if (error.status == 401){
+           navigate(`/login`);
+        }
+     }
     };
 
     const [messCheck, setMessCheck] = useState('');
@@ -567,63 +589,72 @@ const ImportSanPham = () => {
         let seriTonTai = '';
         let tenSPTrung = '';
         let giaSai = '';
-        
-        for(let i = 0; i < sanphams.length; i++){
-            tenSPTotal.push(sanphams[i].ten);
-            if((await axios.get(`${backEndUrl}/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
-                tenSPTrung += `${sanphams[i].ten}, `;
-                isValid = false;
-            }
-            let bienThe = bienThes.filter(x => x.tenSanPham == sanphams[i].ten);
-            
-            
-            for (let j = 0; j < bienThe.length; j++){
-                if (!(bienThe[j].giaBan !== '' && /^(0|[1-9]\d*)(\.\d+)?$/.test(bienThe[j].giaBan))){
-                    giaSai += `${bienThe.tenSanPham}, `;
+        try{
+            for(let i = 0; i < sanphams.length; i++){
+                tenSPTotal.push(sanphams[i].ten);
+                if((await get(`/san-pham/exist-name?name=${sanphams[i].ten}`)).data.data){
+                    tenSPTrung += `${sanphams[i].ten}, `;
                     isValid = false;
                 }
-                let serialsTemp = (bienThe[j].serials + '').split(',').map(x => x.trim());
-                for(let k = 0; k < serialsTemp.length; k++){
-                    seriTotal.push(serialsTemp[k]);
-                    if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20 || serialsTemp[k].includes(" ")){
-                        seriLengtInvalid += `${serialsTemp[k]}, `
-                        isValid = false;
-                    }
-                    if ((await axios.get(`${backEndUrl}/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
-                        seriTonTai += `${serialsTemp[k]}, `
-                        isValid = false;
-                    }
-                }
+                let bienThe = bienThes.filter(x => x.tenSanPham == sanphams[i].ten);
                 
-
+                
+                for (let j = 0; j < bienThe.length; j++){
+                    if (!(bienThe[j].giaBan !== '' && /^(0|[1-9]\d*)(\.\d+)?$/.test(bienThe[j].giaBan))){
+                        giaSai += `${bienThe.tenSanPham}, `;
+                        isValid = false;
+                    }
+                    let serialsTemp = (bienThe[j].serials + '').split(',').map(x => x.trim());
+                    for(let k = 0; k < serialsTemp.length; k++){
+                        seriTotal.push(serialsTemp[k]);
+                        if (serialsTemp[k].length < 7 || serialsTemp[k].length > 20 || serialsTemp[k].includes(" ")){
+                            seriLengtInvalid += `${serialsTemp[k]}, `
+                            isValid = false;
+                        }
+                        if ((await get(`/serial-number/exist-for-add?ma=${serialsTemp[k]}`)).data.data){
+                            seriTonTai += `${serialsTemp[k]}, `
+                            isValid = false;
+                        }
+                    }
+                    
+    
+                }
             }
-        }
-        const tenSPTotalCheck = new Set(tenSPTotal);
-        if(tenSPTotalCheck.size !== tenSPTotal.length){
-            mess += `Tên sản phẩm trong excel bị trùng lặp, `
-            isValid = false;
-        }
-        if (tenSPTrung !== ''){
-            mess += "Sản phẩm đã tồn tại: " + tenSPTrung;
-        }
-        if (seriLengtInvalid !== ''){
-            mess += 'Độ dài serial không nằm trong khoảng 7-20 ký tự (không chứa dấu cách): ' + seriLengtInvalid;
-        }
-        if (seriTonTai !== ''){
-            mess += "Serial đã tồn tại: " + seriTonTai;
+            const tenSPTotalCheck = new Set(tenSPTotal);
+            if(tenSPTotalCheck.size !== tenSPTotal.length){
+                mess += `Tên sản phẩm trong excel bị trùng lặp, `
+                isValid = false;
+            }
+            if (tenSPTrung !== ''){
+                mess += "Sản phẩm đã tồn tại: " + tenSPTrung;
+            }
+            if (seriLengtInvalid !== ''){
+                mess += 'Độ dài serial không nằm trong khoảng 7-20 ký tự (không chứa dấu cách): ' + seriLengtInvalid;
+            }
+            if (seriTonTai !== ''){
+                mess += "Serial đã tồn tại: " + seriTonTai;
+            }
+            
+            const seriTotalCheck = new Set(seriTotal);
+            if(seriTotalCheck.size !== seriTotal.length){
+                mess += `Serial trong excel bị trùng lặp, `
+                isValid = false;
+            }
+            if (giaSai !== ''){
+                mess += `Giá không hợp lệ tại sản phẩm: ${giaSai}, `;
+            }
+            let mess1 = mess.substring(0, mess.length-2)
+            setMessCheck(mess1);
+            return isValid;
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
         }
         
-        const seriTotalCheck = new Set(seriTotal);
-        if(seriTotalCheck.size !== seriTotal.length){
-            mess += `Serial trong excel bị trùng lặp, `
-            isValid = false;
-        }
-        if (giaSai !== ''){
-            mess += `Giá không hợp lệ tại sản phẩm: ${giaSai}, `;
-        }
-        let mess1 = mess.substring(0, mess.length-2)
-        setMessCheck(mess1);
-        return isValid;
         
     }
 
@@ -645,7 +676,17 @@ const ImportSanPham = () => {
     };
 
     useEffect(() => {
-        loadFilterOptions();
+        try{
+            loadFilterOptions();
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
+        }
+        
     }, [])
 
     return (

@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 import { updateRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/mauSac';
-
+import { useNavigate } from 'react-router-dom';
 const style = {
     position: 'absolute',
     top: '40%',
@@ -23,6 +23,7 @@ const style = {
 };
 
 export default function ModalUpdate({fetchRams, info}) {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -90,27 +91,37 @@ export default function ModalUpdate({fetchRams, info}) {
         }
 
         setError(newError);
-        const checkName = await IsValidUpdate(ram.ten, info.id);
-        if (!checkName){
-            formValid = false;
-            console.log('checkName: ', checkName);
-            alert('Tên đã tồn tại')
-        }
-        if (formValid) {
-           const res = await updateRam({
-            id: info.id,
-            ten: ram.ten,
-            trangThai: ram.trangThai
-           })
-           
-           if(res){
-            toast.success(NotificationStatus.CREATED)
-            fetchRams()
-            handleClose()
-           } else {
-            toast.error(NotificationStatus.ERROR)
+        try{
+            const checkName = await IsValidUpdate(ram.ten, info.id);
+            if (!checkName){
+                formValid = false;
+                console.log('checkName: ', checkName);
+                alert('Tên đã tồn tại')
+            }
+            if (formValid) {
+               const res = await updateRam({
+                id: info.id,
+                ten: ram.ten,
+                trangThai: ram.trangThai
+               })
+               
+               if(res){
+                toast.success(NotificationStatus.CREATED)
+                fetchRams()
+                handleClose()
+               } else {
+                toast.error(NotificationStatus.ERROR)
+               }
+            }
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
            }
         }
+        
     };
 
     return (

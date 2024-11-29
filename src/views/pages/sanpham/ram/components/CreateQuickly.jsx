@@ -10,7 +10,7 @@ import { createNewRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/ram';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 import { isValid } from 'date-fns';
-
+import { useNavigate } from 'react-router-dom';
 const style = {
     position: 'absolute',
     top: '40%',
@@ -24,6 +24,7 @@ const style = {
 };
 
 export default function CreateQuickly({fetchRams,setHide}) {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -88,31 +89,40 @@ export default function CreateQuickly({fetchRams,setHide}) {
         }
 
         setError(newError);
-
-        const checkName = await IsValidAdd(ram.ten);
-        if (!checkName){
-            formValid = false;
-            console.log('checkName: ', checkName);
-            alert('Tên đã tồn tại')
-        }
-
-        if (formValid) {
-           const res = await createNewRam({
-            dungLuong: ram.dungLuong,
-            ten: ram.ten,
-            tocDoBus: ram.tocDoBus,
-            trangThai: ram.trangThai
-           })
-           
-           
-           if(res){
-            toast.success(NotificationStatus.CREATED)
-            fetchRams()
-            handleClose()
-           } else {
-            toast.error(NotificationStatus.ERROR)
+        try{
+            const checkName = await IsValidAdd(ram.ten);
+            if (!checkName){
+                formValid = false;
+                console.log('checkName: ', checkName);
+                alert('Tên đã tồn tại')
+            }
+    
+            if (formValid) {
+               const res = await createNewRam({
+                dungLuong: ram.dungLuong,
+                ten: ram.ten,
+                tocDoBus: ram.tocDoBus,
+                trangThai: ram.trangThai
+               })
+               
+               
+               if(res){
+                toast.success(NotificationStatus.CREATED)
+                fetchRams()
+                handleClose()
+               } else {
+                toast.error(NotificationStatus.ERROR)
+               }
+            }
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
            }
         }
+        
     };
 
     return (
