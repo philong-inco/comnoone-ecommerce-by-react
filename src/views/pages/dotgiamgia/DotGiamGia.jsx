@@ -52,10 +52,7 @@ function DotGiamGia() {
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
             fetchCoupons(false);
-        });
-        return () => clearInterval(intervalId);
     }, []);
 
     useEffect(() => {
@@ -69,7 +66,10 @@ function DotGiamGia() {
     }, []);
 
     useEffect(() => {
-        fetchCoupons();
+        const intervalId = setInterval(() => {
+            fetchCoupons(false);
+        }, 2000);
+        return () => clearInterval(intervalId);
     }, [currentPage, size, filters]);
 
     const handleFilterChange = (event) => {

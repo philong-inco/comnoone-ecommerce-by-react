@@ -36,7 +36,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 
 const validationSchema = Yup.object().shape({
-  ten: Yup.string().max(50, 'Tên không được vượt quá 50 ký tự').required('Tên không được để trống'),
+  ten: Yup.string().max(50, 'Tên không được vượt quá 50 ký tự').required('Tên không được để trống').max(255, 'Tên không được vượt quá 255 ký tự'),
   email: Yup.string().email('Email không hợp lệ').required('Email không được để trống'),
   sdt: Yup.string()
     .matches(/^\+?[0-9. ()-]{7,25}$/, 'Số điện thoại không hợp lệ')

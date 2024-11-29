@@ -74,13 +74,17 @@ function PhieuGiamGia() {
       console.log("Check status: "+ i);
     
       checkStatusForBill();
-    }, 2000); 
+    }, 5000); 
     return () => clearInterval(intervalId);
   }, []);
 
 
   useEffect(() => {
     fetchApi(currentPage, size);
+    const intervalId = setInterval(() => {
+      fetchApi(currentPage, size);
+    }, 60000); 
+    return () => clearInterval(intervalId);
   }, [currentPage, size, ma, phamViApDung, loaiGiamGia, trangThai, ngayBatDau, ngayHetHan]);
 
   useEffect(() => {
