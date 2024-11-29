@@ -39,7 +39,7 @@ export const exportToExcel = async (data, fileName) => {
     
  
     const idProducts = data.map(x => x.id);
-    const spcts = await axios.post(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/san-pham-chi-tiet/get-by-product-ids`, idProducts);
+    const spcts = await axios.post(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-ids`, idProducts);
     const bienThe = spcts?.data?.data;
     const headerBienThe = [
       "ID",

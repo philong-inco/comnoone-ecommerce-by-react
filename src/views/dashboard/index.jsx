@@ -1015,8 +1015,8 @@ const Dashboard = () => {
                       cy="50%"
                       outerRadius={150}
                       fill="#8884d8"
-                      label={({ trangThaiHoaDon, percent }) =>
-                        `${mapOrderStatus(trangThaiHoaDon)}: ${(percent * 100).toFixed(2)}%`
+                      label={({ soLuong, percent }) =>
+                        `${mapOrderStatus(soLuong)}: ${(percent * 100).toFixed(2)}%`
                       }
                     >
                       {totalPrecentBill.map((entry, index) => (

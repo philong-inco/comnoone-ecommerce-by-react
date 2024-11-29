@@ -54,7 +54,7 @@ function DotGiamGia() {
     useEffect(() => {
         const intervalId = setInterval(() => {
             fetchCoupons(false);
-        }, 2000);
+        });
         return () => clearInterval(intervalId);
     }, []);
 

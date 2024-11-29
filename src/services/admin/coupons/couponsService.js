@@ -116,7 +116,8 @@ export const getAllCouponsToBill = async (billCode) => {
 
 export const checkStatusForBill = async () => {
   try {
-    const result = await put(`coupons/checkupdatestatus`);
+    const result = await put(`/coupons/checkupdatestatus`);
+    debugger;
     return result;
   } catch (error) {
     console.log('Error check status :', error);
