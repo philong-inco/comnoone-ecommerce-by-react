@@ -21,8 +21,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { IconCirclePlus } from '@tabler/icons-react';
 import { backEndUrl } from '../../../utils/back-end.js';
-
+import { useNavigate } from 'react-router-dom';
+import {get, post, put, del } from '../../../utils/requestSanPham';
 const SuaSanPham = () => {
+  const navigate = useNavigate();
   const { id } = useParams();  
   const [openSeri, setOpenSeri] = useState(false); // openViewSeri
 
@@ -113,64 +115,84 @@ const SuaSanPham = () => {
   }, [nhuCauChecked]);
 
   const fetchDataBienThe = async () => {
-    const dataSpct = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
-    setspct(dataSpct.data.data);
+    try{
+      const dataSpct = await get(`/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+      setspct(dataSpct.data.data);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   }
 
   const loadData = async () => {
-    const dataSanPham = await axios.get(`${backEndUrl}/san-pham/detail/${id}`)
-    const dataSpct = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
-    setSanPham(dataSanPham.data.data);
-    setspct(dataSpct.data.data);
-    setTenSanPham(dataSanPham.data.data.ten)
-    setMaSanPham(dataSanPham.data.data.ma)
-    setMotaSanPham(dataSanPham.data.data.moTa)
-    // thuộc tính
+    try{
+      const dataSanPham = await get(`/san-pham/detail/${id}`)
+      const dataSpct = await get(`/san-pham-chi-tiet/get-by-product-id?idProduct=${id}`);
+      setSanPham(dataSanPham.data.data);
+      setspct(dataSpct.data.data);
+      setTenSanPham(dataSanPham.data.data.ten)
+      setMaSanPham(dataSanPham.data.data.ma)
+      setMotaSanPham(dataSanPham.data.data.moTa)
+      // thuộc tính
+      
+      const nhuCauResult = await get(`/nhu-cau/all-list-active`);
+      const thuongHieuResult = await get(`/thuong-hieu/all-list-active`);
+      const ramResult = await get(`/ram/all-list-active`);
+      const mauSacResult = await get(`/mau-sac/all-list-active`);
+      const cpuResult = await get(`/cpu/all-list-active`);
+      const vgaResult = await get(`/vga/all-list-active`);
+      const webcamResult = await get(`/webcam/all-list-active`);
+      const oCungResult = await get(`/o-cung/all-list-active`);
+      const manHinhResult = await get(`/man-hinh/all-list-active`);
+      const heDieuHanhResult = await get(`/he-dieu-hanh/all-list-active`);
+      const banPhimResult = await get(`/ban-phim/all-list-active`);
+  
+      
+      setNhuCau(nhuCauResult.data.data);
+      setThuongHieu(thuongHieuResult.data.data);
+      setRam(ramResult.data.data);
+      setmauSac(mauSacResult.data.data);
+      setCPU(cpuResult.data.data);
+      setVGA(vgaResult.data.data);
+      setWebcam(webcamResult.data.data);
+      setOCung(oCungResult.data.data);
+      setManHinh(manHinhResult.data.data);
+      setHeDieuHanh(heDieuHanhResult.data.data);
+      setBanPhim(banPhimResult.data.data);
+  
+      console.log('nhuCauResult.data.data: ', nhuCauResult.data.data); 
+      const nhuCauTemp = nhuCauResult.data.data.filter(x => x.ten == dataSanPham.data.data.nhuCau);
+      const thuongHieuTemp = thuongHieuResult.data.data.filter(x => x.ten == dataSanPham.data.data.thuongHieu);
+      const VGATemp = vgaResult.data.data.filter(x => x.ten == dataSpct.data.data[0].vga);
+  
+      const manHinhTemp = manHinhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].manHinh);
+      const webCamTemp = webcamResult.data.data.filter(x => x.ten == dataSpct.data.data[0].webcam);
+      const heDieuHanhTemp = heDieuHanhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].heDieuHanh);
+      const banPhimTemp = banPhimResult.data.data.filter(x => x.ten == dataSpct.data.data[0].banPhim);
+      console.log('VGATemp: ', VGATemp[0]); 
+      console.log('manHinhTemp: ', manHinhTemp); 
+  
+      setNhuCauEntityChecked(nhuCauTemp[0]);
+      setThuongHieuEntityChecked(thuongHieuTemp[0]);
+      setVGAEntityChecked(VGATemp[0]);
+      setManHinhEntityChecked(manHinhTemp[0]);
+      setBanPhimEntityChecked(banPhimTemp[0]);
+      setHeDieuHanhEntityChecked(heDieuHanhTemp[0]);
+      setWebcamEntityChecked(webCamTemp[0]);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
     
-    const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
-    const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
-    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
-    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
-    const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
-    const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
-    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
-    const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
-    const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
-    const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
-
-    
-    setNhuCau(nhuCauResult.data.data);
-    setThuongHieu(thuongHieuResult.data.data);
-    setRam(ramResult.data.data);
-    setmauSac(mauSacResult.data.data);
-    setCPU(cpuResult.data.data);
-    setVGA(vgaResult.data.data);
-    setWebcam(webcamResult.data.data);
-    setOCung(oCungResult.data.data);
-    setManHinh(manHinhResult.data.data);
-    setHeDieuHanh(heDieuHanhResult.data.data);
-    setBanPhim(banPhimResult.data.data);
-
-    console.log('nhuCauResult.data.data: ', nhuCauResult.data.data); 
-    const nhuCauTemp = nhuCauResult.data.data.filter(x => x.ten == dataSanPham.data.data.nhuCau);
-    const thuongHieuTemp = thuongHieuResult.data.data.filter(x => x.ten == dataSanPham.data.data.thuongHieu);
-    const VGATemp = vgaResult.data.data.filter(x => x.ten == dataSpct.data.data[0].vga);
-
-    const manHinhTemp = manHinhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].manHinh);
-    const webCamTemp = webcamResult.data.data.filter(x => x.ten == dataSpct.data.data[0].webcam);
-    const heDieuHanhTemp = heDieuHanhResult.data.data.filter(x => x.ten == dataSpct.data.data[0].heDieuHanh);
-    const banPhimTemp = banPhimResult.data.data.filter(x => x.ten == dataSpct.data.data[0].banPhim);
-    console.log('VGATemp: ', VGATemp[0]); 
-    console.log('manHinhTemp: ', manHinhTemp); 
-
-    setNhuCauEntityChecked(nhuCauTemp[0]);
-    setThuongHieuEntityChecked(thuongHieuTemp[0]);
-    setVGAEntityChecked(VGATemp[0]);
-    setManHinhEntityChecked(manHinhTemp[0]);
-    setBanPhimEntityChecked(banPhimTemp[0]);
-    setHeDieuHanhEntityChecked(heDieuHanhTemp[0]);
-    setWebcamEntityChecked(webCamTemp[0]);
   }
 
   const updateHandle = async () => {
@@ -192,21 +214,33 @@ const SuaSanPham = () => {
     console.log('spUpdate: ', spUpdate);
 
     try {
-      const check = await axios.get(`${backEndUrl}/san-pham/exist-name-for-update?ten=${spUpdate.tenSP}&id=${id}`);
+      const check = await get(`/san-pham/exist-name-for-update?ten=${spUpdate.tenSP}&id=${id}`);
       if (check.data.data){
         alert("Tên sản phẩm đã tồn tại");
         return;
       }
     } catch (error) {  
+      if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+     }
+     if (error.status == 401){
+        navigate(`/login`);
+     }
       // Xử lý lỗi  
       console.error('Có lỗi xảy ra khi check tên:', error);  
       return;
     }  
 
     try {
-      await axios.put(`${backEndUrl}/san-pham/updateSanPhamAndSPCT/${id}`, spUpdate);
+      await put(`/san-pham/updateSanPhamAndSPCT/${id}`, spUpdate);
       alert('Cập nhật thành công');
     } catch (error) {  
+      if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+     }
+     if (error.status == 401){
+        navigate(`/login`);
+     }
       // Xử lý lỗi  
       console.error('Có lỗi xảy ra:', error);  
       alert('Cập nhật không thành công. Vui lòng thử lại.');  
@@ -222,14 +256,24 @@ const SuaSanPham = () => {
   }, [listSeri])
 
     const handleViewSerial = async (id) => {
-      // view serial ở đây
-      console.log('spctId: ', id); 
-      const seriGet = await axios.get(`${backEndUrl}/serial-number/find-by-spct-id/${id}`);
-      setListSeri(seriGet.data.data);
-      const imgListGet = await axios.get(`${backEndUrl}/anh-san-pham/find-by-spct-id?idSPCT=${id}`);
-      setListImg(imgListGet.data.data);
-      setIdSPCT(id);
-      setOpenSeri(true);
+      try{
+        // view serial ở đây
+        console.log('spctId: ', id); 
+        const seriGet = await get(`/serial-number/find-by-spct-id/${id}`);
+        setListSeri(seriGet.data.data);
+        const imgListGet = await get(`/anh-san-pham/find-by-spct-id?idSPCT=${id}`);
+        setListImg(imgListGet.data.data);
+        setIdSPCT(id);
+        setOpenSeri(true);
+      }catch(error){
+         if (error.status == 403){
+            alert("Không đủ quyền thực hiện chức năng này")
+         }
+         if (error.status == 401){
+            navigate(`/login`);
+         }
+      }
+      
     }
 
 
@@ -248,13 +292,21 @@ const SuaSanPham = () => {
 };
 
 const suaTrangThai = (id, status) => {
-    axios.get(`${backEndUrl}/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
-        .then(response => {
-          fetchDataBienThe();
-        })
-        .catch(error => {
-          fetchDataBienThe();
-        });
+    
+        try{
+          get(`/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
+          .then(response => {
+            fetchDataBienThe();
+          })
+        }catch(error){
+           if (error.status == 403){
+            fetchDataBienThe();
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
+        }
 };
 
   return (

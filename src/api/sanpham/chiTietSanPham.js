@@ -41,6 +41,7 @@ export const createSanPhamChiTiet = async ({
         return res
     } catch (error) {
         console.log('Error createSanPhamChiTiet', error);
+        throw error
     }
 }
 
@@ -77,5 +78,6 @@ export const checkToAdd = async ({
         return res?.data
     } catch (error) {
         console.log('Error createSanPhamChiTiet', error);
+        throw error
     }
 }

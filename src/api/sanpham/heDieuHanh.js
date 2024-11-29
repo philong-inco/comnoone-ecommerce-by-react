@@ -16,6 +16,7 @@ export const createNewRam = async ({
         return res?.data?.data
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
@@ -29,6 +30,7 @@ export const getRams = async ({
         return res
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
@@ -50,6 +52,7 @@ export const filterRam = async ({
         return res
     } catch (error) {
         console.log('Error filterRam', error);
+        throw error
     }
 }
 
@@ -62,6 +65,7 @@ export const deleteRam = async ({
         return res
     } catch (error) {
         console.log('Error deleteRam', error);
+        throw error
     }
 }
 
@@ -80,6 +84,7 @@ export const updateRam = async ({
         return res
     } catch (error) {
         console.log('Error updateRam', error);
+        throw error
     }
 }
 
@@ -93,6 +98,7 @@ export const IsValidAdd = async (name) => {
         return true;
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }
 
@@ -106,5 +112,6 @@ export const IsValidUpdate = async (name, id) => {
         return true;
     } catch (error) {
         console.log('Error createNewRam', error);
+        throw error
     }
 }

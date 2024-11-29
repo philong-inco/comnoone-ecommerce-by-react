@@ -22,6 +22,7 @@ export const createSanPham = async ({
         return res?.data?.data
     } catch (error) {
         console.log('Error createSanPham', error);
+        throw error
     }
 }
 
@@ -32,6 +33,7 @@ export const getAllSanPham = async () => {
         return res?.data?.data
     } catch (error) {
         console.log('Error getAllSanPham', error);
+        throw error
     }
 }
 
@@ -50,6 +52,7 @@ export const getAllForExcel = async (filterCurrent) => {
         return result?.data?.data
     } catch (error) {
         console.log('Error getAllForExcel', error);
+        throw error
     }
 }
 
@@ -60,5 +63,6 @@ export const getSanPhamById = async (id) => {
         return res
     } catch (error) {
         console.log('Error getSanPhamById', error);
+        throw error
     }
 }

@@ -26,6 +26,7 @@ import { MenuButton } from '@mui/base';
 import MenuDownload from "./ui-component/Menu.jsx"
 import ImportProduct from './ui-component/ImportProduct.jsx';
 import { backEndUrl } from '../../../utils/back-end.js';
+import {get, post, put, del } from '../../../utils/requestSanPham';
 
 const DanhSachSanPham = () => {
     const navigate = useNavigate();
@@ -271,42 +272,61 @@ const DanhSachSanPham = () => {
     }, [filter]);
 
     const loadProducts = async () => {
-        debugger;
-        const queryString = Object.entries(filter)
+        try{
+            const queryString = Object.entries(filter)
             .filter(([key, value]) => value !== '')
             .map(([key, value]) => `${key}=${value}`)
             .join('&');
-        const urlQuery = urlFindFilter + queryString;
-        const result = await axios.get(urlQuery);
-        setsanPham(result.data.data);
-        setTotalElement(parseInt(result.data.totalElement));
+            const urlQuery = `/san-pham/find/filter-id?${queryString}`;
+            const result = await get(urlQuery);
+            setsanPham(result.data.data);
+            setTotalElement(parseInt(result.data.totalElement));
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
+        }
+        
     };
 
     const loadFilterOptions = async () => {
-        // get các bảng
-        const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list`);
-        const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list`);
-        const ramResult = await axios.get(`${backEndUrl}/ram/all-list`);
-        const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list`);
-        const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list`);
-        const vgaResult = await axios.get(`${backEndUrl}/vga/all-list`);
-        const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list`);
-        const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list`);
-        const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list`);
-        const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list`);
-        const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list`);
+        try{
+            // get các bảng
+            const nhuCauResult = await get(`/nhu-cau/all-list`);
+            const thuongHieuResult = await get(`/thuong-hieu/all-list`);
+            const ramResult = await get(`/ram/all-list`);
+            const mauSacResult = await get(`/mau-sac/all-list`);
+            const cpuResult = await get(`/cpu/all-list`);
+            const vgaResult = await get(`/vga/all-list`);
+            const webcamResult = await get(`/webcam/all-list`);
+            const oCungResult = await get(`/o-cung/all-list`);
+            const manHinhResult = await get(`/man-hinh/all-list`);
+            const heDieuHanhResult = await get(`/he-dieu-hanh/all-list`);
+            const banPhimResult = await get(`/ban-phim/all-list`);
 
-        setNhuCau(nhuCauResult.data.data);
-        setThuongHieu(thuongHieuResult.data.data);
-        setRam(ramResult.data.data);
-        setmauSac(mauSacResult.data.data);
-        setCPU(cpuResult.data.data);
-        setVGA(vgaResult.data.data);
-        setWebcam(webcamResult.data.data);
-        setOCung(oCungResult.data.data);
-        setManHinh(manHinhResult.data.data);
-        setHeDieuHanh(heDieuHanhResult.data.data);
-        setBanPhim(banPhimResult.data.data);
+            setNhuCau(nhuCauResult.data.data);
+            setThuongHieu(thuongHieuResult.data.data);
+            setRam(ramResult.data.data);
+            setmauSac(mauSacResult.data.data);
+            setCPU(cpuResult.data.data);
+            setVGA(vgaResult.data.data);
+            setWebcam(webcamResult.data.data);
+            setOCung(oCungResult.data.data);
+            setManHinh(manHinhResult.data.data);
+            setHeDieuHanh(heDieuHanhResult.data.data);
+            setBanPhim(banPhimResult.data.data);
+        }catch(error){
+           if (error.status == 403){
+              alert("Không đủ quyền thực hiện chức năng này")
+           }
+           if (error.status == 401){
+              navigate(`/login`);
+           }
+        }
+        
     };
 
 
@@ -358,13 +378,22 @@ const DanhSachSanPham = () => {
     };
 
     const suaTrangThai = (id, status) => {
-        axios.get(`${backEndUrl}/san-pham/change-status?id=${id}&status=${status}`)
-            .then(response => {
-                loadProducts();
-            })
-            .catch(error => {
-                loadProducts();
-            });
+        
+            try{
+                get(`/san-pham/change-status?id=${id}&status=${status}`)
+                .then(response => {
+                    loadProducts();
+                })
+                
+            }catch(error){
+               if (error.status == 403){
+                  alert("Không đủ quyền thực hiện chức năng này")
+                  loadProducts();
+               }
+               if (error.status == 401){
+                  navigate(`/login`);
+               }
+            }
     };
 
 

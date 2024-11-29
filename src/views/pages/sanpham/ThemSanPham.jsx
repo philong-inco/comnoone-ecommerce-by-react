@@ -16,7 +16,7 @@ import { checkToAdd, createSanPhamChiTiet } from 'api/sanpham/chiTietSanPham.js'
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification.js';
 import { backEndUrl } from '../../../utils/back-end.js';
-
+import {get, post, put, del } from '../../../utils/requestSanPham';
 const ThemSanPham = () => {
   const navigate = useNavigate();
 
@@ -67,34 +67,44 @@ const ThemSanPham = () => {
   }, []);
 
   const loadAttributes = async () => {
-    // get các bảng
-    const sanPhamResult = await axios.get(`${backEndUrl}/san-pham/all-list-active`);
-    const nhuCauResult = await axios.get(`${backEndUrl}/nhu-cau/all-list-active`);
-    const thuongHieuResult = await axios.get(`${backEndUrl}/thuong-hieu/all-list-active`);
-    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
-    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
-    const vgaResult = await axios.get(`${backEndUrl}/vga/all-list-active`);
-    const webcamResult = await axios.get(`${backEndUrl}/webcam/all-list-active`);
-    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
-    const manHinhResult = await axios.get(`${backEndUrl}/man-hinh/all-list-active`);
-    const heDieuHanhResult = await axios.get(`${backEndUrl}/he-dieu-hanh/all-list-active`);
-    const banPhimResult = await axios.get(`${backEndUrl}/ban-phim/all-list-active`);
-    const anhSanPhamAll = await axios.get(`${backEndUrl}/anh-san-pham/list`);
+    try{
+      // get các bảng
+      const sanPhamResult = await get(`/san-pham/all-list-active`);
+      const nhuCauResult = await get(`/nhu-cau/all-list-active`);
+      const thuongHieuResult = await get(`/thuong-hieu/all-list-active`);
+      const ramResult = await get(`/ram/all-list-active`);
+      const mauSacResult = await get(`/mau-sac/all-list-active`);
+      const cpuResult = await get(`/cpu/all-list-active`);
+      const vgaResult = await get(`/vga/all-list-active`);
+      const webcamResult = await get(`/webcam/all-list-active`);
+      const oCungResult = await get(`/o-cung/all-list-active`);
+      const manHinhResult = await get(`/man-hinh/all-list-active`);
+      const heDieuHanhResult = await get(`/he-dieu-hanh/all-list-active`);
+      const banPhimResult = await get(`/ban-phim/all-list-active`);
+      const anhSanPhamAll = await get(`/anh-san-pham/list`);
 
-    setSanPham(sanPhamResult.data.data);
-    setNhuCau(nhuCauResult.data.data);
-    setThuongHieu(thuongHieuResult.data.data);
-    setRam(ramResult.data.data);
-    setmauSac(mauSacResult.data.data);
-    setCPU(cpuResult.data.data);
-    setVGA(vgaResult.data.data);
-    setWebcam(webcamResult.data.data);
-    setOCung(oCungResult.data.data);
-    setManHinh(manHinhResult.data.data);
-    setHeDieuHanh(heDieuHanhResult.data.data);
-    setBanPhim(banPhimResult.data.data);
-    setListAnh(anhSanPhamAll.data.data);
+      setSanPham(sanPhamResult.data.data);
+      setNhuCau(nhuCauResult.data.data);
+      setThuongHieu(thuongHieuResult.data.data);
+      setRam(ramResult.data.data);
+      setmauSac(mauSacResult.data.data);
+      setCPU(cpuResult.data.data);
+      setVGA(vgaResult.data.data);
+      setWebcam(webcamResult.data.data);
+      setOCung(oCungResult.data.data);
+      setManHinh(manHinhResult.data.data);
+      setHeDieuHanh(heDieuHanhResult.data.data);
+      setBanPhim(banPhimResult.data.data);
+      setListAnh(anhSanPhamAll.data.data);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   };
 
   const [productVarriant, setProductVarriant] = useState([]);
@@ -103,12 +113,22 @@ const ThemSanPham = () => {
   const [resultVariant, setResultVariant] = useState([]); // thằng này nhận kết quả cuối cùng của TableVariant
 
   const checkTenSP = async (name) => {
-    const checkUniqueNameProduct = await axios.get(`${backEndUrl}/san-pham/exist-name?name=${name}`);
-    console.log('checkUniqueNameProduct: ', checkUniqueNameProduct); 
-    if (checkUniqueNameProduct.data.code === 999) {
-      return false;
+    try{
+      const checkUniqueNameProduct = await get(`/san-pham/exist-name?name=${name}`);
+      console.log('checkUniqueNameProduct: ', checkUniqueNameProduct); 
+      if (checkUniqueNameProduct.data.code === 999) {
+        return false;
+      }
+      return true;
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
     }
-    return true;
+    
   }
 
   const handleUpdateContinue = async () => {

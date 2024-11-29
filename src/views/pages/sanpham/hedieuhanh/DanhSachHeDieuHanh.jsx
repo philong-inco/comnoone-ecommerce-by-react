@@ -7,7 +7,7 @@ import {
 import { Add, Delete, Edit } from '@mui/icons-material';
 import axios from 'axios';
 import { backEndUrl } from 'utils/back-end';
-
+import { useNavigate } from 'react-router-dom';
 import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/heDieuHanh';
 import ModalUpdate from './components/ModalUpdate';
 import TransitionsModal from './components/ModalCreate';
@@ -15,6 +15,7 @@ import TransitionsModal from './components/ModalCreate';
 
 
 const DanhSachHeDieuHanh = () => {
+  const navigate = useNavigate();
   const columns = [
     
     { id: 'ma', label: 'Mã', minWidth: 70 },
@@ -39,12 +40,23 @@ const DanhSachHeDieuHanh = () => {
   }, [filter])
 
   const fetchData = async () => {
-    const data = await filterRam(filter);
-    setData(data.data.data);
-    setPageInfo(prev => ({
-      ...prev, pageNo: data.data.pageNo, pageSize: data.data.pageSize, 
-      totalPage:data.data.totalPage, totalElement:data.data.totalElement
-    }))
+    try{
+      
+      const data = await filterRam(filter);
+      setData(data.data.data);
+      setPageInfo(prev => ({
+        ...prev, pageNo: data.data.pageNo, pageSize: data.data.pageSize, 
+        totalPage:data.data.totalPage, totalElement:data.data.totalElement
+      }))
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   }
 
   
@@ -73,12 +85,23 @@ const handleSwitchChange = (id) => (e) => {
 };
 
 const suaTrangThai = async (id, status) => {
-  let tempData = await axios.get(`${backEndUrl}/he-dieu-hanh/detail/${id}`);
+  
+  
+  try{
+    let tempData = await axios.get(`${backEndUrl}/he-dieu-hanh/detail/${id}`);
   let temp = tempData.data.data;
   console.log('temp: ', temp);
   let temp1 = {...temp, trangThai: status}
   console.log('temp1: ', temp1);
-  await updateRam(temp1);
+    await updateRam(temp1);
+  }catch(error){
+     if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+     }
+     if (error.status == 401){
+        navigate(`/login`);
+     }
+  }
   fetchData();
 };
 

@@ -14,11 +14,13 @@ import Slide from '@mui/material/Slide';
 import { useNavigate } from 'react-router-dom';
 import { backEndUrl } from '../../../../utils/back-end.js';
 
+import {get, post, put, del } from '../../../../utils/requestSanPham';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
 export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
+  const navigate = useNavigate();
   const [variant, setVariant] = useState({});
   useEffect(()=>{
     console.log('variant: ', variant);
@@ -71,28 +73,38 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
   const [listSPCT, setListSPCT] = useState([]);
 
   const loadAttributes = async () => {
-    // get các bảng
-    const SPCTResult = await axios.get(`${backEndUrl}/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
-    const ramResult = await axios.get(`${backEndUrl}/ram/all-list-active`);
-    const mauSacResult = await axios.get(`${backEndUrl}/mau-sac/all-list-active`);
-    const cpuResult = await axios.get(`${backEndUrl}/cpu/all-list-active`);
-    const oCungResult = await axios.get(`${backEndUrl}/o-cung/all-list-active`);
-    setListSPCT(SPCTResult.data.data);
-    const spctTemp = SPCTResult.data.data[0];
-    console.log('spctTemp: ', spctTemp); 
-    setVariant(prev => ({
-        ...prev,
-        banPhimId: spctTemp.idBanPhim,
-        heDieuHanhId: spctTemp.idHeDieuHanh,
-        manHinhId: spctTemp.idManHinh,
-        sanPhamId: idSP,
-        vgaId: spctTemp.idVGA,
-        webcamId: spctTemp.idWebcam,
-    }));
-    setRam(ramResult.data.data);
-    setmauSac(mauSacResult.data.data);
-    setCPU(cpuResult.data.data);
-    setOCung(oCungResult.data.data);
+    try{
+      // get các bảng
+      const SPCTResult = await get(`/san-pham-chi-tiet/get-by-product-id?idProduct=${idSP}`);
+      const ramResult = await get(`/ram/all-list-active`);
+      const mauSacResult = await get(`/mau-sac/all-list-active`);
+      const cpuResult = await get(`/cpu/all-list-active`);
+      const oCungResult = await get(`/o-cung/all-list-active`);
+      setListSPCT(SPCTResult.data.data);
+      const spctTemp = SPCTResult.data.data[0];
+      console.log('spctTemp: ', spctTemp); 
+      setVariant(prev => ({
+          ...prev,
+          banPhimId: spctTemp.idBanPhim,
+          heDieuHanhId: spctTemp.idHeDieuHanh,
+          manHinhId: spctTemp.idManHinh,
+          sanPhamId: idSP,
+          vgaId: spctTemp.idVGA,
+          webcamId: spctTemp.idWebcam,
+      }));
+      setRam(ramResult.data.data);
+      setmauSac(mauSacResult.data.data);
+      setCPU(cpuResult.data.data);
+      setOCung(oCungResult.data.data);
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   };
   
   const checkAttributeSelected = async () => {
@@ -102,8 +114,14 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
     }
 
     try{
-        const check = await axios.post(`${backEndUrl}/san-pham-chi-tiet/valid-for-add`, variant);
+        const check = await post(`/san-pham-chi-tiet/valid-for-add`, variant);
     } catch (error){
+      if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+     }
+     if (error.status == 401){
+        navigate(`/login`);
+     }
         if (error.response.status){
             alert("Đã tồn tại biến thể này");
             return;
@@ -114,14 +132,24 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
             variant.listUrlAnhSanPham = listSPCT[i].listUrlAnhSanPham
         }
     }
-    const addResult = await axios.post(`${backEndUrl}/san-pham-chi-tiet/add`, variant);
-        if (addResult.data.code == 200){
-            alert("Thêm thành công");
-            // điều hướng tới trang sửa
-            fetchDataBienThe();
-        } else {
-            alert("Thêm thất bại");
-        }
+    try{
+      const addResult = await post(`/san-pham-chi-tiet/add`, variant);
+      if (addResult.data.code == 200){
+          alert("Thêm thành công");
+          // điều hướng tới trang sửa
+          fetchDataBienThe();
+      } else {
+          alert("Thêm thất bại");
+      }
+    }catch(error){
+       if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+       }
+       if (error.status == 401){
+          navigate(`/login`);
+       }
+    }
+    
   }
   function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
     return new Intl.NumberFormat(locale, {

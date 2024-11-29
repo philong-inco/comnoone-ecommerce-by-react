@@ -22,7 +22,12 @@ const style = {
   p: 5
 };
 
+
+import { useNavigate } from 'react-router-dom';
+
+
 export default function TransitionsModal({ fetchRams }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -79,23 +84,41 @@ export default function TransitionsModal({ fetchRams }) {
 
     setError(newError);
     const checkName = await IsValidAdd(ram.ten);
+    try{
+      const checkName = await IsValidAdd(ram.ten);
+    }catch(error){
+      if (error.status == 403){
+        alert("Không đủ quyền thực hiện chức năng này")
+      }
+      if (error.status == 401){
+        navigate(`/login`);
+      }
+    }
     if (!checkName) {
       formValid = false;
       console.log('checkName: ', checkName);
       alert('Tên đã tồn tại');
     }
     if (formValid) {
-      const res = await createNewRam({
-        ten: ram.ten,
-        trangThai: ram.trangThai
-      });
-
-      if (res) {
-        toast.success(NotificationStatus.CREATED);
-        fetchRams();
-        handleClose();
-      } else {
-        toast.error(NotificationStatus.ERROR);
+      try{
+        const res = await createNewRam({
+          ten: ram.ten,
+          trangThai: ram.trangThai
+        });
+        if (res) {
+          toast.success(NotificationStatus.CREATED);
+          fetchRams();
+          handleClose();
+        } else {
+          toast.error(NotificationStatus.ERROR);
+        }
+      }catch(error){
+        if (error.status == 403){
+          alert("Không đủ quyền thực hiện chức năng này")
+        }
+        if (error.status == 401){
+          navigate(`/login`);
+        }
       }
     }
   };
