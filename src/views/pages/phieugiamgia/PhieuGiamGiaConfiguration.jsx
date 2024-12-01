@@ -64,7 +64,7 @@ function PhieuGiamGiaConfiguration() {
 
   const validationSchema = yup.object({
     tenPhieu: yup.string().required('Tên phiếu giảm giá là bắt buộc'),
-    
+
     giaTri: yup
       .string()
       .required('Giá trị là bắt buộc')
@@ -150,95 +150,6 @@ function PhieuGiamGiaConfiguration() {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const getHangKhachHang = (hang) => {
-    const chipStyles = {
-      width: '100px',
-      textAlign: 'center'
-    };
-
-    switch (hang) {
-      case 0:
-        return (
-          <Chip
-            label="Đồng"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#CD853F',
-              color: '#FFFFFF'
-            }}
-          />
-        );
-      case 1:
-        return (
-          <Chip
-            label="Bạc"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#C0C0C0',
-              color: '#000000'
-            }}
-          />
-        );
-      case 2:
-        return (
-          <Chip
-            label="Vàng"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#FFD700',
-              color: '#000000'
-            }}
-          />
-        );
-      case 3:
-        return (
-          <Chip
-            label="Bạch Kim"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#E5E4E2',
-              color: '#000000'
-            }}
-          />
-        );
-      case 4:
-        return (
-          <Chip
-            label="Kim Cương"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#363636',
-              color: '#FFFFFF'
-            }}
-          />
-        );
-      default:
-        return (
-          <Chip
-            label="Không xác định"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#FFFFFF',
-              color: '#000000'
-            }}
-          />
-        );
-    }
-  };
-
-  const handleSelectChange = (event) => {
-    const value = event.target.value;
-    setSelectHangKhachHang(value);
-    setCurrentPage(1);
-    setSearchKeyWord('');
   };
 
   const handleNavigate = () => {
@@ -440,7 +351,7 @@ function PhieuGiamGiaConfiguration() {
   };
 
   const isChiTietPage = location.pathname.includes('/phieugiamgia/chitietphieugiamgia');
-
+  const isUpdatePage = location.pathname.includes('/phieugiamgia/cauhinhphieugiamgia/')
   const handleSubmitWithConfirm = () => {
     setConfirmOpen(true);
   };
@@ -507,7 +418,7 @@ function PhieuGiamGiaConfiguration() {
               fullWidth
               margin="normal"
               InputProps={{
-                readOnly: isChiTietPage
+                readOnly: isChiTietPage || isUpdatePage
               }}
               value={formik.values.tenPhieu}
               onChange={formik.handleChange}
@@ -527,12 +438,12 @@ function PhieuGiamGiaConfiguration() {
                   error={formik.touched.giaTri && Boolean(formik.errors.giaTri)}
                   helperText={formik.touched.giaTri && formik.errors.giaTri}
                   InputProps={{
-                    readOnly: isChiTietPage,
+                    readOnly: isChiTietPage || isUpdatePage,
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => {
-                            if (!isChiTietPage) {
+                            if (!(isChiTietPage|| isUpdatePage)) {
                               handleCurrencyChange('%');
                             }
                           }}
@@ -542,7 +453,7 @@ function PhieuGiamGiaConfiguration() {
                         </IconButton>
                         <IconButton
                           onClick={() => {
-                            if (!isChiTietPage) {
+                            if (!(isChiTietPage|| isUpdatePage)) {
                               handleCurrencyChange('$');
                             }
                           }}
@@ -566,7 +477,7 @@ function PhieuGiamGiaConfiguration() {
                   error={formik.touched.giaTriToiDa && Boolean(formik.errors.giaTriToiDa)}
                   helperText={formik.touched.giaTriToiDa && formik.errors.giaTriToiDa}
                   InputProps={{
-                    readOnly: isChiTietPage,
+                    readOnly: isChiTietPage|| isUpdatePage,
                     endAdornment: (
                       <InputAdornment position="end">
                         <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
@@ -585,6 +496,9 @@ function PhieuGiamGiaConfiguration() {
                   onChange={formik.handleChange}
                   variant="outlined"
                   fullWidth
+                  InputProps={{
+                    readOnly: isChiTietPage || isUpdatePage
+                  }}
                   margin="normal"
                   name="soLuong"
                   helperText={formik.touched.soLuong && formik.errors.soLuong ? formik.errors.soLuong : ''}
@@ -598,7 +512,7 @@ function PhieuGiamGiaConfiguration() {
                   fullWidth
                   margin="normal"
                   InputProps={{
-                    readOnly: isChiTietPage
+                    readOnly: isChiTietPage || isUpdatePage
                   }}
                   value={formatNumber(formik.values.dieuKien)}
                   onChange={formik.handleChange}
@@ -658,7 +572,7 @@ function PhieuGiamGiaConfiguration() {
                   name="kieu"
                   value={formik.values.kieu}
                   onChange={(e) => {
-                    if (!isChiTietPage) {
+                    if (!(isChiTietPage|| isUpdatePage)) {
                       formik.handleChange(e);
                     }
                   }}
@@ -677,144 +591,114 @@ function PhieuGiamGiaConfiguration() {
         </Paper>
       </Grid>
 
-      <Grid item xs={6}>
-        <Paper style={{ padding: '16px', height: '100%' }}>
-          <Typography variant="h6" gutterBottom>
-            Chọn khách hàng
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="space-between"
-            mb={2}
-            p={2}
-            sx={{
-              backgroundColor: 'white',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              borderRadius: '8px',
-              width: '100%'
-            }}
-          >
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={5}>
-                <FormControl fullWidth>
-                  <FormLabel
-                    component="legend"
-                    sx={{
-                      mb: 1,
-                      fontWeight: 'bold',
-                      fontSize: '1rem',
-                      color: 'text.primary'
-                    }}
-                  >
-                    Tìm kiếm
-                  </FormLabel>
-                  <TextField
-                    value={searchKeyWord}
-                    onChange={(e) => setSearchKeyWord(e.target.value)}
-                    variant="outlined"
-                    placeholder="Nhập tên khách hàng"
-                    fullWidth
-                    InputProps={{
-                      style: {
-                        borderRadius: '8px'
-                      }
-                    }}
-                  />
-                </FormControl>
-              </Grid>
-              <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-              <Grid item xs={5}>
-                <FormControl fullWidth>
-                  <FormLabel
-                    component="legend"
-                    sx={{
-                      mb: 1,
-                      fontWeight: 'bold',
-                      fontSize: '1rem',
-                      color: 'text.primary'
-                    }}
-                  >
-                    Hạng khách hàng
-                  </FormLabel>
-                  <Select
-                    labelId="hang-khach-hang-label"
-                    id="hang-khach-hang-select"
-                    value={selectHangKhachHang}
-                    onChange={handleSelectChange}
-                    displayEmpty
-                    fullWidth
-                    sx={{
-                      borderRadius: '8px',
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <MenuItem value="">-- Tất cả khách hàng --</MenuItem>
-                    <MenuItem value={0}>Đồng</MenuItem>
-                    <MenuItem value={1}>Bạc</MenuItem>
-                    <MenuItem value={2}>Vàng</MenuItem>
-                    <MenuItem value={3}>Bạch Kim</MenuItem>
-                    <MenuItem value={4}>Kim Cương</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Fab
-                color="primary"
-                aria-label="back"
-                sx={{
-                  position: 'fixed',
-                  bottom: 16,
-                  right: 16
-                }}
-                onClick={handleNavigate}
-              >
-                <ArrowBackIcon />
-              </Fab>
-            </Grid>
-          </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={selectedKhachHang.length > 0 && selectedKhachHang.length < khachHang.length}
-                      checked={selectAll}
-                      onChange={handleSelectAll}
-                      disabled={isChiTietPage || formik.values.kieu === '1'}
+      {formik.values.kieu === '2' && (
+        <Grid item xs={6}>
+          <Paper style={{ padding: '16px', height: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+              Chọn khách hàng
+            </Typography>
+            <Box
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={2}
+              p={2}
+              sx={{
+                backgroundColor: 'white',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                borderRadius: '8px',
+                width: '100%'
+              }}
+            >
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={5}>
+                  <FormControl fullWidth>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        mb: 1,
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        color: 'text.primary'
+                      }}
+                    >
+                      Tìm kiếm
+                    </FormLabel>
+                    <TextField
+                      value={searchKeyWord}
+                      onChange={(e) => setSearchKeyWord(e.target.value)}
+                      variant="outlined"
+                      placeholder="Nhập tên khách hàng"
+                      fullWidth
+                      InputProps={{
+                        style: {
+                          borderRadius: '8px'
+                        }
+                      }}
                     />
-                  </TableCell>
-                  <TableCell>Tên khách hàng</TableCell>
-                  <TableCell>Số điện thoại</TableCell>
-                  <TableCell>Ngày sinh</TableCell>
-                  {/* <TableCell>Hạng khách hàng</TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {khachHang.map((row) => (
-                  <TableRow key={row.id}>
+                  </FormControl>
+                </Grid>
+                <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+
+                <Fab
+                  color="primary"
+                  aria-label="back"
+                  sx={{
+                    position: 'fixed',
+                    bottom: 16,
+                    right: 16
+                  }}
+                  onClick={handleNavigate}
+                >
+                  <ArrowBackIcon />
+                </Fab>
+              </Grid>
+            </Box>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
-                        onChange={() => handleSelectKhachHang(row.id)}
+                        indeterminate={selectedKhachHang.length > 0 && selectedKhachHang.length < khachHang.length}
+                        checked={selectAll}
+                        onChange={handleSelectAll}
                         disabled={isChiTietPage || formik.values.kieu === '1'}
                       />
                     </TableCell>
-                    <TableCell>{row.ten}</TableCell>
-                    <TableCell>{row.sdt}</TableCell>
-                    <TableCell>{formatDate(row.ngaySinh)}</TableCell>
-                    {/* <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell> */}
+                    <TableCell>Tên khách hàng</TableCell>
+                    <TableCell>Số điện thoại</TableCell>
+                    <TableCell>Ngày sinh</TableCell>
+                    {/* <TableCell>Hạng khách hàng</TableCell> */}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Box display="fixed" justifyContent="center" alignItems="center" marginTop={2}>
-            <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
-          </Box>
-        </Paper>
-      </Grid>
+                </TableHead>
+                <TableBody>
+                  {khachHang.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
+                          onChange={() => handleSelectKhachHang(row.id)}
+                          disabled={isChiTietPage || formik.values.kieu === '1'}
+                        />
+                      </TableCell>
+                      <TableCell>{row.ten}</TableCell>
+                      <TableCell>{row.sdt}</TableCell>
+                      <TableCell>{formatDate(row.ngaySinh)}</TableCell>
+                      {/* <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell> */}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box display="fixed" justifyContent="center" alignItems="center" marginTop={2}>
+              <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+            </Box>
+          </Paper>
+        </Grid>
+      )}
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
