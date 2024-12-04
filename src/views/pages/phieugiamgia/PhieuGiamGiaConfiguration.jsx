@@ -664,7 +664,7 @@ function PhieuGiamGiaConfiguration() {
                         indeterminate={selectedKhachHang.length > 0 && selectedKhachHang.length < khachHang.length}
                         checked={selectAll}
                         onChange={handleSelectAll}
-                        disabled={isChiTietPage || formik.values.kieu === '1'}
+                        disabled={isChiTietPage || formik.values.kieu === '1' || isUpdatePage}
                       />
                     </TableCell>
                     <TableCell>Tên khách hàng</TableCell>
@@ -680,7 +680,7 @@ function PhieuGiamGiaConfiguration() {
                         <Checkbox
                           checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
                           onChange={() => handleSelectKhachHang(row.id)}
-                          disabled={isChiTietPage || formik.values.kieu === '1'}
+                          disabled={isChiTietPage || formik.values.kieu === '1'|| isUpdatePage}
                         />
                       </TableCell>
                       <TableCell>{row.ten}</TableCell>

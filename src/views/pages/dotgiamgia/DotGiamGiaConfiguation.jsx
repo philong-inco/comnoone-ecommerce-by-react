@@ -57,6 +57,7 @@ function DotGiamGiaConfiguration() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChiTietPage, setIsChiTietPage] = useState(false);
+  const [isUpdatePage, setIsUpdatePage] = useState(false);
   const [currencyType, setCurrencyType] = useState('%');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -72,6 +73,14 @@ function DotGiamGiaConfiguration() {
       setIsChiTietPage(true);
     } else {
       setIsChiTietPage(false);
+    }
+  }, [location, id]);
+
+  useEffect(() => {
+    if (location.pathname.includes('/dotgiamgia/cauhinhdotgiamgia/edit')) {
+      setIsUpdatePage(true);
+    } else {
+      setIsUpdatePage(false);
     }
   }, [location, id]);
 
@@ -497,7 +506,7 @@ function DotGiamGiaConfiguration() {
               error={formik.touched.giaTri && Boolean(formik.errors.giaTri)}
               helperText={formik.touched.giaTri && formik.errors.giaTri}
               InputProps={{
-                readOnly: isChiTietPage,
+                readOnly: isChiTietPage|| isUpdatePage,
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={() => !isChiTietPage && setCurrencyType('%')} color={currencyType === '%' ? 'primary' : 'default'}>
@@ -520,7 +529,7 @@ function DotGiamGiaConfiguration() {
               error={formik.touched.giaTriToiDa && Boolean(formik.errors.giaTriToiDa)}
               helperText={formik.touched.giaTriToiDa && formik.errors.giaTriToiDa}
               InputProps={{
-                readOnly: isChiTietPage,
+                readOnly: isChiTietPage || isUpdatePage,
                 endAdornment: (
                   <InputAdornment position="end">
                     <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
@@ -645,7 +654,7 @@ function DotGiamGiaConfiguration() {
                           <Checkbox
                             checked={selectedSanPham.includes(sanPham.id)}
                             onChange={() => handleSelectSanPham(sanPham.id)}
-                            disabled={isChiTietPage}
+                            disabled={isChiTietPage || isUpdatePage}
                           />
                         </TableCell>
                       </TableRow>
@@ -716,7 +725,7 @@ function DotGiamGiaConfiguration() {
                             <Checkbox
                               checked={selectedSanPhamChiTiet[sanPhamId]?.includes(sanPhamChiTietItem.id) || false}
                               onChange={() => handleSelectSanPhamChiTiet(sanPhamId, sanPhamChiTietItem)}
-                              disabled={isChiTietPage}
+                              disabled={isChiTietPage || isUpdatePage}
                             />
                           </TableCell>
                           <TableCell>{sanPhamChiTietItem.giaBan}</TableCell>
