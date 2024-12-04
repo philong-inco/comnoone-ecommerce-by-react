@@ -55,6 +55,9 @@ function ChinhSach() {
           <Typography paragraph>
             - Để trở thành khách hàng thân thiết, bạn cần đăng ký tài khoản với COMNOONE và tích lũy điểm sau mỗi lần mua hàng.
           </Typography>
+          <Typography paragraph>
+            - Phiếu giảm giá áp dụng cho khách hàng sẽ không quá 2 triệu đồng, phiếu giảm giá nếu là khách hàng cá nhân sẽ được gửi qua email cá nhân của khách hàng.
+          </Typography>
         </Box>
 
         {/* Nội quy nhân viên */}
