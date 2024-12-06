@@ -18,7 +18,7 @@ const AuthGuard = ({ children, allowedRoles }) => {
       }
 
       try {
-        const response = await fetch('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/v1/auth/verify-token', {
+        const response = await fetch('http://localhost:8080/api/v1/auth/verify-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

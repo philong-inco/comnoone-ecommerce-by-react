@@ -61,12 +61,12 @@ function Calendarwork() {
   };
 
   const findNhanVien = async (id) => {
-    const result = await axios.get(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/nhan_vien/${id}`);
+    const result = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
     return result.data.ten;
   }
 
   const findCaLamViec = async (id) => {
-    const result = await axios.get(`https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/ca_lam_viec/searchcalamviec/${id}`);
+    const result = await axios.get(`http://localhost:8080/api/ca_lam_viec/searchcalamviec/${id}`);
     return result.data.moTa;
   }
 
@@ -74,7 +74,7 @@ function Calendarwork() {
     try {
 
       debugger;
-      const response = await axios.get('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/lichlamviec/danhsachlich');
+      const response = await axios.get('http://localhost:8080/api/lichlamviec/danhsachlich');
       if (Array.isArray(response.data)) {
         const lichLamViecEvents = await Promise.all(response.data.map(async (item) => {
           const tenNhanVien = await findNhanVien(item.nhanVien);
@@ -100,7 +100,7 @@ function Calendarwork() {
 
   const fetchAllNhanVien = async () => {
     try {
-      const result = await axios.get('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/nhan_vien/danhsachnhanvien');
+      const result = await axios.get('http://localhost:8080/api/nhan_vien/danhsachnhanvien');
       setDanhSachNhanVien(result.data);
     } catch (error) {
       console.log(error);
@@ -109,7 +109,7 @@ function Calendarwork() {
 
   const fetchAllCaLamViec = async () => {
     try {
-      const results = await axios.get('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/ca_lam_viec/danhsach');
+      const results = await axios.get('http://localhost:8080/api/ca_lam_viec/danhsach');
       if (Array.isArray(results.data)) {
         setDanhSachCaLamViec(results.data);
       } else {
@@ -138,7 +138,7 @@ function Calendarwork() {
           },
         };
 
-        await axios.post('https://weblaptop-by-springboot-and-reactjs-ji0q.onrender.com/api/lichlamviec/addlichnhanvien', {
+        await axios.post('http://localhost:8080/api/lichlamviec/addlichnhanvien', {
           chuThich,
           idNhanVien,
           idCaLamViec,
