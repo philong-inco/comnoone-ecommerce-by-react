@@ -145,6 +145,8 @@ function NewTimeLine(props) {
   };
   // api
   const apiUpdateStatusBill = async (data) => {
+    setLoading(true);
+
     try {
       const response = await updateStatusByCode(id, keyStatus, data);
       if (response.status_code == 201) {
@@ -184,11 +186,13 @@ function NewTimeLine(props) {
           console.log('Messages là mảng rỗng');
         }
       } else {
-        setSnackbarMessage(messages);
+        setSnackbarMessage(error.response.data.error);
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
         console.log('Messages không hợp lệ');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -206,8 +210,8 @@ function NewTimeLine(props) {
       }
     } catch (error) {
       console.log(error);
-
-      setSnackbarMessage(error.response.data.message);
+      // setSnackbarMessage(error.response.data.message);
+      setSnackbarMessage(error.response.data.error);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       console.log(error);
@@ -300,7 +304,8 @@ function NewTimeLine(props) {
       // bill.trangThai === 'DANG_GIAO' ||
       bill.trangThai === 'XAC_NHAN' ||
       bill.trangThai === 'DON_MOI' ||
-      bill.trangThai === 'TREO'
+      bill.trangThai === 'TREO' ||
+      bill.trangThai === 'HEN_LAI'
     ) {
       buttons.push(
         <Grid item xs={3} key="huy-button">
@@ -354,11 +359,28 @@ function NewTimeLine(props) {
       );
     } else if (bill.trangThai === 'DANG_GIAO' && bill.loaiHoaDon === 1) {
       buttons.push(
-        <Grid item xs={3} key="hoan-thanh-button">
-          <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
-            HOÀN THÀNH
-          </Button>
-        </Grid>
+        <>
+          <Grid item xs={3} key="hoan-thanh-button">
+            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
+              HOÀN THÀNH
+            </Button>
+          </Grid>
+          <Grid item xs={3} key="hoan-thanh-button">
+            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HEN_LAI')} fullWidth>
+              HẸN LẠI{' '}
+            </Button>
+          </Grid>
+        </>
+      );
+    } else if (bill.trangThai === 'HEN_LAI') {
+      buttons.push(
+        <>
+          <Grid item xs={3} key="hoan-thanh-button">
+            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
+              HOÀN THÀNH
+            </Button>
+          </Grid>
+        </>
       );
     }
 
@@ -605,6 +627,7 @@ function NewTimeLine(props) {
               onClick={() => {
                 openConfirmOkeDialog();
               }}
+              disabled={loading}
             >
               Lưu
             </Button>

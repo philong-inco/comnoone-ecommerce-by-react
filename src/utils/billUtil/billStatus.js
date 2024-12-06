@@ -24,6 +24,8 @@ export const getStatusDisplayName = (status) => {
       return 'Đã xác nhận';
     case 'TREO':
       return 'Hóa đơn chờ';
+    case 'HEN_LAI':
+      return 'Hẹn lại';
     default:
       return 'Không xác định';
   }
@@ -114,6 +116,8 @@ export const getStatusBillHistory = (status) => {
       return 'Đã xác nhận 9';
     case 12:
       return 'Cập nhập đơn hàng';
+    case 13:
+      return 'Hẹn lại 13';
     default:
       return 'Không xác định 10';
   }

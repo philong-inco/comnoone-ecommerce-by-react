@@ -149,7 +149,7 @@ function Sell() {
         fetchBillCodes(); // Cập nhật danh sách hóa đơn
       }
     } catch (error) {
-      setSnackbarMessage('Chuyển đổi trạng thái thất bại');
+      setSnackbarMessage(error.response.data.error);
       setSnackbarSeverity('error');
       console.log('Lỗi', error);
     } finally {

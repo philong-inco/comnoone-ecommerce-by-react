@@ -56,13 +56,13 @@ function HangBill(props) {
     try {
       const response = await changeStatusByCode(code, 'DON_MOI');
       if (response.status_code === 201) {
-        setSnackbarMessage('Hủy treo hóa đơn thành công');
+        setSnackbarMessage('Chuyển đổi trạng thái thành công');
         setSnackbarSeverity('success');
         fetchAll();
         onReload();
       }
     } catch (error) {
-      setSnackbarMessage('Chuyển đổi trạng thái thất bại');
+      setSnackbarMessage(error.response.data.error);
       setSnackbarSeverity('error');
       console.log('Lỗi', error);
     }

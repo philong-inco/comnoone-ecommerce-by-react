@@ -26,6 +26,8 @@ const getStatus = (stt) => {
       return 'Treo';
     case 12:
       return 'Cập nhập đơn hàng';
+    case 13:
+      return 'Hẹn lại';
     default:
       return '';
   }

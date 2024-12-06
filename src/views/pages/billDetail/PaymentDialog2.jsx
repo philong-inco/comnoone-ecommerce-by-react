@@ -112,16 +112,11 @@ const PaymentDialog2 = (props) => {
         fetchAll();
       }
     } catch (error) {
-      if (error.response) {
-        //   const errorData = error.response.data;
-        //   if (errorData && errorData.message) {
-        //     const errorMessage = errorData.message.map((err) => `${err.messages}`);
-        //     setSnackbarMessage(errorMessage);
-        //   } else {
-        //     setSnackbarMessage('Đã xảy ra lỗi không xác định.');
-        //   }
-        // } else {
-        setSnackbarMessage('Lỗi mạng hoặc không thể kết nối đến server.');
+      if (error.response && error.response.data) {
+        const errorMessages = error.response.data.message.map((msg) => msg.messages).join(', ');
+        setSnackbarMessage(` ${errorMessages}`);
+      } else {
+        setSnackbarMessage('Đã xảy ra lỗi không xác định');
       }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
@@ -280,6 +275,17 @@ const PaymentDialog2 = (props) => {
     setOpenQr(true);
   };
 
+  function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
+    return new Intl.NumberFormat(locale, {
+      style: 'decimal',
+      currency: currency
+    }).format(amount);
+  }
+
+  const handlePriceAll = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setSoTien(value);
+  };
   return (
     <>
       <Dialog open={open} onClose={onCloseDialog} fullWidth maxWidth="md">
