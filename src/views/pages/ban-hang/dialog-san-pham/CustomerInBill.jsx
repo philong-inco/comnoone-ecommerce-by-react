@@ -18,16 +18,30 @@ import {
   DialogActions,
   TextField,
   IconButton,
-  Tooltip
+  Tooltip,
+  FormControl,
+  FormLabel,
+  FormControlLabel,
+  RadioGroup,
+  Radio
 } from '@mui/material';
 import { GridCheckCircleIcon } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { addCustomerToBill } from 'services/admin/bill/billService';
 import { fetchSearchCustomer, findCustomerByPhone } from 'services/admin/customer/customerService';
+import { useForm, Controller } from 'react-hook-form';
+import axios from 'axios';
 
 function CustomerInBill(props) {
   const { id } = useParams();
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors }
+  } = useForm();
   const { bill, onLoading } = props;
   const [customers, setCustomers] = useState([]);
   const [showDiaLogCustomer, setShowDiaLogCustomer] = useState(false);
@@ -40,9 +54,18 @@ function CustomerInBill(props) {
     email: '',
     diaChi: ''
   });
+  const [openAddCustomer, setOpenAddCustomer] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleOpen = () => {
+    setOpenAddCustomer(true);
+    // handleCloseShowDiaLogCustomer();
+  };
+  const handleClose = () => setOpenAddCustomer(false);
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
@@ -163,22 +186,103 @@ function CustomerInBill(props) {
     setShowDiaLogCustomer(false);
     setCustomers([]);
   };
+  //
+  const onSubmit = async (data) => {
+    setLoading(true);
+    let finalData = {
+      ten: data.name,
+      email: data.email,
+      sdt: data.phone,
+      ngay_sinh: new Date(data.dob).toISOString(),
+      gioi_tinh: data.gender,
+      hinhAnh: null,
+      idPhuongXa: 100410,
+      idQuanHuyen: 3310,
+      idTinhThanhPho: 247,
+      diaChiNhanHang: ''
+    };
+    console.log('Customer Data:', finalData);
+    try {
+      const response = await axios.post(`http://localhost:8080/api/khachhang/create`, finalData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.status === 200) {
+        console.log(response);
+        handleAddCustomerToBill(response.data.id);
+        setSnackbarMessage('Dữ liệu khách hàng được thêm thành công!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        reset();
+        handleClose();
+      } else {
+        throw new Error('Unexpected response status');
+      }
+    } catch (error) {
+      console.log(error);
+
+      handleApiError(error);
+    }
+    setLoading(false);
+
+    // handleClose();
+  };
+  const handleApiError = (error) => {
+    // debugger;
+    let errorMessage = 'Có lỗi xảy ra khi xử lý yêu cầu!';
+
+    if (error.response && error.response.data) {
+      const errorData = error.response.data;
+
+      if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+
+      if (errorData.error) {
+        const mainError = errorData.error.split(':').pop().trim();
+        errorMessage = `${errorMessage}: ${mainError}`;
+      }
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        const additionalErrors = errorData.errors.map((err) => err.message || err).join('; ');
+        errorMessage = `${errorMessage}. Chi tiết: ${additionalErrors}`;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    setSnackbarMessage(errorMessage);
+    setSnackbarSeverity('error');
+    setSnackbarOpen(true);
+  };
+
+  const validateDateOfBirth = (value) => {
+    const today = new Date();
+    const birthDate = new Date(value);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const isAdult = age > 18 || (age === 18 && today >= new Date(birthDate.setFullYear(today.getFullYear())));
+    return isAdult || 'Khách hàng phải đủ 18 tuổi';
+  };
 
   return (
     <>
       <Grid container spacing={2} padding={2} sx={{ backgroundColor: 'white', marginTop: 1, borderRadius: 2 }}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Typography variant="h3">Khách hàng</Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              handleShowDiaLogCustomer();
-            }}
-            disabled={id ? false : true}
-          >
-            Chọn khách hàng
-          </Button>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                handleShowDiaLogCustomer();
+              }}
+              disabled={!id}
+              sx={{ mr: 1 }} // Thêm margin giữa các nút
+            >
+              Chọn khách hàng
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleOpen}>
+              Thêm nhanh
+            </Button>
+          </Grid>
         </Grid>
         <Grid container spacing={2} paddingY={2} borderBottom={1} borderColor="grey.300">
           <Grid item xs={6}>
@@ -235,7 +339,10 @@ function CustomerInBill(props) {
 
       {/* Khách hàng */}
       <Dialog open={showDiaLogCustomer} onClose={handleCloseShowDiaLogCustomer} maxWidth="md" fullWidth>
-        <DialogTitle>Danh sách khách hàng</DialogTitle>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
+          <DialogTitle style={{ margin: 0 }}>Danh sách khách hàng</DialogTitle>
+          {/* <AddCustomer handleCloseShowDiaLogCustomer={handleCloseShowDiaLogCustomer} onLoading={loadAll()} /> */}
+        </div>
         <DialogContent>
           {/* Thêm bảng vào Dialog */}
           <input
@@ -253,7 +360,7 @@ function CustomerInBill(props) {
                   <TableCell>Họ và tên</TableCell>
                   <TableCell>SDT</TableCell>
                   <TableCell>Email</TableCell>
-                  <TableCell>Hành động</TableCell>
+                  <TableCell>Hành động </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -265,7 +372,7 @@ function CustomerInBill(props) {
                     <TableCell>{customer.email ? customer.email : 'N/A'}</TableCell>
                     <TableCell>
                       <Tooltip title="Chọn khách hàng này" placement="top">
-                        <IconButton
+                        {/* <IconButton
                           onClick={() => {
                             handleAddCustomerToBill(customer.id);
                           }}
@@ -273,7 +380,16 @@ function CustomerInBill(props) {
                           disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
                         >
                           <GridCheckCircleIcon />
-                        </IconButton>
+                        </IconButton> */}
+                        <Button
+                          onClick={() => {
+                            handleAddCustomerToBill(customer.id);
+                          }}
+                          color="secondary"
+                          disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
+                        >
+                          Chọn
+                        </Button>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -289,11 +405,100 @@ function CustomerInBill(props) {
           onChange={(event, value) => handleChangePageCustomer(value)}
         />
         <DialogActions>
-          <Button onClick={handleCloseShowDiaLogCustomer} color="primary">
+          <Button onClick={handleCloseShowDiaLogCustomer} variant="contained" color="error">
             Đóng
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={openAddCustomer} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Thêm mới khách hàng</DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent>
+            {/* Họ và Tên */}
+            <TextField
+              fullWidth
+              label="Họ và tên"
+              margin="dense"
+              {...register('name', {
+                required: 'Họ và tên là bắt buộc',
+                minLength: { value: 5, message: 'Họ và tên phải từ 5 ký tự' },
+                maxLength: { value: 25, message: 'Họ và tên không vượt quá 25 ký tự' }
+              })}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+            />
+            {/* Email */}
+            <TextField
+              fullWidth
+              label="Email"
+              margin="dense"
+              {...register('email', {
+                required: 'Email là bắt buộc',
+                pattern: {
+                  value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+                  message: 'Email không hợp lệ'
+                }
+              })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
+            {/* Số điện thoại */}
+            <TextField
+              fullWidth
+              label="Số điện thoại"
+              margin="dense"
+              {...register('phone', {
+                required: 'Số điện thoại là bắt buộc',
+                pattern: {
+                  value: /^0[0-9]{9}$/,
+                  message: 'Số điện thoại phải bắt đầu bằng 0 và gồm 10 chữ số'
+                }
+              })}
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+            />
+            {/* Ngày sinh */}
+            <TextField
+              fullWidth
+              type="date"
+              label="Ngày sinh"
+              InputLabelProps={{ shrink: true }}
+              margin="dense"
+              {...register('dob', {
+                required: 'Ngày sinh là bắt buộc',
+                validate: validateDateOfBirth
+              })}
+              error={!!errors.dob}
+              helperText={errors.dob?.message}
+            />
+            {/* Giới tính */}
+            <FormControl component="fieldset" margin="dense">
+              <FormLabel component="legend">Giới tính</FormLabel>
+              <Controller
+                name="gender"
+                control={control}
+                defaultValue="1" // Nam mặc định
+                render={({ field }) => (
+                  <RadioGroup row {...field}>
+                    <FormControlLabel value="1" control={<Radio />} label="Nam" />
+                    <FormControlLabel value="0" control={<Radio />} label="Nữ" />
+                  </RadioGroup>
+                )}
+              />
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="secondary">
+              Hủy
+            </Button>
+            <Button type="submit" variant="contained" color="primary" disabled={loading}>
+              Lưu
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

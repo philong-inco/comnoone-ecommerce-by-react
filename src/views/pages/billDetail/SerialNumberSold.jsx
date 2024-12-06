@@ -135,18 +135,24 @@ function SerialNumberSold(props) {
       listSerialNumberId: selectedRows,
       productId: productId
     };
-    const response = await createSerialNumberSold(data);
-    if (response.status_code === 201) {
-      setSnackbarMessage('Cập nhập số lượng sản phẩm thành công');
-      setSnackbarSeverity('success');
+    try {
+      const response = await createSerialNumberSold(data);
+      if (response.status_code === 201) {
+        setSnackbarMessage('Cập nhập số lượng sản phẩm thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setOpenDialog(false);
+        setSelectedRows([]);
+        setSearchSerial('');
+        setPageSerial(1);
+        setProductId(null);
+        fetchSerialNumberSold();
+        onLoading();
+      }
+    } catch (error) {
+      setSnackbarMessage(error.response.data.error);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
-      setOpenDialog(false);
-      setSelectedRows([]);
-      setSearchSerial('');
-      setPageSerial(1);
-      setProductId(null);
-      fetchSerialNumberSold();
-      onLoading();
     }
   };
 
@@ -327,7 +333,7 @@ function SerialNumberSold(props) {
                 Mowr
               </Button> */}
               <Tooltip title="Quét Qr sản phẩm" placement="top">
-                <IconButton
+                {/* <IconButton
                   color="secondary"
                   aria-label="quét QR"
                   onClick={handleClickOpenQR}
@@ -340,7 +346,20 @@ function SerialNumberSold(props) {
                   variant="contained"
                 >
                   <CropFreeOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
+                <Button
+                  variant="contained"
+                  onClick={handleClickOpenQR}
+                  hidden={
+                    bill.trangThai == 'DANG_GIAO' ||
+                    bill.trangThai == 'HOAN_THANH' ||
+                    bill.trangThai == 'CHO_GIAO' ||
+                    bill.trangThai == 'HUY'
+                  }
+                  sx={{ marginRight: '10px' }}
+                >
+                  Quét QR
+                </Button>
               </Tooltip>
 
               <Tooltip title="Thêm sản phẩm" placement="top">
