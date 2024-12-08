@@ -142,9 +142,9 @@ function Sell() {
 
   const handleConfirm = async () => {
     try {
-      const response = await changeStatusByCode(selectedCode, 'TREO'); // Sử dụng selectedCode
+      const response = await changeStatusByCode(selectedCode, 'TREO');
       if (response.status_code === 201) {
-        setSnackbarMessage('Hóa đơn đã chuyển sang trạng thái trờ');
+        setSnackbarMessage('Hóa đơn đã chuyển sang trạng thái chờ');
         setSnackbarSeverity('success');
         fetchBillCodes(); // Cập nhật danh sách hóa đơn
       }
@@ -153,7 +153,7 @@ function Sell() {
       setSnackbarSeverity('error');
       console.log('Lỗi', error);
     } finally {
-      setSnackbarOpen(true); // Mở snackbar để thông báo
+      setSnackbarOpen(true);
       handleCloseDialog(); // Đóng dialog sau khi xác nhận
     }
   };

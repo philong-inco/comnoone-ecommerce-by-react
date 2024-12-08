@@ -667,9 +667,12 @@ function Test2(props) {
             Tổng hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} VNĐ
           </Typography>
-          <Button variant="contained" color="secondary" onClick={openPaymentDialog} disabled={!id}>
-            {formData.thanhToanSau == 1 ? 'Xác nhận đặt hàng' : 'Tiến hành thanh toán'}
-          </Button>
+          {id && (
+            <Button variant="contained" color="secondary" onClick={openPaymentDialog} disabled={bill.trangThai != 'DON_MOI'}>
+              {formData.thanhToanSau == 1 ? 'Xác nhận đặt hàng' : 'Tiến hành thanh toán'}
+            </Button>
+          )}
+
           <PaymentDialog2 open={isPaymentDialogOpen} onCloseDialog={onClosePaymentDialog} data={formData} onReload={loadAll} />
         </Grid>
       </Grid>

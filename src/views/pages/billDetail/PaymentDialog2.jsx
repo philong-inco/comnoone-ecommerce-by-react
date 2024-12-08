@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mbBankImage from '../../../assets/images/MB-Banl.jpg';
+// import mbBankImage from '../../../assets/images/MB-Banl.jpg';
 import CropFreeOutlinedIcon from '@mui/icons-material/CropFreeOutlined';
 
 import {
@@ -28,6 +28,7 @@ import { useParams } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { payCounter } from 'services/admin/bill/billService';
 import { createVNPay } from 'services/admin/vnpay';
+import { getQr } from 'services/admin/vietqr';
 
 const PaymentDialog2 = (props) => {
   const { id } = useParams();
@@ -57,6 +58,11 @@ const PaymentDialog2 = (props) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [error, setError] = useState(false);
 
+  const [openVietQr, setOpenVietQr] = useState(false);
+  const [qr, setQr] = useState(null);
+
+  const [openConfirmVietQr, setOpenConfirmVietQr] = useState(false);
+
   const handlePhuongThucThanhToanChange = (phuongThuc) => {
     setPhuongThucThanhToan(phuongThuc);
     setXacNhanMo(true);
@@ -64,12 +70,14 @@ const PaymentDialog2 = (props) => {
   console.log('DATA PAY : ', data);
 
   const handleConfirm = () => {
-    if (soTien === '' || soTien === null || soTien == undefined) {
+    if (soTien === '' || soTien === null || soTien == undefined || soTien <= 0) {
       setError(true);
       return;
     } else {
       setError(false);
     }
+    console.log(soTien);
+
     const idThanhToan = phuongThucThanhToan === 'cash' ? 1 : 2;
     const newData = {
       idHTTT: idThanhToan,
@@ -97,18 +105,15 @@ const PaymentDialog2 = (props) => {
     setSoTien('');
     setXacNhanMo(false);
   };
-
   const create = async (newData) => {
-    console.log(id);
-    console.log('Chạy 0', data.ma);
-
     try {
       const response = await addPaymentHistory(data.ma, newData);
       if (response.status_code === 201) {
         setSnackbarMessage('Giao dịch thành công');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        console.log('Chạy 2');
+        setOpenConfirmVietQr(false);
+        setOpenVietQr(false);
         fetchAll();
       }
     } catch (error) {
@@ -120,7 +125,6 @@ const PaymentDialog2 = (props) => {
       }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
-      console.log(error);
     }
   };
 
@@ -210,19 +214,12 @@ const PaymentDialog2 = (props) => {
       setSnackbarOpen(true);
     }
   };
-  // useEffect(() => {
-  //   if (data.loaiHoaDon == 0) {
-  //     setTienThieu(data.tongTienPhaiTra || 0);
-  //   } else {
-  //     setTienThieu(data.tongTienPhaiTra + data.tienShip);
-  //   }
-  // }, [open]);
   useEffect(() => {
     const tongTienPhaiTra = data.loaiHoaDon === 0 ? data.tongTienPhaiTra : data.tongTienPhaiTra + data.tienShip;
 
     const currentTienThieu = tongTienPhaiTra - tienDaThanhToan;
     setTienThieu(currentTienThieu > 0 ? currentTienThieu : 0);
-
+    setSoTien(currentTienThieu > 0 ? currentTienThieu : 0);
     const tienDu = tienDaThanhToan - tongTienPhaiTra;
     setTienDu(tienDu > 0 ? tienDu : 0);
   }, [tienDaThanhToan, data]);
@@ -271,9 +268,9 @@ const PaymentDialog2 = (props) => {
     }
   };
 
-  const handleClickOpenQR = () => {
-    setOpenQr(true);
-  };
+  // const handleClickOpenQR = () => {
+  //   setOpenQr(true);
+  // };
 
   function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
     return new Intl.NumberFormat(locale, {
@@ -282,9 +279,36 @@ const PaymentDialog2 = (props) => {
     }).format(amount);
   }
 
-  const handlePriceAll = (e) => {
+  const handleChangePrice = (e) => {
     const value = e.target.value.replace(/\D/g, '');
     setSoTien(value);
+  };
+
+  const handleOpenVietQr = async () => {
+    try {
+      const res = await getQr(soTien, data.ma);
+      if (res.code == '00') {
+        setQr(res.data.qrDataURL);
+        setOpenVietQr(true);
+      }
+      setSnackbarMessage('Tạm thời không thể gen mã QR');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch {
+      setSnackbarMessage('Tạm thời không thể gen mã QR');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleClonseVietQr = () => {
+    setQr(null);
+    setOpenVietQr(false);
+  };
+
+  const handleConfirmVietQr = (phuongThuc) => {
+    setPhuongThucThanhToan(phuongThuc);
+    setOpenConfirmVietQr(true);
   };
   return (
     <>
@@ -300,27 +324,20 @@ const PaymentDialog2 = (props) => {
                     VNĐ
                   </Typography>
                 </Grid>
-                <Grid item xs={6} style={{ textAlign: 'right' }}>
-                  <Tooltip title="QR thanh toán" placement="top">
-                    <IconButton color="primary" aria-label="quét QR" onClick={handleClickOpenQR}>
-                      <CropFreeOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   label="Số tiền"
-                  type="number"
-                  value={soTien}
+                  value={soTien ? formatCurrency(soTien) : ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (parseFloat(value) >= 0 || value !== '') {
-                      setSoTien(value);
-                    }
+                    // if (parseFloat(value) >= 0 || value !== '') {
+                    // setSoTien(value);
+                    handleChangePrice(e);
+                    // }
                   }}
                   error={error}
-                  helperText={error ? 'Số tiền không được để trống' : ''}
+                  helperText={error ? 'Số tiền không được để trống và lớn hơn 0' : ''}
                   fullWidth
                 />
               </Grid>
@@ -330,6 +347,7 @@ const PaymentDialog2 = (props) => {
                   variant={phuongThucThanhToan === 'cash' ? 'contained' : 'outlined'}
                   onClick={() => handlePhuongThucThanhToanChange('cash')}
                   fullWidth
+                  disabled={tienThieu <= 0}
                 >
                   Tiền mặt
                 </Button>
@@ -337,7 +355,11 @@ const PaymentDialog2 = (props) => {
               <Grid item xs={6}>
                 <Button
                   variant={phuongThucThanhToan === 'transfer' ? 'contained' : 'outlined'}
-                  onClick={() => handlePhuongThucThanhToanChange('transfer')}
+                  onClick={() =>
+                    // handlePhuongThucThanhToanChange('transfer')
+                    handleOpenVietQr()
+                  }
+                  disabled={tienThieu <= 0}
                   fullWidth
                 >
                   Chuyển khoản
@@ -382,9 +404,9 @@ const PaymentDialog2 = (props) => {
                           <TableCell>{thanhToan.loaiThanhToan === 0 ? 'Thanh toán' : 'Trả Sau'}</TableCell>
                           <TableCell>{thanhToan.nguoiTao ? thanhToan.nguoiTao : 'Chưa xác định'}</TableCell>
                           <TableCell>
-                            <Tooltip label="Hủy bỏ giao dịch này">
+                            <Tooltip title="Hủy bỏ giao dịch này" placement="top">
                               <Button onClick={() => handleDelete(thanhToan.id)}>
-                                <Delete color="erorr" />
+                                <Delete color="error" />
                               </Button>
                             </Tooltip>{' '}
                           </TableCell>
@@ -396,7 +418,7 @@ const PaymentDialog2 = (props) => {
               </Grid>
 
               <Grid item xs={12} sx={{ textAlign: 'right' }}>
-                <Button onClick={() => setXacNhanThanhToan(true)} disabled={tienThieu > 0}>
+                <Button onClick={() => setXacNhanThanhToan(true)} disabled={tienThieu > 0} variant="contained" color="secondary">
                   Thanh toán
                 </Button>
               </Grid>
@@ -410,10 +432,12 @@ const PaymentDialog2 = (props) => {
           <DialogContent>
             Bạn có chắc chắn muốn thanh toán bằng {phuongThucThanhToan === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'} không?
           </DialogContent>
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
-            <Button onClick={() => setXacNhanMo(false)}>Hủy</Button>
-            <Button onClick={handleConfirm} color="primary">
-              OK
+          <Grid item xs={12} sx={{ textAlign: 'right', padding: '5px' }}>
+            <Button onClick={() => setXacNhanMo(false)} variant="contained" color="error" sx={{ marginRight: '5px' }}>
+              Hủy
+            </Button>
+            <Button onClick={handleConfirm} variant="contained" color="secondary">
+              Xác nhận
             </Button>
           </Grid>
         </Dialog>
@@ -432,7 +456,6 @@ const PaymentDialog2 = (props) => {
           </Button>
         </Grid>
       </Dialog>
-
       <Dialog
         open={isConformPdf}
         onClose={() => {
@@ -463,24 +486,35 @@ const PaymentDialog2 = (props) => {
           </Button>
         </Grid>
       </Dialog>
-      <Dialog
-        open={openQr}
-        onClose={() => {
-          setOpenQr(false);
-        }}
-      >
-        <img src={mbBankImage} alt="" />
+
+      <Dialog open={openVietQr} onClose={handleClonseVietQr}>
+        {qr && <img src={qr}></img>}
+        <Button
+          onClick={() => {
+            handleConfirmVietQr('transfer');
+            handleClonseVietQr();
+          }}
+          variant="contained"
+          color="secondary"
+        >
+          Xác nhận
+        </Button>
       </Dialog>
-      {pdfUrl && (
-        <iframe
-          ref={iframeRef}
-          src={pdfUrl}
-          width="0"
-          height="0"
-          style={{ display: 'none' }} // Ẩn iframe
-          title="PDF"
-        />
-      )}
+      {/* Xác nhận nhận tiền */}
+      <Dialog open={openConfirmVietQr} onClose={() => setOpenConfirmVietQr(false)}>
+        <DialogTitle>Xác nhận thanh toán</DialogTitle>
+        <DialogContent>
+          Bạn chắc chắn đã nhận số tiền là : <strong>{formatCurrency(soTien)} đ</strong> ?
+        </DialogContent>
+        <Grid item xs={12} sx={{ textAlign: 'right', padding: '5px' }}>
+          <Button onClick={() => setOpenConfirmVietQr(false)} variant="contained" color="error" sx={{ marginRight: '5px' }}>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirm} variant="contained" color="secondary">
+            Đúng vậy
+          </Button>
+        </Grid>
+      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

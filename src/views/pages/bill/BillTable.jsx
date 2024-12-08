@@ -33,7 +33,7 @@ function BillTable(props) {
     { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
     { key: 'CHO_GIAO', label: 'Chờ giao' },
     { key: 'DANG_GIAO', label: 'Đang giao' },
-    // { key: 'TRA_HANG_HOAN_TIEN', label: 'Trả hàng hoàn tiền' },
+    { key: 'HEN_LAI', label: 'Hẹn lại' },
     { key: 'HOAN_THANH', label: 'Hoàn thành' },
     { key: 'HUY', label: 'Hủy' }
   ];
