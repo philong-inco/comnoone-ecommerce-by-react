@@ -220,7 +220,7 @@ function NhanVienConfiguration() {
       if (nhanVienData.hinhAnh) {
         setImageUrl(nhanVienData.hinhAnh);
       } else {
-        setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
+        setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png');
       }
       setValue('ngay_sinh', nhanVienData.ngaySinh.split('T')[0]);
 
@@ -431,7 +431,7 @@ function NhanVienConfiguration() {
                 />
               ) : (
                 <img
-                  src="https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg"
+                  src="https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png"
                   alt=""
                   style={{
                     width: '250px',

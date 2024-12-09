@@ -64,7 +64,6 @@ function PhieuGiamGiaConfiguration() {
 
   const validationSchema = yup.object({
     tenPhieu: yup.string().required('Tên phiếu giảm giá là bắt buộc'),
-
     giaTri: yup
       .string()
       .required('Giá trị là bắt buộc')
@@ -237,11 +236,11 @@ function PhieuGiamGiaConfiguration() {
 
         const data = {
           ten: values.tenPhieu,
-          giaTriDonToiThieu: new BigNumber(String(values.dieuKien).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
+          giaTriDonToiThieu: new BigNumber(String(values.dieuKien).replace(/\./g, '')).toFixed(),
           ngayBatDau: addSeconds(values.tuNgay),
           ngayHetHan: addSeconds(values.denNgay),
           loaiGiamGia: currencyType === '%' ? 1 : 2,
-          giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(), // Chuyển thành chuỗi
+          giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(), 
           giamToiDa: values.giaTriToiDa === '' ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
           phamViApDung: values.kieu,
           soLuong: values.soLuong,
@@ -283,7 +282,7 @@ function PhieuGiamGiaConfiguration() {
           ? prevSelected.filter((selectedId) => selectedId !== id)
           : [...(Array.isArray(prevSelected) ? prevSelected : []), id];
 
-      console.log('Selected KhachHang within handler:', newSelected); // Kiểm tra giá trị mới
+      console.log('Selected KhachHang within handler:', newSelected);
       return newSelected;
     });
   };
@@ -402,8 +401,8 @@ function PhieuGiamGiaConfiguration() {
                 readOnly: true,
                 inputProps: { tabIndex: -1 },
                 sx: {
-                  pointerEvents: 'none', // Ngăn hiệu ứng khi hover
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)' // Tạo nền mờ nhạt để giảm độ nổi bật
+                  pointerEvents: 'none',
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)' 
                 }
               }}
               InputLabelProps={{
@@ -686,7 +685,6 @@ function PhieuGiamGiaConfiguration() {
                       <TableCell>{row.ten}</TableCell>
                       <TableCell>{row.sdt}</TableCell>
                       <TableCell>{formatDate(row.ngaySinh)}</TableCell>
-                      {/* <TableCell>{getHangKhachHang(row.hangKhachHang)}</TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

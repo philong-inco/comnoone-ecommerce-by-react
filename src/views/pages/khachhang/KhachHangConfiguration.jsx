@@ -48,10 +48,10 @@ const validationSchema = Yup.object().shape({
       if (!value) return false;
       const today = new Date();
       const birthDate = new Date(value);
-      let age = today.getFullYear() - birthDate.getFullYear(); // Changed from const to let
+      let age = today.getFullYear() - birthDate.getFullYear(); 
       const monthDifference = today.getMonth() - birthDate.getMonth();
       if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        age--; // Now the reassignment is valid because "age" is a let
+        age--; 
       }
       return age >= 10;
     }),
@@ -129,7 +129,7 @@ function KhachHangConfiguration() {
           token: '0292ba75-34b6-11ef-89ca-1aad91406dac'
         }
       });
-      setProvinces(response.data.data); // Set the response data to provinces state
+      setProvinces(response.data.data); 
     } catch (error) {
       console.error('Error fetching provinces:', error);
       throw error;
@@ -146,7 +146,7 @@ function KhachHangConfiguration() {
           province_id: provinceId
         }
       });
-      setDistricts(response.data.data); // Set the response data to districts state
+      setDistricts(response.data.data); 
     } catch (error) {
       console.error('Error fetching districts:', error);
       throw error;
@@ -163,7 +163,7 @@ function KhachHangConfiguration() {
           district_id: districtId
         }
       });
-      setWards(response.data.data); // Set the response data to wards state
+      setWards(response.data.data); 
     } catch (error) {
       console.error('Error fetching wards:', error);
       throw error;
@@ -313,7 +313,7 @@ function KhachHangConfiguration() {
                 />
               ) : (
                 <img
-                  src="https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg"
+                  src="https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png"
                   alt="Ảnh đại diện"
                   style={{
                     width: '250px',

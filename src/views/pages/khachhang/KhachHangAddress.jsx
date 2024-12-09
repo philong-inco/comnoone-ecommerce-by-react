@@ -318,7 +318,7 @@ function KhachHangAddress() {
       if (khachHangData.hinhAnh) {
         setImageUrl(khachHangData.hinhAnh);
       } else {
-        setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1722592745/employee_images/zbphcixipri1c8rcdeov.jpg');
+        setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png');
       }
       const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data; 

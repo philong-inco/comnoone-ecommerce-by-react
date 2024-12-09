@@ -276,8 +276,8 @@ const KhachHang = () => {
                   component="legend"
                   sx={{
                     fontWeight: 'bold',
-                    whiteSpace: 'nowrap', // Ngăn chữ xuống dòng
-                    width: '50%' // Đặt chiều rộng cho label
+                    whiteSpace: 'nowrap',
+                    width: '50%'
                   }}
                 >
                   Tìm kiếm
@@ -300,7 +300,7 @@ const KhachHang = () => {
                   sx={{
                     fontWeight: 'bold',
                     whiteSpace: 'nowrap',
-                    width: '30%' // Đặt chiều rộng cho label để phù hợp
+                    width: '30%'
                   }}
                 >
                   Giới Tính
@@ -312,9 +312,9 @@ const KhachHang = () => {
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'flex-start', // Căn giữa các nút radio
+                    justifyContent: 'flex-start',
                     flexGrow: 1,
-                    marginLeft: '10px' // Khoảng cách giữa label và radio
+                    marginLeft: '10px'
                   }}
                 >
                   {statuses.map((status) => (
@@ -324,41 +324,6 @@ const KhachHang = () => {
               </Box>
             </FormControl>
           </Grid>
-
-          {/* Trường Hạng Khách Hàng */}
-          {/* <Grid item xs={12} sm={4}>
-            <FormControl fullWidth margin="normal">
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <FormLabel
-                  component="legend"
-                  sx={{
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap', // Ngăn chữ xuống dòng
-                    width: '50%' // Đặt chiều rộng cho label
-                  }}
-                >
-                  Hạng Khách Hàng
-                </FormLabel>
-                <Select
-                  labelId="hang-khach-hang-label"
-                  id="hang-khach-hang-select"
-                  value={selectHangKhachHang}
-                  onChange={handleSelectChange}
-                  displayEmpty
-                  fullWidth
-                >
-                  <MenuItem value="">
-                    <em>-- Chọn hạng khách hàng --</em>
-                  </MenuItem>
-                  <MenuItem value={0}>Đồng</MenuItem>
-                  <MenuItem value={1}>Bạc</MenuItem>
-                  <MenuItem value={2}>Vàng</MenuItem>
-                  <MenuItem value={3}>Bạch Kim</MenuItem>
-                  <MenuItem value={4}>Kim Cương</MenuItem>
-                </Select>
-              </Box>
-            </FormControl>
-          </Grid> */}
         </Grid>
 
         <Box
@@ -437,7 +402,6 @@ const KhachHang = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>STT</TableCell>
               <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hình Ảnh</TableCell>
               <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Mã Khách Hàng</TableCell>
               <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Tên Khách Hàng</TableCell>
@@ -453,20 +417,18 @@ const KhachHang = () => {
             {khachhang.length > 0 &&
               khachhang.map((kh, index) => {
                 const ngaySinh = formatDate(kh.ngaySinh);
-                const { text: hangText, color: hangColor } = getHangKhachHang(kh.hangKhachHang);
                 return (
                   <TableRow key={kh.id}>
-                    <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>{index + 1 + (currentPage - 1) * 5}</TableCell>
-                    <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>
+                    <TableCell sx={{ fontSize: '12px', padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <Avatar alt={kh.ten} src={kh.hinhAnh} sx={{ width: 100, height: 100 }} />
                     </TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.ma}</TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.ten}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{kh.ma}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{kh.ten}</TableCell>
                     <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{ngaySinh}</TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.email}</TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{kh.sdt}</TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>{getGioiTinhKhachHang(kh.gioiTinh)}</TableCell>
-                    <TableCell sx={{  padding: '8px', textAlign: 'center' }}>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{kh.email}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{kh.sdt}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>{getGioiTinhKhachHang(kh.gioiTinh)}</TableCell>
+                    <TableCell sx={{ padding: '8px', textAlign: 'center' }}>
                       <Button className="btn btn-link">
                         <IconEdit stroke={2} onClick={() => handleEdit(kh.id)} />
                       </Button>

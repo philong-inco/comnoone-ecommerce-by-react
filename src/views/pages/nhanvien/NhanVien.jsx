@@ -459,13 +459,12 @@ const DanhSachNhanVien = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>STT</TableCell>
+                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hình Ảnh</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Mã</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Tên</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Ngày Sinh</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>SĐT</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Email</TableCell>
-                            <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hình Ảnh</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Địa Chỉ</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Trạng Thái</TableCell>
                             <TableCell sx={{ fontSize: '12px', padding: '8px', textAlign: 'center' }}>Hành Động</TableCell>
@@ -475,8 +474,7 @@ const DanhSachNhanVien = () => {
                         {nhanVien.length > 0 && nhanVien.map((nv, index) => {
                             const ngaySinh = formatDate(nv.ngaySinh);
                             return (
-                                <TableRow key={nv.id}>
-                                    <TableCell>{index + 1 + (currentPage - 1) * 5}</TableCell>
+                                <TableRow key={nv.id}>        
                                     <TableCell>
                                         <Avatar
                                             alt={nv.ten}
