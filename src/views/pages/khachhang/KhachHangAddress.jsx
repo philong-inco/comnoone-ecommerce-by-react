@@ -256,7 +256,7 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         setLoading1(true);
-        await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        await axios.put(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
@@ -272,7 +272,7 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         setLoading2(true);
-        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        await axios.put(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
         setDefaultAddressId(null); // Unset the default address
         handleCloseModal();
       } catch (error) {
@@ -291,7 +291,7 @@ function KhachHangAddress() {
   const handleDeleteAddress = async () => {
     try {
       setLoading3(true);
-      await axios.delete(`http://localhost:8080/api/diachi/${addressId}`);
+      await axios.delete(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/${addressId}`);
     } catch (error) {
       console.error('Lỗi khi xóa địa chỉ:', error);
     } finally {
@@ -308,7 +308,7 @@ function KhachHangAddress() {
 
   const fetchKhachHangInfo = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
+      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/khachhang/searchbyid/${id}`);
       const khachHangData = response.data;
       setValue('ten', khachHangData.ten);
       setValue('sdt', khachHangData.sdt);
@@ -320,7 +320,7 @@ function KhachHangAddress() {
       } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png');
       }
-      const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
+      const responseDiaChi = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
       const diaChiList = responseDiaChi.data; 
       setAddresses(diaChiList);
       const provinces = new Set();
@@ -442,7 +442,7 @@ function KhachHangAddress() {
       }
 
       await validationSchema.validate(updatedData);
-      const url = `http://localhost:8080/api/khachhang/update/${id}`;
+      const url = `https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/khachhang/update/${id}`;
       const response = await axios.put(url, updatedData, {
         headers: {
           'Content-Type': 'application/json'
@@ -493,7 +493,7 @@ function KhachHangAddress() {
       formDataAddress.idQuanHuyen = data.districts || selectedDistrict;
       formDataAddress.idPhuongXa = data.wards || selectedWard;
       try {
-        const url = data.id_dia_chi ? `http://localhost:8080/api/diachi/updatelocation/${data.id_dia_chi}` : 'http://localhost:8080/api/diachi/create';
+        const url = data.id_dia_chi ? `https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/updatelocation/${data.id_dia_chi}` : 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/diachi/create';
         const method = data.id_dia_chi ? 'PUT' : 'POST';
         const responseAddress = await axios({
           method: method,

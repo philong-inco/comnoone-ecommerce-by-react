@@ -1,1 +1,1 @@
-const t="http://localhost:8080/api";export{t as b};
+const t="https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api";export{t as b};
