@@ -32,7 +32,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, idSP, idSPCT, setListSPCT, listImg }) {
+export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, idSP, idSPCT, setListSPCT, listImg, fetchDataBienThe }) {
   const navigate = useNavigate();
   const [listSeriTemp, setListSeriTemp] = React.useState([]);
   const [addSeriStr, setAddSeriStr] = React.useState('');
@@ -245,12 +245,8 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
       if (bienThe.giaBan == 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined) {
         alert('Điền đủ thông tin');
       } else {
-        try {
-          await put(`/san-pham-chi-tiet/update-price-image`, bienThe);
-          alert('Sửa thành công');
-        } catch (error) {
-          alert('Sửa thất bại');
-        }
+        await put(`/san-pham-chi-tiet/update-price-image`, bienThe);
+        alert('Sửa thành công');
       }
     }catch(error){
        if (error.status == 403){

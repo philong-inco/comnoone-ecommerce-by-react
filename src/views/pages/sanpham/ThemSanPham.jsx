@@ -132,6 +132,11 @@ const ThemSanPham = () => {
   }
 
   const handleUpdateContinue = async () => {
+    let isUnique = await checkTenSP(tenSanPham);
+    console.log('isUnique: ', isUnique);
+    if (!isUnique) {
+      showAlertMessage("Tên sản phẩm đã tồn tại")
+    }
     let check = true;
     if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' 
     ||heDieuHanhChecked === '' || manHinhChecked === '' || webcamChecked === '' 
@@ -143,25 +148,32 @@ const ThemSanPham = () => {
       check = false;
       showAlertMessage('Hãy nhập thông tin sản phẩm')
     }
-    let isUnique = await checkTenSP(tenSanPham);
-    if (!isUnique) {
-      showAlertMessage("Tên sản phẩm đã tồn tại")
-    }
-      console.log('--VGAChecked: ', VGAChecked);
-      console.log('--moTa: ', moTa);
-      console.log('--tenSanPham: ', tenSanPham);
-      console.log('--banPhimChecked: ', banPhimChecked);
-      console.log('--heDieuHanhChecked: ', heDieuHanhChecked);
-      console.log('--manHinhChecked: ', manHinhChecked);
-      console.log('--webcamChecked: ', webcamChecked);
-      console.log('--nhuCauChecked: ', nhuCauChecked);
-      console.log('--thuongHieuChecked: ', thuongHieuChecked);
-      console.log('--check: ', check);
-      console.log('--resultVariant.length > 0: ', resultVariant.length > 0);
-      console.log('--isUnique: ', isUnique);
+    
+      // console.log('--VGAChecked: ', VGAChecked);
+      // console.log('--moTa: ', moTa);
+      // console.log('--tenSanPham: ', tenSanPham);
+      // console.log('--banPhimChecked: ', banPhimChecked);
+      // console.log('--heDieuHanhChecked: ', heDieuHanhChecked);
+      // console.log('--manHinhChecked: ', manHinhChecked);
+      // console.log('--webcamChecked: ', webcamChecked);
+      // console.log('--nhuCauChecked: ', nhuCauChecked);
+      // console.log('--thuongHieuChecked: ', thuongHieuChecked);
+      // console.log('--check: ', check);
+      // console.log('--resultVariant.length > 0: ', resultVariant.length > 0);
+      // console.log('--isUnique: ', isUnique);
     //thực hiện kiểm tra lại các thuộc tính chung và sửa đổi vào result rồi sau đó tạo sản phẩm
     if (check == true && resultVariant.length > 0 && isUnique) {
-      handleCreateProduct();
+      try{
+        handleCreateProduct();
+      }catch(error){
+        if (error.status == 403){
+           alert("Không đủ quyền thực hiện chức năng này")
+        }
+        if (error.status == 401){
+           navigate(`/login`);
+        }
+     }
+      
     }
   }
 
@@ -530,67 +542,82 @@ const ThemSanPham = () => {
   //   return res;
   // }
 
+  const handleChangeAutoComplete = (event, value) => {
+    console.log('value: ', value);
+    setTenSanPham(value)
+  }
+
   const handleChangeMauChoAnh = (target) => {
     console.log(value)
   }
   
   const handleCreateProduct = async() => {
-    const addProductRes = await createProduct({
-      ten: tenSanPham,
-      trangThai: 1,
-      moTa: moTa,
-      nhuCauId: nhuCauChecked,
-      thuongHieuId: thuongHieuChecked
-    })
+    try{
 
-    if(addProductRes.code === 999){
-      toast.error(NotificationStatus.ERROR);
-      return;
-    }
-    
+      const addProductRes = await createProduct({
+        ten: tenSanPham,
+        trangThai: 1,
+        moTa: moTa,
+        nhuCauId: nhuCauChecked,
+        thuongHieuId: thuongHieuChecked
+      })
 
-    resultVariant.forEach(async (variant, index) => {
-      let product = {
-        giaBan: variant.giaBan,
-        trangThai: variant.trangThai,
-        banPhimId: variant.banPhim,
-        cpuId: variant.CPU.id,
-        heDieuHanhId: variant.heDieuHanh,
-        manHinhId: variant.manHinh,
-        mauSacId: variant.mauSac.id,
-        ramId: variant.RAM.id,
-        vgaId: variant.VGA,
-        webcamId: variant.webcam,
-        ocungId: variant.oCung.id,
-        sanPhamId: addProductRes.id,
-        listSerialNumber: '',
-        listUrlAnhSanPham: ''
-      }
-      if (variant.serialNumberList.length > 0){
-        product.listSerialNumber = variant.serialNumberList.join(',');
-      }
-      if (variant.anhSanPham.length > 0){
-        product.listUrlAnhSanPham = variant.anhSanPham.join(',')
-      }
-
-      console.log('product: ', product)
-      // const checkRes = await checkValidToAdd(product);
-      // console.log({checkRes});
-      
-      // if(!checkRes || checkRes.code === 999){
-      //   toast.error(checkRes.message);
-      //   return;
-      // }
-      const addDetailRes = await createProductDetail(product);
-      if(!addDetailRes || addDetailRes.code === 999){
+      if(addProductRes.code === 999){
         toast.error(NotificationStatus.ERROR);
         return;
       }
-      if(index === (resultVariant.length - 1)){
-        toast.success(NotificationStatus.CREATED);
-        navigate(`/sanpham/danhsach`);
+      
+
+      resultVariant.forEach(async (variant, index) => {
+        let product = {
+          giaBan: variant.giaBan,
+          trangThai: variant.trangThai,
+          banPhimId: variant.banPhim,
+          cpuId: variant.CPU.id,
+          heDieuHanhId: variant.heDieuHanh,
+          manHinhId: variant.manHinh,
+          mauSacId: variant.mauSac.id,
+          ramId: variant.RAM.id,
+          vgaId: variant.VGA,
+          webcamId: variant.webcam,
+          ocungId: variant.oCung.id,
+          sanPhamId: addProductRes.id,
+          listSerialNumber: '',
+          listUrlAnhSanPham: ''
+        }
+        if (variant.serialNumberList.length > 0){
+          product.listSerialNumber = variant.serialNumberList.join(',');
+        }
+        if (variant.anhSanPham.length > 0){
+          product.listUrlAnhSanPham = variant.anhSanPham.join(',')
+        }
+
+        console.log('product: ', product)
+        // const checkRes = await checkValidToAdd(product);
+        // console.log({checkRes});
+        
+        // if(!checkRes || checkRes.code === 999){
+        //   toast.error(checkRes.message);
+        //   return;
+        // }
+        const addDetailRes = await createProductDetail(product);
+        if(!addDetailRes || addDetailRes.code === 999){
+          toast.error(NotificationStatus.ERROR);
+          return;
+        }
+        if(index === (resultVariant.length - 1)){
+          toast.success(NotificationStatus.CREATED);
+          navigate(`/sanpham/danhsach`);
+        }
+      })
+    } catch(error){
+      if (error.status == 403){
+         alert("Không đủ quyền thực hiện chức năng này")
       }
-    })
+      if (error.status == 401){
+         navigate(`/login`);
+      }
+   }
   }
 
   const SelectBoxColor = ({ title, options }) => {
@@ -626,9 +653,10 @@ const ThemSanPham = () => {
                 sx={{ width: '68%' }}
                 id="free-solo-demo"
                 freeSolo
+                onChange={handleChangeAutoComplete}
                 options={sanPham.map((option) => option.ten)}
                 renderInput={(params) => (
-                  <TextField {...params} id="nameProduct" label="Tên sản phẩm" variant="outlined" color="secondary" onChange={(e) => setTenSanPham(e.target.value)}/>
+                  <TextField {...params} id="nameProduct" value={tenSanPham} label="Tên sản phẩm" variant="outlined" color="secondary" onChange={(e) => setTenSanPham(e.target.value)}/>
                 )}
               />
 
