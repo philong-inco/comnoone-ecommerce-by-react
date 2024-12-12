@@ -24,6 +24,8 @@ import { backEndUrl } from '../../../utils/back-end.js';
 import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../utils/requestSanPham';
 const SuaSanPham = () => {
+  
+  const [role, setRole] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();  
   const [openSeri, setOpenSeri] = useState(false); // openViewSeri
@@ -88,6 +90,9 @@ const SuaSanPham = () => {
   }, [spct])
 
   useEffect(() => {
+    const roleTemp = JSON.parse(localStorage.getItem('COMNOONE_USER_INFO'));
+    setRole(roleTemp.role)
+    console.log('roleTemp: ', roleTemp);
     loadData();
   }, []);
   useEffect(() => {
@@ -288,6 +293,11 @@ const SuaSanPham = () => {
   }
 
   const handleSwitchChange = (id) => (e) => {
+    if (role === 'STAFF'){
+      alert("Bạn không đủ quyền hạn")
+      fetchDataBienThe();
+      return;
+    }
     e.target.checked ? suaTrangThai(id, 1) : suaTrangThai(id, 0);
 };
 
@@ -296,7 +306,7 @@ const suaTrangThai = (id, status) => {
         try{
           get(`/san-pham-chi-tiet/change-status?idSPCT=${id}&status=${status}`)
           .then(response => {
-            fetchDataBienThe();
+             fetchDataBienThe();
           })
         }catch(error){
            if (error.status == 403){
@@ -418,10 +428,10 @@ const suaTrangThai = (id, status) => {
               <TableCell align="left"><IconEye onClick={() => handleViewSerial(row.id)} stroke={2} /><p sx={{color: '#85EA2D'}}>{row.listSerialNumber !== '' ? row.listSerialNumber.split(',').length : 0}</p>  </TableCell>
               <TableCell align="left">
                 {row.trangThai === 1 ?
-                  <Switch defaultChecked color="secondary"
+                  <Switch defaultChecked color="secondary" disabled={role === 'STAFF'}
                           onChange={handleSwitchChange(row.id)}/>
                     :
-                  <Switch onChange={handleSwitchChange(row.id)} />}
+                  <Switch onChange={handleSwitchChange(row.id)} disabled={role === 'STAFF'} />}
               </TableCell>
             </TableRow>
           ))}
@@ -438,6 +448,7 @@ const suaTrangThai = (id, status) => {
         idSPCT={idSPCT}
         setListSPCT={setspct}
         listImg={listImg}
+        fetchDataBienThe={fetchDataBienThe}
       />
     </>
   )

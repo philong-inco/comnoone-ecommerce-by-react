@@ -29,6 +29,7 @@ import { backEndUrl } from '../../../utils/back-end.js';
 import {get, post, put, del } from '../../../utils/requestSanPham';
 
 const DanhSachSanPham = () => {
+    
     const navigate = useNavigate();
     const handleUpdate = (id) => {
         navigate(`/sanpham/sua/${id}`);
@@ -108,7 +109,7 @@ const DanhSachSanPham = () => {
         idHeDieuHanh: '',
         idBanPhim: ''
     });
-
+    const [role, setRole] = useState('');
     // Data for filters
     const [nhuCau, setNhuCau] = useState([]);
     const [thuongHieu, setThuongHieu] = useState([]);
@@ -141,6 +142,8 @@ const DanhSachSanPham = () => {
     const [trangThaiChecked, setTrangThaiChecked] = useState([]);
 
     useEffect(() => {
+        const roleTemp = JSON.parse(localStorage.getItem('COMNOONE_USER_INFO'));
+        setRole(roleTemp.role)
         loadProducts();
         // Load filter options
         loadFilterOptions();
@@ -578,10 +581,10 @@ const DanhSachSanPham = () => {
                                                             </IconButton>
                                                             {valueTrangThai === 1 ?
                                                                 <Switch defaultChecked color="secondary"
-                                                                    onChange={handleSwitchChange(row.id)}
+                                                                    onChange={handleSwitchChange(row.id)} disabled={role === 'STAFF'}
                                                                 />
                                                                 :
-                                                                <Switch onChange={handleSwitchChange(row.id)} />}
+                                                                <Switch onChange={handleSwitchChange(row.id)} disabled={role === 'STAFF'} />}
                                                         </TableCell>
                                                     }
                                                     return (
