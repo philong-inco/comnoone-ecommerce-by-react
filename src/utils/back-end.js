@@ -1,1 +1,1 @@
-export const backEndUrl = 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api'
+export const backEndUrl = 'http://localhost:8080/api'

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_DOMAIN = 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/';
+const API_DOMAIN = 'http://localhost:8080/api/';
 
 const axiosInstance = axios.create({
   baseURL: API_DOMAIN,

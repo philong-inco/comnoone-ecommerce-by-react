@@ -248,10 +248,10 @@ function PhieuGiamGiaConfiguration() {
         };
         let response;
         if (id) {
-          response = await axios.put(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/coupons/update/${id}`, data);
+          response = await axios.put(`http://localhost:8080/api/coupons/update/${id}`, data);
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
-          response = await axios.post('https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/coupons/add', data);
+          response = await axios.post('http://localhost:8080/api/coupons/add', data);
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được tạo thành công!', severity: 'success' });
         }
         setTimeout(() => {
@@ -327,7 +327,7 @@ function PhieuGiamGiaConfiguration() {
   const fetchCouponDetail = async () => {
     try {
       debugger;
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/coupons/detail/${id}`);
+      const response = await axios.get(`http://localhost:8080/api/coupons/detail/${id}`);
       const coupon = response.data;
       formik.setValues({
         stat: coupon.data.trangThai,

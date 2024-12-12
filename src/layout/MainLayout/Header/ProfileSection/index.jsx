@@ -79,7 +79,7 @@ const ProfileSection = () => {
   useEffect(() => {
     const fetchNhanVien = async () => {
       try {
-        const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/nhan_vien/${userInfo.id}`);
+        const response = await axios.get(`http://localhost:8080/api/nhan_vien/${userInfo.id}`);
         setNhanVien(response.data);
         console.log(response.data)
       } catch (error) {
@@ -94,7 +94,7 @@ const ProfileSection = () => {
 
   const fetchVaiTro = async () => {
     try {
-      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/vaitro/findbynhanvien/${userInfo.id}`);
+      const response = await axios.get(`http://localhost:8080/api/vaitro/findbynhanvien/${userInfo.id}`);
       setVaiTro(response.data);
       console.log(response.data)
     } catch (error) {

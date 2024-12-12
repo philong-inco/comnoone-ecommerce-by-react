@@ -416,7 +416,7 @@ function NewTimeLine(props) {
   console.log('BILL IN TIME LINE : ', bill);
   const fetchInvoicePdf = async () => {
     try {
-      const response = await fetch(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/bills/order-pdf/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/bills/order-pdf/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/pdf'
