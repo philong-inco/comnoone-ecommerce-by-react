@@ -113,11 +113,11 @@ function Sell() {
     }
     try {
       const response = await createBill();
-
       if (response.status_code === 201) {
         setTabs((prevTabs) => [response.data.ma, ...prevTabs]);
         setValue(0);
         navigate(`/ban-hang/hoa-don/${response.data.ma}`);
+        setSnackbarMessage('Tạo mới hóa đơn thành công');
         // toast.success(NotificationStatus.CREATED);
       }
     } catch (error) {

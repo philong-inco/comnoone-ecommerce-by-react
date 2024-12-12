@@ -443,9 +443,9 @@ const MainRoutes = {
     {
       path: '/',
       element: (
-        <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
-          <DashboardDefault />
-        </AuthGuard>
+        // <AuthGuard>
+        <DashboardDefault />
+        // </AuthGuard>
       )
     },
     {
@@ -454,9 +454,9 @@ const MainRoutes = {
         {
           path: 'default',
           element: (
-            <AuthGuard allowedRoles={['ADMIN', 'STAFF']}>
-              <DashboardDefault />
-            </AuthGuard>
+            // <AuthGuard>
+            <DashboardDefault />
+            // </AuthGuard>
           )
         }
       ]

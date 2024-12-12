@@ -135,7 +135,7 @@ function CouponDiaLog(props) {
           </TableContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDiaLogCoupon} color="primary">
+          <Button onClick={handleCloseDiaLogCoupon} color="error" variant="contained">
             Đóng
           </Button>
         </DialogActions>

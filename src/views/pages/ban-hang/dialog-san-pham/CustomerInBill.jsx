@@ -385,6 +385,7 @@ function CustomerInBill(props) {
                           onClick={() => {
                             handleAddCustomerToBill(customer.id);
                           }}
+                          variant="contained"
                           color="secondary"
                           disabled={bill?.idKhachHang === false || bill.idKhachHang === customer.id}
                         >
