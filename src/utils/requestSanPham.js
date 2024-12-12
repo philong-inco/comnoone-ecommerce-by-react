@@ -51,7 +51,7 @@ export const put = async (path, data) => {
 
 export const del = async (path) => {
     try {
-      const response = await axiosInstance.get(path);
+      const response = await axiosInstance.delete(path);
       return response;
     } catch (error) {
       console.error('DELETE request error:', error);

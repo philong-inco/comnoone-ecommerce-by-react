@@ -51,7 +51,7 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
   useEffect(() => {
     setVariant({
         giaBan: 0,
-        trangThai: 0,
+        trangThai: 1,
         cpuId: 0,
         ramId: 0,
         ocungId: 0,
