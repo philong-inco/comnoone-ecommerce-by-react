@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../../utils/requestSanPham';
 
 const ImportSanPham = () => {
+    const [role, setRole] = useState('');
     const navigate = useNavigate();
     const columnsSanPham = [
         {
@@ -564,6 +565,10 @@ const ImportSanPham = () => {
         }
     }, [messCheck])
     const handleAddMultiProduct = async () => {
+        if(role === 'STAFF'){
+            alert('Bạn không có quyền thực hiện tác vụ này')
+            return;
+        }
         if (await validateBeforeAddMultiProduct()) {
             console.log('validateBeforeAddMultiProduct: hợp lệ');
             await toast.promise(
@@ -676,6 +681,8 @@ const ImportSanPham = () => {
     };
 
     useEffect(() => {
+        const roleTemp = JSON.parse(localStorage.getItem('COMNOONE_USER_INFO'));
+        setRole(roleTemp.role)
         try{
             loadFilterOptions();
         }catch(error){
