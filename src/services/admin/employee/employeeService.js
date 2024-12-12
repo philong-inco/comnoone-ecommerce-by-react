@@ -94,3 +94,32 @@ export const sentEmailForgotPassword = async (email) => {
         throw error;
     }
 }
+
+
+export const createNhanVien = async (formData) => {
+    try {
+        const result = await post(`/nhan_vien/create`, formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return result;
+    } catch (error) {
+        console.error('Error creating Employee:', error);
+        throw error;
+    }
+};
+
+export const updateNhanVien = async (id, formData) => {
+    try {
+        const result = await put(`/nhan_vien/update/${id}`, formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return result;
+    } catch (error) {
+        console.error('Error updating Employee:', error);
+        throw error;
+    }
+};

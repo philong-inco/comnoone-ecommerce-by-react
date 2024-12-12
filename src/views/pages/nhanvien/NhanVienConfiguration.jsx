@@ -37,6 +37,7 @@ import {
   DialogContentText,
   DialogTitle
 } from '@mui/material';
+import { createNhanVien, updateNhanVien } from 'services/admin/employee/employeeService';
 const schema = Yup.object().shape({
   ten: Yup.string().required('Họ và tên không được để trống').max(255, 'Tên không được vượt quá 255 ký tự').typeError('Tên xảy ra lỗi !'),
   sdt: Yup.string()
@@ -336,18 +337,9 @@ function NhanVienConfiguration() {
       formData.list_vai_tro = ['STAFF'];
 
       await schema.validate(formData);
-      const url = id ? `https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/nhan_vien/update/${id}` : 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/nhan_vien/create';
-      const method = id ? 'put' : 'post';
-
-      const response = await axios({
-        method: method,
-        url: url,
-        data: formData,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
+      const response = id
+        ? await updateNhanVien(id, formData)
+        : await createNhanVien(formData);
       if (id) {
         setSnackbarMessage('Cập nhật nhân viên thành công!');
         setSnackbarSeverity('success');
@@ -360,7 +352,6 @@ function NhanVienConfiguration() {
         setSnackbarMessage('Thêm nhân viên thành công!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-
         setTimeout(() => {
           handleNavigate();
         }, 1000);
@@ -374,20 +365,30 @@ function NhanVienConfiguration() {
   };
 
   const handleApiError = (error) => {
-    if (error.response && error.response.data && error.response.data.message) {
-      const errorMessage = error.response.data.error;
-      const errorDetails = errorMessage.split(':').pop().trim();
-      setSnackbarMessage(errorDetails);
-    } else if (error.response && error.response.data && error.response.data.error) {
-      setSnackbarMessage(error.response.data.error);
+    if (error.response) {
+        if (error.response.status === 403) {
+            setSnackbarMessage('Bạn không có quyền truy cập vào tài nguyên này.');
+        } else if (error.response.status === 401) {
+            setSnackbarMessage('Phiên làm việc đã hết hạn hoặc chưa được xác thực. Vui lòng đăng nhập lại.');
+            navigate('/login')
+        } else if (error.response.data && error.response.data.message) {
+            const errorMessage = error.response.data.error;
+            const errorDetails = errorMessage.split(':').pop().trim();
+            setSnackbarMessage(errorDetails);
+        } else if (error.response.data && error.response.data.error) {
+            setSnackbarMessage(error.response.data.error);
+        } else {
+            setSnackbarMessage('Có lỗi xảy ra từ máy chủ!');
+        }
     } else if (error.message) {
-      setSnackbarMessage(error.message);
+        setSnackbarMessage(error.message);
     } else {
-      setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
+        setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
     }
+
     setSnackbarSeverity('error');
     setSnackbarOpen(true);
-  };
+};
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
