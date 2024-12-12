@@ -219,10 +219,10 @@ function AddressDiaLog(props) {
   };
 
   const getDeliveryDate = async (to_district_id, to_ward_code) => {
-    const dayShip = await fetchAllDayShip(to_district_id, to_ward_code);
+    // const dayShip = await fetchAllDayShip(to_district_id, to_ward_code);
     const moneyShip = await getMoneyShip(to_district_id, to_ward_code);
-    const date = new Date(dayShip.data.leadtime * 1000);
-    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    // const date = new Date(dayShip.data.leadtime * 1000);
+    // const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
     setFormData((prevOrderInfo) => ({
       ...prevOrderInfo,
       tienShip: moneyShip.data.total
@@ -289,6 +289,12 @@ function AddressDiaLog(props) {
       console.log('Error Address : ', error);
       if (error.response && error.response.data) {
         const errorMessages = error.response.data.message;
+        if (!Array.isArray(errorMessages)) {
+          setSnackbarMessage('Có lỗi xảy ra khi cập nhật!');
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
+          return;
+        }
         const newFormDataError = {
           ten: '',
           sdt: '',

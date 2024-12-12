@@ -1,4 +1,6 @@
+import { message } from 'antd';
 import axios from 'axios';
+import { onLogOut } from 'hooks/useAuth';
 const API_DOMAIN = 'http://localhost:8080/api/';
 
 const axiosInstance = axios.create({
@@ -17,6 +19,38 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+axiosInstance.interceptors.response.use(
+  function (response) {
+    return response.data;
+  },
+  function (error) {
+    const status = error.status;
+
+    switch (status) {
+      case 500: {
+        message.error('Vui lòng đăng nhập lại tài khoản!');
+        setTimeout(() => {
+          onLogOut();
+          window.location.href = '/login';
+        }, 2000);
+        break;
+      }
+
+      case 401: {
+        message.error('Thông tin đăng nhập không chính xác!');
+        break;
+      }
+
+      case 403: {
+        message.error('Tài khoản của bạn không có quyền truy cập!');
+        break;
+      }
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export const get = async (path) => {

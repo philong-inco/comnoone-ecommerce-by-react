@@ -302,27 +302,19 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachphieugiamgia',
-          element: (
-              <DanhSachPhieuGiamGia />
-          )
+          element: <DanhSachPhieuGiamGia />
         },
         {
           path: 'cauhinhphieugiamgia',
-          element: (
-              <PhieuGiamGiaConfiguration />
-          )
+          element: <PhieuGiamGiaConfiguration />
         },
         {
           path: 'cauhinhphieugiamgia/:id',
-          element: (
-              <PhieuGiamGiaConfiguration />
-          )
+          element: <PhieuGiamGiaConfiguration />
         },
         {
           path: 'chitietphieugiamgia/:id',
-          element: (
-              <PhieuGiamGiaConfiguration />
-          )
+          element: <PhieuGiamGiaConfiguration />
         }
       ]
     },
@@ -331,27 +323,19 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachdotgiamgia',
-          element: (
-              <DanhSachDotGiamGia />
-          )
+          element: <DanhSachDotGiamGia />
         },
         {
           path: 'cauhinhdotgiamgia',
-          element: (
-              <DotGiamGiaConfiguration />
-          )
+          element: <DotGiamGiaConfiguration />
         },
         {
           path: 'cauhinhdotgiamgia/edit/:id',
-          element: (
-              <DotGiamGiaConfiguration />
-          )
+          element: <DotGiamGiaConfiguration />
         },
         {
           path: 'cauhinhdotgiamgia/view/:id',
-          element: (
-              <DotGiamGiaConfiguration />
-          )
+          element: <DotGiamGiaConfiguration />
         }
       ]
     },
@@ -360,21 +344,15 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachnhanvien',
-          element: (
-              <DanhSachNhanVien />
-          )
+          element: <DanhSachNhanVien />
         },
         {
           path: 'configuration',
-          element: (
-              <NhanVienConfiguration />
-          )
+          element: <NhanVienConfiguration />
         },
         {
           path: 'configuration/:id',
-          element: (
-              <NhanVienConfiguration />
-          )
+          element: <NhanVienConfiguration />
         }
       ]
     },
@@ -384,21 +362,15 @@ const MainRoutes = {
       children: [
         {
           path: 'danhsachkhachhang',
-          element: (
-              <KhachHang />
-          )
+          element: <KhachHang />
         },
         {
           path: 'khachhangconfiguration',
-          element: (
-              <KhachHangConfiguration />
-          )
+          element: <KhachHangConfiguration />
         },
         {
           path: 'khachhangaddress/:id',
-          element: (
-              <KhachHangAddress />
-          )
+          element: <KhachHangAddress />
         }
       ]
     },
@@ -414,18 +386,14 @@ const MainRoutes = {
     // },
     {
       path: '/',
-      element: (
-          <DashboardDefault />
-      )
+      element: <DashboardDefault />
     },
     {
       path: 'dashboard',
       children: [
         {
           path: 'default',
-          element: (
-              <DashboardDefault />
-          )
+          element: <DashboardDefault />
         }
       ]
     },
@@ -433,7 +401,7 @@ const MainRoutes = {
       path: 'chinhsach',
       element: (
         <ErrorBoundary>
-            <ChinhSach />
+          <ChinhSach />
         </ErrorBoundary>
       )
     }

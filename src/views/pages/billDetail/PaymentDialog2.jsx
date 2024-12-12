@@ -291,7 +291,7 @@ const PaymentDialog2 = (props) => {
         setQr(res.data.qrDataURL);
         setOpenVietQr(true);
       }
-      setSnackbarMessage('Tạm thời không thể gen mã QR');
+      setSnackbarMessage('Tạo QR thanh toán thành công');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch {
