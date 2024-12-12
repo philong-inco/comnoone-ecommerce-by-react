@@ -1,100 +1,108 @@
-import axios from 'axios';
+import { get, post, put } from '../../../utils/request.js';
 
-const BASE_URL = 'http://localhost:8080http://localhost:8080/api/v1/';
-
-export const listDotGiamGia = (filters) => {
-  debugger;
-  const { page = 0, size = 5, ...restFilters } = filters;
-  const queryParams = new URLSearchParams({
-    ...restFilters,
-    page,
-    size
-  }).toString();
-  return axios.get(`http://localhost:8080/api/v1/discounts/all?${queryParams}`);
+export const listDotGiamGia = async (filters) => {
+    try {
+        const { page = 0, size = 5, ...restFilters } = filters;
+        const queryParams = new URLSearchParams({
+            ...restFilters,
+            page,
+            size,
+        }).toString();
+        const result = await get(`v1/discounts/all?${queryParams}`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching discount list:', error);
+        throw error;
+    }
 };
 
 export const themDotGiamGia = async (data) => {
-  await axios.post(`${BASE_URL}/discounts/add`, data);
-};
-export const getDataProducts = async (page, pageSize) => {
-  const url = `http://localhost:8080/api/san-pham/find-status-page?status=1&page=${page}&size=${pageSize}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      const errorDetails = await response.text();
-      throw new Error(`Network response was not ok: ${errorDetails}`);
+    try {
+        const result = await post(`v1/discounts/add`, data);
+        return result;
+    } catch (error) {
+        console.error('Error adding discount period:', error);
+        throw error;
     }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching product data:', error);
-    throw error;
-  }
 };
 
-export const getDGGPage = async (page, size) => {
-  try {
-    size = 6;
-    const result = await get(`http://localhost:8080/api/v1/discounts?page=${page - 1}&size=${size}`);
-    return result;
-  } catch (error) {
-    console.log('Error get :');
-    throw error;
-  }
+export const getDataProducts = async (page, pageSize) => {
+    try {
+        const result = await get(`san-pham/find-status-page?status=1&page=${page}&size=${pageSize}`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        throw error;
+    }
+};
+
+export const getDGGPage = async (page, size = 6) => {
+    try {
+        const result = await get(`v1/discounts?page=${page - 1}&size=${size}`);
+        return result;
+    } catch (error) {
+        console.error('Error fetching discount page:', error);
+        throw error;
+    }
 };
 
 export const getDataProductsDetail = async (idSanPham) => {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/san-pham-chi-tiet/get-by-product-id`, {
-      params: {
-        idProduct: idSanPham
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
-    throw new Error('Không thể tải chi tiết sản phẩm.');
-  }
+    try {
+      const response = await get(`san-pham-chi-tiet/get-by-product-id?idProduct=${idSanPham}`)
+        return response;
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        throw new Error('Không thể tải chi tiết sản phẩm.');
+    }
 };
 
 export const stopDPGG = async (id) => {
-  debugger;
-  try {
-    const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStop/${id}`);
-    return result;
-  } catch (error) {
-    console.log('Error put :', error);
-    throw error;
-  }
+    try {
+        const result = await put(`v1/discounts/changestatusStop/${id}`);
+        debugger;
+        return result;
+    } catch (error) {
+        console.error('Error stopping discount period:', error);
+        throw error;
+    }
 };
 
 export const startDGG = async (id) => {
-  debugger;
-  try {
-    const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusStart/${id}`);
-    return result;
-  } catch (error) {
-    console.log('Error put :', error);
-    throw error;
-  }
+    try {
+        const result = await put(`v1/discounts/changestatusStart/${id}`);
+        return result;
+    } catch (error) {
+        console.error('Error starting discount period:', error);
+        throw error;
+    }
 };
 
 export const deleteDGG = async (id) => {
-  debugger;
+    try {
+        const result = await put(`v1/discounts/changestatusdelete/${id}`);
+        return result;
+    } catch (error) {
+        console.error('Error deleting discount period:', error);
+        throw error;
+    }
+};
+
+export const CheckStatus = async () => {
+    try {
+        const result = await put(`v1/discounts/checkupdatestatus`);
+        return result;
+    } catch (error) {
+        console.error('Error checking status:', error);
+        throw error;
+    }
+};
+
+export const updateDotGiamGia = async (id, data) => {
   try {
-    const result = await axios.put(`http://localhost:8080/api/v1/discounts/changestatusdelete/${id}`);
-    return result;
+    const response = await put(`v1/discounts/update/${id}`, data);
+    return response;
   } catch (error) {
-    console.log('Error put :', error);
+    console.log('Error updating discount:', error);
     throw error;
   }
 };
-
-
-export const CheckStatus = async () =>{
-  try {
-    const response = await axios.put('http://localhost:8080/api/v1/discounts/checkupdatestatus');
-    return response;
-  } catch (error){
-    console.log('Error check status :', error);
-  }
-}

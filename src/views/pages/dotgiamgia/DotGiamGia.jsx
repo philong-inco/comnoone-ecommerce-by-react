@@ -44,8 +44,9 @@ function DotGiamGia() {
                 size,
                 page: currentPage - 1,
             });
-            setDotGiamGia(response.data.content);
-            setTotalPages(response.data.totalPages);
+            debugger;
+            setDotGiamGia(response.content);
+            setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Error fetching coupons:", error);
         }

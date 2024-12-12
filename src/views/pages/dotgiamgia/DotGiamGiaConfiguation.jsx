@@ -43,7 +43,7 @@ import axios from 'axios';
 import PercentIcon from '@mui/icons-material/Percent';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import BigNumber from 'bignumber.js';
-import { getDataProducts, getDataProductsDetail } from 'services/admin/coupons/dotGiamGiaService';
+import { getDataProducts, getDataProductsDetail, themDotGiamGia, updateDotGiamGia } from 'services/admin/coupons/dotGiamGiaService';
 function DotGiamGiaConfiguration() {
   const [sanPhamChiTiet, setSanPhamChiTiet] = useState({});
   const [sanPhamList, setSanPhamList] = useState([]);
@@ -86,12 +86,11 @@ function DotGiamGiaConfiguration() {
 
   useEffect(() => {
     const fetchSanPhamChiTiet = async () => {
-      debugger;
       try {
         const fetchedSanPhamChiTiet = await Promise.all(
           selectedSanPham.map(async (sanPhamId) => {
             const response = await getDataProductsDetail(sanPhamId);
-            return { sanPhamId, productDetails: response.data.data };
+            return { sanPhamId, productDetails: response.data };
           })
         );
         setSanPhamChiTiet((prevState) => {
@@ -139,14 +138,13 @@ function DotGiamGiaConfiguration() {
   };
 
   const handleSelectSanPham = async (sanPhamId) => {
-    debugger;
     setSelectedSanPham((prev) => {
       const newSelected = prev.includes(sanPhamId) ? prev.filter((id) => id !== sanPhamId) : [...prev, sanPhamId];
       if (!sanPhamChiTiet[sanPhamId]) {
         (async () => {
           try {
             const response = await getDataProductsDetail(sanPhamId);
-            const productDetails = response.data.data;
+            const productDetails = response.data;
             setSanPhamChiTiet((prev) => ({
               ...prev,
               [sanPhamId]: productDetails
@@ -162,7 +160,6 @@ function DotGiamGiaConfiguration() {
   };
 
   const handleSelectSanPhamChiTiet = (sanPhamId, sanPhamChiTietItem) => {
-    debugger;
     setSelectedSanPhamChiTiet((prevState) => {
       const currentItems = prevState[sanPhamId] || [];
 
@@ -308,10 +305,10 @@ function DotGiamGiaConfiguration() {
 
         let response;
         if (id) {
-          response = await axios.put(`http://localhost:8080/api/v1/discounts/update/${id}`, data);
+          response = await updateDotGiamGia(id, data);
           setSnackbar({ open: true, message: 'Đợt giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
-          response = await axios.post('http://localhost:8080/api/v1/discounts/add', data);
+          response = await themDotGiamGia(data);
           setSnackbar({ open: true, message: 'Đợt giảm giá đã được tạo thành công!', severity: 'success' });
         }
 
@@ -319,16 +316,26 @@ function DotGiamGiaConfiguration() {
           navigate('/dotgiamgia/danhsachdotgiamgia');
         }, 3000);
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          // Hiển thị lỗi server
-          setErrors(error.response.data.errors);
+        if (error.response) {
+            const { status, data } = error.response;
+    
+            if (status === 401) {
+                setSnackbar({ open: true, message: 'Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục!', severity: 'warning' });
+            } else if (status === 403) {
+                setSnackbar({ open: true, message: 'Bạn không có quyền truy cập vào tài nguyên này!', severity: 'error' });
+            } else if (data && data.errors) {
+                setErrors(data.errors);
+            } else {
+                setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+            }
         } else {
-          console.log(error);
-          setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+            console.error(error);
+            setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
         }
-      } finally {
+    } finally {
         setIsSubmitting(false);
-      }
+    }
+    
     }
   });
 
@@ -354,7 +361,6 @@ function DotGiamGiaConfiguration() {
 
   const fetchDggDetail = async () => {
     try {
-      debugger;
       const response = await axios.get(`http://localhost:8080/api/v1/discounts/${id}`);
       const data = response.data;
 
@@ -382,7 +388,7 @@ function DotGiamGiaConfiguration() {
       );
 
       const sanPhamIds = sanPhamChiTietData
-        .map((item) => parseInt(item.sanPhamId)) // Chuyển chuỗi thành số nguyên
+        .map((item) => parseInt(item.sanPhamId))
         .filter((value, index, self) => !isNaN(value) && self.indexOf(value) === index);
 
       const selectedSanPhamChiTietData = sanPhamChiTietData.reduce((acc, item) => {
