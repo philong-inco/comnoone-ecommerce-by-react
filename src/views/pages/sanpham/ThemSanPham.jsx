@@ -147,6 +147,19 @@ const ThemSanPham = () => {
     {
       check = false;
       showAlertMessage('Hãy nhập thông tin sản phẩm')
+      return;
+    }
+    if(tenSanPham.length > 200)
+    {
+      check = false;
+      showAlertMessage('Số lượng ký tự không quá 200 ký tự')
+      return;
+    }
+    if(moTa.length > 200)
+    {
+      check = false;
+      showAlertMessage('Số lượng ký tự không quá 200 ký tự')
+      return;
     }
     
       // console.log('--VGAChecked: ', VGAChecked);

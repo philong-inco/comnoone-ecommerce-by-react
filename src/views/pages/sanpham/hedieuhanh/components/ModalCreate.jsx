@@ -87,6 +87,10 @@ export default function TransitionsModal({fetchRams}) {
                 console.log('checkName: ', checkName);
                 alert('Tên đã tồn tại')
             }
+            if(ram.ten.length > 200){
+                alert("Ký tự tối đa 200 ký tự");
+                return;
+            }
             if (formValid) {
                const res = await createNewRam({
                 ten: ram.ten,

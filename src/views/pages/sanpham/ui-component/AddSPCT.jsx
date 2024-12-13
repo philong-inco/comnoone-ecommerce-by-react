@@ -112,6 +112,10 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
         alert("Vui lòng điền đủ thông tin")
         return;
     }
+    if (variant.giaBan !== undefined && parseFloat(variant.giaBan) > 500000000){
+      alert("Giá bán một sản phẩm không thể vượt quá 500 triệu")
+        return;
+    }
 
     try{
         const check = await post(`/san-pham-chi-tiet/valid-for-add`, variant);

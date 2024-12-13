@@ -325,7 +325,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
         }
       });
       // check giá
-      if (item.giaBan === '' || isNaN(item.giaBan) || parseFloat(item.giaBan) <= 0) {
+      if (item.giaBan === '' || isNaN(item.giaBan) || parseFloat(item.giaBan) <= 0 || parseFloat(item.giaBan) > 500000000) {
         check.check = false;
         check.message += idx + 1 + ', ';
       }

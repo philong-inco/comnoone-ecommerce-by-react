@@ -291,6 +291,14 @@ const ImportSanPham = () => {
                 }
             })
             for(const product of listNewProduct){
+                if(product?.ten || product?.ten.length > 200){
+                    alert("Tên sản phẩm không hợp lệ");
+                    return;
+                }
+                if(product?.moTa || product?.moTa.length > 200){
+                    alert("Mô tả sản phẩm không hợp lệ");
+                    return;
+                }
                 if(!product?.nhuCauInfo){
                     alert(`Tên nhu cầu không tồn tại hoặc không còn được sử dụng`)
                     return;
@@ -353,6 +361,10 @@ const ImportSanPham = () => {
 
             let isNotMatchProductName = false;
             for(const bienthe of listBienThe){
+                if(bienthe?.giaBan || parseFloat(bienthe.giaBan) > 500000000){
+                    alert("Giá sản phẩm không hợp lệ (khác 0 và tối đa 500 triệu");
+                    return;
+                }
                 if(!bienthe?.sanPhamInfo){
                     alert(`Tên sản phẩm "${bienthe.tenSanPham}" ở mục BIẾN THỂ không khớp`)
                     isNotMatchProductName = true;

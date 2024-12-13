@@ -216,6 +216,18 @@ const SuaSanPham = () => {
       alert("Vui lòng điền đủ thông tin")
       return;
     }
+    if(tenSanPham.length > 200)
+    {
+      check = false;
+      alert('Số lượng ký tự không quá 200 ký tự')
+      return;
+    }
+    if(moTaSanPham.length > 200)
+    {
+      check = false;
+      alert('Số lượng ký tự không quá 200 ký tự')
+      return;
+    }
     console.log('spUpdate: ', spUpdate);
 
     try {
