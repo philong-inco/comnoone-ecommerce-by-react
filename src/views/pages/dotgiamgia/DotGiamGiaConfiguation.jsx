@@ -43,7 +43,8 @@ import axios from 'axios';
 import PercentIcon from '@mui/icons-material/Percent';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import BigNumber from 'bignumber.js';
-import { getDataProducts, getDataProductsDetail, themDotGiamGia, updateDotGiamGia } from 'services/admin/coupons/dotGiamGiaService';
+import { detailDotGiamGia, getDataProducts, getDataProductsDetail, themDotGiamGia, updateDotGiamGia } from 'services/admin/coupons/dotGiamGiaService';
+import { get } from 'utils/request';
 function DotGiamGiaConfiguration() {
   const [sanPhamChiTiet, setSanPhamChiTiet] = useState({});
   const [sanPhamList, setSanPhamList] = useState([]);
@@ -205,8 +206,8 @@ function DotGiamGiaConfiguration() {
     validationSchema: yup.object({
       tenPhieu: yup.string().required('Tên đợt giảm giá là bắt buộc'),
       moTa: yup
-      .string()
-      .max(256, "Mô tả không được vượt quá 256 ký tự"),
+        .string()
+        .max(256, "Mô tả không được vượt quá 256 ký tự"),
       giaTri: yup
         .string()
         .required('Giá trị là bắt buộc')
@@ -262,7 +263,7 @@ function DotGiamGiaConfiguration() {
           return schema.min(tuNgay, 'Ngày kết thúc phải sau ngày bắt đầu');
         })
 
-        
+
     }),
 
     onSubmit: async (values, { setErrors, validateForm }) => {
@@ -291,7 +292,7 @@ function DotGiamGiaConfiguration() {
             return;
           }
         }
-        
+
         const data = {
           ten: values.tenPhieu,
           moTa: values.moTa,
@@ -317,25 +318,25 @@ function DotGiamGiaConfiguration() {
         }, 3000);
       } catch (error) {
         if (error.response) {
-            const { status, data } = error.response;
-    
-            if (status === 401) {
-                setSnackbar({ open: true, message: 'Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục!', severity: 'warning' });
-            } else if (status === 403) {
-                setSnackbar({ open: true, message: 'Bạn không có quyền truy cập vào tài nguyên này!', severity: 'error' });
-            } else if (data && data.errors) {
-                setErrors(data.errors);
-            } else {
-                setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
-            }
-        } else {
-            console.error(error);
+          const { status, data } = error.response;
+
+          if (status === 401) {
+            setSnackbar({ open: true, message: 'Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục!', severity: 'warning' });
+          } else if (status === 403) {
+            setSnackbar({ open: true, message: 'Bạn không có quyền truy cập vào tài nguyên này!', severity: 'error' });
+          } else if (data && data.errors) {
+            setErrors(data.errors);
+          } else {
             setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
+          }
+        } else {
+          console.error(error);
+          setSnackbar({ open: true, message: 'Đã xảy ra lỗi!', severity: 'error' });
         }
-    } finally {
+      } finally {
         setIsSubmitting(false);
-    }
-    
+      }
+
     }
   });
 
@@ -359,10 +360,11 @@ function DotGiamGiaConfiguration() {
     return cleanedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
-  const fetchDggDetail = async () => {
+  const fetchDggDetail = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/discounts/${id}`);
-      const data = response.data;
+      debugger;
+      const response = await detailDotGiamGia(id);
+      const data = response;
 
       formik.setValues({
         stat: data.trangThai,
@@ -380,10 +382,8 @@ function DotGiamGiaConfiguration() {
       const sanPhamChiTietIds = data.spctDotGiamGias || [];
       const sanPhamChiTietData = await Promise.all(
         sanPhamChiTietIds.map(async (idSanPhamChiTiet) => {
-          const spctResponse = await axios.get(
-            `http://localhost:8080/api/san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSanPhamChiTiet}`
-          );
-          return spctResponse.data.data;
+          const spctResponse = await get(`san-pham-chi-tiet/get-by-productdetail-id?idProductDetail=${idSanPhamChiTiet}`);
+          return spctResponse.data;
         })
       );
 
@@ -512,7 +512,7 @@ function DotGiamGiaConfiguration() {
               error={formik.touched.giaTri && Boolean(formik.errors.giaTri)}
               helperText={formik.touched.giaTri && formik.errors.giaTri}
               InputProps={{
-                readOnly: isChiTietPage|| isUpdatePage,
+                readOnly: isChiTietPage || isUpdatePage,
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={() => !isChiTietPage && setCurrencyType('%')} color={currencyType === '%' ? 'primary' : 'default'}>

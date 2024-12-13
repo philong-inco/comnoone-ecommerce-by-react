@@ -29,7 +29,7 @@ function Notification({ message = 'This is a success Alert inside a Snackbar!', 
   return (
     <Snackbar
       open={open}
-      autoHideDuration={null} // Tắt tự động ẩn
+      autoHideDuration={null} 
       onClose={handleClose}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
     >

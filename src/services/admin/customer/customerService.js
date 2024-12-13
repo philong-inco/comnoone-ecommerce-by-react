@@ -74,3 +74,20 @@ export const findCustomerByPhone = async (phone) => {
     console.log('Error  find customer by phone number : ', error);
   }
 };
+
+export const updateInfoKhachHang = async (id, updatedData) => {
+  try {
+      const result = await put(`khachhang/update/${id}`, updatedData, {
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      });
+      return result;
+  } catch (error) {
+      if (error.response && error.response.status === 401) {
+          handleUnauthorizedError();
+      }
+      console.log('Update Khach Hang : ', error);
+      throw error;
+  }
+};

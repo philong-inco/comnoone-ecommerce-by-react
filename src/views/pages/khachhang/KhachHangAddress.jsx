@@ -33,11 +33,13 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  Fab 
+  Fab
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import { IconPencil } from '@tabler/icons-react';
+import { createDiaChi, defaultLocation, deleteAddress, getAllDiaChiByIdKhachHang, getInfoKhachHang, unDefaultLocation, updateDiaChi } from 'services/admin/address';
+import { updateInfoKhachHang } from 'services/admin/customer/customerService';
 const validationSchema = Yup.object().shape({
   ten: Yup.string()
     .max(50, 'Tên không được vượt quá 50 ký tự')
@@ -90,7 +92,7 @@ function KhachHangAddress() {
     },
   });
 
-  const { register: registerAddress, handleSubmit: handleSubmitAddress, control: controlAddress, formState: { errors: addressErrors }, setValue:  setValueAddress, reset: resetAddress } = useForm({
+  const { register: registerAddress, handleSubmit: handleSubmitAddress, control: controlAddress, formState: { errors: addressErrors }, setValue: setValueAddress, reset: resetAddress } = useForm({
     resolver: yupResolver(addressValidationSchema),
     defaultValues: {
       ten_nguoi_nhan: '',
@@ -256,7 +258,7 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         setLoading1(true);
-        await axios.put(`http://localhost:8080/api/diachi/defaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
+        await defaultLocation(selectedAddress.id, id)
         setDefaultAddressId(selectedAddress.id);
         handleCloseModal();
       } catch (error) {
@@ -272,8 +274,8 @@ function KhachHangAddress() {
     if (selectedAddress) {
       try {
         setLoading2(true);
-        await axios.put(`http://localhost:8080/api/diachi/undefaultlocation/${selectedAddress.id}?idKhachHang=${id}`, null);
-        setDefaultAddressId(null); // Unset the default address
+        await unDefaultLocation(selectedAddress.id, id)
+        setDefaultAddressId(null);
         handleCloseModal();
       } catch (error) {
         console.error('Failed to unset default address', error);
@@ -291,7 +293,8 @@ function KhachHangAddress() {
   const handleDeleteAddress = async () => {
     try {
       setLoading3(true);
-      await axios.delete(`http://localhost:8080/api/diachi/${addressId}`);
+      await deleteAddress(addressId);
+
     } catch (error) {
       console.error('Lỗi khi xóa địa chỉ:', error);
     } finally {
@@ -308,8 +311,9 @@ function KhachHangAddress() {
 
   const fetchKhachHangInfo = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/khachhang/searchbyid/${id}`);
-      const khachHangData = response.data;
+      debugger;
+      const response = await getInfoKhachHang(id);
+      const khachHangData = response;
       setValue('ten', khachHangData.ten);
       setValue('sdt', khachHangData.sdt);
       setValue('email', khachHangData.email);
@@ -320,8 +324,9 @@ function KhachHangAddress() {
       } else {
         setImageUrl('https://res.cloudinary.com/daljc2ktr/image/upload/v1733729321/uw5bgtdqzuqaaqfweeqz.png');
       }
-      const responseDiaChi = await axios.get(`http://localhost:8080/api/diachi/getAllDiaChiByIdKhachHang/${id}`);
-      const diaChiList = responseDiaChi.data; 
+      const responseDiaChi = await getAllDiaChiByIdKhachHang(id)
+      const diaChiList = responseDiaChi;
+
       setAddresses(diaChiList);
       const provinces = new Set();
       const districts = new Set();
@@ -420,8 +425,6 @@ function KhachHangAddress() {
         gioi_tinh: data.gioi_tinh,
         hinhAnh: imageUrl
       };
-
-      // Tính tuổi từ ngày sinh
       const today = new Date();
       const birthDate = new Date(data.ngay_sinh);
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -431,8 +434,8 @@ function KhachHangAddress() {
         age--;
       }
 
-      if (age < 18) {
-        setSnackbarMessage('Tuổi phải lớn hơn hoặc bằng 18!');
+      if (age < 16) {
+        setSnackbarMessage('Tuổi phải lớn hơn hoặc bằng 16!');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
         setTimeout(() => {
@@ -440,22 +443,24 @@ function KhachHangAddress() {
         }, 1000);
         return;
       }
-
       await validationSchema.validate(updatedData);
-      const url = `http://localhost:8080/api/khachhang/update/${id}`;
-      const response = await axios.put(url, updatedData, {
-        headers: {
-          'Content-Type': 'application/json'
+      try {
+        debugger;
+        const response = await updateInfoKhachHang(id, updatedData);
+        if (response.status_code === 200) {
+          setSnackbarMessage('Cập nhật thành công khách hàng!');
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+          setTimeout(() => {
+            handleNavigate();
+            handleCloseSnackbar();
+          }, 1000);
         }
-      });
-      if (response.status === 200) {
-        setSnackbarMessage('Cập nhật thành công khách hàng!');
-        setSnackbarSeverity('success');
+      } catch (error) {
+        setSnackbarMessage('Cập nhật thất bại!');
+        setSnackbarSeverity('error');
         setSnackbarOpen(true);
-        setTimeout(() => {
-          handleNavigate();
-          handleCloseSnackbar();
-        }, 1000);
+        console.error('Error updating customer information:', error);
       }
 
     } catch (error) {
@@ -492,38 +497,33 @@ function KhachHangAddress() {
       formDataAddress.idTinhThanhPho = data.provinces || selectedProvince;
       formDataAddress.idQuanHuyen = data.districts || selectedDistrict;
       formDataAddress.idPhuongXa = data.wards || selectedWard;
+
       try {
-        const url = data.id_dia_chi ? `http://localhost:8080/api/diachi/updatelocation/${data.id_dia_chi}` : 'http://localhost:8080/api/diachi/create';
-        const method = data.id_dia_chi ? 'PUT' : 'POST';
-        const responseAddress = await axios({
-          method: method,
-          url: url,
-          data: formDataAddress,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+        if (data.id_dia_chi) {
+          await updateDiaChi(data.id_dia_chi, formDataAddress);
+          setSnackbarMessage('Cập nhật thành công địa chỉ!');
+        } else {
+          await createDiaChi(formDataAddress);
+          setSnackbarMessage('Thêm thành công địa chỉ!');
+        }
+
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          handleCloseModal();
+          handleCloseSnackbar();
+        }, 1000);
       } catch (error) {
-        console.log(error);
-      } if (data.id_dia_chi) {
-        setSnackbarMessage('Cập nhật thành công địa chỉ!');
-        setSnackbarSeverity('success');
+        debugger;
+        const errorMessage = error.response && error.response.data && error.response.data.error
+          ? error.response.data.error
+          : 'Có lỗi xảy ra khi cập nhật thông tin!';
+        setSnackbarMessage(errorMessage);
+        setSnackbarSeverity('error');
         setSnackbarOpen(true);
-        setTimeout(() => {
-          handleCloseModal();
-          handleCloseSnackbar();
-        }, 1000);
-      } else {
-        setSnackbarMessage('Thêm thành công địa chỉ !');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-        setTimeout(() => {
-          handleCloseModal();
-          handleCloseSnackbar();
-        }, 1000);
       }
     } catch (error) {
-      setSnackbarMessage('Có lỗi xảy ra khi cập nhật thông tin!');
+      setSnackbarMessage('Có lỗi xảy ra khi xử lý yêu cầu!');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {
@@ -533,6 +533,7 @@ function KhachHangAddress() {
       }, 1000);
     }
   };
+
 
   const openCloudinaryWidget = () => {
     window.cloudinary.openUploadWidget({
@@ -603,17 +604,17 @@ function KhachHangAddress() {
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'auto' }}>
       <Fab
-                color="primary"
-                aria-label="back"
-                sx={{
-                    position: 'fixed',
-                    bottom: 16,
-                    right: 16,
-                }}
-                onClick={handleNavigate}
-            >
-                <ArrowBackIcon />
-            </Fab>
+        color="primary"
+        aria-label="back"
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+        }}
+        onClick={handleNavigate}
+      >
+        <ArrowBackIcon />
+      </Fab>
       <Box sx={{ width: '33%', p: 2, borderRight: '1px solid #ddd' }}>
         <Typography variant="h4" gutterBottom sx={{ marginBottom: '5%', textAlign: 'center' }}>
           Thông tin khách hàng
@@ -1010,8 +1011,6 @@ function KhachHangAddress() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Thông báo bỏ làm giá trị mặc định */}
       <Dialog
         open={openUnsetDefaultDialog}
         onClose={() => setOpenUnsetDefaultDialog(false)}
@@ -1047,7 +1046,7 @@ function KhachHangAddress() {
       </Dialog>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        autoHideDuration={8000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >

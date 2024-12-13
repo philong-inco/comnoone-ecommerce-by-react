@@ -45,6 +45,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAll, getSearchKeyWord, getSelectHangKhachHang, getDanhSachKhachHang } from 'services/admin/customer/customerService.js';
 import BigNumber from 'bignumber.js';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { createPGG, getPGGById, updatedPGG } from 'services/admin/coupons/couponsService';
 function PhieuGiamGiaConfiguration() {
   const [currencyType, setCurrencyType] = useState('%');
   const [khachHang, setKhachHang] = useState([]);
@@ -248,10 +249,10 @@ function PhieuGiamGiaConfiguration() {
         };
         let response;
         if (id) {
-          response = await axios.put(`http://localhost:8080/api/coupons/update/${id}`, data);
+          response = await updatedPGG(id,data)
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
-          response = await axios.post('http://localhost:8080/api/coupons/add', data);
+          response = await createPGG(data)
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được tạo thành công!', severity: 'success' });
         }
         setTimeout(() => {
@@ -327,8 +328,8 @@ function PhieuGiamGiaConfiguration() {
   const fetchCouponDetail = async () => {
     try {
       debugger;
-      const response = await axios.get(`http://localhost:8080/api/coupons/detail/${id}`);
-      const coupon = response.data;
+      const response = await getPGGById(id);
+      const coupon = response;
       formik.setValues({
         stat: coupon.data.trangThai,
         maPhieu: coupon.data.ma,

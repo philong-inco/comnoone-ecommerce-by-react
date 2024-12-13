@@ -231,7 +231,7 @@ function KhachHangConfiguration() {
         });
 
         if (response.status === 200) {
-          setSnackbarMessage('Dữ liệu khách hàng được thêm thành công!');
+          setSnackbarMessage('Khách hàng được thêm thành công!');
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
           setTimeout(handleNavigate, 3000);

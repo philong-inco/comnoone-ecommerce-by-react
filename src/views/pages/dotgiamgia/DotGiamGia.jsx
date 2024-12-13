@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Switch, TablePagination,
@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import { listDotGiamGia, startDGG, stopDPGG, deleteDGG, CheckStatus } from 'services/admin/coupons/dotGiamGiaService';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import moment from 'moment';
 
 function DotGiamGia() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,47 +38,46 @@ function DotGiamGia() {
     const [selectedCouponStatus, setSelectedCouponStatus] = useState(null);
     const navigate = useNavigate();
 
-    const fetchCoupons = async () => {
+    const fetchCoupons = useCallback(async () => {
         try {
             const response = await listDotGiamGia({
                 ...filters,
                 size,
                 page: currentPage - 1,
             });
-            debugger;
             setDotGiamGia(response.content);
             setTotalPages(response.totalPages);
         } catch (error) {
             console.error("Error fetching coupons:", error);
         }
-    };
+    }, [filters, size, currentPage]);
 
     useEffect(() => {
-            fetchCoupons(false);
-    }, []);
+        fetchCoupons();  // Call on initial load
+    }, [fetchCoupons]);
 
+    // Delay API calls for checking status
     useEffect(() => {
         const intervalId = setInterval(() => {
-            const i = 1;
-            console.log("Check status: " + i);
+            console.log("Check status...");
             CheckStatus();
-        }, 5000);
-
+        }, 10000); // Increased interval to 10 seconds
         return () => clearInterval(intervalId);
     }, []);
 
+    // Delay API calls for fetching coupons
     useEffect(() => {
         const intervalId = setInterval(() => {
-            fetchCoupons(false);
-        }, 2000);
+            fetchCoupons();
+        }, 10000); // Increased interval to 10 seconds
         return () => clearInterval(intervalId);
-    }, [currentPage, size, filters]);
+    }, [fetchCoupons]);
 
     const handleFilterChange = (event) => {
-        setFilters({
-            ...filters,
+        setFilters((prevFilters) => ({
+            ...prevFilters,
             [event.target.name]: event.target.value
-        });
+        }));
     };
 
     const handlePageChange = (event, newPage) => {
@@ -331,8 +331,8 @@ function DotGiamGia() {
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{phieu.ma}</TableCell>
                                     <TableCell>{phieu.ten}</TableCell>
-                                    <TableCell>{phieu.thoiGianBatDau}</TableCell>
-                                    <TableCell>{phieu.thoiGianKetthuc}</TableCell>
+                                    <TableCell>{moment(phieu.thoiGianBatDau).format('DD/MM/YYYY HH:mm')}</TableCell>
+                                    <TableCell>{moment(phieu.thoiGianKetthuc).format('DD/MM/YYYY HH:mm')}</TableCell>
                                     <TableCell>
                                         <Box sx={{
                                             backgroundColor: getStatusColor(phieu.trangThai),

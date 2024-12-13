@@ -42,7 +42,7 @@ export const filterRam = async ({
     name,
     trangThai,
 }) => {
-  
+
     try {
         let queryStr = '';
         queryStr += (page === undefined || page === '') ? 'page=0' : 'page=' + page;
@@ -96,7 +96,7 @@ export const IsValidAdd = async (name) => {
     try {
         const res = await get(`${path}/exist-name?name=${name}`)
         const result = res.data.data;
-        if (result){
+        if (result) {
             return false;
         }
         return true;
@@ -110,7 +110,7 @@ export const IsValidUpdate = async (name, id) => {
     try {
         const res = await get(`${path}/exist-name-diff-id?name=${name}&id=${id}`)
         const result = res.data.data;
-        if (result){
+        if (result) {
             return false;
         }
         return true;

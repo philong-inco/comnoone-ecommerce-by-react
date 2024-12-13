@@ -1015,15 +1015,20 @@ const Dashboard = () => {
                       cy="50%"
                       outerRadius={150}
                       fill="#8884d8"
-                      label={({ soLuong, percent }) =>
-                        `${mapOrderStatus(soLuong)}: ${(percent * 100).toFixed(2)}%`
+                      label={({ name, value }) =>
+                        `${mapOrderStatus(parseInt(name, 10))}: ${(value * 100).toFixed(2)}%`
                       }
                     >
                       {totalPrecentBill.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                    <Tooltip
+                      formatter={(value, name) => [
+                        `${(value * 100).toFixed(2)}%`,
+                        mapOrderStatus(parseInt(name, 10))
+                      ]}
+                    />
                     <Legend
                       formatter={(value) => mapOrderStatus(parseInt(value, 10))}
                     />
@@ -1035,6 +1040,7 @@ const Dashboard = () => {
                 </Typography>
               )}
             </Box>
+
           </Box>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>

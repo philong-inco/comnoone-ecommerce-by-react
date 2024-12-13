@@ -1,4 +1,9 @@
-import { get, post, patch, put, del, del2 } from 'utils/request';
+import { get, post, put, del, del2 } from 'utils/request';
+
+const handleUnauthorizedError = () => {
+  localStorage.removeItem('COMNOONE_TOKEN');
+  window.location.href = '/login';
+};
 
 export const filterCoupons = async (page, size, path) => {
   try {
@@ -6,6 +11,9 @@ export const filterCoupons = async (page, size, path) => {
     console.log(result);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.error('Error fetching coupons filter:', error);
     throw error;
   }
@@ -16,6 +24,9 @@ export const getPGGPage = async (page, size) => {
     const result = await get(`coupons?page=${page - 1}&size=${size}`);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error get :');
     throw error;
   }
@@ -27,6 +38,9 @@ export const getPGGById = async (id) => {
     console.log('GET response:', result);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error get :');
     throw error;
   }
@@ -37,6 +51,9 @@ export const createPGG = async (options) => {
     const result = await post('coupons/add', options);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.error('Error creating coupons:', error);
     throw error;
   }
@@ -47,6 +64,9 @@ export const deletedCoupons = async (id) => {
     const result = await del(`coupons/delete/${id}`);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.error('Error :', error);
     throw error;
   }
@@ -57,6 +77,9 @@ export const updatedPGG = async (id, pgg) => {
     const result = await put(`coupons/update/${id}`, pgg);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.error('Error :', error);
     throw error;
   }
@@ -68,6 +91,9 @@ export const getKHPGGById = async (id, page, size) => {
     console.log('GET response:', result);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error get :', error);
     throw error;
   }
@@ -79,6 +105,9 @@ export const deleteKhPGG = async (id, status) => {
     console.log('GET response:', result);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error get :', error);
     throw error;
   }
@@ -89,6 +118,9 @@ export const stopKhPGG = async (id) => {
     const result = await put(`coupons/updateStatusPause/${id}`);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error put :', error);
     throw error;
   }
@@ -99,6 +131,9 @@ export const startKhPGG = async (id) => {
     const result = await put(`coupons/updateStatusStart/${id}`);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error put :', error);
     throw error;
   }
@@ -109,6 +144,9 @@ export const getAllCouponsToBill = async (billCode) => {
     const result = await get(`coupons/to-bill/${billCode}`);
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error get :', error);
     throw error;
   }
@@ -120,8 +158,10 @@ export const checkStatusForBill = async () => {
     debugger;
     return result;
   } catch (error) {
+    if (error.response && error.response.status === 401) {
+      handleUnauthorizedError();
+    }
     console.log('Error check status :', error);
     throw error;
   }
-}
-
+};
