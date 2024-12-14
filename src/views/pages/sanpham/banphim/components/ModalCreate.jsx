@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { createNewRam, IsValidAdd } from 'api/sanpham/banPhim';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
-
+import AlertComNoOne from '../../ui-component/AlertComNoOne';
 const style = {
   position: 'absolute',
   top: '40%',
@@ -22,11 +22,12 @@ const style = {
   p: 5
 };
 
-
 import { useNavigate } from 'react-router-dom';
 
-
 export default function TransitionsModal({ fetchRams }) {
+  const [comNoti, setComNoti] = useState({
+    title: '', message: '', isOpen: false
+  })
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -190,7 +191,14 @@ export default function TransitionsModal({ fetchRams }) {
           </Box>
         </Fade>
       </Modal>
+      <AlertComNoOne
+        title={comNoti.title}
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+      ></AlertComNoOne>
+      <Button
+        onClick={()=>setComNoti(...prev => ({...prev, title: "Tiêu đề", message: "Nội dung", isOpen: true}))}
+      >Show</Button>
     </div>
   );
 }
-``;
