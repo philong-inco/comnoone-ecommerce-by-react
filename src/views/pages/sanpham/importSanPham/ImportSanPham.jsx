@@ -200,7 +200,7 @@ const ImportSanPham = () => {
             flex: 1,
             renderCell: (params) => (
                 <div>
-                    {params.row.serials}
+                    {params.row.serials.split(',').length} serials
                 </div>
             )
         },
@@ -300,11 +300,11 @@ const ImportSanPham = () => {
                 }
             })
             for(const product of listNewProduct){
-                if(product?.ten || product?.ten.length > 200){
+                if(!product?.ten || product?.ten.length > 200){
                     alert("Tên sản phẩm không hợp lệ");
                     return;
                 }
-                if(product?.moTa || product?.moTa.length > 200){
+                if(!product?.moTa || product?.moTa.length > 200){
                     alert("Mô tả sản phẩm không hợp lệ");
                     return;
                 }
@@ -370,8 +370,8 @@ const ImportSanPham = () => {
 
             let isNotMatchProductName = false;
             for(const bienthe of listBienThe){
-                if(bienthe?.giaBan || parseFloat(bienthe.giaBan) > 500000000){
-                    alert("Giá sản phẩm không hợp lệ (khác 0 và tối đa 500 triệu");
+                if(!bienthe?.giaBan || isNaN(bienthe.giaBan) || parseFloat(bienthe.giaBan) > 500000000){
+                    alert("Giá sản phẩm không hợp lệ (khác 0 và tối đa 500 triệu)");
                     return;
                 }
                 if(!bienthe?.sanPhamInfo){
@@ -436,6 +436,7 @@ const ImportSanPham = () => {
             setSanPhams(listNewProduct);
             setBienThes(listBienThe);
             setIsImport(true);
+            alert("Tải excel lên thành công")
         };
 
         fileInputRef.current.value = null;

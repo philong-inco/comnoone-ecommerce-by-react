@@ -266,7 +266,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
       }
     }
     if (listInValidLength.length > 0) {
-      showMessage('Serial phải từ 7-20 ký tự chữ số, các serial sau không hợp lệ: ' + listInValidLength.join(','));
+      alert('Serial phải từ 7-20 ký tự chữ số, các serial sau không hợp lệ: ' + listInValidLength.join(','));
       return;
     }
     for (const serial of newSerial) {
@@ -291,7 +291,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
     });
 
     if (listSerialExist.length > 0) {
-      showMessage('Đã loại bỏ các serial đã tồn tại sau', 'Danh sách: ' + listSerialExist.join(','));
+      alert('Đã loại bỏ các serial đã tồn tại sau', 'Danh sách: ' + listSerialExist.join(','));
     }
 
     setVariantList(updateVariant);
@@ -313,7 +313,7 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
       if (check.isDulicateSeri) {
         noti += '\n | Serial Number nhập trong danh sách bị trùng lặp.';
       }
-      showMessage(noti);
+      alert(noti);
     }
   };
 

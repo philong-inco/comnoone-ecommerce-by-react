@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/thuonghieu';
 import ModalUpdate from './components/ModalUpdate';
 import AlertComNoOne from '../ui-component/AlertComNoOne';
-
+import TransitionsModal from './components/ModalCreate';
 
 
 const DanhSachThuongHieu = () => {

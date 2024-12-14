@@ -143,7 +143,7 @@ const alert = (message) => {
     let isUnique = await checkTenSP(tenSanPham);
     console.log('isUnique: ', isUnique);
     if (!isUnique) {
-      showAlertMessage("Tên sản phẩm đã tồn tại")
+      alert("Tên sản phẩm đã tồn tại")
     }
     let check = true;
     if (VGAChecked === '' || moTa === '' || tenSanPham === '' || banPhimChecked === '' 
@@ -154,19 +154,19 @@ const alert = (message) => {
     || nhuCauChecked === undefined || thuongHieuChecked === undefined)
     {
       check = false;
-      showAlertMessage('Hãy nhập thông tin sản phẩm')
+      alert('Hãy nhập thông tin sản phẩm')
       return;
     }
     if(tenSanPham.length > 200)
     {
       check = false;
-      showAlertMessage('Số lượng ký tự không quá 200 ký tự')
+      alert('Số lượng ký tự không quá 200 ký tự')
       return;
     }
     if(moTa.length > 200)
     {
       check = false;
-      showAlertMessage('Số lượng ký tự không quá 200 ký tự')
+      alert('Số lượng ký tự không quá 200 ký tự')
       return;
     }
     
@@ -224,7 +224,7 @@ const alert = (message) => {
       generateVariant(0, defaultVariant);
       setSelectedKeyToChild(selectedKey);
     } else if (selectedKey.length !== 4 && selectedKey.length !== 0) {
-      showAlertMessage('Thiếu thông tin để tạo biến thể', 'Vui lòng chọn đủ 4 thuộc tính Ram, Cpu, Ổ cứng, màu sắc')
+      alert('Thiếu thông tin để tạo biến thể', 'Vui lòng chọn đủ 4 thuộc tính Ram, Cpu, Ổ cứng, màu sắc')
     }
   }, [selectedKey]);
 
