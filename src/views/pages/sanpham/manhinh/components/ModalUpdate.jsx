@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
 import { updateRam, IsValidAdd, IsValidUpdate } from 'api/sanpham/manHinh';
 import { useNavigate } from 'react-router-dom';
+import AlertComNoOne from '../../ui-component/AlertComNoOne';
 const style = {
     position: 'absolute',
     top: '40%',
@@ -23,6 +24,14 @@ const style = {
 };
 
 export default function ModalUpdate({ fetchRams, info }) {
+    //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -223,6 +232,11 @@ export default function ModalUpdate({ fetchRams, info }) {
                     </Box>
                 </Fade>
             </Modal>
+            <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
         </div>
     );
 }

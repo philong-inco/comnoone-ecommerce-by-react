@@ -3,28 +3,27 @@ import { Button, notification, Space } from 'antd';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
-const AlertComNoOne = ({title, message, isOpen}) => {
+const AlertComNoOne = ({message, isOpen, count}) => {
 
     const [api, contextHolder] = notification.useNotification();
     const [pauseOnHover, setPauseOnHover] = useState(true);
-    // const openNotification = (pauseOnHover) => () => {
-    //   api.open({
-    //     message: title,
-    //     description: message,
-    //     showProgress: true,
-    //     pauseOnHover,
-    //   });
-    // };
     useEffect(()=>{
         if (isOpen){
             api.open({
-                message: title,
-                description: message,
+                message: message,
                 showProgress: true,
                 pauseOnHover,
+                style: {  
+                  backgroundColor: '#fbf0ff', // Màu nền 
+                  fontSize: "16px", 
+                  fontWeight: "500",
+                  color: 'white', // Màu chữ  
+                  borderRadius: "5px",
+                  
+                },  
             });
         }
-    }, [title, message, isOpen])
+    }, [message, isOpen, count])
     return (
       <>
         {contextHolder}

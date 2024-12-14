@@ -11,10 +11,23 @@ import { useNavigate } from 'react-router-dom';
 import { deleteRam, getRams, filterRam, updateRam } from 'api/sanpham/heDieuHanh';
 import ModalUpdate from './components/ModalUpdate';
 import TransitionsModal from './components/ModalCreate';
-
+import AlertComNoOne from '../ui-component/AlertComNoOne';
 
 
 const DanhSachHeDieuHanh = () => {
+  const [role, setRole] = useState('');
+  useEffect(()=>{
+    const roleTemp = JSON.parse(localStorage.getItem('COMNOONE_USER_INFO'));
+    setRole(roleTemp.role)
+  },[]);
+  //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const navigate = useNavigate();
   const columns = [
     
@@ -178,8 +191,8 @@ const suaTrangThai = async (id, status) => {
                           <div style={{display: 'flex'}}>
                             <TableCell sx={{display: 'flex'}} key={column.id} align={column.align}>
                               <ModalUpdate fetchRams={fetchData} info={row}/>
-                              {value1 === 1 && <Switch defaultChecked color="secondary" onChange={handleSwitchChange(row.id)}/>}
-                              {value1 === 0 && <Switch color="secondary" onChange={handleSwitchChange(row.id)}/>}
+                              {value1 === 1 && <Switch disabled={role === 'STAFF'}  defaultChecked color="secondary" onChange={handleSwitchChange(row.id)}/>}
+                              {value1 === 0 && <Switch  disabled={role === 'STAFF'} color="secondary" onChange={handleSwitchChange(row.id)}/>}
                             </TableCell>
                            
                           </div> 
@@ -208,6 +221,11 @@ const suaTrangThai = async (id, status) => {
       />
     </Paper>
     </MainCard>
+    <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </div>
   );
 }

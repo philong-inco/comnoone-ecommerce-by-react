@@ -20,11 +20,20 @@ import axios from 'axios';
 import { backEndUrl } from '../../../../utils/back-end';
 import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../../utils/requestSanPham';
+import AlertComNoOne from './AlertComNoOne';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
 const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
+  //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const navigate = useNavigate();
 
     const [listAnhTemp, setListAnhTemp] = useState([]);
@@ -130,6 +139,11 @@ const AlbumImageForUpdateSPCT = ({setOpenAlbum, listCurrent, setVariant}) => {
             </div>
         </div>
       </Dialog>
+      <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </React.Fragment>
   );
 }

@@ -13,13 +13,21 @@ import axios from 'axios';
 import Slide from '@mui/material/Slide';
 import { useNavigate } from 'react-router-dom';
 import { backEndUrl } from '../../../../utils/back-end.js';
-
+import AlertComNoOne from './AlertComNoOne.jsx';
 import {get, post, put, del } from '../../../../utils/requestSanPham';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
   });
 
 export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
+  //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const navigate = useNavigate();
   const [variant, setVariant] = useState({});
   useEffect(()=>{
@@ -229,6 +237,11 @@ export default function AddSPCT({ idSP, setIsOpenAddSCPT, fetchDataBienThe }) {
           <Button color='secondary' onClick={() => setIsOpenAddSCPT(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
+      <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </React.Fragment>
     );
 }

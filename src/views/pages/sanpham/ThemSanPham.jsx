@@ -17,9 +17,17 @@ import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification.js';
 import { backEndUrl } from '../../../utils/back-end.js';
 import {get, post, put, del } from '../../../utils/requestSanPham';
+import AlertComNoOne from './ui-component/AlertComNoOne.jsx';
 const ThemSanPham = () => {
   const navigate = useNavigate();
-
+//Thông báo
+const [comNoti, setComNoti] = useState({
+  message: '', isOpen: false, count: 0
+})
+const alert = (message) => {
+  setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+}
+//Thông báo
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -745,6 +753,11 @@ const ThemSanPham = () => {
           )}
         </div>
       </MainCard>
+      <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </>
   );
 };

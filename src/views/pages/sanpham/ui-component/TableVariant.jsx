@@ -14,7 +14,16 @@ import { IconTrash } from '@tabler/icons-react';
 import { backEndUrl } from '../../../../utils/back-end.js';
 import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../../utils/requestSanPham';
+import AlertComNoOne from './AlertComNoOne.jsx';
 const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, showMessage, setResult, actionFather, listAnh, mauSacChecked }) => {
+  //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const [variantList, setVariantList] = useState([]);
   const navigate = useNavigate();
   const combinedKey = (index, variant) => {
@@ -551,6 +560,11 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
           setPriceAll={setPriceAll}
         /> */}
       </div>
+      <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </div>
     // <div>
 

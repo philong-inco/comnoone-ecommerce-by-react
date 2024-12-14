@@ -27,9 +27,17 @@ import MenuDownload from "./ui-component/Menu.jsx"
 import ImportProduct from './ui-component/ImportProduct.jsx';
 import { backEndUrl } from '../../../utils/back-end.js';
 import {get, post, put, del } from '../../../utils/requestSanPham';
+import AlertComNoOne from './ui-component/AlertComNoOne.jsx';
 
 const DanhSachSanPham = () => {
-    
+    //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
     const navigate = useNavigate();
     const handleUpdate = (id) => {
         navigate(`/sanpham/sua/${id}`);
@@ -614,7 +622,11 @@ const DanhSachSanPham = () => {
 
 
             </MainCard>
-
+            <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
         </>
     );
 }

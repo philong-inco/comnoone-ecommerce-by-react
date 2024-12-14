@@ -5,7 +5,7 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import { Add } from '@mui/icons-material';
 import { TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createNewRam, IsValidAdd } from 'api/sanpham/banPhim';
 import { toast } from 'react-toastify';
 import { NotificationStatus } from 'utils/notification';
@@ -25,9 +25,14 @@ const style = {
 import { useNavigate } from 'react-router-dom';
 
 export default function TransitionsModal({ fetchRams }) {
+  //Thông báo
   const [comNoti, setComNoti] = useState({
-    title: '', message: '', isOpen: false
+    message: '', isOpen: false, count: 0
   })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -101,7 +106,7 @@ export default function TransitionsModal({ fetchRams }) {
       alert('Tên đã tồn tại');
     }
     if(ram.ten.length > 200){
-      alert("Ký tự tối đa 200 ký tự");
+      alert("Ký tự tối đa 200 ký tự")
       return;
     }
     if (formValid) {
@@ -192,13 +197,10 @@ export default function TransitionsModal({ fetchRams }) {
         </Fade>
       </Modal>
       <AlertComNoOne
-        title={comNoti.title}
         message={comNoti.message}
         isOpen={comNoti.isOpen}
+        count={comNoti.count}
       ></AlertComNoOne>
-      <Button
-        onClick={()=>setComNoti(...prev => ({...prev, title: "Tiêu đề", message: "Nội dung", isOpen: true}))}
-      >Show</Button>
     </div>
   );
 }

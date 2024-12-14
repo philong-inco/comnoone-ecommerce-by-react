@@ -13,8 +13,17 @@ import { excelImportBlank } from '../../../../utils/serialUtil/excelImportBlank'
 import { backEndUrl } from '../../../../utils/back-end';
 import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../../utils/requestSanPham';
+import AlertComNoOne from '../ui-component/AlertComNoOne';
 
 const ImportSanPham = () => {
+    //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
     const [role, setRole] = useState('');
     const navigate = useNavigate();
     const columnsSanPham = [
@@ -710,6 +719,11 @@ const ImportSanPham = () => {
 
     return (
         <div>
+            <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
             <div>
                 <MainCard title="Import Sản phẩm của bạn">
                     <div style={{ display: "flex", justifyContent: "center" }}>

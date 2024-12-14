@@ -23,8 +23,16 @@ import { IconCirclePlus } from '@tabler/icons-react';
 import { backEndUrl } from '../../../utils/back-end.js';
 import { useNavigate } from 'react-router-dom';
 import {get, post, put, del } from '../../../utils/requestSanPham';
+import AlertComNoOne from './ui-component/AlertComNoOne.jsx';
 const SuaSanPham = () => {
-  
+  //Thông báo
+  const [comNoti, setComNoti] = useState({
+    message: '', isOpen: false, count: 0
+  })
+  const alert = (message) => {
+    setComNoti(prev => ({...prev, message: message, isOpen: true, count: (comNoti.count + 1)}))
+  }
+  //Thông báo
   const [role, setRole] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();  
@@ -254,9 +262,11 @@ const SuaSanPham = () => {
     } catch (error) {  
       if (error.status == 403){
         alert("Không đủ quyền thực hiện chức năng này")
-     }
+        return;
+      }
      if (error.status == 401){
         navigate(`/login`);
+        return;
      }
       // Xử lý lỗi  
       console.error('Có lỗi xảy ra:', error);  
@@ -462,6 +472,11 @@ const suaTrangThai = (id, status) => {
         listImg={listImg}
         fetchDataBienThe={fetchDataBienThe}
       />
+      <AlertComNoOne
+        message={comNoti.message}
+        isOpen={comNoti.isOpen}
+        count={comNoti.count}
+      ></AlertComNoOne>
     </>
   )
 }
