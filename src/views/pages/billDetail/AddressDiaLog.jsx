@@ -290,7 +290,7 @@ function AddressDiaLog(props) {
       if (error.response && error.response.data) {
         const errorMessages = error.response.data.message;
         if (!Array.isArray(errorMessages)) {
-          setSnackbarMessage('Có lỗi xảy ra khi cập nhật!');
+          setSnackbarMessage(errorMessages);
           setSnackbarSeverity('error');
           setSnackbarOpen(true);
           return;

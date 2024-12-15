@@ -378,14 +378,14 @@ const ProductList = (props) => {
       setFilter((prev) => ({
         ...prev,
         tenSP: keyword,
-        maSP: ''
-        // maSPCT: ''
+        // maSP: '',
+        maSPCT: ''
       }));
     } else if (typeOfFilter === '1') {
       setFilter((prev) => ({
         ...prev,
-        maSP: keyword,
-        // maSPCT: keyword,
+        // maSP: keyword,
+        maSPCT: keyword,
         tenSP: ''
       }));
     }

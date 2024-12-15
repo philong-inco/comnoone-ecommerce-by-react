@@ -361,13 +361,13 @@ function NewTimeLine(props) {
       buttons.push(
         <>
           <Grid item xs={3} key="hoan-thanh-button">
-            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
-              HOÀN THÀNH
+            <Button variant="contained" style={{ background: 'yellow' }} onClick={() => handleClickBtnStatusNoMessage('HEN_LAI')} fullWidth>
+              HẸN LẠI{' '}
             </Button>
           </Grid>
           <Grid item xs={3} key="hoan-thanh-button">
-            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HEN_LAI')} fullWidth>
-              HẸN LẠI{' '}
+            <Button variant="contained" onClick={() => handleClickBtnStatusNoMessage('HOAN_THANH')} fullWidth>
+              HOÀN THÀNH
             </Button>
           </Grid>
         </>

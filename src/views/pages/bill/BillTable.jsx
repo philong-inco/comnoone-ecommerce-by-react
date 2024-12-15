@@ -65,7 +65,7 @@ function BillTable(props) {
       title: 'Tên khách hàng',
       dataIndex: 'tenKhachHang',
       key: 'tenKhachHang',
-      render: (tenKhachHang) => (tenKhachHang == null ? 'Khách lẻ' : tenKhachHang)
+      render: (tenKhachHang) => (!tenKhachHang ? 'Khách lẻ' : tenKhachHang)
     },
     { title: 'SDT', dataIndex: 'sdt', key: 'sdt' },
     { title: 'Email', dataIndex: 'email', key: 'email' },
