@@ -120,88 +120,6 @@ const KhachHang = () => {
     }
   };
 
-  const getHangKhachHang = (hang) => {
-    const chipStyles = {
-      width: '100px',
-      textAlign: 'center'
-    };
-
-    switch (hang) {
-      case 0:
-        return (
-          <Chip
-            label="Đồng"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#CD853F',
-              color: '#FFFFFF'
-            }}
-          />
-        );
-      case 1:
-        return (
-          <Chip
-            label="Bạc"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#C0C0C0',
-              color: '#000000'
-            }}
-          />
-        );
-      case 2:
-        return (
-          <Chip
-            label="Vàng"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#FFD700',
-              color: '#000000'
-            }}
-          />
-        );
-      case 3:
-        return (
-          <Chip
-            label="Bạch Kim"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#E5E4E2',
-              color: '#000000'
-            }}
-          />
-        );
-      case 4:
-        return (
-          <Chip
-            label="Kim Cương"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#363636',
-              color: '#FFFFFF'
-            }}
-          />
-        );
-      default:
-        return (
-          <Chip
-            label="Không xác định"
-            color="default"
-            sx={{
-              ...chipStyles,
-              backgroundColor: '#FFFFFF',
-              color: '#000000'
-            }}
-          />
-        );
-    }
-  };
-
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString).toLocaleDateString('vi-VN', options);
@@ -268,7 +186,6 @@ const KhachHang = () => {
         }}
       >
         <Grid container spacing={2} alignItems="center">
-          {/* Trường Tìm Kiếm */}
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth margin="normal">
               <Box display="flex" alignItems="center" justifyContent="space-between">

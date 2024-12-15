@@ -14,10 +14,6 @@ import Logo from 'ui-component/Logo';
 import AuthRegister from '../authentication/auth-forms/AuthRegister';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 
-// assets
-
-// ===============================|| AUTH3 - REGISTER ||=============================== //
-
 const Register = () => {
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 

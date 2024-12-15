@@ -241,7 +241,7 @@ function PhieuGiamGiaConfiguration() {
           ngayBatDau: addSeconds(values.tuNgay),
           ngayHetHan: addSeconds(values.denNgay),
           loaiGiamGia: currencyType === '%' ? 1 : 2,
-          giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(), 
+          giaTriGiamGia: new BigNumber(String(values.giaTri).replace(/\./g, '')).toFixed(),
           giamToiDa: values.giaTriToiDa === '' ? null : new BigNumber(String(values.giaTriToiDa).replace(/\./g, '')).toFixed(),
           phamViApDung: values.kieu,
           soLuong: values.soLuong,
@@ -249,7 +249,7 @@ function PhieuGiamGiaConfiguration() {
         };
         let response;
         if (id) {
-          response = await updatedPGG(id,data)
+          response = await updatedPGG(id, data)
           setSnackbar({ open: true, message: 'Phiếu giảm giá đã được cập nhật thành công!', severity: 'success' });
         } else {
           response = await createPGG(data)
@@ -259,14 +259,23 @@ function PhieuGiamGiaConfiguration() {
           navigate('/phieugiamgia/danhsachphieugiamgia');
         }, 3000);
       } catch (error) {
+        debugger;
+        const statusCode = error.response?.status;
         const errorMessage = error.response?.data?.error || 'Đã xảy ra lỗi!';
-        const extractedMessage = errorMessage.split(':')[1].split(':')[0].trim();
+
+        let extractedMessage = 'Đã xảy ra lỗi!';
+        if (statusCode === 403) {
+          extractedMessage = 'Không có quyền thực hiện hành động';
+        } else {
+          extractedMessage = errorMessage.split(':')[1]?.split(':')[0]?.trim() || 'Đã xảy ra lỗi!';
+        }
         setSnackbar({
           open: true,
           message: `Lỗi: ${extractedMessage}`,
           severity: 'error'
         });
-      } finally {
+      }
+      finally {
         setIsSubmitting(false);
       }
     }
@@ -403,7 +412,7 @@ function PhieuGiamGiaConfiguration() {
                 inputProps: { tabIndex: -1 },
                 sx: {
                   pointerEvents: 'none',
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)' 
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
                 }
               }}
               InputLabelProps={{
@@ -443,7 +452,7 @@ function PhieuGiamGiaConfiguration() {
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => {
-                            if (!(isChiTietPage|| isUpdatePage)) {
+                            if (!(isChiTietPage || isUpdatePage)) {
                               handleCurrencyChange('%');
                             }
                           }}
@@ -453,7 +462,7 @@ function PhieuGiamGiaConfiguration() {
                         </IconButton>
                         <IconButton
                           onClick={() => {
-                            if (!(isChiTietPage|| isUpdatePage)) {
+                            if (!(isChiTietPage || isUpdatePage)) {
                               handleCurrencyChange('$');
                             }
                           }}
@@ -477,7 +486,7 @@ function PhieuGiamGiaConfiguration() {
                   error={formik.touched.giaTriToiDa && Boolean(formik.errors.giaTriToiDa)}
                   helperText={formik.touched.giaTriToiDa && formik.errors.giaTriToiDa}
                   InputProps={{
-                    readOnly: isChiTietPage|| isUpdatePage,
+                    readOnly: isChiTietPage || isUpdatePage,
                     endAdornment: (
                       <InputAdornment position="end">
                         <Typography sx={{ color: 'orange', fontWeight: 'bold' }}>₫</Typography>
@@ -572,7 +581,7 @@ function PhieuGiamGiaConfiguration() {
                   name="kieu"
                   value={formik.values.kieu}
                   onChange={(e) => {
-                    if (!(isChiTietPage|| isUpdatePage)) {
+                    if (!(isChiTietPage || isUpdatePage)) {
                       formik.handleChange(e);
                     }
                   }}
@@ -680,7 +689,7 @@ function PhieuGiamGiaConfiguration() {
                         <Checkbox
                           checked={Array.isArray(selectedKhachHang) && selectedKhachHang.includes(row.id)}
                           onChange={() => handleSelectKhachHang(row.id)}
-                          disabled={isChiTietPage || formik.values.kieu === '1'|| isUpdatePage}
+                          disabled={isChiTietPage || formik.values.kieu === '1' || isUpdatePage}
                         />
                       </TableCell>
                       <TableCell>{row.ten}</TableCell>

@@ -64,7 +64,7 @@ export const getAllDiaChiByIdKhachHang = async (id) => {
 
 export const createDiaChi = async (formDataAddress) => {
   try {
-    const result = await post('diachi/create', formDataAddress); // Sử dụng phương thức POST
+    const result = await post('diachi/create', formDataAddress);
     return result;
   } catch (error) {
     console.error('Error creating Dia Chi:', error);
