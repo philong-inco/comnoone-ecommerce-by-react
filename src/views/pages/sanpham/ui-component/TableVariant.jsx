@@ -60,8 +60,9 @@ const TableVariant = ({ listKeySort, variantListFromParent, setProductVarriant, 
     setPriceAll(value);
   };
   const changePriceAll = () => {
+    debugger
     console.log('priceAll: ', priceAll);
-    if (confirm('Xác nhận thay đổi toàn bộ giá bán thành: ', priceAll)) {
+    if (confirm('Xác nhận thay đổi toàn bộ giá bán thành: '+ priceAll)) {
       const newVariantMap = variantList.map((varian) => ({
         ...varian,
         giaBan: priceAll
