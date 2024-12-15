@@ -279,7 +279,7 @@ function CustomerInBill(props) {
             >
               Chọn khách hàng
             </Button>
-            <Button variant="contained" color="primary" onClick={handleOpen}>
+            <Button disabled={!id} variant="contained" color="primary" onClick={handleOpen}>
               Thêm nhanh
             </Button>
           </Grid>
