@@ -248,6 +248,7 @@ const PaymentDialog2 = (props) => {
 
   const apiPayCounter = async (data) => {
     try {
+      setLoading(false);
       const response = await payCounter(id, data);
       if (response.status_code === 201) {
         setSnackbarMessage('Xác nhận thanh toán thành công thành công');
@@ -265,6 +266,8 @@ const PaymentDialog2 = (props) => {
       setSnackbarMessage('Không thể thực hiện thanh toán');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
+    } finally {
+      setLoading(true);
     }
   };
 
@@ -418,8 +421,8 @@ const PaymentDialog2 = (props) => {
               </Grid>
 
               <Grid item xs={12} sx={{ textAlign: 'right' }}>
-                <Button onClick={() => setXacNhanThanhToan(true)} disabled={tienThieu > 0} variant="contained" color="secondary">
-                  Thanh toán
+                <Button onClick={() => setXacNhanThanhToan(true)} disabled={tienThieu > 0 && loading} variant="contained" color="secondary">
+                  Hoàn thành
                 </Button>
               </Grid>
             </Grid>
@@ -525,6 +528,17 @@ const PaymentDialog2 = (props) => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {pdfUrl && (
+        <iframe
+          ref={iframeRef}
+          src={pdfUrl}
+          width="0"
+          height="0"
+          style={{ display: 'none' }} // Ẩn iframe
+          title="PDF"
+        />
+      )}
     </>
   );
 };

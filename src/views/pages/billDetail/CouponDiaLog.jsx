@@ -140,7 +140,6 @@ function CouponDiaLog(props) {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

@@ -354,9 +354,11 @@ function SerialNumberSold(props) {
                     bill.trangThai == 'DANG_GIAO' ||
                     bill.trangThai == 'HOAN_THANH' ||
                     bill.trangThai == 'CHO_GIAO' ||
-                    bill.trangThai == 'HUY'
+                    bill.trangThai == 'HUY' ||
+                    bill.trangThai == 'HEN_LAI'
                   }
                   sx={{ marginRight: '10px' }}
+                  disabled={!id}
                 >
                   Quét QR
                 </Button>
@@ -368,7 +370,8 @@ function SerialNumberSold(props) {
                     bill.trangThai == 'DANG_GIAO' ||
                     bill.trangThai == 'HOAN_THANH' ||
                     bill.trangThai == 'CHO_GIAO' ||
-                    bill.trangThai == 'HUY'
+                    bill.trangThai == 'HUY' ||
+                    bill.trangThai == 'HEN_LAI'
                   }
                   variant="contained"
                   color="secondary"
@@ -408,61 +411,13 @@ function SerialNumberSold(props) {
                     {product.productName} <br />
                     <strong style={{ color: 'black' }}>{parseFloat(product.price).toLocaleString()} đ</strong>
                   </TableCell>
-                  {/* <TableCell>
-                    {product.quantity}
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Tooltip title="Cập nhập số lượng" placement="top">
-                        <IconButton
-                          disabled={
-                            bill.trangThai == 'DANG_GIAO' ||
-                            bill.trangThai == 'HOAN_THANH' ||
-                            bill.trangThai == 'CHO_GIAO' ||
-                            bill.trangThai == 'HUY'
-                          }
-                          onClick={() => handleOpenDialog(product.productDetailId)}
-                        >
-                          <RemoveCircleOutline />
-                        </IconButton>
-                      </Tooltip>
-                      <TextField
-                        disabled={
-                          bill.trangThai == 'DANG_GIAO' ||
-                          bill.trangThai == 'HOAN_THANH' ||
-                          bill.trangThai == 'CHO_GIAO' ||
-                          bill.trangThai == 'HUY'
-                        }
-                        type="number"
-                        value={product.quantity}
-                        onChange={(e) => handleOpenDialog(product.productDetailId)}
-                        inputProps={{ min: 0 }}
-                        sx={{
-                          width: 50,
-                          height: 30, // Điều chỉnh chiều cao
-                          '& .MuiInputBase-input': {
-                            padding: '5px 10px' // Điều chỉnh padding để phù hợp với chiều cao
-                          }
-                        }}
-                      />
-                      <Tooltip title="Cập nhập số lượng" placement="top">
-                        <IconButton
-                          disabled={
-                            bill.trangThai == 'DANG_GIAO' ||
-                            bill.trangThai == 'HOAN_THANH' ||
-                            bill.trangThai == 'CHO_GIAO' ||
-                            bill.trangThai == 'HUY'
-                          }
-                          onClick={() => handleOpenDialog(product.productDetailId)}
-                        >
-                          <AddCircleOutline />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </TableCell> */}
+
                   <TableCell>
                     {bill.trangThai === 'DANG_GIAO' ||
                     bill.trangThai === 'HOAN_THANH' ||
                     bill.trangThai === 'CHO_GIAO' ||
-                    bill.trangThai === 'HUY' ? (
+                    bill.trangThai === 'HUY' ||
+                    bill.trangThai == 'HEN_LAI' ? (
                       <strong>{product.quantity}</strong>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center' }}>
