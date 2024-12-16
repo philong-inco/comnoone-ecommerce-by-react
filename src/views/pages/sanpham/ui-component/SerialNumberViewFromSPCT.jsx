@@ -251,10 +251,11 @@ export default function SerialNumberViewFromSPCT({ title, list, open, setOpen, i
 
   const handleUpdateSPCT = async () => {
     try{
-      if (bienThe.giaBan == 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined) {
+      if (bienThe.giaBan <= 0 || bienThe.listUrlAnhSanPham.length == 0 || bienThe.id === undefined) {
         alert('Điền đủ thông tin');
       } else {
         await put(`/san-pham-chi-tiet/update-price-image`, bienThe);
+        fetchDataBienThe();
         alert('Sửa thành công');
       }
     }catch(error){
