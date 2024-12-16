@@ -314,7 +314,6 @@ function DotGiamGia() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>STT</TableCell>
                             <TableCell>Mã đợt giảm giá</TableCell>
                             <TableCell>Tên đợt giảm giá</TableCell>
                             <TableCell>Ngày bắt đầu</TableCell>
@@ -326,9 +325,8 @@ function DotGiamGia() {
                     </TableHead>
                     <TableBody>
                         {dotGiamGia.length > 0 ? (
-                            dotGiamGia.map((phieu, index) => (
+                            dotGiamGia.map((phieu) => (
                                 <TableRow key={phieu.id}>
-                                    <TableCell>{index + 1}</TableCell>
                                     <TableCell>{phieu.ma}</TableCell>
                                     <TableCell>{phieu.ten}</TableCell>
                                     <TableCell>{moment(phieu.thoiGianBatDau).format('DD/MM/YYYY HH:mm')}</TableCell>
