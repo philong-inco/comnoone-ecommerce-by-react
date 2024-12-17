@@ -53,20 +53,23 @@ function DotGiamGia() {
     }, [filters, size, currentPage]);
 
     useEffect(() => {
-        fetchCoupons();
+        fetchCoupons();  // Call on initial load
     }, [fetchCoupons]);
 
+    // Delay API calls for checking status
     useEffect(() => {
         const intervalId = setInterval(() => {
             console.log("Check status...");
             CheckStatus();
-        }, 10000);
+        }, 10000); // Increased interval to 10 seconds
         return () => clearInterval(intervalId);
     }, []);
+
+    // Delay API calls for fetching coupons
     useEffect(() => {
         const intervalId = setInterval(() => {
             fetchCoupons();
-        }, 10000);
+        }, 10000); // Increased interval to 10 seconds
         return () => clearInterval(intervalId);
     }, [fetchCoupons]);
 
@@ -116,22 +119,34 @@ function DotGiamGia() {
         setOpenSnackbar(true);
     };
 
+    const handleCloseConfirmDialogOne = () => {
+        setOpenConfirmDialogOne(false);
+        setSelectedCouponId(null);
+    };
+
+    const handleConfirmSwitchChange = (id, trangThai) => {
+        setSelectedCouponId(id);
+        setSelectedCouponStatus(trangThai);
+        setOpenConfirmDialogOne(true);
+    };
+
     const handleSwitchChange = async () => {
         const newStatus = selectedCouponStatus === 1 ? 1 : 4;
         try {
             if (newStatus === 4) {
                 const response = await startDGG(selectedCouponId);
-                if (response.status === 200) {
-                    setSnackbarMessage('Phiếu giảm giá đã được bắt đầu áp dụng.');
+                debugger
+                if (response == "Bạn đã update trạng thái thành công") {
+                    setSnackbarMessage('Đợt giảm giá đã được bắt đầu áp dụng.');
                 } else {
-                    throw new Error('Có lỗi xảy ra khi bắt đầu áp dụng phiếu giảm giá.');
+                    throw new Error('Có lỗi xảy ra khi bắt đầu áp dụng Đợt giảm giá.');
                 }
             } else if (newStatus === 1) {
                 const response = await stopDPGG(selectedCouponId);
-                if (response.status === 200) {
-                    setSnackbarMessage('Phiếu giảm giá đã được ngừng áp dụng.');
+                if (response == "Bạn đã update trạng thái thành công") {
+                    setSnackbarMessage('Đợt giảm giá đã được ngừng áp dụng.');
                 } else {
-                    throw new Error('Có lỗi xảy ra khi ngừng áp dụng phiếu giảm giá.');
+                    throw new Error('Có lỗi xảy ra khi ngừng áp dụng đợt giảm giá.');
                 }
             }
             setSnackbarSeverity('success');
@@ -305,8 +320,8 @@ function DotGiamGia() {
                             <TableCell>Ngày bắt đầu</TableCell>
                             <TableCell>Ngày kết thúc</TableCell>
                             <TableCell>Trạng thái</TableCell>
-                            <TableCell>Hành động</TableCell>
                             <TableCell>Chi tiết</TableCell>
+                            <TableCell>Hành động</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -331,6 +346,13 @@ function DotGiamGia() {
                                         </Box>
                                     </TableCell>
                                     <TableCell>
+                                        <Tooltip title="Xem chi tiết">
+                                            <IconButton onClick={() => handleViewCoupon(phieu.id)}>
+                                                <VisibilityIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell>
                                         {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                                             <>
                                                 <IconButton
@@ -344,7 +366,7 @@ function DotGiamGia() {
                                             </>
                                         )}
 
-                                        {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
+                                        {(phieu.trangThai === 0 || phieu.trangThai === 1 || phieu.trangThai === 4) && (
                                             <>
                                                 <Tooltip title="Hủy đợt giảm giá">
                                                     <IconButton color="error" onClick={() => handleOpenConfirmDialog(phieu.id)}>
@@ -353,13 +375,15 @@ function DotGiamGia() {
                                                 </Tooltip>
                                             </>
                                         )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Tooltip title="Xem chi tiết">
-                                            <IconButton onClick={() => handleViewCoupon(phieu.id)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </Tooltip>
+
+                                        {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                                            <>
+                                                <Switch
+                                                    checked={phieu.trangThai === 1}
+                                                    onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}
+                                                />
+                                            </>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -398,6 +422,26 @@ function DotGiamGia() {
                     </Button>
                     <Button onClick={handleDelete} color="secondary" autoFocus>
                         Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={openConfirmDialogOne}
+                onClose={handleCloseConfirmDialogOne}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Xác nhận thay đổi trạng thái?"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn có chắc chắn muốn thay đổi trạng thái của đợt giảm giá này không?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirmDialogOne}>Hủy</Button>
+                    <Button onClick={handleSwitchChange} autoFocus>
+                        Đồng ý
                     </Button>
                 </DialogActions>
             </Dialog>
