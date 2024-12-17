@@ -503,7 +503,7 @@ function DotGiamGiaConfiguration() {
               helperText={formik.touched.tenPhieu && formik.errors.tenPhieu}
             />
             <TextField
-              label="Giá trị phiếu"
+              label="Giá trị đợt giảm giá"
               name="giaTri"
               fullWidth
               margin="normal"
