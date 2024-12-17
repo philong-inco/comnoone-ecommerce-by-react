@@ -299,8 +299,8 @@ function Test2(props) {
         errors.ten = 'Vui lòng nhập tên của bạn';
       } else if (formData.ten.trim().length < 5) {
         errors.ten = 'Tên phải có ít nhất 5 ký tự';
-      } else if (formData.ten.trim().length > 50) {
-        errors.ten = 'Tên không được vượt quá 50 ký tự';
+      } else if (formData.ten.trim().length > 25) {
+        errors.ten = 'Tên không được vượt quá 25 ký tự';
       }
       //   } else if (!/^[\p{L} ]+$/u.test(formData.ten)) {
       //     errors.ten = 'Tên chỉ được nhập chữ và khoảng trắng';
@@ -327,6 +327,8 @@ function Test2(props) {
       }
       if (!formData.diaChi) {
         errors.diaChi = 'Vui lòng nhập địa chỉ';
+      } else if (formData.diaChi.trim().length < 5) {
+        errors.diaChi = 'Địa chỉ phải có ít nhất 5 ký tự';
       } else if (formData.diaChi.length > 50) {
         errors.diaChi = 'Địa chỉ không được vượt quá 50 ký tự';
       }
