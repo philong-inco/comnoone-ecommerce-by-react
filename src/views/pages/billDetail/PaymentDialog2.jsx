@@ -263,7 +263,7 @@ const PaymentDialog2 = (props) => {
       }
     } catch (error) {
       console.log(error);
-      setSnackbarMessage('Không thể thực hiện thanh toán');
+      setSnackbarMessage(error.response.data.error);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {

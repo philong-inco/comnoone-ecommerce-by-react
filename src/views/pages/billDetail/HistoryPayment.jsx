@@ -46,7 +46,7 @@ function HistoryPayment(props) {
                   <TableCell>Mã giao dịch</TableCell>
                   <TableCell>Số tiền</TableCell>
                   <TableCell>Phương thanh toán</TableCell>
-                  <TableCell>Loại thanh toán</TableCell>
+                  <TableCell>Hình thức thanh toán</TableCell>
                   <TableCell>Trạng thái</TableCell>
                   <TableCell>Người tạo</TableCell>
                   <TableCell>Ngày tạo</TableCell>
