@@ -195,37 +195,6 @@ function PhieuGiamGia() {
     setOpenConfirmDialog(true);
   };
 
-  const handleSwitchChange = async () => {
-    const newStatus = selectedCouponStatus === 1 ? 1 : 4;
-    try {
-      if (newStatus === 4) {
-        const response = await startKhPGG(selectedCouponId);
-        if (response.status_code === 200) {
-          setSnackbarMessage('Phiếu giảm giá đã được bắt đầu áp dụng.');
-        } else {
-          throw new Error('Có lỗi xảy ra khi bắt đầu áp dụng phiếu giảm giá.');
-        }
-      } else if (newStatus === 1) {
-        const response = await stopKhPGG(selectedCouponId);
-        if (response.status_code === 200) {
-          setSnackbarMessage('Phiếu giảm giá đã được ngừng áp dụng.');
-        } else {
-          throw new Error('Có lỗi xảy ra khi ngừng áp dụng phiếu giảm giá.');
-        }
-      }
-      setSnackbarSeverity('success');
-      fetchApi(currentPage);
-    } catch (error) {
-      console.error(error);
-      setSnackbarMessage(error.message || 'Cập nhật trạng thái thất bại.');
-      setSnackbarSeverity('error');
-    } finally {
-      setOpenSnackbar(true);
-      setOpenConfirmDialog(false);
-    }
-  };
-
-
 
   return (
     <div>
@@ -400,7 +369,7 @@ function PhieuGiamGia() {
                         </IconButton>
                       </>
                     )}
-                    {(phieu.trangThai === 0 || phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                    {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                       <>
 
                         <IconButton
@@ -411,16 +380,6 @@ function PhieuGiamGia() {
                             <DeleteIcon />
                           </Tooltip>
                         </IconButton>
-                      </>
-                    )}
-                    {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
-                      <>
-                        <Tooltip title="Thay đổi trạng thái">
-                          <Switch
-                            checked={phieu.trangThai === 1}
-                            onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}  // Xác nhận trước khi thay đổi trạng thái
-                          />
-                        </Tooltip>
                       </>
                     )}
                   </TableCell>
@@ -479,25 +438,7 @@ function PhieuGiamGia() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openConfirmDialog}
-        onClose={handleCloseConfirmDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Xác nhận thay đổi trạng thái?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Bạn có chắc chắn muốn thay đổi trạng thái của phiếu giảm giá này không?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmDialog}>Hủy</Button>
-          <Button onClick={handleSwitchChange} autoFocus>
-            Đồng ý
-          </Button>
-        </DialogActions>
-      </Dialog>
+      
       {/* Snackbar component */}
       <Snackbar
         open={openSnackbar}
