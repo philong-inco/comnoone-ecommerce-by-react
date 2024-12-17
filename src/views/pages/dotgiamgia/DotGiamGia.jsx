@@ -53,23 +53,20 @@ function DotGiamGia() {
     }, [filters, size, currentPage]);
 
     useEffect(() => {
-        fetchCoupons();  // Call on initial load
+        fetchCoupons();
     }, [fetchCoupons]);
 
-    // Delay API calls for checking status
     useEffect(() => {
         const intervalId = setInterval(() => {
             console.log("Check status...");
             CheckStatus();
-        }, 10000); // Increased interval to 10 seconds
+        }, 10000);
         return () => clearInterval(intervalId);
     }, []);
-
-    // Delay API calls for fetching coupons
     useEffect(() => {
         const intervalId = setInterval(() => {
             fetchCoupons();
-        }, 10000); // Increased interval to 10 seconds
+        }, 10000);
         return () => clearInterval(intervalId);
     }, [fetchCoupons]);
 
@@ -117,17 +114,6 @@ function DotGiamGia() {
         setSnackbarMessage('Hủy đợt giảm giá thành công');
         setSnackbarSeverity('success');
         setOpenSnackbar(true);
-    };
-
-    const handleCloseConfirmDialogOne = () => {
-        setOpenConfirmDialogOne(false);
-        setSelectedCouponId(null);
-    };
-
-    const handleConfirmSwitchChange = (id, trangThai) => {
-        setSelectedCouponId(id);
-        setSelectedCouponStatus(trangThai);
-        setOpenConfirmDialogOne(true);
     };
 
     const handleSwitchChange = async () => {
@@ -319,8 +305,8 @@ function DotGiamGia() {
                             <TableCell>Ngày bắt đầu</TableCell>
                             <TableCell>Ngày kết thúc</TableCell>
                             <TableCell>Trạng thái</TableCell>
-                            <TableCell>Chi tiết</TableCell>
                             <TableCell>Hành động</TableCell>
+                            <TableCell>Chi tiết</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -345,13 +331,6 @@ function DotGiamGia() {
                                         </Box>
                                     </TableCell>
                                     <TableCell>
-                                        <Tooltip title="Xem chi tiết">
-                                            <IconButton onClick={() => handleViewCoupon(phieu.id)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell>
                                         {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                                             <>
                                                 <IconButton
@@ -365,7 +344,7 @@ function DotGiamGia() {
                                             </>
                                         )}
 
-                                        {(phieu.trangThai === 0 || phieu.trangThai === 1 || phieu.trangThai === 4) && (
+                                        {(phieu.trangThai === 0 || phieu.trangThai === 4) && (
                                             <>
                                                 <Tooltip title="Hủy đợt giảm giá">
                                                     <IconButton color="error" onClick={() => handleOpenConfirmDialog(phieu.id)}>
@@ -374,15 +353,13 @@ function DotGiamGia() {
                                                 </Tooltip>
                                             </>
                                         )}
-
-                                        {(phieu.trangThai === 1 || phieu.trangThai === 4) && (
-                                            <>
-                                                <Switch
-                                                    checked={phieu.trangThai === 1}
-                                                    onChange={() => handleConfirmSwitchChange(phieu.id, phieu.trangThai)}
-                                                />
-                                            </>
-                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Tooltip title="Xem chi tiết">
+                                            <IconButton onClick={() => handleViewCoupon(phieu.id)}>
+                                                <VisibilityIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -421,26 +398,6 @@ function DotGiamGia() {
                     </Button>
                     <Button onClick={handleDelete} color="secondary" autoFocus>
                         Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog
-                open={openConfirmDialogOne}
-                onClose={handleCloseConfirmDialogOne}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{"Xác nhận thay đổi trạng thái?"}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Bạn có chắc chắn muốn thay đổi trạng thái của đợt giảm giá này không?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirmDialogOne}>Hủy</Button>
-                    <Button onClick={handleSwitchChange} autoFocus>
-                        Đồng ý
                     </Button>
                 </DialogActions>
             </Dialog>
