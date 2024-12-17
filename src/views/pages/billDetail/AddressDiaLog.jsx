@@ -49,6 +49,7 @@ function AddressDiaLog(props) {
     tienShip: ''
   });
   const [formDataError, setFormDataError] = useState({
+    diaChi: '',
     ten: '',
     sdt: '',
     email: '',
@@ -272,6 +273,7 @@ function AddressDiaLog(props) {
           tienShip: ''
         });
         setFormDataError({
+          diaChi: '',
           tinh: '',
           huyen: '',
           phuong: '',
@@ -296,6 +298,7 @@ function AddressDiaLog(props) {
           return;
         }
         const newFormDataError = {
+          diaChi: '',
           ten: '',
           sdt: '',
           email: '',
@@ -303,7 +306,9 @@ function AddressDiaLog(props) {
           huyen: '',
           phuong: ''
         };
-        const requiredFieldErrors = errorMessages.filter((error) => [6002, 6004, 6006, 6008, 6009, 6010, 6011].includes(error.error_code));
+        const requiredFieldErrors = errorMessages.filter((error) =>
+          [6002, 6004, 6006, 6008, 6009, 6010, 6011, 8823].includes(error.error_code)
+        );
         if (requiredFieldErrors.length > 0) {
           requiredFieldErrors.forEach((error) => {
             const field = error.field;
@@ -317,6 +322,9 @@ function AddressDiaLog(props) {
                 break;
               case 'ten':
                 newFormDataError.ten = message;
+                break;
+              case 'diaChi':
+                newFormDataError.diaChi = message;
                 break;
               case 'tinh':
                 newFormDataError.tinh = message;
@@ -348,6 +356,9 @@ function AddressDiaLog(props) {
                 break;
               case 6007: // NAME_INVALID
                 newFormDataError.ten = message;
+                break;
+              case 8823:
+                newFormDataError.diaChi = message;
                 break;
               default:
                 break;
@@ -424,13 +435,8 @@ function AddressDiaLog(props) {
 
             {/* Trường nhập địa chỉ */}
             <div className="form-group">
-              <textarea
-                id="diaChi"
-                placeholder="Nhập địa chỉ giao hàng"
-                value={formData.diaChi}
-                onChange={handleInputChange}
-                // required
-              ></textarea>
+              <textarea id="diaChi" placeholder="Nhập địa chỉ giao hàng" value={formData.diaChi} onChange={handleInputChange}></textarea>
+              {formDataError.diaChi && <span className="error-message">{formDataError.diaChi}</span>}
             </div>
 
             {/* Dropdown chọn Tỉnh/Thành Phố */}

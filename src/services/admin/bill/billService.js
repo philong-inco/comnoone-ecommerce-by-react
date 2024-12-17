@@ -160,3 +160,13 @@ export const listHangBill = async () => {
     throw error;
   }
 };
+
+export const clearCoupons = async (billCode) => {
+  try {
+    const result = await post(`bills/clear-coupons/${billCode}`);
+    return result;
+  } catch (error) {
+    console.error('Error pclearCoupons :', error);
+    throw error;
+  }
+};
