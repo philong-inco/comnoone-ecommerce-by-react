@@ -361,7 +361,7 @@ function NewTimeLine(props) {
       buttons.push(
         <>
           <Grid item xs={3} key="hoan-thanh-button">
-            <Button variant="contained" style={{ background: 'yellow' }} onClick={() => handleClickBtnStatusNoMessage('HEN_LAI')} fullWidth>
+            <Button variant="contained" color="warning" onClick={() => handleClickBtnStatusNoMessage('HEN_LAI')} fullWidth>
               HẸN LẠI{' '}
             </Button>
           </Grid>

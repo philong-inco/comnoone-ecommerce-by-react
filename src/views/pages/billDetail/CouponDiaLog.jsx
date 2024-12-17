@@ -116,7 +116,7 @@ function CouponDiaLog(props) {
 
                     <TableCell>
                       <Tooltip title={`Chọn phiếu giảm giá: ${coupon.ma}`} placement="top">
-                        <IconButton
+                        {/* <IconButton
                           onClick={() => {
                             handleAddCouponToBill(coupon.id);
                           }}
@@ -125,7 +125,17 @@ function CouponDiaLog(props) {
                           disabled={bill.idPhieuGiamGia === coupon.id ? true : false || false}
                         >
                           <GridCheckCircleIcon />
-                        </IconButton>
+                        </IconButton> */}
+                        <Button
+                          onClick={() => {
+                            handleAddCouponToBill(coupon.id);
+                          }}
+                          variant="contained"
+                          color="secondary"
+                          disabled={bill.idPhieuGiamGia === coupon.id ? true : false || false}
+                        >
+                          Chọn
+                        </Button>
                       </Tooltip>
                     </TableCell>
                   </TableRow>

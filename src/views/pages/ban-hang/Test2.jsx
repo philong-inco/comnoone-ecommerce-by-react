@@ -23,12 +23,15 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { Box } from '@mui/system';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { addCouponToBillByCode, getPDF, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
+import { addCouponToBillByCode, clearCoupons, getPDF, payCounter, updateAddressInBill } from 'services/admin/bill/billService';
 import { fetchAllDayShip, fetchAllProvince, fetchAllProvinceDistricts, fetchAllProvinceWard, getMoneyShip } from 'services/admin/ghn';
 import PaymentDialog2 from '../billDetail/PaymentDialog2';
 import CouponDiaLog from '../billDetail/CouponDiaLog';
@@ -294,8 +297,10 @@ function Test2(props) {
       // Kiểm tra tên
       if (!formData.ten) {
         errors.ten = 'Vui lòng nhập tên của bạn';
-      } else if (formData.ten.length < 5) {
+      } else if (formData.ten.trim().length < 5) {
         errors.ten = 'Tên phải có ít nhất 5 ký tự';
+      } else if (formData.ten.trim().length > 50) {
+        errors.ten = 'Tên không được vượt quá 50 ký tự';
       }
       //   } else if (!/^[\p{L} ]+$/u.test(formData.ten)) {
       //     errors.ten = 'Tên chỉ được nhập chữ và khoảng trắng';
@@ -319,6 +324,11 @@ function Test2(props) {
       }
       if (!formData.phuong) {
         errors.phuong = 'Vui lòng chọn Phường/Xã';
+      }
+      if (!formData.diaChi) {
+        errors.diaChi = 'Vui lòng nhập địa chỉ';
+      } else if (formData.diaChi.length > 50) {
+        errors.diaChi = 'Địa chỉ không được vượt quá 50 ký tự';
       }
     }
     console.log('Form Data Oke : ', formData);
@@ -443,6 +453,21 @@ function Test2(props) {
     onReload();
   };
 
+  const clearCouponsInBill = async () => {
+    try {
+      const response = await clearCoupons(id);
+      if (response.status_code === 200) {
+        setSnackbarMessage('Bỏ chọn phiếu giảm giá thành công');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        onLoading();
+      }
+    } catch (error) {
+      setSnackbarMessage(error.response.data.error);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
   console.log('BILL : ', bill);
 
   return (
@@ -518,6 +543,8 @@ function Test2(props) {
                   placeholder="Nhập địa chỉ giao hàng"
                   value={formData.diaChi}
                   onChange={handleInputChange}
+                  error={!!formDataError.diaChi}
+                  helperText={formDataError.diaChi}
                   fullWidth
                   margin="normal"
                   multiline
@@ -622,15 +649,21 @@ function Test2(props) {
             >
               Chọn Mã Giảm Giá :
             </Button>
+
             <form onSubmit={handleSubmitFormCoupon}>
               <input
                 type="text"
                 placeholder="Mã Giảm Giá"
                 name="maPGG"
-                style={{ width: '150%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                 ref={inputRef}
               />
-            </form>{' '}
+            </form>
+            <Tooltip title="Bỏ chọn phiếu" placement="top">
+              <IconButton color="error" aria-label="close" onClick={clearCouponsInBill}>
+                <CloseIcon style={{ color: 'red' }} />
+              </IconButton>
+            </Tooltip>
           </Box>
           <FormControlLabel
             disabled={id ? false : true}

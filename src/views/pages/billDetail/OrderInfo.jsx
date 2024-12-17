@@ -639,7 +639,7 @@ function OrderInfo(props) {
           {/* <Typography mt={1} variant="h4">
             Giảm hạng: {id ? parseFloat(formData?.tienGiamHangKhachHang || 0).toLocaleString() || '0' : '0'} đ
           </Typography> */}
-          <Typography mt={1} variant="h4" fontWeight="bold" color="error">
+          <Typography mt={1} variant="h4" fontWeight="bold">
             Tiền sau giảm giá: {id ? parseFloat(formData?.tongTienPhaiTra || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
           {isDelivery && (
@@ -647,7 +647,7 @@ function OrderInfo(props) {
               Tiền ship: {id ? parseFloat(formData?.tienShip || 0).toLocaleString() || '0' : '0'} đ
             </Typography>
           )}
-          <Typography mt={1} variant="h4" fontWeight="bold" color="error">
+          <Typography mt={1} variant="h4" fontWeight="bold">
             Tổng tiền hóa đơn :{' '}
             {id ? parseFloat(formData?.tongTienPhaiTra + (isDelivery ? formData.tienShip : 0) || 0).toLocaleString() || '0' : '0'} đ
           </Typography>
