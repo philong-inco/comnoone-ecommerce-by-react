@@ -53,7 +53,7 @@ function Test2(props) {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const [showDiaLogCoupon, setShowDiaLogCoupon] = useState(false);
 
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -385,6 +385,7 @@ function Test2(props) {
 
   const apiPayCounter = async (data) => {
     try {
+      setLoading(true);
       const response = await payCounter(id, data);
       if (response.status_code === 201) {
         setSnackbarMessage('Xác nhận đắt hàng thành công thành công');
@@ -410,6 +411,8 @@ function Test2(props) {
       }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -725,9 +728,11 @@ function Test2(props) {
           Bạn chắc chắn muốn thanh toán hóa đơn <strong>{bill.ma} </strong> trả sau không?
         </DialogContent>
         <Grid item xs={12} sx={{ textAlign: 'right' }}>
-          <Button onClick={() => setXacNhanThanhToanSau(false)}>Hủy</Button>
-          <Button onClick={handleXacNhanThanhToanSau} color="primary">
-            OK
+          <Button onClick={() => setXacNhanThanhToanSau(false)} variant="contained" color="error" sx={{ marginRight: '5px' }}>
+            Hủy
+          </Button>
+          <Button onClick={handleXacNhanThanhToanSau} variant="contained" color="secondary" disabled={loading}>
+            Xác nhận
           </Button>
         </Grid>
       </Dialog>
@@ -758,6 +763,9 @@ function Test2(props) {
               localStorage.setItem('billCode', '');
               // onReload();
             }}
+            variant="contained"
+            color="error"
+            sx={{ marginRight: '5px' }}
           >
             Hủy
           </Button>
@@ -766,9 +774,10 @@ function Test2(props) {
               setIsConformPdf(false);
               printPdf();
             }}
-            color="primary"
+            variant="contained"
+            color="secondary"
           >
-            OK
+            Có
           </Button>
         </Grid>
       </Dialog>

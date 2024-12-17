@@ -35,6 +35,8 @@ const PaymentDialog2 = (props) => {
   const iframeRef = useRef();
   const { open, onCloseDialog, data, onReload } = props;
   const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(false);
+
   const [lichSuThanhToan, setLichSuThanhToan] = useState([]);
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('');
   const [soTien, setSoTien] = useState('');
@@ -249,6 +251,7 @@ const PaymentDialog2 = (props) => {
   const apiPayCounter = async (data) => {
     try {
       setLoading(false);
+      setLoading2(true);
       const response = await payCounter(id, data);
       if (response.status_code === 201) {
         setSnackbarMessage('Xác nhận thanh toán thành công thành công');
@@ -268,6 +271,7 @@ const PaymentDialog2 = (props) => {
       setSnackbarOpen(true);
     } finally {
       setLoading(true);
+      setLoading2(false);
     }
   };
 
@@ -453,9 +457,11 @@ const PaymentDialog2 = (props) => {
           Bạn có chắc chắn muốn thanh toán bằng hóa đơn <strong>{data.ma} </strong> không?
         </DialogContent>
         <Grid item xs={12} sx={{ textAlign: 'right' }}>
-          <Button onClick={() => setXacNhanThanhToan(false)}>Hủy</Button>
-          <Button onClick={handleConfirmThanhToan} color="primary">
-            OK
+          <Button onClick={() => setXacNhanThanhToan(false)} variant="contained" color="error" sx={{ marginRight: '5px' }}>
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmThanhToan} variant="contained" disabled={loading2} color="secondary">
+            Xác nhận
           </Button>
         </Grid>
       </Dialog>
@@ -475,6 +481,9 @@ const PaymentDialog2 = (props) => {
               localStorage.setItem('billCode', '');
               onReload();
             }}
+            variant="contained"
+            color="error"
+            sx={{ marginRight: '5px' }}
           >
             Hủy
           </Button>
@@ -483,9 +492,10 @@ const PaymentDialog2 = (props) => {
               setIsConformPdf(false);
               printPdf();
             }}
-            color="primary"
+            variant="contained"
+            color="secondary"
           >
-            OK
+            Có
           </Button>
         </Grid>
       </Dialog>
