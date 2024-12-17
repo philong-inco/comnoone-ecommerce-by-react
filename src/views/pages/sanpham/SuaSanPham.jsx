@@ -323,6 +323,13 @@ const SuaSanPham = () => {
     e.target.checked ? suaTrangThai(id, 1) : suaTrangThai(id, 0);
 };
 
+function formatCurrency(amount, locale = 'vi-VN', currency = 'VND') {
+  return new Intl.NumberFormat(locale, {
+    style: 'decimal',
+    currency: currency
+  }).format(amount);
+}
+
 const suaTrangThai = (id, status) => {
     
         try{
@@ -446,7 +453,7 @@ const suaTrangThai = (id, status) => {
               <TableCell align="left">{row.cpu}</TableCell>
               <TableCell align="left">{row.ocung}</TableCell>
               <TableCell align="left">{row.mauSac}</TableCell>
-              <TableCell align="left">{row.giaBan} đ</TableCell>
+              <TableCell align="left">{formatCurrency(row.giaBan)} đ</TableCell>
               <TableCell align="left"><IconEye onClick={() => handleViewSerial(row.id)} stroke={2} /><p sx={{color: '#85EA2D'}}>{row.listSerialNumber !== '' ? row.listSerialNumber.split(',').length : 0}</p>  </TableCell>
               <TableCell align="left">
                 {row.trangThai === 1 ?
