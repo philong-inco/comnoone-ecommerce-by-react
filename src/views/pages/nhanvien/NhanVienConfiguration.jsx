@@ -207,7 +207,7 @@ function NhanVienConfiguration() {
 
   const fetchNhanVien = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/nhan_vien/${id}`);
+      const response = await axios.get(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/nhan_vien/${id}`);
       const nhanVienData = response.data;
       const gioiTinhString = nhanVienData.gioiTinh !== undefined ? nhanVienData.gioiTinh.toString() : '1';
       console.log('Giới tính sau khi convert: ', gioiTinhString);

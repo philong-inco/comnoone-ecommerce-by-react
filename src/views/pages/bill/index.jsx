@@ -79,7 +79,7 @@ function Bill() {
 
     try {
       const response = await axios({
-        url: `http://localhost:8080/api/bills/export`,
+        url: `https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/bills/export`,
         method: 'GET',
         params: { filter },
         responseType: 'blob'

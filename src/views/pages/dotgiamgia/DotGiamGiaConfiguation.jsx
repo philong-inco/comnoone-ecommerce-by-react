@@ -454,7 +454,7 @@ function DotGiamGiaConfiguration() {
     setResetFilter((prev) => prev + 1);
   };
 
-  const urlFindFilter = 'http://localhost:8080/api/san-pham/find/filter-id?';
+  const urlFindFilter = 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/san-pham/find/filter-id?';
   const [filter, setFilter] = useState({
     page: 0,
     size: '5',

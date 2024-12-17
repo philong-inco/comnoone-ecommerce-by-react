@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import axios from 'axios';
 import { onLogOut } from 'hooks/useAuth';
-const API_DOMAIN = 'http://localhost:8080/api/';
+const API_DOMAIN = 'https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/';
 
 const axiosInstance = axios.create({
   baseURL: API_DOMAIN,

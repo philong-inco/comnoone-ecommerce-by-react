@@ -203,7 +203,7 @@ function CustomerInBill(props) {
     };
     console.log('Customer Data:', finalData);
     try {
-      const response = await axios.post(`http://localhost:8080/api/khachhang/create`, finalData, {
+      const response = await axios.post(`https://weblaptop-by-springboot-and-reactjs-aqjc.onrender.com/api/khachhang/create`, finalData, {
         headers: { 'Content-Type': 'application/json' }
       });
 
