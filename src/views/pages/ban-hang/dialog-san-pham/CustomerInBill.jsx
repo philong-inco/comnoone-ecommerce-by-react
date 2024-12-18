@@ -258,8 +258,8 @@ function CustomerInBill(props) {
     const today = new Date();
     const birthDate = new Date(value);
     const age = today.getFullYear() - birthDate.getFullYear();
-    const isAdult = age > 18 || (age === 18 && today >= new Date(birthDate.setFullYear(today.getFullYear())));
-    return isAdult || 'Khách hàng phải đủ 18 tuổi';
+    const isAdult = age > 16 || (age === 16 && today >= new Date(birthDate.setFullYear(today.getFullYear())));
+    return isAdult || 'Khách hàng phải đủ 16 tuổi';
   };
 
   return (
