@@ -480,7 +480,8 @@ function SerialNumberSold(props) {
                           bill.trangThai == 'DANG_GIAO' ||
                           bill.trangThai == 'HOAN_THANH' ||
                           bill.trangThai == 'CHO_GIAO' ||
-                          bill.trangThai == 'HUY'
+                          bill.trangThai == 'HUY' ||
+                          bill.trangThai == 'HEN_LAI'
                         }
                         variant="contained"
                         color="error"
